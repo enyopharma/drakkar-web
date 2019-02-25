@@ -10,21 +10,31 @@ use Psr\Http\Message\ResponseFactoryInterface;
 
 use League\Plates\Engine;
 
+use App\Repositories\RunRepository;
+
 final class IndexHandler implements RequestHandlerInterface
 {
+    private $repository;
+
     private $engine;
 
     private $factory;
 
-    public function __construct(Engine $engine, ResponseFactoryInterface $factory)
-    {
+    public function __construct(
+        RunRepository $repository,
+        Engine $engine,
+        ResponseFactoryInterface $factory
+    ) {
+        $this->repository = $repository;
         $this->engine = $engine;
         $this->factory = $factory;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $body = $this->engine->render('index');
+        $body = $this->engine->render('index', [
+            'runs' => $this->repository->all(),
+        ]);
 
         $response = $this->factory
             ->createResponse(200)
@@ -34,4 +44,4 @@ final class IndexHandler implements RequestHandlerInterface
 
         return $response;
     }
-};
+}

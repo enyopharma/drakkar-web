@@ -38,3 +38,37 @@
         </div>
     </div>
 </div>
+
+<h2>Curation runs</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th class="text-center">N°</th>
+            <th class="text-center">Type</th>
+            <th class="text-center">Description</th>
+            <th class="text-center">Date</th>
+            <th class="text-center">Publications</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($runs as $run): ?>
+        <tr>
+            <td class="text-center">
+                <?= $this->e($run['name']) ?>
+            </td>
+            <td class="text-center">
+                <?= $this->e($run['type']) ?>
+            </td>
+            <td class="text-center">
+                <?= $this->e($run['description']) ?>
+            </td>
+            <td class="text-center">
+                <?= $this->e($run['created_at']) ?>
+            </td>
+            <td class="text-center">
+                <?= $this->e($run['count_publications']) ?>
+            </td>
+        </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
