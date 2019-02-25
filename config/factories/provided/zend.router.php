@@ -1,5 +1,6 @@
 <?php declare(strict_types=1);
 
+use Zend\Expressive\Helper\UrlHelper;
 use Zend\Expressive\Router\RouteCollector;
 use Zend\Expressive\Router\RouterInterface;
 use Zend\Expressive\Router\Middleware\RouteMiddleware;
@@ -12,13 +13,19 @@ return [
         },
 
         RouteMiddleware::class => function ($container) {
-            $router = $container->get(RouterInterface::class);
-
-            return new RouteMiddleware($router);
+            return new RouteMiddleware(
+                $container->get(RouterInterface::class)
+            );
         },
 
         DispatchMiddleware::class => function () {
             return new DispatchMiddleware;
+        },
+
+        UrlHelper::class => function ($container) {
+            return new UrlHelper(
+                $container->get(RouterInterface::class)
+            );
         },
     ],
 

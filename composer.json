@@ -26,7 +26,8 @@
         "services/http-factory-nyholm": "^0.2.0",
         "slashtrace/slashtrace": "^1.1",
         "vlucas/phpdotenv": "^2.5",
-        "zendframework/zend-expressive-fastroute": "^3.0"
+        "zendframework/zend-expressive-fastroute": "^3.0",
+        "zendframework/zend-expressive-helpers": "^5.1"
     },
     "autoload": {
         "psr-4": {

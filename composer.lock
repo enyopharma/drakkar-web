@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b8180438b8bf27031ab54af904e89a05",
+    "content-hash": "50dcad83a95926bf969c692ca1c95926",
     "packages": [
         {
             "name": "container-interop/service-provider",
@@ -1573,6 +1573,66 @@
                 "zf"
             ],
             "time": "2018-08-02T14:10:40+00:00"
+        },
+        {
+            "name": "zendframework/zend-expressive-helpers",
+            "version": "5.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/zendframework/zend-expressive-helpers.git",
+                "reference": "c4db15318ae53965794f46618535fc61dd058ea7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/zendframework/zend-expressive-helpers/zipball/c4db15318ae53965794f46618535fc61dd058ea7",
+                "reference": "c4db15318ae53965794f46618535fc61dd058ea7",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1",
+                "psr/container": "^1.0",
+                "psr/http-message": "^1.0.1",
+                "psr/http-server-middleware": "^1.0",
+                "zendframework/zend-expressive-router": "^3.0"
+            },
+            "require-dev": {
+                "malukenho/docheader": "^0.1.6",
+                "mockery/mockery": "^1.0",
+                "phpunit/phpunit": "^7.0.2",
+                "zendframework/zend-coding-standard": "~1.0.0",
+                "zendframework/zend-diactoros": "^1.7.1"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.1.x-dev",
+                    "dev-develop": "5.2.x-dev"
+                },
+                "zf": {
+                    "config-provider": "Zend\\Expressive\\Helper\\ConfigProvider"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Zend\\Expressive\\Helper\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "description": "Helper/Utility classes for Expressive",
+            "keywords": [
+                "ZendFramework",
+                "expressive",
+                "http",
+                "middleware",
+                "psr",
+                "psr-7",
+                "zend-expressive",
+                "zf"
+            ],
+            "time": "2018-07-26T20:05:23+00:00"
         },
         {
             "name": "zendframework/zend-expressive-router",

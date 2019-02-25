@@ -43,11 +43,12 @@
 <table class="table">
     <thead>
         <tr>
-            <th class="text-center">N°</th>
-            <th class="text-center">Type</th>
-            <th class="text-center">Description</th>
-            <th class="text-center">Date</th>
-            <th class="text-center">Publications</th>
+            <th class="text-center col-1">N°</th>
+            <th class="text-center col-1">Type</th>
+            <th class="col-4">Description</th>
+            <th class="text-center col-2">Date</th>
+            <th class="text-center col-2">Publications</th>
+            <th class="text-center col-2">-</th>
         </tr>
     </thead>
     <tbody>
@@ -59,14 +60,23 @@
             <td class="text-center">
                 <?= $this->e($run['type']) ?>
             </td>
-            <td class="text-center">
+            <td>
                 <?= $this->e($run['description']) ?>
             </td>
             <td class="text-center">
                 <?= $this->e($run['created_at']) ?>
             </td>
             <td class="text-center">
-                <?= $this->e($run['count_publications']) ?>
+                <span title="curated/predurated/total">
+                    <?= $this->e($run['nb_curated']) ?> /
+                    <?= $this->e($run['nb_precurated']) ?> /
+                    <?= $this->e($run['nb_total']) ?>
+                </span>
+            </td>
+            <td class="text-center">
+                <a href="<?= $this->url('runs.show', $run) ?>">
+                    Resume curation
+                </a>
             </td>
         </tr>
         <?php endforeach; ?>

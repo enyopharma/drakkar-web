@@ -22,7 +22,7 @@ final class FallbackRequestHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        if (is_string($this->value) && $this->container->has($this->value)) {
+        if ($this->container->has($this->value)) {
             $handler = $this->container->get($this->value);
 
             if ($handler instanceof RequestHandlerInterface) {
@@ -38,7 +38,7 @@ final class FallbackRequestHandler implements RequestHandlerInterface
             );
         }
 
-        if (is_string($this->value) && class_exists($this->value)) {
+        if (class_exists($this->value)) {
             $handler = $this->instance($this->value);
 
             if ($handler instanceof RequestHandlerInterface) {
@@ -54,7 +54,7 @@ final class FallbackRequestHandler implements RequestHandlerInterface
         }
 
         throw new \UnexpectedValueException(
-            vsprintf('Value %s must implement %s to be used as a route handler', [
+            vsprintf('Value %s can\'t be resolved as an implementation of %s', [
                 $this->value,
                 RequestHandlerInterface::class,
             ])

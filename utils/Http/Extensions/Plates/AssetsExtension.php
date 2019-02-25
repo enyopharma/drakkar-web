@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
 
-namespace Http\Extensions\Plates;
+namespace Utils\Http\Extensions\Plates;
 
 use League\Plates\Engine;
 use League\Plates\Extension\ExtensionInterface;
 
-final class Assets implements ExtensionInterface
+final class AssetsExtension implements ExtensionInterface
 {
     private $manifest;
 

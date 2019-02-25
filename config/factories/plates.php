@@ -3,7 +3,10 @@
 use League\Plates\Engine;
 use League\Plates\Extension\ExtensionInterface;
 
-use Http\Extensions\Plates\Assets;
+use Zend\Expressive\Helper\UrlHelper;
+
+use Utils\Http\Extensions\Plates\UrlExtension;
+use Utils\Http\Extensions\Plates\AssetsExtension;
 
 return [
     'parameters' => [
@@ -13,18 +16,27 @@ return [
     ],
 
     'factories' => [
-        Assets::class => function ($container) {
-            $manifest = $container->get('plates.manifest.path');
+        UrlExtension::class => function ($container) {
+            return new UrlExtension(
+                $container->get(UrlHelper::class)
+            );
+        },
 
-            return new Assets($manifest);
+        AssetsExtension::class => function ($container) {
+            return new AssetsExtension(
+                $container->get('plates.manifest.path')
+            );
         },
     ],
 
     'extensions' => [
         Engine::class => function ($container, Engine $engine) {
-            $assets = $container->get(Assets::class);
+            $xs[] = $container->get(UrlExtension::class);
+            $xs[] = $container->get(AssetsExtension::class);
 
-            $engine->loadExtension($assets);
+            foreach ($xs as $extension) {
+                $engine->loadExtension($extension);
+            }
 
             return $engine;
         },
