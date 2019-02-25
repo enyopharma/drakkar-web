@@ -14,18 +14,18 @@ use App\Repositories\RunRepository;
 
 final class IndexHandler implements RequestHandlerInterface
 {
-    private $repository;
+    private $runs;
 
     private $engine;
 
     private $factory;
 
     public function __construct(
-        RunRepository $repository,
+        RunRepository $runs,
         Engine $engine,
         ResponseFactoryInterface $factory
     ) {
-        $this->repository = $repository;
+        $this->runs = $runs;
         $this->engine = $engine;
         $this->factory = $factory;
     }
@@ -33,7 +33,7 @@ final class IndexHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $body = $this->engine->render('index', [
-            'runs' => $this->repository->all(),
+            'runs' => $this->runs->all(),
         ]);
 
         $response = $this->factory
