@@ -4,14 +4,29 @@ namespace App\Repositories;
 
 final class ResultSet implements \IteratorAggregate
 {
-    private $iterable;
+    private $iterator;
 
     private $constraints;
 
     public function __construct(iterable $iterable, array $constraints = [])
     {
-        $this->iterable = $iterable;
+        $this->iterator = is_array($iterable)
+            ? new \ArrayIterator($iterable)
+            : new \IteratorIterator($iterable);
+
         $this->constraints = $constraints;
+    }
+
+    public function first(): array
+    {
+        $this->iterator->rewind();
+
+        return $this->iterator->current();
+    }
+
+    public function count(): int
+    {
+        return iterator_count($this->iterator);
     }
 
     public function chunks(int $size = 10): \Generator
@@ -35,7 +50,9 @@ final class ResultSet implements \IteratorAggregate
 
     public function getIterator()
     {
-        foreach ($this->iterable as $row) {
+        $this->iterator->rewind();
+
+        foreach ($this->iterator as $row) {
             if ($this->isPassingConstraints($row)) {
                 yield $row;
             }

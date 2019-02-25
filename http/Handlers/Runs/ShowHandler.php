@@ -12,10 +12,13 @@ use League\Plates\Engine;
 
 use App\Repositories\Association;
 use App\Repositories\RunRepository;
+use App\Repositories\PublicationRepository;
 
 final class ShowHandler implements RequestHandlerInterface
 {
     private $runs;
+
+    private $publications;
 
     private $engine;
 
@@ -23,10 +26,12 @@ final class ShowHandler implements RequestHandlerInterface
 
     public function __construct(
         RunRepository $runs,
+        PublicationRepository $publications,
         Engine $engine,
         ResponseFactoryInterface $factory
     ) {
         $this->runs = $runs;
+        $this->publications = $publications;
         $this->engine = $engine;
         $this->factory = $factory;
     }
@@ -35,9 +40,15 @@ final class ShowHandler implements RequestHandlerInterface
     {
         $input = array_merge($request->getAttributes(), $request->getQueryParams());
 
+        $id = (int) $input['id'];
+        $state = $input['state'] ?? Association::PENDING;
+        $page = $input['page'] ?? 1;
+        $limit = $input['limit'] ?? 10;
+
         $body = $this->engine->render('runs/show', [
-            'state' => $input['state'] ?? Association::PENDING,
-            'run' => $this->runs->find((int) $input['id'])
+            'state' => $state,
+            'run' => $this->runs->find((int) $input['id']),
+            'publications' => $this->publications->fromRun((int) $input['id'], $state),
         ]);
 
         $response = $this->factory

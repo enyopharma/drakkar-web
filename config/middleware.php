@@ -8,10 +8,12 @@ use Zend\Expressive\Router\Middleware\DispatchMiddleware;
 use Utils\Http\CallableMiddleware;
 use Utils\Http\NotFoundMiddleware;
 use Utils\Http\HttpErrorMiddleware;
+use Utils\Http\HttpMethodMiddleware;
 
 return function (ContainerInterface $container) {
     return [
         $container->get(HttpErrorMiddleware::class),
+        $container->get(HttpMethodMiddleware::class),
         $container->get(RouteMiddleware::class),
         $container->get(DispatchMiddleware::class),
         $container->get(NotFoundMiddleware::class),

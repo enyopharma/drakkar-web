@@ -1,6 +1,3 @@
-<?php
-    use App\Repositories\Association;
-?>
 <?php $this->layout('layout'); ?>
 <div class="page-header">
     <h1>
@@ -13,34 +10,36 @@
 <ul class="nav nav-tabs nav-fill">
     <li class="nav-item">
         <a
-            class="nav-link text-warning <?= $state == Association::PENDING ? 'active' : '' ?>"
-            href="<?= $this->url('runs.show', $run, ['state' => Association::PENDING]) ?>"
+            class="nav-link text-warning <?= $this->isPending($state) ? 'active' : '' ?>"
+            href="<?= $this->url('runs.show', $run, ['state' => $this->pending()]) ?>"
         >
             Pending (<?= $run['nb_pending'] ?>)
         </a>
     </li>
     <li class="nav-item">
         <a
-            class="nav-link text-primary <?= $state == Association::SELECTED ? 'active' : '' ?>"
-            href="<?= $this->url('runs.show', $run, ['state' => Association::SELECTED]) ?>"
+            class="nav-link text-primary <?= $this->isSelected($state) ? 'active' : '' ?>"
+            href="<?= $this->url('runs.show', $run, ['state' => $this->selected()]) ?>"
         >
             Selected (<?= $run['nb_selected'] ?>)
         </a>
     </li>
     <li class="nav-item">
         <a
-            class="nav-link text-danger <?= $state == Association::DISCARDED ? 'active' : '' ?>"
-            href="<?= $this->url('runs.show', $run, ['state' => Association::DISCARDED]) ?>"
+            class="nav-link text-danger <?= $this->isDiscarded($state) ? 'active' : '' ?>"
+            href="<?= $this->url('runs.show', $run, ['state' => $this->discarded()]) ?>"
         >
             Discarded (<?= $run['nb_discarded'] ?>)
         </a>
     </li>
     <li class="nav-item">
         <a
-            class="nav-link text-success <?= $state == Association::CURATED ? 'active' : '' ?>"
-            href="<?= $this->url('runs.show', $run, ['state' => Association::CURATED]) ?>"
+            class="nav-link text-success <?= $this->isCurated($state) ? 'active' : '' ?>"
+            href="<?= $this->url('runs.show', $run, ['state' => $this->curated()]) ?>"
         >
             Curated (<?= $run['nb_curated'] ?>)
         </a>
     </li>
 </ul>
+
+<?php $this->insert('runs/show/' . $state, ['run' => $run, 'publications' => $publications]) ?>

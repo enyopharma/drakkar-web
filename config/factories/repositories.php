@@ -1,13 +1,20 @@
 <?php declare(strict_types=1);
 
 use App\Repositories\RunRepository;
+use App\Repositories\PublicationRepository;
 
 return [
     'factories' => [
         RunRepository::class => function ($container) {
-            $pdo = $container->get(\PDO::class);
+            return new RunRepository(
+                $container->get(\PDO::class)
+            );
+        },
 
-            return new RunRepository($pdo);
+        PublicationRepository::class => function ($container) {
+            return new PublicationRepository(
+                $container->get(\PDO::class)
+            );
         },
     ],
 ];

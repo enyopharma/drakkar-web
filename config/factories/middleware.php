@@ -5,19 +5,24 @@ use Psr\Http\Message\ResponseFactoryInterface;
 
 use Utils\Http\NotFoundMiddleware;
 use Utils\Http\HttpErrorMiddleware;
+use Utils\Http\HttpMethodMiddleware;
 
 return [
     'factories' => [
         HttpErrorMiddleware::class => function ($container) {
-            $factory = $container->get(StreamFactoryInterface::class);
+            return new HttpErrorMiddleware(
+                $container->get(StreamFactoryInterface::class)
+            );
+        },
 
-            return new HttpErrorMiddleware($factory);
+        HttpMethodMiddleware::class => function () {
+            return new HttpMethodMiddleware;
         },
 
         NotFoundMiddleware::class => function ($container) {
-            $factory = $container->get(ResponseFactoryInterface::class);
-
-            return new NotFoundMiddleware($factory);
+            return new NotFoundMiddleware(
+                $container->get(ResponseFactoryInterface::class)
+            );
         },
     ],
 ];

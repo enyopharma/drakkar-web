@@ -5,6 +5,7 @@ use League\Plates\Extension\ExtensionInterface;
 
 use Zend\Expressive\Helper\UrlHelper;
 
+use Http\Extensions\Plates\HelpersExtension;
 use Utils\Http\Extensions\Plates\UrlExtension;
 use Utils\Http\Extensions\Plates\AssetsExtension;
 
@@ -16,6 +17,10 @@ return [
     ],
 
     'factories' => [
+        HelpersExtension::class => function () {
+            return new HelpersExtension;
+        },
+
         UrlExtension::class => function ($container) {
             return new UrlExtension(
                 $container->get(UrlHelper::class)
@@ -31,6 +36,7 @@ return [
 
     'extensions' => [
         Engine::class => function ($container, Engine $engine) {
+            $xs[] = $container->get(HelpersExtension::class);
             $xs[] = $container->get(UrlExtension::class);
             $xs[] = $container->get(AssetsExtension::class);
 
