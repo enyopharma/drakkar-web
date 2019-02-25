@@ -67,7 +67,7 @@ SQL;
         );
     }
 
-    public function all(): ResultSet
+    public function all(): ResultSetInterface
     {
         $stmt = $this->pdo->prepare(self::ALL);
 

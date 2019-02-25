@@ -20,7 +20,7 @@ SQL;
         $this->pdo = $pdo;
     }
 
-    public function fromRun(int $id, string $state, int $page = 1, int $limit = 10): ResultSet
+    public function fromRun(int $id, string $state, int $page = 1, int $limit = 10): ResultSetInterface
     {
         $offset = ($page - 1) * $limit;
 
@@ -28,6 +28,6 @@ SQL;
 
         $stmt->execute([$id, $state, $limit, $offset]);
 
-        return new ResultSet($stmt->fetchAll());
+        return new Pagination(new ResultSet($stmt->fetchAll()), 10, $page, $limit);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-final class ResultSet implements \IteratorAggregate
+final class ResultSet implements ResultSetInterface
 {
     private $iterator;
 
