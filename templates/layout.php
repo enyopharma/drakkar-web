@@ -8,7 +8,6 @@
     </head>
     <body>
         <div class="container">
-            <div id="index"></div>
             <?= $this->section('content') ?>
         </div>
     </body>

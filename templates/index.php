@@ -5,7 +5,7 @@
         <small class="d-none d-md-inline">Lets sail toward the vinland!</small>
     </h1>
 </div>
-<div class="row">
+<div class="row my-4">
     <div class="col">
         <a href="#" class="btn btn-primary btn-lg btn-block">
             Download current vinland dataset

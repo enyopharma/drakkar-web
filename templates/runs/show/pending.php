@@ -1,4 +1,4 @@
-<h2>
+<h2 class="my-4">
     Pending publications:
 </h2>
 

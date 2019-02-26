@@ -7,7 +7,7 @@
     </h1>
 </div>
 
-<ul class="nav nav-tabs nav-fill">
+<ul class="nav nav-tabs nav-fill my-4">
     <li class="nav-item">
         <a
             class="nav-link text-warning <?= $this->isPending($state) ? 'active' : '' ?>"
