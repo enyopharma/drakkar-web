@@ -11,7 +11,7 @@ final class HttpMethodMiddleware implements MiddlewareInterface
 {
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $body = $request->getParsedBody();
+        $body = (array) $request->getParsedBody() ?? [];
 
         if (in_array($body['_method'] ?? '', ['PUT', 'DELETE'])) {
             $request = $request->withMethod($body['_method']);
