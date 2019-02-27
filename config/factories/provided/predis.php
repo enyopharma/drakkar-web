@@ -2,7 +2,7 @@
 
 use Predis\Client;
 
-use Utils\Redis\PredisClientPool;
+use Utils\Clients\PredisClientPool;
 
 return [
     'parameters' => [

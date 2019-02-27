@@ -1,17 +1,28 @@
 <?php declare(strict_types=1);
 
-use Utils\Database\PDOCnxPool;
+use Utils\Clients\PDOClientPool;
 
 return [
-    'factories' => [
-        PDOCnxPool::class => function ($container) {
-            $configurations = $container->get('pdo.configurations');
+    'parameters' => [
+        'pdo.configurations' => [
+            'default' => [
+                'dsn' => 'pgsql:host=localhost;port=5432;dbname=database',
+                'username' => 'username',
+                'password' => 'secret',
+                'options' => [],
+            ],
+        ],
+    ],
 
-            return new PDOCnxPool($configurations);
+    'factories' => [
+        PDOClientPool::class => function ($container) {
+            return new PDOClientPool(
+                $container->get('pdo.configurations')
+            );
         },
 
         \PDO::class => function ($container) {
-            return $container->get(PDOCnxPool::class)->cnx('default');
+            return $container->get(PDOClientPool::class)->client('default');
         },
     ],
 ];

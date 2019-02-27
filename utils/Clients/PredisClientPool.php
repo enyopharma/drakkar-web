@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Utils\Redis;
+namespace Utils\Clients;
 
 use Predis\Client;
 

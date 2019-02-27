@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Utils\Database;
+namespace Utils\Clients;
 
-final class PDOCnxPool
+final class PDOClientPool
 {
     private $configurations;
 
@@ -14,7 +14,7 @@ final class PDOCnxPool
         $this->pool = [];
     }
 
-    public function cnx(string $name): \PDO
+    public function client(string $name): \PDO
     {
         if (isset($this->pool[$name])) {
             return $this->pool[$name];
@@ -35,7 +35,7 @@ final class PDOCnxPool
                 $xs[] = $this->configurations[$name]['options'];
             }
 
-            return $this->pool[$name] = new \PDO($dsn, ...$xs);
+            return $this->pool[$name] = new \PDO($dsn, ...($xs ?? []));
         }
 
         throw new \LogicException(
