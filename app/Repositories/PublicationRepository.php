@@ -7,20 +7,20 @@ final class PublicationRepository
     private $pdo;
 
     const FROM_RUN = <<<SQL
-SELECT p.*, a.run_id, a.state, a.annotation
-FROM associations AS a, publications AS p
-WHERE p.id = a.publication_id
-AND a.run_id = ?
-AND a.state = ?
-ORDER BY id ASC
-LIMIT ? OFFSET ?
+        SELECT a.run_id, p.*, a.state, a.annotation
+        FROM associations AS a, publications AS p
+        WHERE p.id = a.publication_id
+        AND a.run_id = ?
+        AND a.state = ?
+        ORDER BY a.updated_at DESC, a.id ASC
+        LIMIT ? OFFSET ?
 SQL;
 
     const UPDATE = <<<SQL
-UPDATE associations
-SET state = ?, annotation = ?
-WHERE run_id = ?
-AND publication_id = ?
+        UPDATE associations
+        SET state = ?, annotation = ?, updated_at = NOW()
+        WHERE run_id = ?
+        AND publication_id = ?
 SQL;
 
     public function __construct(\PDO $pdo)
