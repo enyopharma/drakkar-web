@@ -4,35 +4,20 @@ namespace Shared\Http;
 
 final class Session
 {
-    private $data;
+    private $previous;
 
-    public function __construct(array $data)
+    public function populate(array $data): void
     {
-        $this->data = $data;
+        $this->previous = $data['previous'] ?? '';
     }
 
-    public function has(string $key): bool
+    public function previous(): string
     {
-        return key_exists($key, $this->data);
-    }
-
-    public function set(string $key, $value)
-    {
-        return $this->data[$key] = $value;
-    }
-
-    public function get(string $key, $default)
-    {
-        return $this->data[$key] ?? $default;
-    }
-
-    public function unset(string $key)
-    {
-        unset($this->data[$key]);
+        return $this->previous;
     }
 
     public function data(): array
     {
-        return $this->data;
+        return [];
     }
 }

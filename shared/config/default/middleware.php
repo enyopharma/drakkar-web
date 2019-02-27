@@ -3,19 +3,12 @@
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
-use Shared\Http\SessionMiddleware;
 use Shared\Http\NotFoundMiddleware;
 use Shared\Http\HttpErrorMiddleware;
 use Shared\Http\HttpMethodMiddleware;
 
 return [
     'factories' => [
-        SessionMiddleware::class => function ($container) {
-            return new SessionMiddleware(
-                $container->get(SessionHandlerInterface::class)
-            );
-        },
-
         HttpErrorMiddleware::class => function ($container) {
             return new HttpErrorMiddleware(
                 $container->get(StreamFactoryInterface::class)

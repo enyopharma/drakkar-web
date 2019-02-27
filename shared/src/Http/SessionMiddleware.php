@@ -46,13 +46,22 @@ class SessionMiddleware implements MiddlewareInterface
     private $handler;
 
     /**
+     * The mutable session.
+     *
+     * @var \Shared\Http\Session
+     */
+    private $session;
+
+    /**
      * Constructor.
      *
-     * @param \SessionHandlerInterface $handler
+     * @param \SessionHandlerInterface  $handler
+     * @param \Shared\Http\Session      $session
      */
-    public function __construct(SessionHandlerInterface $handler)
+    public function __construct(SessionHandlerInterface $handler, Session $session)
     {
         $this->handler = $handler;
+        $this->session = $session;
     }
 
     /**
@@ -91,19 +100,19 @@ class SessionMiddleware implements MiddlewareInterface
         // Start the session with options disabling cookies.
         if (session_start(self::SESSION_START_OPTIONS)) {
             // Get the session as an object.
-            $session = new Session($_SESSION);
+            $session = $this->session->populate($_SESSION);
 
             // Empty the session globals.
             $_SESSION = [];
 
-            // Add the session to the request.
+            // Attach the session to the request.
             $request = $request->withAttribute(Session::class, $session);
 
             // Get a response from the request handler.
             $response = $handler->handle($request);
 
             // Populate the session globals with the mutated session data.
-            $_SESSION = $session->data();
+            $_SESSION['previous'] = (string) $request->getUri();
 
             // Write the session data and close the session.
             session_write_close();

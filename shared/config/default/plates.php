@@ -5,6 +5,7 @@ use League\Plates\Extension\ExtensionInterface;
 
 use Zend\Expressive\Helper\UrlHelper;
 
+use Shared\Http\Session;
 use Shared\Http\Extensions\Plates\UrlExtension;
 use Shared\Http\Extensions\Plates\AssetsExtension;
 
@@ -31,12 +32,9 @@ return [
 
     'extensions' => [
         Engine::class => function ($container, Engine $engine) {
-            $xs[] = $container->get(UrlExtension::class);
-            $xs[] = $container->get(AssetsExtension::class);
-
-            foreach ($xs as $extension) {
-                $engine->loadExtension($extension);
-            }
+            $engine->addData(['session' => $container->get(Session::class)]);
+            $engine->loadExtension($container->get(AssetsExtension::class));
+            $engine->loadExtension($container->get(UrlExtension::class));
 
             return $engine;
         },
