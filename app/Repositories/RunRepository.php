@@ -7,36 +7,29 @@ final class RunRepository
     private $pdo;
 
     const FIND = <<<SQL
-SELECT r.*,
-    COUNT(p.id) AS nb_pending,
-    COUNT(s.id) AS nb_selected,
-    COUNT(d.id) AS nb_discarded,
-    COUNT(c.id) AS nb_curated
-FROM runs AS r
-LEFT JOIN associations AS p ON r.id = p.run_id AND p.state = ?
-LEFT JOIN associations AS s ON r.id = s.run_id AND s.state = ?
-LEFT JOIN associations AS d ON r.id = d.run_id AND d.state = ?
-LEFT JOIN associations AS c ON r.id = c.run_id AND c.state = ?
-WHERE r.deleted_at IS NULL AND r.id = ?
-GROUP BY r.id
+        SELECT * FROM runs WHERE id = ?
+SQL;
+
+    const COUNT_PUBLICATIONS = <<<SQL
+        SELECT a.run_id, COUNT(p.id)
+        FROM associations AS a, publications AS p
+        WHERE p.id = a.publication_id AND a.run_id = ? AND a.state = ?
+        GROUP BY a.run_id
 SQL;
 
     const ALL = <<<SQL
-SELECT r.*,
-    COUNT(p.id) AS nb_pending,
-    COUNT(s.id) AS nb_selected,
-    COUNT(d.id) AS nb_discarded,
-    COUNT(c.id) AS nb_curated,
-    COUNT(s.id) + COUNT(d.id) AS nb_precurated,
-    COUNT(p.id) + COUNT(s.id) + COUNT(d.id) + COUNT(c.id) AS nb_total
-FROM runs AS r
-LEFT JOIN associations AS p ON r.id = p.run_id AND p.state = ?
-LEFT JOIN associations AS s ON r.id = s.run_id AND s.state = ?
-LEFT JOIN associations AS d ON r.id = d.run_id AND d.state = ?
-LEFT JOIN associations AS c ON r.id = c.run_id AND c.state = ?
-WHERE r.deleted_at IS NULL
-GROUP BY r.id
-ORDER BY r.created_at DESC, r.id DESC
+        SELECT *
+        FROM runs
+        WHERE deleted_at IS NULL
+        GROUP BY id
+        ORDER BY created_at DESC, id DESC
+SQL;
+
+    const ALL_COUNT_PUBLICATIONS = <<<SQL
+        SELECT a.run_id, COUNT(p.id)
+        FROM associations AS a, publications AS p
+        WHERE p.id = a.publication_id AND a.state = ?
+        GROUP BY a.run_id
 SQL;
 
     public function __construct(\PDO $pdo)
@@ -46,20 +39,20 @@ SQL;
 
     public function find(int $id): array
     {
-        $stmt = $this->pdo->prepare(self::FIND);
+        $run_stmt = $this->pdo->prepare(self::FIND);
 
-        $stmt->execute([
-            Association::PENDING,
-            Association::SELECTED,
-            Association::DISCARDED,
-            Association::CURATED,
-            $id,
-        ]);
+        $run_stmt->execute([$id]);
 
-        $runs = $stmt->fetchAll();
+        if ($run = $run_stmt->fetch()) {
+            $count_stmt = $this->pdo->prepare(self::COUNT_PUBLICATIONS);
 
-        if (count($runs) > 0) {
-            return $runs[0];
+            foreach (Association::STATES as $state) {
+                $count_stmt->execute([$run['id'], $state]);
+
+                $run['nbs'][$state] = $count_stmt->fetchColumn(1);
+            }
+
+            return $run;
         }
 
         throw new \RuntimeException(
@@ -69,15 +62,17 @@ SQL;
 
     public function all(): ResultSetInterface
     {
-        $stmt = $this->pdo->prepare(self::ALL);
+        $runs_stmt = $this->pdo->prepare(self::ALL);
+        $count_stmt = $this->pdo->prepare(self::ALL_COUNT_PUBLICATIONS);
 
-        $stmt->execute([
-            Association::PENDING,
-            Association::SELECTED,
-            Association::DISCARDED,
-            Association::CURATED,
-        ]);
+        $runs_stmt->execute();
 
-        return new ResultSet($stmt->fetchAll());
+        foreach (Association::STATES as $state) {
+            $count_stmt->execute([$state]);
+
+            $nbs[$state] = $count_stmt->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_UNIQUE);
+        }
+
+        return new ResultSet(new RunCollection($runs_stmt, $nbs));
     }
 }

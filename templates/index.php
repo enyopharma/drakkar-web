@@ -67,10 +67,20 @@
                 <?= $this->e($run['created_at']) ?>
             </td>
             <td class="text-center">
-                <span title="curated/predurated/total">
-                    <?= $this->e($run['nb_curated']) ?> /
-                    <?= $this->e($run['nb_precurated']) ?> /
-                    <?= $this->e($run['nb_total']) ?>
+                <span class="text-warning">
+                    <?= $this->e($run['nbs'][$this->pending()]) ?>
+                </span>
+                -
+                <span class="text-primary">
+                    <?= $this->e($run['nbs'][$this->selected()]) ?>
+                </span>
+                -
+                <span class="text-danger">
+                    <?= $this->e($run['nbs'][$this->discarded()]) ?>
+                </span>
+                -
+                <span class="text-primary">
+                    <?= $this->e($run['nbs'][$this->curated()]) ?>
                 </span>
             </td>
             <td class="text-center">
