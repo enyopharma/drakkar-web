@@ -17,13 +17,6 @@ final class ResultSet implements ResultSetInterface
         $this->constraints = $constraints;
     }
 
-    public function first(): array
-    {
-        $this->iterator->rewind();
-
-        return $this->iterator->current();
-    }
-
     public function count(): int
     {
         return iterator_count($this->iterator);

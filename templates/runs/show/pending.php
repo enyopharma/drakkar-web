@@ -7,5 +7,5 @@
     There is no pending publication.
 </p>
 <?php else: ?>
-<?php $this->insert('publications/card', ['run' => $run, 'publication' => $publications->first()]) ?>
+<?php $this->insert('publications/list', ['run' => $run, 'publications' => $publications]) ?>
 <?php endif ?>

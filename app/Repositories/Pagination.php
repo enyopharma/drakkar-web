@@ -20,11 +20,6 @@ final class Pagination implements ResultSetInterface
         $this->limit = $limit;
     }
 
-    public function first(): array
-    {
-        return $this->rs->first();
-    }
-
     public function count(): int
     {
         return $this->rs->count();
