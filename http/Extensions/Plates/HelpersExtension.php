@@ -5,42 +5,42 @@ namespace Http\Extensions\Plates;
 use League\Plates\Engine;
 use League\Plates\Extension\ExtensionInterface;
 
-use App\Repositories\Association;
+use App\Repositories\Publication;
 
 final class HelpersExtension implements ExtensionInterface
 {
     public function register(Engine $engine)
     {
         $engine->registerFunction('pending', function () {
-            return Association::PENDING;
+            return Publication::PENDING;
         });
 
         $engine->registerFunction('selected', function () {
-            return Association::SELECTED;
+            return Publication::SELECTED;
         });
 
         $engine->registerFunction('discarded', function () {
-            return Association::DISCARDED;
+            return Publication::DISCARDED;
         });
 
         $engine->registerFunction('curated', function () {
-            return Association::CURATED;
+            return Publication::CURATED;
         });
 
         $engine->registerFunction('isPending', function (string $state) {
-            return $state === Association::PENDING;
+            return $state === Publication::PENDING;
         });
 
         $engine->registerFunction('isSelected', function (string $state) {
-            return $state === Association::SELECTED;
+            return $state === Publication::SELECTED;
         });
 
         $engine->registerFunction('isDiscarded', function (string $state) {
-            return $state === Association::DISCARDED;
+            return $state === Publication::DISCARDED;
         });
 
         $engine->registerFunction('isCurated', function (string $state) {
-            return $state === Association::CURATED;
+            return $state === Publication::CURATED;
         });
     }
 }

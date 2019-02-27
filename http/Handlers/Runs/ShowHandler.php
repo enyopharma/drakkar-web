@@ -10,7 +10,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 
 use League\Plates\Engine;
 
-use App\Repositories\Association;
+use App\Repositories\Publication;
 use App\Repositories\RunRepository;
 use App\Repositories\PublicationRepository;
 
@@ -41,7 +41,7 @@ final class ShowHandler implements RequestHandlerInterface
         $input = array_merge($request->getAttributes(), $request->getQueryParams());
 
         $id = (int) $input['id'];
-        $state = $input['state'] ?? Association::PENDING;
+        $state = $input['state'] ?? Publication::PENDING;
         $page = $input['page'] ?? 1;
         $limit = $input['limit'] ?? 10;
 

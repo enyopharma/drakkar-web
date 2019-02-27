@@ -41,7 +41,7 @@ SQL;
 
     public function update(int $run_id, int $publication_id, string $state, string $annotation): bool
     {
-        if (in_array($state, Association::STATES)) {
+        if (in_array($state, Publication::STATES)) {
             $stmt = $this->pdo->prepare(self::UPDATE);
 
             return $stmt->execute([$state, $annotation, $run_id, $publication_id]);
@@ -49,7 +49,7 @@ SQL;
 
         throw new \UnexpectedValueException(
             vsprintf('%s is not a valid curation state (%s)', [
-                $state, implode(', ', Association::STATES),
+                $state, implode(', ', Publication::STATES),
             ])
         );
     }

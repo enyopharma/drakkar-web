@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-final class Association
+final class Publication
 {
     const PENDING = 'pending';
     const SELECTED = 'selected';

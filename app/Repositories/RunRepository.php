@@ -46,7 +46,7 @@ SQL;
         if ($run = $run_stmt->fetch()) {
             $count_stmt = $this->pdo->prepare(self::COUNT_PUBLICATIONS);
 
-            foreach (Association::STATES as $state) {
+            foreach (Publication::STATES as $state) {
                 $count_stmt->execute([$run['id'], $state]);
 
                 $run['nbs'][$state] = $count_stmt->fetchColumn(1);
@@ -67,7 +67,7 @@ SQL;
 
         $runs_stmt->execute();
 
-        foreach (Association::STATES as $state) {
+        foreach (Publication::STATES as $state) {
             $count_stmt->execute([$state]);
 
             $nbs[$state] = $count_stmt->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_UNIQUE);
