@@ -10,13 +10,19 @@ use Shared\Http\HttpErrorMiddleware;
 use Shared\Http\HttpMethodMiddleware;
 
 return [
-    'extensions' => [
-        'http.middleware.queue' => function ($container, array $queue) {
+    'parameters' => [
+        'http.middleware.queue.factory.path' => '%{app.root}/config/middleware.php',
+    ],
+
+    'factories' => [
+        'http.middleware.queue' => function ($container) {
+            $factory = require $container->get('http.middleware.queue.factory.path');
+
             $middleware[] = $container->get(HttpErrorMiddleware::class);
             $middleware[] = $container->get(SessionMiddleware::class);
             $middleware[] = $container->get(HttpMethodMiddleware::class);
 
-            $middleware = array_merge($middleware, $queue);
+            $middleware = array_merge($middleware, $factory($container));
 
             $middleware[] = $container->get(RouteMiddleware::class);
             $middleware[] = $container->get(DispatchMiddleware::class);

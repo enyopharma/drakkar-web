@@ -3,8 +3,14 @@
 use Shared\Http\RouteMapper;
 
 return [
-    'extensions' => [
-        'router.mapper' => function ($container, callable $mapper) {
+    'parameters' => [
+        'router.mapper.path' => '%{app.root}/config/routes.php',
+    ],
+
+    'factories' => [
+        'router.mapper' => function ($container) {
+            $mapper = require $container->get('router.mapper.path');
+
             return new RouteMapper($container, $mapper);
         },
     ],
