@@ -112,7 +112,7 @@ class SessionMiddleware implements MiddlewareInterface
             $response = $handler->handle($request);
 
             // Populate the session globals with the mutated session data.
-            $_SESSION['previous'] = (string) $request->getUri();
+            $_SESSION = $this->session->data($request);
 
             // Write the session data and close the session.
             session_write_close();

@@ -2,6 +2,8 @@
 
 namespace Shared\Http;
 
+use Psr\Http\Message\ServerRequestInterface;
+
 final class Session
 {
     private $previous;
@@ -16,8 +18,10 @@ final class Session
         return $this->previous;
     }
 
-    public function data(): array
+    public function data(ServerRequestInterface $request): array
     {
-        return [];
+        return [
+            'previous' => (string) $request->getUri(),
+        ];
     }
 }
