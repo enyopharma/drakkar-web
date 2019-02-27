@@ -23,7 +23,11 @@
             <input type="hidden" name="_method" value="PUT" />
             <div class="form-row">
                 <div class="col">
-                    <textarea class="form-control" rows="3"></textarea>
+                    <textarea
+                        class="form-control"
+                        name="annotation"
+                        rows="3"
+                    ><?= $publication['annotation'] ?></textarea>
                 </div>
             </div>
             <hr>

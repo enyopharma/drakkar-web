@@ -28,11 +28,20 @@ final class UpdateHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        $input = array_merge($request->getAttributes(), $request->getParsedBody());
+
+        $run_id = (int) $input['run_id'];
+        $publication_id = (int) $input['id'];
+        $state = $input['state'];
+        $annotation = $input['annotation'];
+
         $response = $this->factory
             ->createResponse(200)
             ->withHeader('content-type', 'text/html');
 
-        $response->getBody()->write(json_encode($request->getParsedBody()));
+        $this->publications->update($run_id, $publication_id, $state, $annotation)
+            ? $response->getBody()->write('success')
+            : $response->getBody()->write('failure');
 
         return $response;
     }
