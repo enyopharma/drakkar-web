@@ -42,5 +42,16 @@ final class HelpersExtension implements ExtensionInterface
         $engine->registerFunction('isCurated', function (string $state) {
             return $state === Publication::CURATED;
         });
+
+        $engine->registerFunction('textStyles', function (string $state) {
+            $map = [
+                Publication::PENDING => 'text-warning',
+                Publication::SELECTED => 'text-primary',
+                Publication::DISCARDED => 'text-danger',
+                Publication::CURATED => 'text-curated',
+            ];
+
+            return $map[$state] ?? '';
+        });
     }
 }
