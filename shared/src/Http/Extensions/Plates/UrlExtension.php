@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Utils\Http\Extensions\Plates;
+namespace Shared\Http\Extensions\Plates;
 
 use League\Plates\Engine;
 use League\Plates\Extension\ExtensionInterface;

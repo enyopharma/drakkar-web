@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-use Utils\Http\RouteMapper;
+use Shared\Http\RouteMapper;
 
 return [
     'parameters' => [
@@ -9,9 +9,7 @@ return [
 
     'factories' => [
         'router.mapper' => function ($container) {
-            $mapper = require $container->get('router.mapper.path');
-
-            return new RouteMapper($container, $mapper);
+            return require $container->get('router.mapper.path');
         },
     ],
 ];

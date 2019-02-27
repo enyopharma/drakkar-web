@@ -62,7 +62,8 @@ return function (string $env, bool $debug): array {
          */
         'project' => [
             'php' => array_merge([
-                sprintf('%s/config/factories/provided/*.php', $root),
+                sprintf('%s/shared/config/provided/*.php', $root),
+                sprintf('%s/shared/config/default/*.php', $root),
                 sprintf('%s/config/factories/*.php', $root),
                 sprintf('%s/config/factories/%s/*.php', $root, $env),
             ], $debug ? [

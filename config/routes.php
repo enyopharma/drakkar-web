@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-use Utils\Http\RouteCollector;
+use Shared\Http\RouteCollector;
 
 return function (RouteCollector $collector) {
     $collector->get('/', ...[

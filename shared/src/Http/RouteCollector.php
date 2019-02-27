@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Utils\Http;
+namespace Shared\Http;
 
 use Zend\Expressive\Router\RouteCollector as ZendRouteCollector;
 

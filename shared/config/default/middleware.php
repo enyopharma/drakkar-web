@@ -3,10 +3,10 @@
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
-use Utils\Http\SessionMiddleware;
-use Utils\Http\NotFoundMiddleware;
-use Utils\Http\HttpErrorMiddleware;
-use Utils\Http\HttpMethodMiddleware;
+use Shared\Http\SessionMiddleware;
+use Shared\Http\NotFoundMiddleware;
+use Shared\Http\HttpErrorMiddleware;
+use Shared\Http\HttpMethodMiddleware;
 
 return [
     'factories' => [

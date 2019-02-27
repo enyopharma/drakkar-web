@@ -1,24 +1,22 @@
 <?php declare(strict_types=1);
 
-namespace Utils\Http;
+namespace Shared\Http;
 
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\ResponseFactoryInterface;
 
-final class NotFoundMiddleware implements MiddlewareInterface
+final class HttpMethodMiddleware implements MiddlewareInterface
 {
-    private $factory;
-
-    public function __construct(ResponseFactoryInterface $factory)
-    {
-        $this->factory = $factory;
-    }
-
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        return $this->factory->createResponse(404, 'Not found');
+        $body = (array) $request->getParsedBody() ?? [];
+
+        if (in_array($body['_method'] ?? '', ['PUT', 'DELETE'])) {
+            $request = $request->withMethod($body['_method']);
+        }
+
+        return $handler->handle($request);
     }
 }

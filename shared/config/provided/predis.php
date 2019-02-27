@@ -2,7 +2,7 @@
 
 use Predis\Client;
 
-use Utils\Clients\PredisClientPool;
+use Shared\Clients\PredisClientPool;
 
 return [
     'parameters' => [

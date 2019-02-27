@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-use Utils\Clients\PDOClientPool;
+use Shared\Clients\PDOClientPool;
 
 return [
     'parameters' => [
