@@ -20,6 +20,9 @@ services:
         networks:
             - default
             - sso
+    redis:
+        container_name: drakkar_redis
+        image: redis
 networks:
     web:
         external:
