@@ -7,5 +7,5 @@
     There is no discarded publication.
 </p>
 <?php else: ?>
-<?php $this->insert('publications/deck', ['run' => $run, 'publications' => $publications]) ?>
+<?php $this->insert('publications/deck', ['publications' => $publications]) ?>
 <?php endif ?>

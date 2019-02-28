@@ -1,4 +1,29 @@
 <?php $this->layout('layout'); ?>
+
+<?php $this->push('scripts'); ?>
+<script type="text/javascript">
+$(document).ready(function () {
+    $('.card .collapse').on('shown.bs.collapse', function (e) {
+        var textarea = $(e.target).find('textarea');
+        var value = textarea.val();
+
+        // trick to put the cursor at the end of the textarea content.
+        textarea.focus().val('').val(value);
+    });
+});
+</script>
+<?php $this->end(); ?>
+
+<?php if ($this->isPending($state)): ?>
+<?php $this->push('scripts'); ?>
+<script type="text/javascript">
+$(document).ready(function () {
+    $('.card .collapse').first().collapse('show');
+});
+</script>
+<?php $this->end(); ?>
+<?php endif; ?>
+
 <div class="page-header">
     <h1>
         <a href="<?= $this->url('index') ?>">Drakkar</a>
@@ -42,4 +67,4 @@
     </li>
 </ul>
 
-<?php $this->insert('runs/show/' . $state, ['run' => $run, 'publications' => $publications]) ?>
+<?php $this->insert('runs/show/' . $state, ['publications' => $publications]) ?>
