@@ -21,7 +21,7 @@ return [
             );
         },
 
-        \PDO::class => function ($container) {
+        PDO::class => function ($container) {
             return $container->get(PDOClientPool::class)->client('default');
         },
     ],

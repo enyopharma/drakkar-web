@@ -2,49 +2,48 @@
 
 namespace App\Repositories;
 
+use Shared\Sql\StatementMap;
+
 final class PublicationRepository
 {
-    private $pdo;
+    private $stmts;
 
-    const FROM_RUN = <<<SQL
-        SELECT a.run_id, p.*, a.state, a.annotation
-        FROM associations AS a, publications AS p
-        WHERE p.id = a.publication_id
-        AND a.run_id = ?
-        AND a.state = ?
-        ORDER BY a.updated_at DESC, a.id ASC
-        LIMIT ? OFFSET ?
-SQL;
-
-    const UPDATE = <<<SQL
-        UPDATE associations
-        SET state = ?, annotation = ?, updated_at = NOW()
-        WHERE run_id = ?
-        AND publication_id = ?
-SQL;
-
-    public function __construct(\PDO $pdo)
+    public function __construct(StatementMap $stmts)
     {
-        $this->pdo = $pdo;
+        $this->stmts = $stmts;
     }
 
-    public function fromRun(int $id, string $state, int $page = 1, int $limit = 10): ResultSetInterface
+    public function fromRun(int $run_id, string $state, int $page = 1, int $limit = 20): ResultSetInterface
     {
         $offset = ($page - 1) * $limit;
 
-        $stmt = $this->pdo->prepare(self::FROM_RUN);
+        $stmts['select'] = $this->stmts->executed('publications/select.from_run', [
+            $run_id,
+            $state,
+            $limit,
+            $offset,
+        ]);
 
-        $stmt->execute([$id, $state, $limit, $offset]);
+        $stmts['count'] = $this->stmts->executed('publications/count.from_run', [
+            $run_id,
+            $state,
+        ]);
 
-        return new Pagination(new ResultSet($stmt->fetchAll()), 10, $page, $limit);
+        $publications = $stmts['select']->fetchAll();
+        $total = ($nb = $stmts['count']->fetchColumn()) ? $nb : 0;
+
+        return new Pagination(new ResultSet($publications), $total, $page, $limit);
     }
 
-    public function update(int $run_id, int $publication_id, string $state, string $annotation): bool
+    public function update(int $run_id, int $publication_id, string $state, string $annotation): \PDOStatement
     {
         if (in_array($state, Publication::STATES)) {
-            $stmt = $this->pdo->prepare(self::UPDATE);
-
-            return $stmt->execute([$state, $annotation, $run_id, $publication_id]);
+            return $this->stmts->executed('publications/update', [
+                $state,
+                $annotation,
+                $run_id,
+                $publication_id,
+            ]);
         }
 
         throw new \UnexpectedValueException(

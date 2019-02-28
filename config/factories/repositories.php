@@ -3,17 +3,19 @@
 use App\Repositories\RunRepository;
 use App\Repositories\PublicationRepository;
 
+use Shared\Sql\StatementMap;
+
 return [
     'factories' => [
         RunRepository::class => function ($container) {
             return new RunRepository(
-                $container->get(\PDO::class)
+                $container->get(StatementMap::class)
             );
         },
 
         PublicationRepository::class => function ($container) {
             return new PublicationRepository(
-                $container->get(\PDO::class)
+                $container->get(StatementMap::class)
             );
         },
     ],

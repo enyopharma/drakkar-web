@@ -2,54 +2,29 @@
 
 namespace App\Repositories;
 
+use Shared\Sql\StatementMap;
+
 final class RunRepository
 {
-    private $pdo;
+    private $stmts;
 
-    const FIND = <<<SQL
-        SELECT * FROM runs WHERE id = ?
-SQL;
-
-    const COUNT_PUBLICATIONS = <<<SQL
-        SELECT a.run_id, COUNT(p.id)
-        FROM associations AS a, publications AS p
-        WHERE p.id = a.publication_id AND a.run_id = ? AND a.state = ?
-        GROUP BY a.run_id
-SQL;
-
-    const ALL = <<<SQL
-        SELECT *
-        FROM runs
-        WHERE deleted_at IS NULL
-        GROUP BY id
-        ORDER BY created_at DESC, id DESC
-SQL;
-
-    const ALL_COUNT_PUBLICATIONS = <<<SQL
-        SELECT a.run_id, COUNT(p.id)
-        FROM associations AS a, publications AS p
-        WHERE p.id = a.publication_id AND a.state = ?
-        GROUP BY a.run_id
-SQL;
-
-    public function __construct(\PDO $pdo)
+    public function __construct(StatementMap $stmts)
     {
-        $this->pdo = $pdo;
+        $this->stmts = $stmts;
     }
 
     public function find(int $id): array
     {
-        $run_stmt = $this->pdo->prepare(self::FIND);
+        $stmts['run'] = $this->stmts->executed('runs/find', [$id]);
 
-        $run_stmt->execute([$id]);
-
-        if ($run = $run_stmt->fetch()) {
-            $count_stmt = $this->pdo->prepare(self::COUNT_PUBLICATIONS);
-
+        if ($run = $stmts['run']->fetch()) {
             foreach (Publication::STATES as $state) {
-                $count_stmt->execute([$run['id'], $state]);
+                $stmts['count'] = $this->stmts->executed('publications/count.from_run', [
+                    $run['id'],
+                    $state,
+                ]);
 
-                $run['nbs'][$state] = ($nb = $count_stmt->fetchColumn(1)) ? $nb : 0;
+                $run['nbs'][$state] = ($nb = $stmts['count']->fetchColumn(1)) ? $nb : 0;
             }
 
             return $run;
@@ -62,17 +37,14 @@ SQL;
 
     public function all(): ResultSetInterface
     {
-        $runs_stmt = $this->pdo->prepare(self::ALL);
-        $count_stmt = $this->pdo->prepare(self::ALL_COUNT_PUBLICATIONS);
-
-        $runs_stmt->execute();
+        $stmts['runs'] = $this->stmts->executed('runs/select');
 
         foreach (Publication::STATES as $state) {
-            $count_stmt->execute([$state]);
-
-            $nbs[$state] = $count_stmt->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_UNIQUE);
+            $nbs[$state] = $this->stmts
+                ->executed('runs/count.publications', [$state])
+                ->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_UNIQUE);
         }
 
-        return new ResultSet(new RunCollection($runs_stmt, $nbs));
+        return new ResultSet(new RunCollection($stmts['runs'], $nbs));
     }
 }
