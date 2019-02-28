@@ -17,10 +17,10 @@ final class StatementMap
         $this->stmts = [];
     }
 
-    public function stmt(string $name, string ...$xs): \PDOStatement
+    public function stmt(string $name, int ...$ins): \PDOStatement
     {
         if (key_exists($name, $this->queries)) {
-            $sql = vsprintf($this->queries[$name], $xs);
+            $sql = vsprintf($this->queries[$name], array_map([$this, 'in'], $ins));
 
             $key = md5($sql);
 
@@ -36,9 +36,9 @@ final class StatementMap
         );
     }
 
-    public function executed(string $name, array $input = [], string ...$xs): \PDOStatement
+    public function executed(string $name, array $input = [], int ...$ins): \PDOStatement
     {
-        $stmt = $this->stmt($name, ...$xs);
+        $stmt = $this->stmt($name, ...$ins);
 
         if ($stmt->execute($input)) {
             return $stmt;
@@ -47,5 +47,10 @@ final class StatementMap
         throw new \LogicException(
             sprintf('Execution of \'%s\' failed', $name)
         );
+    }
+
+    private function in(int $number): string
+    {
+        return implode(', ', array_pad([], $number, '?'));
     }
 }
