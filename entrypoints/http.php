@@ -41,6 +41,11 @@ $factories = (require $root . '/config/factories.php')($config);
 $container = (require $root . '/config/container.php')($factories);
 
 /**
+ * Call boot script with the container.
+ */
+(require $root . '/config/boot.php')($container, $env, $debug);
+
+/**
  * Run the http application.
  */
 $container->get(Quanta\HttpEntrypoint::class)->run();

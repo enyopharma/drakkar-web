@@ -8,14 +8,22 @@ final class Session
 {
     private $previous;
 
+    private $populated = false;
+
     public function populate(array $data): void
     {
         $this->previous = $data['previous'] ?? '';
+
+        $this->populated = true;
     }
 
     public function previous(): string
     {
-        return $this->previous;
+        if ($this->populated) {
+            return $this->previous;
+        }
+
+        throw new \RuntimeException($this->notPopulatedErrorMessage());
     }
 
     public function data(ServerRequestInterface $request): array
@@ -23,5 +31,10 @@ final class Session
         return [
             'previous' => (string) $request->getUri(),
         ];
+    }
+
+    private function notPopulatedErrorMessage(): string
+    {
+        return 'The session has not been populated yet';
     }
 }

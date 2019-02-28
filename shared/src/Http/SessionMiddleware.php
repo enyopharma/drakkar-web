@@ -2,8 +2,6 @@
 
 namespace Shared\Http;
 
-use SessionHandlerInterface;
-
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -39,13 +37,6 @@ class SessionMiddleware implements MiddlewareInterface
     const EXPIRED = 'Thu, 19 Nov 1981 08:52:00 GMT';
 
     /**
-     * The session handler to use.
-     *
-     * @var \SessionHandlerInterface
-     */
-    private $handler;
-
-    /**
      * The mutable session.
      *
      * @var \Shared\Http\Session
@@ -55,12 +46,10 @@ class SessionMiddleware implements MiddlewareInterface
     /**
      * Constructor.
      *
-     * @param \SessionHandlerInterface  $handler
-     * @param \Shared\Http\Session      $session
+     * @param \Shared\Http\Session $session
      */
-    public function __construct(SessionHandlerInterface $handler, Session $session)
+    public function __construct(Session $session)
     {
-        $this->handler = $handler;
         $this->session = $session;
     }
 
@@ -87,15 +76,12 @@ class SessionMiddleware implements MiddlewareInterface
             );
         }
 
-        // Set the session handler.
-        session_set_save_handler($this->handler);
-
         // Set the session id from the request.
         $name = session_name();
 
-        $id = $request->getCookieParams()[$name] ?? '';
+        $params = $request->getCookieParams();
 
-        session_id($id);
+        session_id($params[$name] ?? '');
 
         // Start the session with options disabling cookies.
         if (session_start(self::SESSION_START_OPTIONS)) {
