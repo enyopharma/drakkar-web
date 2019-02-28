@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-final class Pagination implements ResultSetInterface
+final class Pagination implements \IteratorAggregate
 {
     private $rs;
 
@@ -12,7 +12,7 @@ final class Pagination implements ResultSetInterface
 
     private $limit;
 
-    public function __construct(ResultSetInterface $rs, int $total, int $page, int $limit)
+    public function __construct(ResultSet $rs, int $total, int $page, int $limit)
     {
         $this->rs = $rs;
         $this->total = $total;

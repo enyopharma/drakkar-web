@@ -13,7 +13,7 @@ final class PublicationRepository
         $this->stmts = $stmts;
     }
 
-    public function fromRun(int $run_id, string $state, int $page = 1, int $limit = 20): ResultSetInterface
+    public function fromRun(int $run_id, string $state, int $page = 1, int $limit = 20): Pagination
     {
         $offset = ($page - 1) * $limit;
 

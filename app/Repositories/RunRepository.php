@@ -35,7 +35,7 @@ final class RunRepository
         );
     }
 
-    public function all(): ResultSetInterface
+    public function all(): ResultSet
     {
         $stmts['runs'] = $this->stmts->executed('runs/select');
 
