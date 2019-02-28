@@ -76,6 +76,9 @@ class SessionMiddleware implements MiddlewareInterface
             );
         }
 
+        // Attach the session to the request.
+        $request = $request->withAttribute(Session::class, $this->session);
+
         // Set the session id from the request.
         $name = session_name();
 
@@ -86,13 +89,10 @@ class SessionMiddleware implements MiddlewareInterface
         // Start the session with options disabling cookies.
         if (session_start(self::SESSION_START_OPTIONS)) {
             // Get the session as an object.
-            $session = $this->session->populate($_SESSION);
+            $this->session->populate($_SESSION);
 
             // Empty the session globals.
             $_SESSION = [];
-
-            // Attach the session to the request.
-            $request = $request->withAttribute(Session::class, $session);
 
             // Get a response from the request handler.
             $response = $handler->handle($request);
