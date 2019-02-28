@@ -67,4 +67,26 @@ $(document).ready(function () {
     </li>
 </ul>
 
-<?php $this->insert('runs/show/' . $state, ['publications' => $publications]) ?>
+<h2 class="my-4">
+    <?= $this->stateMap($state)['header'] ?>
+</h2>
+
+<?php if ($publications->count() == 0): ?>
+<p>
+    <?= $this->stateMap($state)['empty'] ?>
+</p>
+<?php else: ?>
+<?php $this->insert('pagination/nav', [
+    'pagination' => $publications,
+    'url' => $this->partialUrl('runs.show', $run, ['state' => $state]),
+]) ?>
+<div class="row my-4">
+    <div class="col">
+        <?php $this->insert('publications/deck', ['publications' => $publications]) ?>
+    </div>
+</div>
+<?php $this->insert('pagination/nav', [
+    'pagination' => $publications,
+    'url' => $this->partialUrl('runs.show', $run, ['state' => $state]),
+]) ?>
+<?php endif ?>

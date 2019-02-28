@@ -40,15 +40,14 @@ final class ShowHandler implements RequestHandlerInterface
     {
         $input = array_merge($request->getAttributes(), $request->getQueryParams());
 
-        $id = (int) $input['id'];
+        $id = $input['id'];
         $state = $input['state'] ?? Publication::PENDING;
         $page = $input['page'] ?? 1;
-        $limit = $input['limit'] ?? 10;
 
         $body = $this->engine->render('runs/show', [
             'state' => $state,
             'run' => $this->runs->find((int) $input['id']),
-            'publications' => $this->publications->fromRun((int) $input['id'], $state),
+            'publications' => $this->publications->fromRun((int) $input['id'], $state, (int) $page),
         ]);
 
         $response = $this->factory

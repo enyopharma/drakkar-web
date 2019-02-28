@@ -19,5 +19,19 @@ final class UrlExtension implements ExtensionInterface
     public function register(Engine $engine)
     {
         $engine->registerFunction('url', $this->helper);
+        $engine->registerFunction('partialUrl', [$this, 'partial']);
+    }
+
+    public function partial(...$xs): callable
+    {
+        return function (array $query = [], string $fragement = null, array $options = []) use ($xs) {
+            return ($this->helper)(
+                $xs[0] ?? null,
+                $xs[1] ?? [],
+                ($xs[2] ?? []) + $query,
+                is_null($fragment) ? ($xs[3] ?? null) : $fragment,
+                ($xs[4] ?? []) + $options
+            );
+        };
     }
 }

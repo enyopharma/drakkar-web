@@ -30,7 +30,7 @@ final class PublicationRepository
         ]);
 
         $publications = $stmts['select']->fetchAll();
-        $total = ($nb = $stmts['count']->fetchColumn()) ? $nb : 0;
+        $total = ($nb = $stmts['count']->fetchColumn(1)) ? $nb : 0;
 
         return new Pagination(new ResultSet($publications), $total, $page, $limit);
     }

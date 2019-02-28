@@ -30,13 +30,56 @@ final class Pagination implements \IteratorAggregate
         return $this->rs->chunks($size);
     }
 
+    public function page(): int
+    {
+        return $this->page;
+    }
+
+    public function total(): int
+    {
+        return (int) ($this->total/$this->limit) + 1;
+    }
+
+    public function links(int $n = 10): array
+    {
+        // compute the total number of pages
+        $total = $this->total();
+
+        // show one block until $n pages
+        if ($total <= $n) {
+            return [$this->range(1, $total)];
+        }
+
+        // show two blocks when current page is close to the begining
+        if ($this->page < $n - 2) {
+            return [$this->range(1, 8), $this->range($total - 1, $total)];
+        }
+
+        // show two blocks when current page is close to the end
+        if ($this->page > $total - $n + 3) {
+            return [$this->range(1, 2), $this->range($total - 7, $total)];
+        }
+
+        // show three blocks when current page is not close to an edge
+        return [
+            $this->range(1, 2),
+            $this->range($this->page - 3, $this->page + 3),
+            $this->range($total - 1, $total)
+        ];
+    }
+
     public function getIterator()
     {
         return $this->rs;
     }
 
-    public function pages(int $limit = 10): array
+    private function link(int $page): array
     {
-        return [];
+        return ['active' => $this->page == $page, 'page' => $page];
+    }
+
+    private function range(int $start, int $stop): array
+    {
+        return array_map([$this, 'link'], range($start, $stop));
     }
 }

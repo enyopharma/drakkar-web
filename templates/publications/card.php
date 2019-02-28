@@ -1,7 +1,7 @@
 <div class="card">
     <h4 class="card-header">
         <a
-            class="<?= $this->textStyles($publication['state']) ?>"
+            class="<?= $this->stateMap($publication['state'])['styles']['text'] ?>"
             data-toggle="collapse"
             href="#pmid-<?= $publication['pmid'] ?>"
         >
