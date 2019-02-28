@@ -7,5 +7,5 @@
     There is no curated publication.
 </p>
 <?php else: ?>
-<?php $this->insert('publications/list', ['run' => $run, 'publications' => $publications]) ?>
+<?php $this->insert('publications/deck', ['run' => $run, 'publications' => $publications]) ?>
 <?php endif ?>

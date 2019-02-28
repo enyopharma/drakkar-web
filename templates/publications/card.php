@@ -67,8 +67,7 @@
                             name="state"
                             value="<?= $this->curated() ?>"
                             class="btn btn-block btn-success"
-                            <?= $this->isPending($publication['state']) ? 'disabled' : '' ?>
-                            <?= $this->isCurated($publication['state']) ? 'disabled' : '' ?>
+                            <?= $this->isSelected($publication['state']) ? '' : 'disabled' ?>
                         >
                             Curated
                         </button>
@@ -78,4 +77,3 @@
         </div>
     </div>
 </div>
-<hr>

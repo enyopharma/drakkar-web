@@ -49,7 +49,7 @@ SQL;
             foreach (Publication::STATES as $state) {
                 $count_stmt->execute([$run['id'], $state]);
 
-                $run['nbs'][$state] = $count_stmt->fetchColumn(1);
+                $run['nbs'][$state] = ($nb = $count_stmt->fetchColumn(1)) ? $nb : 0;
             }
 
             return $run;
