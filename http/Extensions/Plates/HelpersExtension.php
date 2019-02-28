@@ -48,7 +48,7 @@ final class HelpersExtension implements ExtensionInterface
                 Publication::PENDING => 'text-warning',
                 Publication::SELECTED => 'text-primary',
                 Publication::DISCARDED => 'text-danger',
-                Publication::CURATED => 'text-curated',
+                Publication::CURATED => 'text-success',
             ];
 
             return $map[$state] ?? '';
