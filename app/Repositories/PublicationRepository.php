@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use Shared\Sql\StatementMap;
+use Enyo\Sql\StatementMap;
 
 final class PublicationRepository
 {

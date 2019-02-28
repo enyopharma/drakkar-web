@@ -3,7 +3,7 @@
 use App\Repositories\RunRepository;
 use App\Repositories\PublicationRepository;
 
-use Shared\Sql\StatementMap;
+use Enyo\Sql\StatementMap;
 
 return [
     'factories' => [

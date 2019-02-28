@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-use Shared\Http\RouteCollector;
+use Enyo\Http\RouteCollector;
 
 return function (RouteCollector $collector) {
     $collector->get('/', ...[

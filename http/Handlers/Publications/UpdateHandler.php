@@ -8,7 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
-use Shared\Http\Session;
+use Enyo\Http\Session;
 use App\Repositories\PublicationRepository;
 
 final class UpdateHandler implements RequestHandlerInterface
