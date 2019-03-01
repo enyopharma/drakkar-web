@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Http\Handlers\Runs;
+namespace App\Http\Handlers\Runs;
 
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;

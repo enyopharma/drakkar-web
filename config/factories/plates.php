@@ -3,7 +3,7 @@
 use League\Plates\Engine;
 use League\Plates\Extension\ExtensionInterface;
 
-use Http\Extensions\Plates\HelpersExtension;
+use App\Http\Extensions\Plates\HelpersExtension;
 
 return [
     'factories' => [

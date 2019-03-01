@@ -12,8 +12,8 @@ return [
             return $commands($container);
         },
 
-        Commands\ExampleCommand::class => function () {
-            return new Commands\ExampleCommand;
+        App\Cli\Commands\ExampleCommand::class => function () {
+            return new App\Cli\Commands\ExampleCommand;
         },
     ],
 ];

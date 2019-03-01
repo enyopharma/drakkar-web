@@ -4,6 +4,6 @@ use Psr\Container\ContainerInterface;
 
 return function (ContainerInterface $container) {
     return [
-        $container->get(Commands\ExampleCommand::class),
+        $container->get(App\Cli\Commands\ExampleCommand::class),
     ];
 };

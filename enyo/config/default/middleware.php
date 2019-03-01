@@ -3,12 +3,6 @@
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
-use Enyo\Http\SessionMiddleware;
-use Enyo\Http\CallableMiddleware;
-use Enyo\Http\NotFoundMiddleware;
-use Enyo\Http\HttpErrorMiddleware;
-use Enyo\Http\HttpMethodMiddleware;
-
 return [
     'parameters' => [
         'http.middleware.queue.factory.path' => '%{app.root}/config/middleware.php',
@@ -21,18 +15,18 @@ return [
             return $middleware($container);
         },
 
-        HttpErrorMiddleware::class => function ($container) {
-            return new HttpErrorMiddleware(
+        Enyo\Http\HttpErrorMiddleware::class => function ($container) {
+            return new Enyo\Http\HttpErrorMiddleware(
                 $container->get(StreamFactoryInterface::class)
             );
         },
 
-        HttpMethodMiddleware::class => function () {
-            return new HttpMethodMiddleware;
+        Enyo\Http\HttpMethodMiddleware::class => function () {
+            return new Enyo\Http\HttpMethodMiddleware;
         },
 
-        NotFoundMiddleware::class => function ($container) {
-            return new NotFoundMiddleware(
+        Enyo\Http\NotFoundMiddleware::class => function ($container) {
+            return new Enyo\Http\NotFoundMiddleware(
                 $container->get(ResponseFactoryInterface::class)
             );
         },
