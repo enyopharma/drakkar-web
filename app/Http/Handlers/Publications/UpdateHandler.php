@@ -13,9 +13,9 @@ use App\Repositories\PublicationRepository;
 
 final class UpdateHandler implements RequestHandlerInterface
 {
-    private $publications;
+    private $session;
 
-    private $engine;
+    private $publications;
 
     private $factory;
 
@@ -31,12 +31,13 @@ final class UpdateHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $input = array_merge($request->getAttributes(), $request->getParsedBody());
+        $attributes = (array) $request->getAttributes();
+        $body = (array) $request->getParsedBody();
 
-        $run_id = (int) $input['run_id'];
-        $publication_id = (int) $input['id'];
-        $state = $input['state'];
-        $annotation = $input['annotation'];
+        $run_id = (int) $attributes['run_id'];
+        $publication_id = (int) $attributes['id'];
+        $state = $body['state'];
+        $annotation = $body['annotation'];
 
         $this->publications->update($run_id, $publication_id, $state, $annotation);
 
