@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Repositories;
+namespace Enyo\Data;
 
 final class Pagination implements \IteratorAggregate
 {

@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-use Enyo\Sql\StatementMap;
+use Enyo\Data\StatementMap;
 
 return [
     'parameters' => [

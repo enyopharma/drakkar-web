@@ -2,7 +2,8 @@
 
 namespace App\Repositories;
 
-use Enyo\Sql\StatementMap;
+use Enyo\Data\ResultSet;
+use Enyo\Data\StatementMap;
 
 final class RunRepository
 {
