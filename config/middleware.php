@@ -2,8 +2,22 @@
 
 use Psr\Container\ContainerInterface;
 
+use Zend\Expressive\Router\Middleware\RouteMiddleware;
+use Zend\Expressive\Router\Middleware\DispatchMiddleware;
+
+use Enyo\Http\SessionMiddleware;
+use Enyo\Http\CallableMiddleware;
+use Enyo\Http\NotFoundMiddleware;
+use Enyo\Http\HttpErrorMiddleware;
+use Enyo\Http\HttpMethodMiddleware;
+
 return function (ContainerInterface $container) {
     return [
-        //
+        $container->get(HttpErrorMiddleware::class),
+        $container->get(SessionMiddleware::class),
+        $container->get(HttpMethodMiddleware::class),
+        $container->get(RouteMiddleware::class),
+        $container->get(DispatchMiddleware::class),
+        $container->get(NotFoundMiddleware::class),
     ];
 };
