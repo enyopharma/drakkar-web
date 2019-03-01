@@ -18,11 +18,7 @@ require $root . '/vendor/autoload.php';
 /**
  * Register slashtrace as error handler.
  */
- $slashtrace = new SlashTrace\SlashTrace;
-
- $slashtrace->addHandler(new SlashTrace\EventHandler\DebugHandler);
-
- $slashtrace->register();
+require $root . '/config/slashtrace.php';
 
 /**
  * Build the app container.
