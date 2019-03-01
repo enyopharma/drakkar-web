@@ -46,7 +46,7 @@ return function (string $root): array {
          */
         'immutables' => [
             'app.env' => $env === false ? 'development' : $env,
-            'app.debug' => $debug && (strtolower($debug) === 'true' || $debug === '1'),
+            'app.debug' => $debug && (strtolower((string) $debug) === 'true' || $debug === '1'),
             'app.root' => $root,
         ],
 
