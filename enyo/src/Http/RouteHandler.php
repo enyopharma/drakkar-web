@@ -3,20 +3,20 @@
 namespace Enyo\Http;
 
 use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
+use Psr\Http\Message\ResponseInterface as Response;
+use Psr\Http\Message\ServerRequestInterface as Request;
 
 final class RouteHandler implements MiddlewareInterface
 {
     private $handler;
 
-    public function __construct(RequestHandlerInterface $handler)
+    public function __construct(RequestHandler $handler)
     {
         $this->handler = $handler;
     }
 
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    public function process(Request $request, RequestHandler $handler): Response
     {
         return $this->handler->handle($request);
     }

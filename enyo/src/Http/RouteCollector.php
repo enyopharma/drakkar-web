@@ -6,14 +6,14 @@ use Zend\Expressive\Router\RouteCollector as ZendRouteCollector;
 
 final class RouteCollector
 {
-    private $collector;
-
     private $factory;
 
-    public function __construct(ZendRouteCollector $collector, RouteHandlerFactory $factory)
+    private $collector;
+
+    public function __construct(RouteHandlerFactory $factory, ZendRouteCollector $collector)
     {
-        $this->collector = $collector;
         $this->factory = $factory;
+        $this->collector = $collector;
     }
 
     /**

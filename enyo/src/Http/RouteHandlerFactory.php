@@ -2,25 +2,17 @@
 
 namespace Enyo\Http;
 
-use Psr\Container\ContainerInterface;
-
-use Psr\Http\Server\MiddlewareInterface;
-
 final class RouteHandlerFactory
 {
-    private $container;
+    private $factory;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(RequestHandlerFactory $factory)
     {
-        $this->container = $container;
+        $this->factory = $factory;
     }
 
-    public function __invoke($value): MiddlewareInterface
+    public function __invoke($value): RouteHandler
     {
-        $handler = is_callable($value)
-            ? new CallableRequestHandler($value)
-            : new FallbackRequestHandler($this->container, $value);
-
-        return new RouteHandler($handler);
+        return new RouteHandler(($this->factory)($value));
     }
 }

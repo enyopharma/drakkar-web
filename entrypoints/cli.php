@@ -16,6 +16,15 @@ require $root . '/vendor/autoload.php';
 (new Dotenv\Dotenv($root))->load();
 
 /**
+ * Register slashtrace as error handler.
+ */
+ $slashtrace = new SlashTrace\SlashTrace;
+
+ $slashtrace->addHandler(new SlashTrace\EventHandler\DebugHandler);
+
+ $slashtrace->register();
+
+/**
  * Build the app container.
  */
 $config = (require $root . '/config/app.php')($root);

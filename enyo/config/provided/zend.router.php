@@ -33,7 +33,7 @@ return [
         RouterInterface::class => function ($container, RouterInterface $router) {
             $mapper = $container->get('router.mapper');
 
-            $mapper($container, new RouteCollector($router));
+            $mapper(new RouteCollector($router));
 
             return $router;
         },

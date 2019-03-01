@@ -1,23 +1,21 @@
 <?php declare(strict_types=1);
 
-use Psr\Container\ContainerInterface;
-
-use Zend\Expressive\Router\Middleware\RouteMiddleware;
-use Zend\Expressive\Router\Middleware\DispatchMiddleware;
-
+use Enyo\Http\MiddlewareFactory;
 use Enyo\Http\SessionMiddleware;
-use Enyo\Http\CallableMiddleware;
 use Enyo\Http\NotFoundMiddleware;
 use Enyo\Http\HttpErrorMiddleware;
 use Enyo\Http\HttpMethodMiddleware;
 
-return function (ContainerInterface $container) {
+use Zend\Expressive\Router\Middleware\RouteMiddleware;
+use Zend\Expressive\Router\Middleware\DispatchMiddleware;
+
+return function (MiddlewareFactory $factory) {
     return [
-        $container->get(HttpErrorMiddleware::class),
-        $container->get(SessionMiddleware::class),
-        $container->get(HttpMethodMiddleware::class),
-        $container->get(RouteMiddleware::class),
-        $container->get(DispatchMiddleware::class),
-        $container->get(NotFoundMiddleware::class),
+        $factory(HttpErrorMiddleware::class),
+        $factory(SessionMiddleware::class),
+        $factory(HttpMethodMiddleware::class),
+        $factory(RouteMiddleware::class),
+        $factory(DispatchMiddleware::class),
+        $factory(NotFoundMiddleware::class),
     ];
 };

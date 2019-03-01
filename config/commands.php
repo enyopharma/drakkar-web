@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-use Psr\Container\ContainerInterface;
+use Enyo\Cli\CommandFactory;
 
-return function (ContainerInterface $container) {
+return function (CommandFactory $factory) {
     return [
-        $container->get(App\Cli\Commands\ExampleCommand::class),
+        $factory(App\Cli\Commands\ExampleCommand::class),
     ];
 };
