@@ -28,6 +28,7 @@
         "services/http-entrypoint-quanta": "^0.1.0",
         "services/http-factory-nyholm": "^0.2.0",
         "slashtrace/slashtrace": "^1.1",
+        "symfony/console": "^4.2",
         "vlucas/phpdotenv": "^2.5",
         "zendframework/zend-expressive-fastroute": "^3.0",
         "zendframework/zend-expressive-helpers": "^5.1"
