@@ -31,14 +31,14 @@ final class RunRepository
             return $run;
         }
 
-        throw new \RuntimeException(
+        throw new NotFoundException(
             sprintf('No curation run with id %s', $id)
         );
     }
 
     public function all(): ResultSet
     {
-        $stmts['runs'] = $this->stmts->executed('runs/select');
+        $runs = $this->stmts->executed('runs/select')->fetchAll();
 
         foreach (Publication::STATES as $state) {
             $nbs[$state] = $this->stmts
@@ -46,6 +46,6 @@ final class RunRepository
                 ->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_UNIQUE);
         }
 
-        return new ResultSet(new RunCollection($stmts['runs'], $nbs));
+        return new ResultSet(new RunCollection($runs, $nbs));
     }
 }

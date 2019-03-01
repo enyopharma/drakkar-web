@@ -4,22 +4,21 @@ namespace Enyo\Data;
 
 final class ResultSet implements \IteratorAggregate
 {
-    private $iterator;
+    private $iterable;
 
     private $constraints;
 
     public function __construct(iterable $iterable, array $constraints = [])
     {
-        $this->iterator = is_array($iterable)
-            ? new \ArrayIterator($iterable)
-            : new \IteratorIterator($iterable);
-
+        $this->iterable = $iterable;
         $this->constraints = $constraints;
     }
 
     public function count(): int
     {
-        return iterator_count($this->iterator);
+        return is_array($this->iterable)
+            ? count($this->iterable)
+            : iterator_count($this->iterable);
     }
 
     public function chunks(int $size = 10): \Generator
@@ -43,9 +42,7 @@ final class ResultSet implements \IteratorAggregate
 
     public function getIterator()
     {
-        $this->iterator->rewind();
-
-        foreach ($this->iterator as $row) {
+        foreach ($this->iterable as $row) {
             if ($this->isPassingConstraints($row)) {
                 yield $row;
             }

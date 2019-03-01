@@ -4,19 +4,19 @@ namespace App\Repositories;
 
 final class RunCollection implements \IteratorAggregate
 {
-    private $stmt;
+    private $runs;
 
     private $nbs;
 
-    public function __construct(\PDOStatement $stmt, array $nbs)
+    public function __construct(array $runs, array $nbs)
     {
-        $this->stmt = $stmt;
+        $this->runs = $runs;
         $this->nbs = $nbs;
     }
 
     public function getIterator()
     {
-        while ($run = $this->stmt->fetch()) {
+        foreach ($this->runs as $run) {
             yield $run + [
                 'nbs' => array_map(function ($nb) use ($run) {
                     return $nb[$run['id']]['count'] ?? 0;

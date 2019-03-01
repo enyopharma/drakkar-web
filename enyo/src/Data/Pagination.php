@@ -37,7 +37,14 @@ final class Pagination implements \IteratorAggregate
 
     public function total(): int
     {
-        return (int) ($this->total/$this->limit) + 1;
+        return (int) ceil($this->total/$this->limit);
+    }
+
+    public function overflow(): bool
+    {
+        $total = $this->total();
+
+        return $total > 0 && $this->page > $total;
     }
 
     public function links(int $n = 10): array

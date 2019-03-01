@@ -40,6 +40,11 @@
 </div>
 
 <h2>Curation runs</h2>
+<?php if ($runs->count() == 0): ?>
+<p>
+    There is no curation run.
+</p>
+<?php else: ?>
 <table class="table">
     <thead>
         <tr>
@@ -92,3 +97,4 @@
         <?php endforeach; ?>
     </tbody>
 </table>
+<?php endif; ?>

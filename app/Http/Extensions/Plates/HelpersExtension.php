@@ -12,28 +12,28 @@ final class HelpersExtension implements ExtensionInterface
     private $map = [
         Publication::PENDING => [
             'header' => 'Pending publication',
-            'empty' => 'There is no pending publication',
+            'empty' => 'There is no pending publication.',
             'styles' => [
                 'text' => 'text-warning',
             ],
         ],
         Publication::SELECTED => [
             'header' => 'Selected publication',
-            'empty' => 'There is no selected publication',
+            'empty' => 'There is no selected publication.',
             'styles' => [
                 'text' => 'text-primary',
             ],
         ],
         Publication::DISCARDED => [
             'header' => 'Discarded publication',
-            'empty' => 'There is no discarded publication',
+            'empty' => 'There is no discarded publication.',
             'styles' => [
                 'text' => 'text-danger',
             ],
         ],
         Publication::CURATED => [
             'header' => 'Curated publication',
-            'empty' => 'There is no curated publication',
+            'empty' => 'There is no curated publication.',
             'styles' => [
                 'text' => 'text-success',
             ],
