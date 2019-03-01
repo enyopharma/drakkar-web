@@ -16,15 +16,6 @@ require $root . '/vendor/autoload.php';
 (new Dotenv\Dotenv($root))->load();
 
 /**
- * Register slashtrace as error handler.
- */
- $slashtrace = new SlashTrace\SlashTrace;
-
- $slashtrace->addHandler(new SlashTrace\EventHandler\DebugHandler);
-
- $slashtrace->register();
-
-/**
  * Build the app container.
  */
 $config = (require $root . '/config/app.php')($root);
@@ -32,11 +23,6 @@ $factories = (require $root . '/config/factories.php')($config);
 $container = (require $root . '/config/container.php')($factories);
 
 /**
- * Call boot scripts with the container.
+ * Run the cli application.
  */
-(require $root . '/config/session.php')($container);
-
-/**
- * Run the http application.
- */
-$container->get(Quanta\HttpEntrypoint::class)->run();
+$container->get(Symfony\Component\Console\Application::class)->run();

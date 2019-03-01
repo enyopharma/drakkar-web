@@ -5,7 +5,7 @@ use Psr\Container\ContainerInterface;
 
 use Cache\SessionHandler\Psr6SessionHandler;
 
-return function (ContainerInterface $container, string $env, bool $debug) {
+return function (ContainerInterface $container) {
     $cache = $container->get(CacheItemPoolInterface::class);
 
     if (($ttl = getenv('SESSION_TTL')) !== false) {

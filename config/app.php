@@ -3,17 +3,23 @@
 /**
  * Return the application configuration.
  *
- * @param string $env
- * @param bool $debug
+ * @param string $root
  * @return array
  */
-return function (string $env, bool $debug): array {
+return function (string $root): array {
     /**
-     * The root of the application.
+     * Get the app env.
      *
-     * @var string
+     * @var bool|string
      */
-    $root = realpath(__DIR__ . '/..');
+    $env = getenv('APP_ENV');
+
+    /**
+     * Get the app debug mode.
+     *
+     * @var bool|string
+     */
+    $debug = getenv('APP_DEBUG');
 
     /**
      * The configuration values.
@@ -39,8 +45,8 @@ return function (string $env, bool $debug): array {
          * @var array
          */
         'immutables' => [
-            'app.env' => $env,
-            'app.debug' => $debug,
+            'app.env' => $env === false ? 'development' : $env,
+            'app.debug' => $debug && (strtolower($debug) === 'true' || $debug === '1'),
             'app.root' => $root,
         ],
 
