@@ -18,13 +18,7 @@ final class AssetsExtension implements ExtensionInterface
 
     public function register(Engine $engine)
     {
-        /**
-         * Phpstan...
-         * @var \League\Plates\callback
-         */
-        $callable = [$this, 'asset'];
-
-        $engine->registerFunction('asset', $callable);
+        $engine->registerFunction('asset', [$this, 'asset']);
     }
 
     public function asset($path): string
