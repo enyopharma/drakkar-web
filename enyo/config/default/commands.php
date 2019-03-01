@@ -5,7 +5,7 @@ use Enyo\Cli\CommandFactory;
 
 return [
     'parameters' => [
-        'cli.commands.factory.path' => '%{app.root}/config/commands.php',
+        'cli.commands.factory.path' => '%{app.root}/app/commands.php',
     ],
 
     'factories' => [

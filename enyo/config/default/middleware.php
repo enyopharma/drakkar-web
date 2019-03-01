@@ -7,7 +7,7 @@ use Enyo\Http\MiddlewareFactory;
 
 return [
     'parameters' => [
-        'http.middleware.queue.factory.path' => '%{app.root}/config/middleware.php',
+        'http.middleware.queue.factory.path' => '%{app.root}/app/middleware.php',
     ],
 
     'factories' => [

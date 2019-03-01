@@ -6,7 +6,7 @@ use Enyo\Http\RequestHandlerFactory;
 
 return [
     'parameters' => [
-        'router.mapper.path' => '%{app.root}/config/routes.php',
+        'router.mapper.path' => '%{app.root}/app/routes.php',
     ],
 
     'factories' => [

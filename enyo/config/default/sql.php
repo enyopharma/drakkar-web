@@ -2,7 +2,7 @@
 
 return [
     'parameters' => [
-        'sql.queries.path' => '%{app.root}/config/queries.php',
+        'sql.queries.path' => '%{app.root}/app/queries.php',
     ],
 
     'factories' => [
