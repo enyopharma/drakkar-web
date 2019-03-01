@@ -1,8 +1,5 @@
 <?php declare(strict_types=1);
 
-use Psr\Http\Message\StreamFactoryInterface;
-use Psr\Http\Message\ResponseFactoryInterface;
-
 use Enyo\Http\MiddlewareFactory;
 
 return [
