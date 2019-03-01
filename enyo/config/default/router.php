@@ -9,9 +9,9 @@ return [
 
     'factories' => [
         'router.mapper' => function ($container) {
-            $mapper = require $container->get('router.mapper.path');
-
-            return new RouteMapper($container, $mapper);
+            return new RouteMapper(
+                require $container->get('router.mapper.path')
+            );
         },
     ],
 ];

@@ -9,10 +9,12 @@ return [
     ],
 
     'factories' => [
-        'http.middleware.queue' => function ($container) {
-            $middleware = require $container->get('http.middleware.queue.factory.path');
+        'http.middleware.queue.factory' => function ($container) {
+            return require $container->get('http.middleware.queue.factory.path');
+        },
 
-            return $middleware($container);
+        'http.middleware.queue' => function ($container) {
+            return $container->get('http.middleware.queue.factory')($container);
         },
 
         Enyo\Http\HttpErrorMiddleware::class => function ($container) {

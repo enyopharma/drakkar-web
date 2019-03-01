@@ -6,10 +6,12 @@ return [
     ],
 
     'factories' => [
-        'cli.commands' => function ($container) {
-            $commands = require $container->get('cli.commands.factory.path');
+        'cli.commands.factory' => function ($container) {
+            return require $container->get('cli.commands.factory.path');
+        },
 
-            return $commands($container);
+        'cli.commands' => function ($container) {
+            return $container->get('cli.commands.factory')($container);
         },
 
         App\Cli\Commands\ExampleCommand::class => function () {

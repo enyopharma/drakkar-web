@@ -8,23 +8,17 @@ use Zend\Expressive\Router\RouteCollector as ZendRouteCollector;
 
 final class RouteMapper
 {
-    private $container;
-
     private $mapper;
 
-    public function __construct(ContainerInterface $container, callable $mapper)
+    public function __construct(callable $mapper)
     {
-        $this->container = $container;
         $this->mapper = $mapper;
     }
 
-    public function __invoke(ZendRouteCollector $collector)
+    public function __invoke(ContainerInterface $container, ZendRouteCollector $collector)
     {
         ($this->mapper)(
-            new RouteCollector(
-                $collector,
-                new RouteHandlerFactory($this->container)
-            )
+            new RouteCollector($collector, new RouteHandlerFactory($container))
         );
     }
 }
