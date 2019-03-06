@@ -2,15 +2,11 @@
 
 namespace App\Http\Handlers\Runs;
 
-use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\ResponseFactoryInterface;
 
-use League\Plates\Engine;
-use Zend\Expressive\Helper\UrlHelper;
-
+use Enyo\Http\Responder;
 use App\Repositories\Publication;
 use App\Repositories\RunRepository;
 use App\Repositories\NotFoundException;
@@ -22,24 +18,16 @@ final class ShowHandler implements RequestHandlerInterface
 
     private $publications;
 
-    private $url;
-
-    private $engine;
-
-    private $factory;
+    private $responder;
 
     public function __construct(
         RunRepository $runs,
         PublicationRepository $publications,
-        UrlHelper $url,
-        Engine $engine,
-        ResponseFactoryInterface $factory
+        Responder $responder
     ) {
         $this->runs = $runs;
         $this->publications = $publications;
-        $this->url = $url;
-        $this->engine = $engine;
-        $this->factory = $factory;
+        $this->responder = $responder;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -56,29 +44,19 @@ final class ShowHandler implements RequestHandlerInterface
         }
 
         catch (NotFoundException $e) {
-            return $this->factory->createResponse(404, 'Not found');
+            return $this->responder->notfound();
         }
 
         $publications = $this->publications->fromRun($id, $state, $page);
 
         if ($publications->overflow()) {
-            return $this->factory
-                ->createResponse(302)
-                ->withHeader('location', ($this->url)('runs.show', $run, ['state' => $state]));
+            return $this->responder->redirect('runs.show', $run, ['state' => $state]);
         }
 
-        $body = $this->engine->render('runs/show', [
+        return $this->responder->html('runs/show', [
             'state' => $state,
             'run' => $run,
             'publications' => $publications,
         ]);
-
-        $response = $this->factory
-            ->createResponse(200)
-            ->withHeader('content-type', 'text/html');
-
-        $response->getBody()->write($body);
-
-        return $response;
     }
 }
