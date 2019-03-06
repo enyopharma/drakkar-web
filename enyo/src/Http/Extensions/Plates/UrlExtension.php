@@ -24,7 +24,7 @@ final class UrlExtension implements ExtensionInterface
 
     public function partial(...$xs): callable
     {
-        return function (array $query = [], string $fragement = null, array $options = []) use ($xs) {
+        return function (array $query = [], string $fragment = null, array $options = []) use ($xs) {
             return ($this->helper)(
                 $xs[0] ?? null,
                 $xs[1] ?? [],
