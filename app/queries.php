@@ -1,39 +1,43 @@
 <?php declare(strict_types=1);
 
-$qs['runs/find'] = <<<SQL
-    SELECT * FROM runs WHERE id = ?
-SQL;
-
-$qs['runs/select'] = <<<SQL
+$queries['runs/find'] = <<<SQL
     SELECT *
     FROM runs
-    WHERE deleted_at IS NULL
+    WHERE id = ?
+    AND state = 'populated'
+    AND deleted_at IS NULL
+SQL;
+
+$queries['runs/select'] = <<<SQL
+    SELECT *
+    FROM runs
+    WHERE state = 'populated' AND deleted_at IS NULL
     GROUP BY id
     ORDER BY created_at DESC, id DESC
 SQL;
 
-$qs['runs/count.publications'] = <<<SQL
+$queries['runs/count.publications'] = <<<SQL
     SELECT a.run_id, COUNT(p.id)
     FROM associations AS a, publications AS p
     WHERE p.id = a.publication_id AND a.state = ?
     GROUP BY a.run_id
 SQL;
 
-$qs['publications/update'] = <<<SQL
+$queries['publications/update'] = <<<SQL
     UPDATE associations
     SET state = ?, annotation = ?, updated_at = NOW()
     WHERE run_id = ?
     AND publication_id = ?
 SQL;
 
-$qs['publications/count.from_run'] = <<<SQL
+$queries['publications/count.from_run'] = <<<SQL
     SELECT a.run_id, COUNT(p.id)
     FROM associations AS a, publications AS p
     WHERE p.id = a.publication_id AND a.run_id = ? AND a.state = ?
     GROUP BY a.run_id
 SQL;
 
-$qs['publications/select.from_run'] = <<<SQL
+$queries['publications/select.from_run'] = <<<SQL
     SELECT a.run_id, p.*, a.state, a.annotation
     FROM associations AS a, publications AS p
     WHERE p.id = a.publication_id
@@ -43,4 +47,4 @@ $qs['publications/select.from_run'] = <<<SQL
     LIMIT ? OFFSET ?
 SQL;
 
-return $qs;
+return $queries;
