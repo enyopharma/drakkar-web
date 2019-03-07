@@ -4,7 +4,7 @@ use Enyo\Http\RouteCollector;
 
 return function (RouteCollector $collector) {
     $collector->get('/', ...[
-        App\Http\Handlers\IndexHandler::class,
+        App\Http\Handlers\Runs\IndexHandler::class,
         'index',
     ]);
 

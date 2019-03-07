@@ -2,31 +2,36 @@
 
 namespace App\Http\Handlers;
 
+use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 
-use Enyo\Http\Responder;
-use App\Repositories\RunRepository;
+use League\Plates\Engine;
 
 final class IndexHandler implements RequestHandlerInterface
 {
-    private $runs;
+    private $engine;
 
-    private $responder;
+    private $factory;
 
-    public function __construct(
-        RunRepository $runs,
-        Responder $responder
-    ) {
-        $this->runs = $runs;
-        $this->responder = $responder;
+    public function __construct(Engine $engine, ResponseFactoryInterface $factory)
+    {
+        $this->engine = $engine;
+        $this->factory = $factory;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        return $this->responder->html('index', [
-            'runs' => $this->runs->all(),
-        ]);
+        $body = $this->engine->render('index');
+
+        $response = $this->factory
+            ->createResponse(200)
+            ->withHeader('content-type', 'text/html');
+
+        $response->getBody()->write($body);
+
+        return $response;
     }
 }
