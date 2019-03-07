@@ -16,7 +16,7 @@ final class RunRepository
 
     public function find(int $id): array
     {
-        $stmts['run'] = $this->stmts->executed('runs/find', [$id]);
+        $stmts['run'] = $this->stmts->executed('runs/find', [Run::POPULATED, $id]);
 
         if ($run = $stmts['run']->fetch()) {
             foreach (Publication::STATES as $state) {
@@ -38,7 +38,7 @@ final class RunRepository
 
     public function all(): ResultSet
     {
-        $runs = $this->stmts->executed('runs/select')->fetchAll();
+        $runs = $this->stmts->executed('runs/select', [Run::POPULATED])->fetchAll();
 
         foreach (Publication::STATES as $state) {
             $nbs[$state] = $this->stmts

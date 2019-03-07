@@ -1,17 +1,13 @@
 <?php declare(strict_types=1);
 
 $queries['runs/find'] = <<<SQL
-    SELECT *
-    FROM runs
-    WHERE id = ?
-    AND state = 'populated'
-    AND deleted_at IS NULL
+    SELECT * FROM runs
+    WHERE state = ? AND id = ? AND deleted_at IS NULL
 SQL;
 
 $queries['runs/select'] = <<<SQL
-    SELECT *
-    FROM runs
-    WHERE state = 'populated' AND deleted_at IS NULL
+    SELECT * FROM runs
+    WHERE state = ? AND deleted_at IS NULL
     GROUP BY id
     ORDER BY created_at DESC, id DESC
 SQL;
