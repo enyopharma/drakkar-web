@@ -12,11 +12,23 @@ $queries['runs/select'] = <<<SQL
     ORDER BY created_at DESC, id DESC
 SQL;
 
+$queries['runs/insert'] = <<<SQL
+    INSERT INTO runs (type, name) VALUES (?, ?)
+SQL;
+
 $queries['runs/count.publications'] = <<<SQL
     SELECT a.run_id, COUNT(p.id)
     FROM associations AS a, publications AS p
     WHERE p.id = a.publication_id AND a.state = ?
     GROUP BY a.run_id
+SQL;
+
+$queries['associations/insert'] = <<<SQL
+    INSERT INTO associations (run_id, publication_id) VALUES (?, ?)
+SQL;
+
+$queries['publications/insert'] = <<<SQL
+    INSERT INTO publications (pmid) VALUES (?)
 SQL;
 
 $queries['publications/update'] = <<<SQL
