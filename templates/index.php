@@ -48,9 +48,8 @@
 <table class="table">
     <thead>
         <tr>
-            <th class="text-center col-1">N°</th>
             <th class="text-center col-1">Type</th>
-            <th class="col-4">Description</th>
+            <th class="col-5">Name</th>
             <th class="text-center col-2">Date</th>
             <th class="text-center col-2">Publications</th>
             <th class="text-center col-2">-</th>
@@ -60,13 +59,10 @@
         <?php foreach ($runs as $run): ?>
         <tr>
             <td class="text-center">
-                <?= $this->e($run['name']) ?>
-            </td>
-            <td class="text-center">
                 <?= $this->e($run['type']) ?>
             </td>
             <td>
-                <?= $this->e($run['description']) ?>
+                <?= $this->e($run['name']) ?>
             </td>
             <td class="text-center">
                 <?= $this->e($run['created_at']) ?>
