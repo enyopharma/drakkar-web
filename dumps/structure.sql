@@ -16,28 +16,28 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 --
--- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: 
+-- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
 --
 
 CREATE EXTENSION IF NOT EXISTS plpgsql WITH SCHEMA pg_catalog;
 
 
 --
--- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner:
+-- Name: EXTENSION plpgsql; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 --
--- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner:
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
 --
 
 CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
 
 
 --
--- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner:
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
 --
 
 COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
@@ -48,7 +48,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: associations; Type: TABLE; Schema: public; Owner: pierre
+-- Name: associations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.associations (
@@ -56,16 +56,14 @@ CREATE TABLE public.associations (
     run_id integer NOT NULL,
     publication_id integer NOT NULL,
     state character varying(10) DEFAULT 'pending'::character varying NOT NULL,
-    annotation text NOT NULL,
+    annotation text DEFAULT ''::text NOT NULL,
     updated_at timestamp(0) without time zone DEFAULT now() NOT NULL,
     CONSTRAINT associations_state_check CHECK (((state)::text = ANY (ARRAY[('pending'::character varying)::text, ('selected'::character varying)::text, ('discarded'::character varying)::text, ('curated'::character varying)::text])))
 );
 
 
-ALTER TABLE public.associations OWNER TO pierre;
-
 --
--- Name: associations_id_seq; Type: SEQUENCE; Schema: public; Owner: pierre
+-- Name: associations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.associations_id_seq
@@ -77,17 +75,15 @@ CREATE SEQUENCE public.associations_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.associations_id_seq OWNER TO pierre;
-
 --
--- Name: associations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pierre
+-- Name: associations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.associations_id_seq OWNED BY public.associations.id;
 
 
 --
--- Name: descriptions; Type: TABLE; Schema: public; Owner: pierre
+-- Name: descriptions; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.descriptions (
@@ -101,10 +97,8 @@ CREATE TABLE public.descriptions (
 );
 
 
-ALTER TABLE public.descriptions OWNER TO pierre;
-
 --
--- Name: descriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: pierre
+-- Name: descriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.descriptions_id_seq
@@ -116,17 +110,15 @@ CREATE SEQUENCE public.descriptions_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.descriptions_id_seq OWNER TO pierre;
-
 --
--- Name: descriptions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pierre
+-- Name: descriptions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.descriptions_id_seq OWNED BY public.descriptions.id;
 
 
 --
--- Name: features; Type: TABLE; Schema: public; Owner: pierre
+-- Name: features; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.features (
@@ -139,10 +131,8 @@ CREATE TABLE public.features (
 );
 
 
-ALTER TABLE public.features OWNER TO pierre;
-
 --
--- Name: features_id_seq; Type: SEQUENCE; Schema: public; Owner: pierre
+-- Name: features_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.features_id_seq
@@ -154,17 +144,15 @@ CREATE SEQUENCE public.features_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.features_id_seq OWNER TO pierre;
-
 --
--- Name: features_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pierre
+-- Name: features_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.features_id_seq OWNED BY public.features.id;
 
 
 --
--- Name: interactors; Type: TABLE; Schema: public; Owner: pierre
+-- Name: interactors; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.interactors (
@@ -179,10 +167,8 @@ CREATE TABLE public.interactors (
 );
 
 
-ALTER TABLE public.interactors OWNER TO pierre;
-
 --
--- Name: interactors_id_seq; Type: SEQUENCE; Schema: public; Owner: pierre
+-- Name: interactors_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.interactors_id_seq
@@ -194,17 +180,15 @@ CREATE SEQUENCE public.interactors_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.interactors_id_seq OWNER TO pierre;
-
 --
--- Name: interactors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pierre
+-- Name: interactors_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.interactors_id_seq OWNED BY public.interactors.id;
 
 
 --
--- Name: keywords; Type: TABLE; Schema: public; Owner: pierre
+-- Name: keywords; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.keywords (
@@ -214,10 +198,8 @@ CREATE TABLE public.keywords (
 );
 
 
-ALTER TABLE public.keywords OWNER TO pierre;
-
 --
--- Name: keywords_id_seq; Type: SEQUENCE; Schema: public; Owner: pierre
+-- Name: keywords_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.keywords_id_seq
@@ -229,17 +211,15 @@ CREATE SEQUENCE public.keywords_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.keywords_id_seq OWNER TO pierre;
-
 --
--- Name: keywords_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pierre
+-- Name: keywords_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.keywords_id_seq OWNED BY public.keywords.id;
 
 
 --
--- Name: methods; Type: TABLE; Schema: public; Owner: pierre
+-- Name: methods; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.methods (
@@ -250,10 +230,8 @@ CREATE TABLE public.methods (
 );
 
 
-ALTER TABLE public.methods OWNER TO pierre;
-
 --
--- Name: methods_id_seq; Type: SEQUENCE; Schema: public; Owner: pierre
+-- Name: methods_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.methods_id_seq
@@ -265,17 +243,15 @@ CREATE SEQUENCE public.methods_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.methods_id_seq OWNER TO pierre;
-
 --
--- Name: methods_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pierre
+-- Name: methods_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.methods_id_seq OWNED BY public.methods.id;
 
 
 --
--- Name: proteins; Type: TABLE; Schema: public; Owner: pierre
+-- Name: proteins; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.proteins (
@@ -292,10 +268,8 @@ CREATE TABLE public.proteins (
 );
 
 
-ALTER TABLE public.proteins OWNER TO pierre;
-
 --
--- Name: proteins_id_seq; Type: SEQUENCE; Schema: public; Owner: pierre
+-- Name: proteins_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.proteins_id_seq
@@ -307,33 +281,29 @@ CREATE SEQUENCE public.proteins_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.proteins_id_seq OWNER TO pierre;
-
 --
--- Name: proteins_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pierre
+-- Name: proteins_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.proteins_id_seq OWNED BY public.proteins.id;
 
 
 --
--- Name: publications; Type: TABLE; Schema: public; Owner: pierre
+-- Name: publications; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.publications (
     id integer NOT NULL,
     pmid bigint NOT NULL,
-    title text NOT NULL,
-    abstract text NOT NULL,
-    journal text NOT NULL,
-    authors text NOT NULL
+    title text DEFAULT ''::text NOT NULL,
+    abstract text DEFAULT ''::text NOT NULL,
+    journal text DEFAULT ''::text NOT NULL,
+    authors text DEFAULT ''::text NOT NULL
 );
 
 
-ALTER TABLE public.publications OWNER TO pierre;
-
 --
--- Name: publications_id_seq; Type: SEQUENCE; Schema: public; Owner: pierre
+-- Name: publications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.publications_id_seq
@@ -345,24 +315,22 @@ CREATE SEQUENCE public.publications_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.publications_id_seq OWNER TO pierre;
-
 --
--- Name: publications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pierre
+-- Name: publications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.publications_id_seq OWNED BY public.publications.id;
 
 
 --
--- Name: runs; Type: TABLE; Schema: public; Owner: pierre
+-- Name: runs; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.runs (
     id integer NOT NULL,
     type character(2) NOT NULL,
     name text NOT NULL,
-    state character varying(10) NOT NULL,
+    state character varying(10) DEFAULT 'pending'::character varying NOT NULL,
     created_at timestamp(0) without time zone DEFAULT now() NOT NULL,
     deleted_at timestamp(0) without time zone,
     CONSTRAINT runs_state_check CHECK (((state)::text = ANY (ARRAY[('pending'::character varying)::text, ('populated'::character varying)::text]))),
@@ -370,10 +338,8 @@ CREATE TABLE public.runs (
 );
 
 
-ALTER TABLE public.runs OWNER TO pierre;
-
 --
--- Name: runs_id_seq; Type: SEQUENCE; Schema: public; Owner: pierre
+-- Name: runs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.runs_id_seq
@@ -385,17 +351,15 @@ CREATE SEQUENCE public.runs_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.runs_id_seq OWNER TO pierre;
-
 --
--- Name: runs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pierre
+-- Name: runs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.runs_id_seq OWNED BY public.runs.id;
 
 
 --
--- Name: sequences; Type: TABLE; Schema: public; Owner: pierre
+-- Name: sequences; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.sequences (
@@ -407,10 +371,8 @@ CREATE TABLE public.sequences (
 );
 
 
-ALTER TABLE public.sequences OWNER TO pierre;
-
 --
--- Name: sequences_id_seq; Type: SEQUENCE; Schema: public; Owner: pierre
+-- Name: sequences_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
 CREATE SEQUENCE public.sequences_id_seq
@@ -422,87 +384,85 @@ CREATE SEQUENCE public.sequences_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.sequences_id_seq OWNER TO pierre;
-
 --
--- Name: sequences_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: pierre
+-- Name: sequences_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
 --
 
 ALTER SEQUENCE public.sequences_id_seq OWNED BY public.sequences.id;
 
 
 --
--- Name: associations id; Type: DEFAULT; Schema: public; Owner: pierre
+-- Name: associations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.associations ALTER COLUMN id SET DEFAULT nextval('public.associations_id_seq'::regclass);
 
 
 --
--- Name: descriptions id; Type: DEFAULT; Schema: public; Owner: pierre
+-- Name: descriptions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.descriptions ALTER COLUMN id SET DEFAULT nextval('public.descriptions_id_seq'::regclass);
 
 
 --
--- Name: features id; Type: DEFAULT; Schema: public; Owner: pierre
+-- Name: features id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.features ALTER COLUMN id SET DEFAULT nextval('public.features_id_seq'::regclass);
 
 
 --
--- Name: interactors id; Type: DEFAULT; Schema: public; Owner: pierre
+-- Name: interactors id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.interactors ALTER COLUMN id SET DEFAULT nextval('public.interactors_id_seq'::regclass);
 
 
 --
--- Name: keywords id; Type: DEFAULT; Schema: public; Owner: pierre
+-- Name: keywords id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.keywords ALTER COLUMN id SET DEFAULT nextval('public.keywords_id_seq'::regclass);
 
 
 --
--- Name: methods id; Type: DEFAULT; Schema: public; Owner: pierre
+-- Name: methods id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.methods ALTER COLUMN id SET DEFAULT nextval('public.methods_id_seq'::regclass);
 
 
 --
--- Name: proteins id; Type: DEFAULT; Schema: public; Owner: pierre
+-- Name: proteins id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.proteins ALTER COLUMN id SET DEFAULT nextval('public.proteins_id_seq'::regclass);
 
 
 --
--- Name: publications id; Type: DEFAULT; Schema: public; Owner: pierre
+-- Name: publications id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.publications ALTER COLUMN id SET DEFAULT nextval('public.publications_id_seq'::regclass);
 
 
 --
--- Name: runs id; Type: DEFAULT; Schema: public; Owner: pierre
+-- Name: runs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.runs ALTER COLUMN id SET DEFAULT nextval('public.runs_id_seq'::regclass);
 
 
 --
--- Name: sequences id; Type: DEFAULT; Schema: public; Owner: pierre
+-- Name: sequences id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.sequences ALTER COLUMN id SET DEFAULT nextval('public.sequences_id_seq'::regclass);
 
 
 --
--- Name: associations associations_pkey; Type: CONSTRAINT; Schema: public; Owner: pierre
+-- Name: associations associations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.associations
@@ -510,7 +470,7 @@ ALTER TABLE ONLY public.associations
 
 
 --
--- Name: descriptions descriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: pierre
+-- Name: descriptions descriptions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.descriptions
@@ -518,7 +478,7 @@ ALTER TABLE ONLY public.descriptions
 
 
 --
--- Name: features features_pkey; Type: CONSTRAINT; Schema: public; Owner: pierre
+-- Name: features features_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.features
@@ -526,7 +486,7 @@ ALTER TABLE ONLY public.features
 
 
 --
--- Name: interactors interactors_pkey; Type: CONSTRAINT; Schema: public; Owner: pierre
+-- Name: interactors interactors_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.interactors
@@ -534,7 +494,7 @@ ALTER TABLE ONLY public.interactors
 
 
 --
--- Name: keywords keywords_pkey; Type: CONSTRAINT; Schema: public; Owner: pierre
+-- Name: keywords keywords_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.keywords
@@ -542,7 +502,7 @@ ALTER TABLE ONLY public.keywords
 
 
 --
--- Name: methods methods_pkey; Type: CONSTRAINT; Schema: public; Owner: pierre
+-- Name: methods methods_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.methods
@@ -550,7 +510,7 @@ ALTER TABLE ONLY public.methods
 
 
 --
--- Name: proteins proteins_pkey; Type: CONSTRAINT; Schema: public; Owner: pierre
+-- Name: proteins proteins_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.proteins
@@ -558,7 +518,7 @@ ALTER TABLE ONLY public.proteins
 
 
 --
--- Name: publications publications_pkey; Type: CONSTRAINT; Schema: public; Owner: pierre
+-- Name: publications publications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.publications
@@ -566,7 +526,7 @@ ALTER TABLE ONLY public.publications
 
 
 --
--- Name: runs runs_pkey; Type: CONSTRAINT; Schema: public; Owner: pierre
+-- Name: runs runs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.runs
@@ -574,7 +534,7 @@ ALTER TABLE ONLY public.runs
 
 
 --
--- Name: sequences sequences_pkey; Type: CONSTRAINT; Schema: public; Owner: pierre
+-- Name: sequences sequences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.sequences
@@ -582,133 +542,133 @@ ALTER TABLE ONLY public.sequences
 
 
 --
--- Name: association_run_id_publication_id_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: association_run_id_publication_id_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX association_run_id_publication_id_key ON public.associations USING btree (run_id, publication_id);
 
 
 --
--- Name: associations_publication_id_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: associations_publication_id_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX associations_publication_id_key ON public.associations USING btree (publication_id);
 
 
 --
--- Name: associations_run_id_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: associations_run_id_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX associations_run_id_key ON public.associations USING btree (run_id);
 
 
 --
--- Name: descriptions_association_id_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: descriptions_association_id_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX descriptions_association_id_key ON public.descriptions USING btree (association_id);
 
 
 --
--- Name: descriptions_interactor1_id_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: descriptions_interactor1_id_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX descriptions_interactor1_id_key ON public.descriptions USING btree (interactor1_id);
 
 
 --
--- Name: descriptions_interactor2_id_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: descriptions_interactor2_id_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX descriptions_interactor2_id_key ON public.descriptions USING btree (interactor2_id);
 
 
 --
--- Name: descriptions_method_id_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: descriptions_method_id_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX descriptions_method_id_key ON public.descriptions USING btree (method_id);
 
 
 --
--- Name: descriptions_uniq_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: descriptions_uniq_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX descriptions_uniq_key ON public.descriptions USING btree (association_id, method_id, interactor1_id, interactor2_id);
 
 
 --
--- Name: features_sequence_id_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: features_sequence_id_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX features_sequence_id_key ON public.features USING btree (sequence_id);
 
 
 --
--- Name: interactor_protein_id_start_stop_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: interactor_protein_id_start_stop_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX interactor_protein_id_start_stop_key ON public.interactors USING btree (protein_id, start, stop);
 
 
 --
--- Name: interactors_protein_id_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: interactors_protein_id_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX interactors_protein_id_key ON public.interactors USING btree (protein_id);
 
 
 --
--- Name: interactors_taxon_name_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: interactors_taxon_name_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX interactors_taxon_name_key ON public.interactors USING btree (taxon, name) WHERE ((taxon)::text <> 'H'::text);
 
 
 --
--- Name: methods_search_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: methods_search_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX methods_search_key ON public.methods USING gin (search public.gin_trgm_ops);
 
 
 --
--- Name: proteins_accession_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: proteins_accession_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX proteins_accession_key ON public.proteins USING btree (accession);
 
 
 --
--- Name: proteins_search_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: proteins_search_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX proteins_search_key ON public.proteins USING gin (search public.gin_trgm_ops);
 
 
 --
--- Name: publications_pmid_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: publications_pmid_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX publications_pmid_key ON public.publications USING btree (pmid);
 
 
 --
--- Name: sequences_accession_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: sequences_accession_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX sequences_accession_key ON public.sequences USING btree (accession);
 
 
 --
--- Name: sequences_protein_id_key; Type: INDEX; Schema: public; Owner: pierre
+-- Name: sequences_protein_id_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX sequences_protein_id_key ON public.sequences USING btree (protein_id);
 
 
 --
--- Name: associations association_run_id_key; Type: FK CONSTRAINT; Schema: public; Owner: pierre
+-- Name: associations association_run_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.associations
@@ -716,7 +676,7 @@ ALTER TABLE ONLY public.associations
 
 
 --
--- Name: associations associations_publication_id_key; Type: FK CONSTRAINT; Schema: public; Owner: pierre
+-- Name: associations associations_publication_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.associations
@@ -724,7 +684,7 @@ ALTER TABLE ONLY public.associations
 
 
 --
--- Name: descriptions descriptions_association_id_key; Type: FK CONSTRAINT; Schema: public; Owner: pierre
+-- Name: descriptions descriptions_association_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.descriptions
@@ -732,7 +692,7 @@ ALTER TABLE ONLY public.descriptions
 
 
 --
--- Name: descriptions descriptions_interactor1_id_key; Type: FK CONSTRAINT; Schema: public; Owner: pierre
+-- Name: descriptions descriptions_interactor1_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.descriptions
@@ -740,7 +700,7 @@ ALTER TABLE ONLY public.descriptions
 
 
 --
--- Name: descriptions descriptions_interactor2_id_key; Type: FK CONSTRAINT; Schema: public; Owner: pierre
+-- Name: descriptions descriptions_interactor2_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.descriptions
@@ -748,7 +708,7 @@ ALTER TABLE ONLY public.descriptions
 
 
 --
--- Name: descriptions descriptions_method_id_key; Type: FK CONSTRAINT; Schema: public; Owner: pierre
+-- Name: descriptions descriptions_method_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.descriptions
@@ -756,7 +716,7 @@ ALTER TABLE ONLY public.descriptions
 
 
 --
--- Name: features features_sequence_id_key; Type: FK CONSTRAINT; Schema: public; Owner: pierre
+-- Name: features features_sequence_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.features
@@ -764,7 +724,7 @@ ALTER TABLE ONLY public.features
 
 
 --
--- Name: interactors interactors_protein_id_key; Type: FK CONSTRAINT; Schema: public; Owner: pierre
+-- Name: interactors interactors_protein_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.interactors
@@ -772,7 +732,7 @@ ALTER TABLE ONLY public.interactors
 
 
 --
--- Name: sequences sequences_protein_id_key; Type: FK CONSTRAINT; Schema: public; Owner: pierre
+-- Name: sequences sequences_protein_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.sequences
