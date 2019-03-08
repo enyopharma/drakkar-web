@@ -20,7 +20,7 @@ final class RunRepository
 
         if ($run = $stmts['run']->fetch()) {
             foreach (Publication::STATES as $state) {
-                $stmts['count'] = $this->stmts->executed('publications/count.from_run', [
+                $stmts['count'] = $this->stmts->executed('runs.publications/count', [
                     $run['id'],
                     $state,
                 ]);
@@ -42,7 +42,7 @@ final class RunRepository
 
         foreach (Publication::STATES as $state) {
             $nbs[$state] = $this->stmts
-                ->executed('runs/count.publications', [$state])
+                ->executed('runs.publications/count.eagerload', [$state])
                 ->fetchAll(\PDO::FETCH_GROUP|\PDO::FETCH_UNIQUE);
         }
 

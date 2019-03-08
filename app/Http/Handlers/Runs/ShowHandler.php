@@ -47,7 +47,7 @@ final class ShowHandler implements RequestHandlerInterface
             return $this->responder->notfound();
         }
 
-        $publications = $this->publications->fromRun($id, $state, $page);
+        $publications = $this->publications->paginated($id, $state, $page);
 
         if ($publications->overflow()) {
             return $this->responder->redirect('runs.show', $run, ['state' => $state]);

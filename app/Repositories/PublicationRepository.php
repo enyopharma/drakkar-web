@@ -15,18 +15,18 @@ final class PublicationRepository
         $this->stmts = $stmts;
     }
 
-    public function fromRun(int $run_id, string $state, int $page = 1, int $limit = 20): Pagination
+    public function paginated(int $run_id, string $state, int $page = 1, int $limit = 20): Pagination
     {
         $offset = ($page - 1) * $limit;
 
-        $stmts['select'] = $this->stmts->executed('publications/select.from_run', [
+        $stmts['select'] = $this->stmts->executed('runs.publications/select', [
             $run_id,
             $state,
             $limit,
             $offset,
         ]);
 
-        $stmts['count'] = $this->stmts->executed('publications/count.from_run', [
+        $stmts['count'] = $this->stmts->executed('runs.publications/count', [
             $run_id,
             $state,
         ]);
@@ -40,7 +40,7 @@ final class PublicationRepository
     public function update(int $run_id, int $publication_id, string $state, string $annotation): \PDOStatement
     {
         if (in_array($state, Publication::STATES)) {
-            return $this->stmts->executed('publications/update', [
+            return $this->stmts->executed('runs.publications/update', [
                 $state,
                 $annotation,
                 $run_id,
