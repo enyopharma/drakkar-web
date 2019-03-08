@@ -17,6 +17,17 @@ final class StatementMap
         $this->stmts = [];
     }
 
+    public function transaction(callable $transaction)
+    {
+        $this->pdo->beginTransaction();
+
+        $result = $transaction($this);
+
+        $this->pdo->commit();
+
+        return $result;
+    }
+
     public function stmt(string $name, int ...$ins): \PDOStatement
     {
         if (key_exists($name, $this->queries)) {
@@ -36,6 +47,19 @@ final class StatementMap
         );
     }
 
+    public function inserted(string $name, array $input = []): int
+    {
+        $stmt = $this->stmt($name);
+
+        if ($stmt->execute($input)) {
+            return (int) $this->pdo->lastInsertId();
+        }
+
+        throw new \LogicException(
+            sprintf('Execution of \'%s\' failed: %s %s %s', $name, ...$stmt->errorInfo())
+        );
+    }
+
     public function executed(string $name, array $input = [], int ...$ins): \PDOStatement
     {
         $stmt = $this->stmt($name, ...$ins);
@@ -45,7 +69,7 @@ final class StatementMap
         }
 
         throw new \LogicException(
-            sprintf('Execution of \'%s\' failed', $name)
+            sprintf('Execution of \'%s\' failed: %s %s %s', $name, ...$stmt->errorInfo())
         );
     }
 

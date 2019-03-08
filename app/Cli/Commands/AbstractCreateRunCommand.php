@@ -7,19 +7,19 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Enyo\Data\StatementMap;
+use App\Repositories\RunRepository;
+use App\Repositories\NotUniqueException;
 
 abstract class AbstractCreateRunCommand extends Command
 {
     private $type;
 
-    private $stmts;
+    private $runs;
 
-    public function __construct(string $type, \Pdo $pdo, StatementMap $stmts)
+    public function __construct(string $type, RunRepository $runs)
     {
         $this->type = $type;
-        $this->pdo = $pdo;
-        $this->stmts = $stmts;
+        $this->runs = $runs;
 
         parent::__construct();
     }
@@ -36,31 +36,30 @@ abstract class AbstractCreateRunCommand extends Command
     {
         $name = $input->getArgument('name');
 
+        // read pmids from stdin.
         try {
             $pmids = $this->pmids();
         }
 
         catch (\UnexpectedValueException $e) {
             $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+
+            return;
         }
 
         // check if pmid are already associated to a HH/VH run.
-
-        $this->pdo->beginTransaction();
-
-        $this->stmts->executed('runs/insert', [$this->type, $name]);
-
-        $run_id = $this->pdo->lastInsertId();
-
-        foreach ($pmids as $pmid) {
-            $this->stmts->executed('publications/insert', [$pmid]);
-
-            $publication_id =  $this->pdo->lastInsertId();
-
-            $this->stmts->executed('associations/insert', [$run_id, $publication_id]);
+        try {
+            $run['id'] = $this->runs->insert($this->type, $name, ...$pmids);
         }
 
-        $this->pdo->commit();
+        catch (NotUniqueException $e) {
+            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+
+            return;
+        }
+
+        // success message.
+        $output->writeln(sprintf('<info>Curation run inserted with id %s</info>', $run['id']));
     }
 
     private function pmids(): array
@@ -69,24 +68,31 @@ abstract class AbstractCreateRunCommand extends Command
 
         $stdin = fopen("php://stdin", "r");
 
-        while ($line = fgets($stdin)) {
-            $line = rtrim($line);
+        try {
+            while ($line = fgets($stdin)) {
+                $line = rtrim($line);
 
-            if (empty($line)) continue;
+                if (empty($line)) continue;
 
-            if (! preg_match('/^[0-9]+$/', $line)) {
-                throw new \UnexpectedValueException(
-                    sprintf('Value %s from stdin is not a pmid', strlen($line) > 10
-                        ? substr($line, 0, 10) . '...'
-                        : $line
-                    )
-                );
+                if (! preg_match('/^[0-9]+$/', $line)) {
+                    throw new \UnexpectedValueException(
+                        vsprintf('Value \'%s\' from stdin is not a valid PMID', [
+                            strlen($line) > 10 ? substr($line, 0, 10) . '...' : $line,
+                        ])
+                    );
+                }
+
+                $pmids[$line] = true;
             }
-
-            $pmids[$line] = true;
         }
 
-        fclose($stdin);
+        catch (\UnexpectedValueException $e) {
+            throw $e;
+        }
+
+        finally {
+            fclose($stdin);
+        }
 
         return array_keys($pmids);
     }

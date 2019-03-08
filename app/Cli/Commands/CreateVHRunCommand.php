@@ -3,15 +3,14 @@
 namespace App\Cli\Commands;
 
 use App\Repositories\Run;
-
-use Enyo\Data\StatementMap;
+use App\Repositories\RunRepository;
 
 final class CreateVHRunCommand extends AbstractCreateRunCommand
 {
     protected static $defaultName = 'runs:create:vh';
 
-    public function __construct(\PDO $pdo, StatementMap $stmts)
+    public function __construct(RunRepository $runs)
     {
-        parent::__construct(Run::VH, $pdo, $stmts);
+        parent::__construct(Run::VH, $runs);
     }
 }

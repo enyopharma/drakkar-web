@@ -55,4 +55,16 @@ $queries['publications/insert'] = <<<SQL
     INSERT INTO publications (pmid) VALUES (?)
 SQL;
 
+$queries['publications/find.pmid'] = <<<SQL
+    SELECT * FROM publications WHERE pmid = ?
+SQL;
+
+$queries['publications/select.type.pmids'] = <<<SQL
+    SELECT r.id as run_id, r.name as run_name, p.*
+    FROM runs AS r, publications AS p, associations AS a
+    WHERE r.id = a.run_id AND r.type = ?
+    AND p.id = a.publication_id AND p.pmid IN(%s)
+    GROUP BY r.id, p.id
+SQL;
+
 return $queries;
