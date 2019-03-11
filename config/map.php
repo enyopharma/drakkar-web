@@ -5,14 +5,13 @@ use Quanta\Container\ConfigurationEntry;
 use Quanta\Container\ConfigurationSource;
 use Quanta\Container\ConfiguredFactoryMap;
 use Quanta\Container\MergedConfigurationSource;
+use Quanta\Container\InteropConfigurationSource;
 use Quanta\Container\PhpFileConfigurationSource;
 use Quanta\Container\Maps\FactoryMap;
-use Quanta\Container\Maps\MergedFactoryMap;
 use Quanta\Container\Maps\CompiledFactoryMap;
 use Quanta\Container\Maps\FactoryMapInterface;
 use Quanta\Container\Values\ValueFactory;
-use Quanta\Container\Passes\ExtensionPass;
-use Quanta\Container\Passes\MergedProcessingPass;
+use Quanta\Container\Passes\DummyProcessingPass;
 use Quanta\Container\Factories\Factory;
 
 /**
@@ -30,40 +29,21 @@ return function (array $app): FactoryMapInterface {
         return new Factory($factory($value));
     };
 
-    // closure creating an extension pass from an id and an extension.
-    $extension = function (string $id, callable $extension) {
-        return new ExtensionPass($id, $extension);
-    };
-
-    // closure creating a configuration source from a service provider.
-    $source = function ($provider) {
-        $factories = $provider->getFactories();
-        $extensions = $provider->getExtensions();
-
-        foreach ($extensions as $id => $extension) {
-            $passes[] = new ExtensionPass($id, $extension);
-        }
-
-        return new ConfigurationSource(
-            new ConfigurationEntry(
-                new Configuration(
-                    new FactoryMap($factories),
-                    new MergedProcessingPass(...($passes ?? []))
-                )
-            )
-        );
-    };
-
     // create the factory map.
     return new CompiledFactoryMap(
-        new MergedFactoryMap(
-            new ConfiguredFactoryMap(
-                new MergedConfigurationSource(...array_merge(
-                    array_map($source, $app['providers']), [
-                    new PhpFileConfigurationSource($factory, ...$app['project']['php'])
-                ]))
-            ),
-            new FactoryMap(array_map($parameter, $app['immutables']))
+        new ConfiguredFactoryMap(
+            new MergedConfigurationSource(...[
+                new InteropConfigurationSource(...$app['providers']),
+                new PhpFileConfigurationSource($factory, ...$app['project']['php']),
+                new ConfigurationSource(
+                    new ConfigurationEntry(
+                        new Configuration(
+                            new FactoryMap(array_map($parameter, $app['immutables'])),
+                            new DummyProcessingPass
+                        )
+                    )
+                ),
+            ])
         ),
         $app['compilation']['cache'],
         $app['compilation']['path']

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "533689ceb902ca255ddf51f23bcd82d3",
+    "content-hash": "d0981903bdf59c9d3c6739aefaa8cad1",
     "packages": [
         {
             "name": "cache/adapter-common",
@@ -1484,16 +1484,16 @@
         },
         {
             "name": "quanta/container-configuration",
-            "version": "0.4.0",
+            "version": "0.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quantaphp/container-configuration.git",
-                "reference": "b1d11cfa0a18cf75505cc5b8a7bd66b35f554a95"
+                "reference": "c79ad4b84264c24a02ca715372d86b64cae77ee5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/container-configuration/zipball/b1d11cfa0a18cf75505cc5b8a7bd66b35f554a95",
-                "reference": "b1d11cfa0a18cf75505cc5b8a7bd66b35f554a95",
+                "url": "https://api.github.com/repos/quantaphp/container-configuration/zipball/c79ad4b84264c24a02ca715372d86b64cae77ee5",
+                "reference": "c79ad4b84264c24a02ca715372d86b64cae77ee5",
                 "shasum": ""
             },
             "require": {
@@ -1530,7 +1530,57 @@
                 "container",
                 "dependency-injection"
             ],
-            "time": "2019-03-11T12:33:26+00:00"
+            "time": "2019-03-11T15:43:00+00:00"
+        },
+        {
+            "name": "quanta/container-interop",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/quantaphp/container-interop.git",
+                "reference": "a79adf50ea79e952514eb7e0032b44c88a332dc4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/quantaphp/container-interop/zipball/a79adf50ea79e952514eb7e0032b44c88a332dc4",
+                "reference": "a79adf50ea79e952514eb7e0032b44c88a332dc4",
+                "shasum": ""
+            },
+            "require": {
+                "container-interop/service-provider": "^0.4.0",
+                "php": ">=7.0",
+                "quanta/container-configuration": "^0.4.0"
+            },
+            "require-dev": {
+                "eloquent/phony-kahlan": "^2.0",
+                "kahlan/kahlan": "^4.0",
+                "phpstan/phpstan": "^0.11.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Quanta\\Container\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "pmall",
+                    "email": "pierre.mallinjoud@gmail.com"
+                }
+            ],
+            "description": "Library for creating quanta Psr-11 container configuration from interop service providers",
+            "homepage": "https://github.com/quantaphp/container-interop",
+            "keywords": [
+                "PSR-11",
+                "container",
+                "dependency-injection",
+                "service-provider"
+            ],
+            "time": "2019-03-11T16:42:31+00:00"
         },
         {
             "name": "quanta/http-entrypoint",
