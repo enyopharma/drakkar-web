@@ -75,5 +75,15 @@ return function (string $root): array {
                 sprintf('%s/config/factories/debug/*.php', $root)
             ] : []),
         ],
+
+        /**
+         * The compilation options.
+         *
+         * @var array
+         */
+        'compilation' => [
+            'cache' => $env == 'production',
+            'path' => $root . '/storage/app/factories.php',
+        ],
     ];
 };

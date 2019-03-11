@@ -8,6 +8,7 @@ use Quanta\Container\MergedConfigurationSource;
 use Quanta\Container\PhpFileConfigurationSource;
 use Quanta\Container\Maps\FactoryMap;
 use Quanta\Container\Maps\MergedFactoryMap;
+use Quanta\Container\Maps\CompiledFactoryMap;
 use Quanta\Container\Maps\FactoryMapInterface;
 use Quanta\Container\Values\ValueFactory;
 use Quanta\Container\Passes\ExtensionPass;
@@ -53,14 +54,18 @@ return function (array $app): FactoryMapInterface {
         );
     };
 
-    // merge the map with the immutable parameters.
-    return new MergedFactoryMap(
-        new ConfiguredFactoryMap(
-            new MergedConfigurationSource(...array_merge(
-                array_map($source, $app['providers']), [
-                new PhpFileConfigurationSource($factory, ...$app['project']['php'])
-            ]))
+    // create the factory map.
+    return new CompiledFactoryMap(
+        new MergedFactoryMap(
+            new ConfiguredFactoryMap(
+                new MergedConfigurationSource(...array_merge(
+                    array_map($source, $app['providers']), [
+                    new PhpFileConfigurationSource($factory, ...$app['project']['php'])
+                ]))
+            ),
+            new FactoryMap(array_map($parameter, $app['immutables']))
         ),
-        new FactoryMap(array_map($parameter, $app['immutables']))
+        $app['compilation']['cache'],
+        $app['compilation']['path']
     );
 };
