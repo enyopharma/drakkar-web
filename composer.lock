@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "21437b9104967eaa7f520a45431c199e",
+    "content-hash": "13008a9b8197e6ba3d20a308f50b885d",
     "packages": [
         {
             "name": "cache/adapter-common",
@@ -1232,27 +1232,70 @@
             "time": "2017-10-23T01:57:42+00:00"
         },
         {
-            "name": "quanta/container",
-            "version": "0.2.7",
+            "name": "quanta/array-type-check",
+            "version": "0.1.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/quantaphp/container.git",
-                "reference": "e73484a63366bbfb4979e89c5ce3596c4f227ca6"
+                "url": "https://github.com/quantaphp/array-type-check.git",
+                "reference": "77d7e2b02ad52a6a72124f268c67b5c9b5157bdd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/container/zipball/e73484a63366bbfb4979e89c5ce3596c4f227ca6",
-                "reference": "e73484a63366bbfb4979e89c5ce3596c4f227ca6",
+                "url": "https://api.github.com/repos/quantaphp/array-type-check/zipball/77d7e2b02ad52a6a72124f268c67b5c9b5157bdd",
+                "reference": "77d7e2b02ad52a6a72124f268c67b5c9b5157bdd",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0"
+            },
+            "require-dev": {
+                "eloquent/phony-kahlan": "^2.0",
+                "kahlan/kahlan": "^4.0",
+                "phpstan/phpstan": "^0.11.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Quanta\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "pmall",
+                    "email": "pierre.mallinjoud@gmail.com"
+                }
+            ],
+            "description": "PHP associative array type check",
+            "homepage": "https://github.com/quantaphp/array-type-check",
+            "time": "2019-03-06T13:35:19+00:00"
+        },
+        {
+            "name": "quanta/container",
+            "version": "0.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/quantaphp/container.git",
+                "reference": "31b663ea7e3c4621564cdbc5fa5ff469860e9093"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/quantaphp/container/zipball/31b663ea7e3c4621564cdbc5fa5ff469860e9093",
+                "reference": "31b663ea7e3c4621564cdbc5fa5ff469860e9093",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.0",
                 "psr/container": "^1.0",
-                "quanta/exceptions": "^0.4.0"
+                "quanta/array-type-check": "0.1.0"
             },
             "require-dev": {
                 "eloquent/phony-kahlan": "^2.0",
-                "kahlan/kahlan": "^4.0"
+                "kahlan/kahlan": "^4.0",
+                "phpstan/phpstan": "^0.10.8"
             },
             "type": "library",
             "autoload": {
@@ -1271,32 +1314,33 @@
                 }
             ],
             "description": "Minimalist dependency injection container implementing Psr-11",
-            "homepage": "https://github.com/quanta/container",
+            "homepage": "https://github.com/quantaphp/container",
             "keywords": [
                 "PSR-11",
                 "container",
                 "dependency-injection"
             ],
-            "time": "2019-01-04T16:13:48+00:00"
+            "time": "2019-03-04T14:15:49+00:00"
         },
         {
-            "name": "quanta/container-factories",
-            "version": "0.7.1",
+            "name": "quanta/container-configuration",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/quantaphp/container-factories.git",
-                "reference": "37344a4cf9ab8df8e232513fc3cab978e1a26a55"
+                "url": "https://github.com/quantaphp/container-configuration.git",
+                "reference": "b1d11cfa0a18cf75505cc5b8a7bd66b35f554a95"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/container-factories/zipball/37344a4cf9ab8df8e232513fc3cab978e1a26a55",
-                "reference": "37344a4cf9ab8df8e232513fc3cab978e1a26a55",
+                "url": "https://api.github.com/repos/quantaphp/container-configuration/zipball/b1d11cfa0a18cf75505cc5b8a7bd66b35f554a95",
+                "reference": "b1d11cfa0a18cf75505cc5b8a7bd66b35f554a95",
                 "shasum": ""
             },
             "require": {
+                "container-interop/service-provider": "^0.4.0",
                 "php": ">=7.0",
                 "psr/container": "^1.0",
-                "quanta/exceptions": "^0.4.0"
+                "quanta/array-type-check": "^0.1.0"
             },
             "require-dev": {
                 "eloquent/phony-kahlan": "^2.0",
@@ -1319,57 +1363,14 @@
                     "email": "pierre.mallinjoud@gmail.com"
                 }
             ],
-            "description": "Library for creating Psr-11 container factory maps from various sources",
-            "homepage": "https://github.com/quanta/container-factories",
+            "description": "Library for creating associative arrays of Psr-11 factories",
+            "homepage": "https://github.com/quantaphp/container-configuration",
             "keywords": [
                 "PSR-11",
                 "container",
                 "dependency-injection"
             ],
-            "time": "2019-02-05T11:25:55+00:00"
-        },
-        {
-            "name": "quanta/exceptions",
-            "version": "0.4.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/quantaphp/exceptions.git",
-                "reference": "b1e83dcf9d6665c8eb0b0eafb0ffb66970858a3c"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/exceptions/zipball/b1e83dcf9d6665c8eb0b0eafb0ffb66970858a3c",
-                "reference": "b1e83dcf9d6665c8eb0b0eafb0ffb66970858a3c",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.0"
-            },
-            "require-dev": {
-                "kahlan/kahlan": "^4.0"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Quanta\\Exceptions\\": "src"
-                },
-                "files": [
-                    "src/functions.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "pmall",
-                    "email": "pierre.mallinjoud@gmail.com"
-                }
-            ],
-            "description": "Common exception error messages for quanta packages",
-            "homepage": "https://github.com/quanta/exceptions",
-            "time": "2019-01-04T15:31:02+00:00"
+            "time": "2019-03-11T12:33:26+00:00"
         },
         {
             "name": "quanta/http-entrypoint",
@@ -1725,16 +1726,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v4.2.3",
+            "version": "v4.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "1f0ad51dfde4da8a6070f06adc58b4e37cbb37a4"
+                "reference": "9dc2299a016497f9ee620be94524e6c0af0280a9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/1f0ad51dfde4da8a6070f06adc58b4e37cbb37a4",
-                "reference": "1f0ad51dfde4da8a6070f06adc58b4e37cbb37a4",
+                "url": "https://api.github.com/repos/symfony/console/zipball/9dc2299a016497f9ee620be94524e6c0af0280a9",
+                "reference": "9dc2299a016497f9ee620be94524e6c0af0280a9",
                 "shasum": ""
             },
             "require": {
@@ -1793,7 +1794,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2019-01-25T14:35:16+00:00"
+            "time": "2019-02-23T15:17:42+00:00"
         },
         {
             "name": "symfony/contracts",
@@ -1908,7 +1909,7 @@
                 },
                 {
                     "name": "Gert de Pagter",
-                    "email": "BackEndTea@gmail.com"
+                    "email": "backendtea@gmail.com"
                 }
             ],
             "description": "Symfony polyfill for ctype functions",
@@ -1982,16 +1983,16 @@
         },
         {
             "name": "symfony/var-dumper",
-            "version": "v3.4.22",
+            "version": "v3.4.23",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/var-dumper.git",
-                "reference": "2159335b452d929cbb9921fc4eb7d1bfed32d0be"
+                "reference": "d34d10236300876d14291e9df85c6ef3d3bb9066"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/2159335b452d929cbb9921fc4eb7d1bfed32d0be",
-                "reference": "2159335b452d929cbb9921fc4eb7d1bfed32d0be",
+                "url": "https://api.github.com/repos/symfony/var-dumper/zipball/d34d10236300876d14291e9df85c6ef3d3bb9066",
+                "reference": "d34d10236300876d14291e9df85c6ef3d3bb9066",
                 "shasum": ""
             },
             "require": {
@@ -2047,7 +2048,7 @@
                 "debug",
                 "dump"
             ],
-            "time": "2019-01-29T16:19:17+00:00"
+            "time": "2019-02-23T15:06:07+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -2169,16 +2170,16 @@
         },
         {
             "name": "zendframework/zend-expressive-helpers",
-            "version": "5.1.2",
+            "version": "5.1.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/zendframework/zend-expressive-helpers.git",
-                "reference": "c4db15318ae53965794f46618535fc61dd058ea7"
+                "reference": "8c078dd74d75b97a680b036114712dedb35b85b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-expressive-helpers/zipball/c4db15318ae53965794f46618535fc61dd058ea7",
-                "reference": "c4db15318ae53965794f46618535fc61dd058ea7",
+                "url": "https://api.github.com/repos/zendframework/zend-expressive-helpers/zipball/8c078dd74d75b97a680b036114712dedb35b85b6",
+                "reference": "8c078dd74d75b97a680b036114712dedb35b85b6",
                 "shasum": ""
             },
             "require": {
@@ -2225,7 +2226,7 @@
                 "zend-expressive",
                 "zf"
             ],
-            "time": "2018-07-26T20:05:23+00:00"
+            "time": "2019-02-27T16:42:27+00:00"
         },
         {
             "name": "zendframework/zend-expressive-router",
@@ -2635,33 +2636,33 @@
         },
         {
             "name": "nette/finder",
-            "version": "v2.4.2",
+            "version": "v2.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/finder.git",
-                "reference": "ee951a656cb8ac622e5dd33474a01fd2470505a0"
+                "reference": "6be1b83ea68ac558aff189d640abe242e0306fe2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/finder/zipball/ee951a656cb8ac622e5dd33474a01fd2470505a0",
-                "reference": "ee951a656cb8ac622e5dd33474a01fd2470505a0",
+                "url": "https://api.github.com/repos/nette/finder/zipball/6be1b83ea68ac558aff189d640abe242e0306fe2",
+                "reference": "6be1b83ea68ac558aff189d640abe242e0306fe2",
                 "shasum": ""
             },
             "require": {
-                "nette/utils": "~2.4",
-                "php": ">=5.6.0"
+                "nette/utils": "^2.4 || ~3.0.0",
+                "php": ">=7.1"
             },
             "conflict": {
                 "nette/nette": "<2.2"
             },
             "require-dev": {
-                "nette/tester": "~2.0",
+                "nette/tester": "^2.0",
                 "tracy/tracy": "^2.3"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.4-dev"
+                    "dev-master": "2.5-dev"
                 }
             },
             "autoload": {
@@ -2693,7 +2694,7 @@
                 "iterator",
                 "nette"
             ],
-            "time": "2018-06-28T11:49:23+00:00"
+            "time": "2019-02-28T18:13:25+00:00"
         },
         {
             "name": "nette/neon",
@@ -2820,16 +2821,16 @@
         },
         {
             "name": "nette/robot-loader",
-            "version": "v3.1.0",
+            "version": "v3.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/robot-loader.git",
-                "reference": "fc76c70e740b10f091e502b2e393d0be912f38d4"
+                "reference": "3e8d75d6d976e191bdf46752ca40a286671219d2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/robot-loader/zipball/fc76c70e740b10f091e502b2e393d0be912f38d4",
-                "reference": "fc76c70e740b10f091e502b2e393d0be912f38d4",
+                "url": "https://api.github.com/repos/nette/robot-loader/zipball/3e8d75d6d976e191bdf46752ca40a286671219d2",
+                "reference": "3e8d75d6d976e191bdf46752ca40a286671219d2",
                 "shasum": ""
             },
             "require": {
@@ -2881,7 +2882,7 @@
                 "nette",
                 "trait"
             ],
-            "time": "2018-08-13T14:19:06+00:00"
+            "time": "2019-03-01T20:23:02+00:00"
         },
         {
             "name": "nette/utils",
@@ -3018,16 +3019,16 @@
         },
         {
             "name": "ocramius/package-versions",
-            "version": "1.3.0",
+            "version": "1.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Ocramius/PackageVersions.git",
-                "reference": "4489d5002c49d55576fa0ba786f42dbb009be46f"
+                "reference": "a4d4b60d0e60da2487bd21a2c6ac089f85570dbb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Ocramius/PackageVersions/zipball/4489d5002c49d55576fa0ba786f42dbb009be46f",
-                "reference": "4489d5002c49d55576fa0ba786f42dbb009be46f",
+                "url": "https://api.github.com/repos/Ocramius/PackageVersions/zipball/a4d4b60d0e60da2487bd21a2c6ac089f85570dbb",
+                "reference": "a4d4b60d0e60da2487bd21a2c6ac089f85570dbb",
                 "shasum": ""
             },
             "require": {
@@ -3036,6 +3037,7 @@
             },
             "require-dev": {
                 "composer/composer": "^1.6.3",
+                "doctrine/coding-standard": "^5.0.1",
                 "ext-zip": "*",
                 "infection/infection": "^0.7.1",
                 "phpunit/phpunit": "^7.0.0"
@@ -3063,7 +3065,7 @@
                 }
             ],
             "description": "Composer plugin that provides efficient querying for installed package versions (no runtime IO)",
-            "time": "2018-02-05T13:05:30+00:00"
+            "time": "2019-02-21T12:16:21+00:00"
         },
         {
             "name": "phpstan/phpdoc-parser",
@@ -3113,16 +3115,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.11.2",
+            "version": "0.11.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "8e185a74004920419ee97bf9dc62e6a175e8dca5"
+                "reference": "e4644b4a8fd393c346f1137305fb2f76a7dc20a7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/8e185a74004920419ee97bf9dc62e6a175e8dca5",
-                "reference": "8e185a74004920419ee97bf9dc62e6a175e8dca5",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/e4644b4a8fd393c346f1137305fb2f76a7dc20a7",
+                "reference": "e4644b4a8fd393c346f1137305fb2f76a7dc20a7",
                 "shasum": ""
             },
             "require": {
@@ -3182,20 +3184,20 @@
                 "MIT"
             ],
             "description": "PHPStan - PHP Static Analysis Tool",
-            "time": "2019-02-12T14:54:38+00:00"
+            "time": "2019-03-10T16:25:30+00:00"
         },
         {
             "name": "symfony/finder",
-            "version": "v4.2.3",
+            "version": "v4.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",
-                "reference": "ef71816cbb264988bb57fe6a73f610888b9aa70c"
+                "reference": "267b7002c1b70ea80db0833c3afe05f0fbde580a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/finder/zipball/ef71816cbb264988bb57fe6a73f610888b9aa70c",
-                "reference": "ef71816cbb264988bb57fe6a73f610888b9aa70c",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/267b7002c1b70ea80db0833c3afe05f0fbde580a",
+                "reference": "267b7002c1b70ea80db0833c3afe05f0fbde580a",
                 "shasum": ""
             },
             "require": {
@@ -3231,12 +3233,14 @@
             ],
             "description": "Symfony Finder Component",
             "homepage": "https://symfony.com",
-            "time": "2019-01-16T20:35:37+00:00"
+            "time": "2019-02-23T15:42:05+00:00"
         }
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "quanta/container-configuration": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

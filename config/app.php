@@ -34,7 +34,6 @@ return function (string $root): array {
          */
         'parsers' => [
             new Quanta\Container\Values\EnvVarParser,
-            new Quanta\Container\Values\InstanceParser,
             new Quanta\Container\Values\ReferenceParser,
             new Quanta\Container\Values\InterpolatedStringParser,
         ],

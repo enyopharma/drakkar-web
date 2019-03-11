@@ -18,14 +18,19 @@ require $root . '/vendor/autoload.php';
 /**
  * Register slashtrace as error handler.
  */
-require $root . '/config/slashtrace.php';
+ $slashtrace = new SlashTrace\SlashTrace;
+
+ $slashtrace->addHandler(new SlashTrace\EventHandler\DebugHandler);
+
+ $slashtrace->register();
 
 /**
  * Build the app container.
  */
-$config = (require $root . '/config/app.php')($root);
-$factories = (require $root . '/config/factories.php')($config);
-$container = (require $root . '/config/container.php')($factories);
+ $app = (require $root . '/config/app.php')($root);
+ $map = (require $root . '/config/map.php')($app);
+ $factories = (require $root . '/config/factories.php')($map);
+ $container = (require $root . '/config/container.php')($factories);
 
 /**
  * Call boot scripts with the container.
