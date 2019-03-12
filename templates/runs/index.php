@@ -80,7 +80,7 @@
                     <?= $this->e($run['nbs'][$this->discarded()]) ?>
                 </span>
                 -
-                <span class="text-primary">
+                <span class="text-success">
                     <?= $this->e($run['nbs'][$this->curated()]) ?>
                 </span>
             </td>
