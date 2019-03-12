@@ -6,12 +6,12 @@ SQL;
 
 $queries['runs/find'] = <<<SQL
     SELECT * FROM runs
-    WHERE state = ? AND id = ? AND deleted_at IS NULL
+    WHERE id = ? AND populated IS TRUE AND deleted_at IS NULL
 SQL;
 
 $queries['runs/select'] = <<<SQL
     SELECT * FROM runs
-    WHERE state = ? AND deleted_at IS NULL
+    WHERE populated IS TRUE AND deleted_at IS NULL
     GROUP BY id
     ORDER BY created_at DESC, id DESC
 SQL;

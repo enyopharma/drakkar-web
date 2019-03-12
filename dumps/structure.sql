@@ -295,10 +295,8 @@ ALTER SEQUENCE public.proteins_id_seq OWNED BY public.proteins.id;
 CREATE TABLE public.publications (
     id integer NOT NULL,
     pmid bigint NOT NULL,
-    title text DEFAULT ''::text NOT NULL,
-    abstract text DEFAULT ''::text NOT NULL,
-    journal text DEFAULT ''::text NOT NULL,
-    authors text DEFAULT ''::text NOT NULL
+    populated boolean DEFAULT false,
+    metadata jsonb
 );
 
 
@@ -330,10 +328,9 @@ CREATE TABLE public.runs (
     id integer NOT NULL,
     type character(2) NOT NULL,
     name text NOT NULL,
-    state character varying(10) DEFAULT 'pending'::character varying NOT NULL,
+    populated boolean DEFAULT false NOT NULL,
     created_at timestamp(0) without time zone DEFAULT now() NOT NULL,
     deleted_at timestamp(0) without time zone,
-    CONSTRAINT runs_state_check CHECK (((state)::text = ANY (ARRAY[('pending'::character varying)::text, ('populated'::character varying)::text]))),
     CONSTRAINT runs_type_check CHECK (((type)::text = ANY (ARRAY[('hh'::character varying)::text, ('vh'::character varying)::text])))
 );
 
