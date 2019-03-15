@@ -6,7 +6,7 @@ final class UpdatePublicationState
 {
     const NOT_FOUND = 0;
 
-    const UPDATE_ASSOCIATION_STH = <<<SQL
+    const UPDATE_ASSOCIATION_SQL = <<<SQL
         UPDATE associations
         SET state = ?, annotation = ?, updated_at = NOW()
         WHERE run_id = ? AND publication_id = ?
@@ -25,7 +25,7 @@ SQL;
         string $state,
         string $annotation
     ): DomainPayloadInterface {
-        $update_association_sth = $this->pdo->prepare(self::UPDATE_ASSOCIATION_STH);
+        $update_association_sth = $this->pdo->prepare(self::UPDATE_ASSOCIATION_SQL);
 
         $update_association_sth->execute([$state, $annotation, $run_id, $publication_id]);
 
