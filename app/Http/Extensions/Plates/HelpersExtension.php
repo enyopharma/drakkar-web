@@ -5,7 +5,7 @@ namespace App\Http\Extensions\Plates;
 use League\Plates\Engine;
 use League\Plates\Extension\ExtensionInterface;
 
-use App\Repositories\Publication;
+use App\Domain\Publication;
 
 final class HelpersExtension implements ExtensionInterface
 {

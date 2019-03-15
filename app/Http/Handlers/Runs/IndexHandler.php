@@ -7,26 +7,24 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use Enyo\Http\Responder;
-use App\Repositories\RunRepository;
+use App\Domain\SelectRuns;
 
 final class IndexHandler implements RequestHandlerInterface
 {
-    private $runs;
+    private $domain;
 
     private $responder;
 
-    public function __construct(
-        RunRepository $runs,
-        Responder $responder
-    ) {
-        $this->runs = $runs;
+    public function __construct(SelectRuns $domain, Responder $responder)
+    {
+        $this->domain = $domain;
         $this->responder = $responder;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        return $this->responder->html('runs/index', [
-            'runs' => $this->runs->all(),
-        ]);
+        return ($this->domain)()->parsed(function (array $data) {
+            return $this->responder->html('runs/index', $data);
+        });
     }
 }

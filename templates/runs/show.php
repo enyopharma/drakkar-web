@@ -38,7 +38,7 @@ $(document).ready(function () {
             class="nav-link text-warning <?= $this->isPending($state) ? 'active' : '' ?>"
             href="<?= $this->url('runs.show', $run, ['state' => $this->pending()]) ?>"
         >
-            Pending (<?= $run['nbs'][$this->pending()] ?>)
+            Pending (<?= $nbs[$this->pending()] ?>)
         </a>
     </li>
     <li class="nav-item">
@@ -46,7 +46,7 @@ $(document).ready(function () {
             class="nav-link text-primary <?= $this->isSelected($state) ? 'active' : '' ?>"
             href="<?= $this->url('runs.show', $run, ['state' => $this->selected()]) ?>"
         >
-            Selected (<?= $run['nbs'][$this->selected()] ?>)
+            Selected (<?= $nbs[$this->selected()] ?>)
         </a>
     </li>
     <li class="nav-item">
@@ -54,7 +54,7 @@ $(document).ready(function () {
             class="nav-link text-danger <?= $this->isDiscarded($state) ? 'active' : '' ?>"
             href="<?= $this->url('runs.show', $run, ['state' => $this->discarded()]) ?>"
         >
-            Discarded (<?= $run['nbs'][$this->discarded()] ?>)
+            Discarded (<?= $nbs[$this->discarded()] ?>)
         </a>
     </li>
     <li class="nav-item">
@@ -62,7 +62,7 @@ $(document).ready(function () {
             class="nav-link text-success <?= $this->isCurated($state) ? 'active' : '' ?>"
             href="<?= $this->url('runs.show', $run, ['state' => $this->curated()]) ?>"
         >
-            Curated (<?= $run['nbs'][$this->curated()] ?>)
+            Curated (<?= $nbs[$this->curated()] ?>)
         </a>
     </li>
 </ul>

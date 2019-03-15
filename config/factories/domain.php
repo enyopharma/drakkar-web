@@ -1,0 +1,29 @@
+<?php declare(strict_types=1);
+
+return [
+    'factories' => [
+        App\Domain\InsertRun::class => function ($container) {
+            return new App\Domain\InsertRun(
+                $container->get(PDO::class)
+            );
+        },
+
+        App\Domain\SelectRun::class => function ($container) {
+            return new App\Domain\SelectRun(
+                $container->get(PDO::class)
+            );
+        },
+
+        App\Domain\SelectRuns::class => function ($container) {
+            return new App\Domain\SelectRuns(
+                $container->get(PDO::class)
+            );
+        },
+
+        App\Domain\UpdatePublication::class => function ($container) {
+            return new App\Domain\UpdatePublication(
+                $container->get(PDO::class)
+            );
+        },
+    ],
+];

@@ -7,19 +7,18 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use App\Repositories\RunRepository;
-use App\Repositories\NotUniqueException;
+use App\Domain\InsertRun;
 
 abstract class AbstractCreateRunCommand extends Command
 {
     private $type;
 
-    private $runs;
+    private $insert;
 
-    public function __construct(string $type, RunRepository $runs)
+    public function __construct(string $type, InsertRun $insert)
     {
         $this->type = $type;
-        $this->runs = $runs;
+        $this->insert = $insert;
 
         parent::__construct();
     }
@@ -34,35 +33,64 @@ abstract class AbstractCreateRunCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // read the input.
         $name = $input->getArgument('name');
 
-        // read pmids from stdin.
         try {
-            $pmids = $this->pmids();
+            $pmids = $this->pmidsFromStdin();
         }
 
         catch (\UnexpectedValueException $e) {
-            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
-
-            return;
+            return $this->error($output, ['message' => $e->getMessage()]);
         }
 
-        // check if pmid are already associated to a HH/VH run.
-        try {
-            $run['id'] = $this->runs->insert($this->type, $name, ...$pmids);
-        }
+        // get a payload from the domain.
+        $payload = ($this->insert)($this->type, $name, ...$pmids);
 
-        catch (NotUniqueException $e) {
-            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
-
-            return;
-        }
-
-        // success message.
-        $output->writeln(sprintf('<info>Curation run inserted with id %s</info>', $run['id']));
+        // return a response from the payload.
+        return $payload->parsed($this->bind('success', $output), [
+            InsertRun::INVALID_TYPE => $this->bind('invalidType', $output),
+            InsertRun::NOT_UNIQUE => $this->bind('notUnique', $output),
+        ]);
     }
 
-    private function pmids(): array
+    private function bind(string $method, ...$xs)
+    {
+        return function ($data) use ($method, $xs) {
+            return $this->{$method}(...array_merge($xs, [$data]));
+        };
+    }
+
+    private function success($output, array $data): void
+    {
+        $output->writeln(
+            vsprintf('<info>Curation run inserted with id %s</info>', [
+                $data['run']['id'],
+            ])
+        );
+    }
+
+    private function invalidType($output): void
+    {
+        $output->writeln(
+            vsprintf('<error>Value \'%s\' is not a valid curation run type</error>', [
+                $this->type,
+            ])
+        );
+    }
+
+    private function notUnique($output, array $data): void
+    {
+        $output->writeln(
+            vsprintf('<error>Publication with PMID %s is already associated to a %s curation run (\'%s\')</error>', [
+                $data['publication']['pmid'],
+                $this->type,
+                $data['run']['name'],
+            ])
+        );
+    }
+
+    private function pmidsFromStdin(): array
     {
         $pmids = [];
 
@@ -82,7 +110,7 @@ abstract class AbstractCreateRunCommand extends Command
                     );
                 }
 
-                $pmids[$line] = true;
+                $pmids[(int) $line] = true;
             }
         }
 

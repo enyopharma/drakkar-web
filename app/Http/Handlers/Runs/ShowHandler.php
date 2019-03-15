@@ -7,26 +7,18 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use Enyo\Http\Responder;
-use App\Repositories\Publication;
-use App\Repositories\RunRepository;
-use App\Repositories\NotFoundException;
-use App\Repositories\PublicationRepository;
+use App\Domain\SelectRun;
+use App\Domain\Publication;
 
 final class ShowHandler implements RequestHandlerInterface
 {
-    private $runs;
-
-    private $publications;
+    private $domain;
 
     private $responder;
 
-    public function __construct(
-        RunRepository $runs,
-        PublicationRepository $publications,
-        Responder $responder
-    ) {
-        $this->runs = $runs;
-        $this->publications = $publications;
+    public function __construct(SelectRun $domain, Responder $responder)
+    {
+        $this->domain = $domain;
         $this->responder = $responder;
     }
 
@@ -37,26 +29,56 @@ final class ShowHandler implements RequestHandlerInterface
 
         $id = (int) $attributes['id'];
         $state = $query['state'] ?? Publication::PENDING;
-        $page = (int) ($query['page'] ?? 1);
+        $page = (int) $query['page'];
 
-        try {
-            $run = $this->runs->find($id);
-        }
+        $payload = ($this->domain)($id, $state, $page);
 
-        catch (NotFoundException $e) {
-            return $this->responder->notfound();
-        }
+        return $payload->parsed($this->bind('success', $state, $page), [
+            SelectRun::NOT_FOUND => $this->bind('notfound', $id),
+            SelectRun::INVALID_STATE => $this->bind('invalidState', $id),
+            SelectRun::UNDERFLOW => $this->bind('underflow', $id, $state),
+            SelectRun::OVERFLOW => $this->bind('overflow', $id, $state),
+        ]);
+    }
 
-        $publications = $this->publications->paginated($id, $state, $page);
+    private function bind(string $method, ...$xs)
+    {
+        return function ($data) use ($method, $xs) {
+            return $this->{$method}(...array_merge($xs, [$data]));
+        };
+    }
 
-        if ($publications->overflow()) {
-            return $this->responder->redirect('runs.show', $run, ['state' => $state]);
-        }
-
-        return $this->responder->html('runs/show', [
+    private function success(string $state, int $page, array $data): ResponseInterface
+    {
+        return $this->responder->html('runs/show', array_merge($data, [
             'state' => $state,
-            'run' => $run,
-            'publications' => $publications,
+            'page' => $page,
+        ]));
+    }
+
+    private function notfound(int $id): ResponseInterface
+    {
+        return $this->responder->notfound();
+    }
+
+    private function invalidState(int $id): ResponseInterface
+    {
+        return $this->responder->notfound();
+    }
+
+    private function underflow(int $id, string $state): ResponseInterface
+    {
+        return $this->responder->redirect('runs.show', ['id' => $id], [
+            'state' => $state,
+            'page' => 1,
+        ]);
+    }
+
+    private function overflow(int $id, string $state, array $data): ResponseInterface
+    {
+        return $this->responder->redirect('runs.show', ['id' => $id], [
+            'state' => $state,
+            'page' => $data['max'],
         ]);
     }
 }

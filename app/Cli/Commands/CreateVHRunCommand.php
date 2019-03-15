@@ -2,15 +2,15 @@
 
 namespace App\Cli\Commands;
 
-use App\Repositories\Run;
-use App\Repositories\RunRepository;
+use App\Domain\Run;
+use App\Domain\InsertRun;
 
 final class CreateVHRunCommand extends AbstractCreateRunCommand
 {
     protected static $defaultName = 'runs:create:vh';
 
-    public function __construct(RunRepository $runs)
+    public function __construct(InsertRun $insert)
     {
-        parent::__construct(Run::VH, $runs);
+        parent::__construct(Run::VH, $insert);
     }
 }
