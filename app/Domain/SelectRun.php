@@ -72,7 +72,7 @@ SQL;
         // select a slice of the curation runs publications with the given state.
         $offset = ($page - 1) * self::LIMIT;
 
-        if ($nbs[$state] <= $offset) {
+        if ($offset != 0 && $nbs[$state] <= $offset) {
             return new DomainError(self::OVERFLOW, [
                 'max' => (int) ($nbs[$state]/self::LIMIT),
             ]);
