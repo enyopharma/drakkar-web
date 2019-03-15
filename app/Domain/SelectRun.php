@@ -15,7 +15,7 @@ final class SelectRun
     CONST LIMIT = 20;
 
     const SELECT_RUN_STH = <<<SQL
-        SELECT * FROM runs WHERe id = ?
+        SELECT * FROM runs WHERE populated IS TRUE AND id = ?
 SQL;
 
     const COUNT_PUBLICATIONS_SQL = <<<SQL
