@@ -20,8 +20,8 @@ return [
             );
         },
 
-        App\Domain\UpdatePublication::class => function ($container) {
-            return new App\Domain\UpdatePublication(
+        App\Domain\UpdatePublicationState::class => function ($container) {
+            return new App\Domain\UpdatePublicationState(
                 $container->get(PDO::class)
             );
         },

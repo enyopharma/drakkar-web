@@ -2,7 +2,7 @@
 
 namespace App\Domain;
 
-final class UpdatePublication
+final class UpdatePublicationState
 {
     const NOT_FOUND = 0;
 

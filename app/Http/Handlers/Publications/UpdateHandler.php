@@ -7,7 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use Enyo\Http\Responder;
-use App\Domain\UpdatePublication;
+use App\Domain\UpdatePublicationState;
 
 final class UpdateHandler implements RequestHandlerInterface
 {
@@ -15,7 +15,7 @@ final class UpdateHandler implements RequestHandlerInterface
 
     private $responder;
 
-    public function __construct(UpdatePublication $domain, Responder $responder)
+    public function __construct(UpdatePublicationState $domain, Responder $responder)
     {
         $this->domain = $domain;
         $this->responder = $responder;
@@ -34,7 +34,7 @@ final class UpdateHandler implements RequestHandlerInterface
         $payload = ($this->domain)($run_id, $publication_id, $state, $annotation);
 
         return $payload->parsed($this->bind('success'), [
-            UpdatePublication::NOT_FOUND => $this->bind('notfound', $run_id, $publication_id)
+            UpdatePublicationState::NOT_FOUND => $this->bind('notfound', $run_id, $publication_id)
         ]);
     }
 
