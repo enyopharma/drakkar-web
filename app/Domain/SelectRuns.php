@@ -7,7 +7,7 @@ use Enyo\Data\ResultSet;
 final class SelectRuns
 {
     const SELECT_RUNS_SQL = <<<SQL
-        SELECT * FROM runs
+        SELECT * FROM runs ORDER BY created_at DESC, id DESC
 SQL;
 
     const COUNT_PUBLICATIONS_SQL = <<<SQL
