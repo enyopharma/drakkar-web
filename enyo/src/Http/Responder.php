@@ -55,7 +55,7 @@ final class Responder
             : $response->withHeader('location', $urlOrName);
     }
 
-    public function html(string $template, array $data): ResponseInterface
+    public function html(string $template, array $data = []): ResponseInterface
     {
         $contents = $this->engine->render($template, $data);
 
