@@ -7,5 +7,6 @@ return function (CommandFactory $factory) {
         $factory(App\Cli\Commands\ExampleCommand::class),
         $factory(App\Cli\Commands\CreateHHRunCommand::class),
         $factory(App\Cli\Commands\CreateVHRunCommand::class),
+        $factory(App\Cli\Commands\PopulatePublicationCommand::class),
     ];
 };

@@ -25,5 +25,11 @@ return [
                 $container->get(PDO::class)
             );
         },
+
+        App\Domain\UpdatePublicationMetadata::class => function ($container) {
+            return new App\Domain\UpdatePublicationMetadata(
+                $container->get(PDO::class)
+            );
+        },
     ],
 ];
