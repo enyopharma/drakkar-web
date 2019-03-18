@@ -2,7 +2,7 @@
 
 namespace App\Domain;
 
-final class UpdatePublicationMetadata
+final class PopulatePublication
 {
     const QUERY_FAILED = 0;
     const PARSING_FAILED = 1;

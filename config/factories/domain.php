@@ -26,8 +26,15 @@ return [
             );
         },
 
-        App\Domain\UpdatePublicationMetadata::class => function ($container) {
-            return new App\Domain\UpdatePublicationMetadata(
+        App\Domain\PopulateRun::class => function ($container) {
+            return new App\Domain\PopulateRun(
+                $container->get(PDO::class),
+                $container->get(App\Domain\PopulatePublication::class)
+            );
+        },
+
+        App\Domain\PopulatePublication::class => function ($container) {
+            return new App\Domain\PopulatePublication(
                 $container->get(PDO::class)
             );
         },

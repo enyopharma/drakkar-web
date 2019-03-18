@@ -7,7 +7,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use App\Domain\UpdatePublicationMetadata;
+use App\Domain\PopulatePublication;
 
 final class PopulatePublicationCommand extends Command
 {
@@ -15,7 +15,7 @@ final class PopulatePublicationCommand extends Command
 
     private $domain;
 
-    public function __construct(UpdatePublicationMetadata $domain)
+    public function __construct(PopulatePublication $domain)
     {
         $this->domain = $domain;
 
@@ -35,9 +35,9 @@ final class PopulatePublicationCommand extends Command
         $pmid = (int) $input->getArgument('pmid');
 
         return ($this->domain)($pmid)->parsed($this->bind('success', $pmid, $output), [
-            UpdatePublicationMetadata::QUERY_FAILED => $this->bind('queryFailed', $pmid, $output),
-            UpdatePublicationMetadata::PARSING_FAILED => $this->bind('parsingFailed', $output),
-            UpdatePublicationMetadata::NOT_FOUND => $this->bind('notFound', $pmid, $output),
+            PopulatePublication::QUERY_FAILED => $this->bind('queryFailed', $pmid, $output),
+            PopulatePublication::PARSING_FAILED => $this->bind('parsingFailed', $output),
+            PopulatePublication::NOT_FOUND => $this->bind('notFound', $pmid, $output),
         ]);
     }
 
