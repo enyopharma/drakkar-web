@@ -1,1 +1,2 @@
-entrypoints/cli.php
+#!/bin/bash
+docker-compose exec app php entrypoints/cli.php $@
