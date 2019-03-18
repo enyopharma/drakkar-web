@@ -29,7 +29,7 @@ return [
         App\Domain\PopulateRun::class => function ($container) {
             return new App\Domain\PopulateRun(
                 $container->get(PDO::class),
-                $container->get(App\Domain\PopulatePublication::class)
+                $container->get(Enyo\Queue\Client::class)
             );
         },
 

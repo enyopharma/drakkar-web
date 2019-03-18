@@ -37,8 +37,6 @@ SQL;
         WHERE pmid = ?
 SQL;
 
-
-
     const REMOTE_URL = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi';
 
     private $pdo;

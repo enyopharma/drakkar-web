@@ -36,7 +36,7 @@ final class PopulatePublicationCommand extends Command
 
         return ($this->domain)($pmid)->parsed($this->bind('success', $pmid, $output), [
             PopulatePublication::QUERY_FAILED => $this->bind('queryFailed', $pmid, $output),
-            PopulatePublication::PARSING_FAILED => $this->bind('parsingFailed', $output),
+            PopulatePublication::PARSING_FAILED => $this->bind('parsingFailed', $pmid, $output),
             PopulatePublication::NOT_FOUND => $this->bind('notFound', $pmid, $output),
         ]);
     }
@@ -62,9 +62,15 @@ final class PopulatePublicationCommand extends Command
         );
     }
 
-    private function parsingFailed($output, array $data)
+    private function parsingFailed($pmid, $output, array $data)
     {
-        $output->writeln(sprintf('<error>Metadata parsing failed with code %s</error>', $data['error']));
+        $output->writeln(
+            vsprintf('<error>Metadata parsing failed with code %s for pmid %s</error>', [
+                $data['error'],
+                $pmid,
+            ]
+        ));
+
         $output->writeln('Retrieved contents:');
         $output->writeln($data['contents']);
     }

@@ -33,10 +33,12 @@ return [
     'extensions' => [
         Engine::class => function ($container, Engine $engine) {
             $engine->addData(['session' => $container->get(Session::class)]);
-            $engine->loadExtension($container->get(AssetsExtension::class));
-            $engine->loadExtension($container->get(UrlExtension::class));
 
             return $engine;
         },
+    ],
+
+    'mappers' => [
+        'plates.extensions' => ExtensionInterface::class,
     ],
 ];

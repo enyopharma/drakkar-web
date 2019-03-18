@@ -41,7 +41,9 @@ abstract class AbstractCreateRunCommand extends Command
         }
 
         catch (\UnexpectedValueException $e) {
-            return $this->error($output, ['message' => $e->getMessage()]);
+            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+
+            return 0;
         }
 
         // get a payload from the domain.
@@ -97,7 +99,7 @@ abstract class AbstractCreateRunCommand extends Command
         $stdin = fopen("php://stdin", "r");
 
         try {
-            while ($line = fgets($stdin)) {
+            while ($stdin && $line = fgets($stdin)) {
                 $line = rtrim($line);
 
                 if (empty($line)) continue;
@@ -119,7 +121,7 @@ abstract class AbstractCreateRunCommand extends Command
         }
 
         finally {
-            fclose($stdin);
+            $stdin && fclose($stdin);
         }
 
         return array_keys($pmids);
