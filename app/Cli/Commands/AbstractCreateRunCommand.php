@@ -9,16 +9,21 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use App\Domain\InsertRun;
 
+use Enyo\Cli\Responder;
+
 abstract class AbstractCreateRunCommand extends Command
 {
     private $type;
 
     private $insert;
 
-    public function __construct(string $type, InsertRun $insert)
+    private $responder;
+
+    public function __construct(string $type, InsertRun $insert, Responder $responder)
     {
         $this->type = $type;
         $this->insert = $insert;
+        $this->responder = $responder;
 
         parent::__construct();
     }
@@ -33,7 +38,6 @@ abstract class AbstractCreateRunCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        // read the input.
         $name = $input->getArgument('name');
 
         try {
@@ -46,10 +50,8 @@ abstract class AbstractCreateRunCommand extends Command
             return 0;
         }
 
-        // get a payload from the domain.
         $payload = ($this->insert)($this->type, $name, ...$pmids);
 
-        // return a response from the payload.
         return $payload->parsed($this->bind('success', $output), [
             InsertRun::INVALID_TYPE => $this->bind('invalidType', $output),
             InsertRun::NOT_UNIQUE => $this->bind('notUnique', $output),
@@ -63,33 +65,30 @@ abstract class AbstractCreateRunCommand extends Command
         };
     }
 
-    private function success($output, array $data): void
+    private function success(OutputInterface $output, array $data): void
     {
-        $output->writeln(
-            vsprintf('<info>Curation run inserted with id %s</info>', [
-                $data['run']['id'],
-            ])
-        );
+        $this->responder->info('Curation run inserted with id %s.', ...[
+            $output,
+            $data['run']['id'],
+        ]);
     }
 
-    private function invalidType($output): void
+    private function invalidType(OutputInterface $output): void
     {
-        $output->writeln(
-            vsprintf('<error>Value \'%s\' is not a valid curation run type</error>', [
-                $this->type,
-            ])
-        );
+        $this->responder->error('Value \'%s\' is not a valid curation run type.', ...[
+            $output,
+            $this->type,
+        ]);
     }
 
-    private function notUnique($output, array $data): void
+    private function notUnique(OutputInterface $output, array $data): void
     {
-        $output->writeln(
-            vsprintf('<error>Publication with PMID %s is already associated to a %s curation run (\'%s\')</error>', [
-                $data['publication']['pmid'],
-                $this->type,
-                $data['run']['name'],
-            ])
-        );
+        $this->responder->error('Publication with PMID %s is already associated to a %s curation run (\'%s\').', ...[
+            $output,
+            $data['publication']['pmid'],
+            $this->type,
+            $data['run']['name'],
+        ]);
     }
 
     private function pmidsFromStdin(): array

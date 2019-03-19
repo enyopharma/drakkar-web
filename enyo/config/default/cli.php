@@ -1,13 +1,20 @@
 <?php declare(strict_types=1);
 
-use App\Cli\Commands\ExampleCommand;
-
 use Symfony\Component\Console\Command\Command;
+
+use Enyo\Cli\Responder;
+use Enyo\Cli\Commands\ExampleCommand;
 
 return [
     'factories' => [
-        ExampleCommand::class => function () {
-            return new ExampleCommand;
+        Responder::class => function () {
+            return new Responder;
+        },
+
+        ExampleCommand::class => function ($container) {
+            return new ExampleCommand(
+                $container->get(Responder::class)
+            );
         },
     ],
 

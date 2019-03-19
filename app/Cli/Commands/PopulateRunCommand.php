@@ -9,15 +9,20 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use App\Domain\PopulateRun;
 
+use Enyo\Cli\Responder;
+
 final class PopulateRunCommand extends Command
 {
     protected static $defaultName = 'runs:populate';
 
     private $domain;
 
-    public function __construct(PopulateRun $domain)
+    private $responder;
+
+    public function __construct(PopulateRun $domain, Responder $responder)
     {
         $this->domain = $domain;
+        $this->responder = $responder;
 
         parent::__construct();
     }
@@ -47,24 +52,23 @@ final class PopulateRunCommand extends Command
         };
     }
 
-    private function success(int $id, $output)
+    private function success(int $id, OutputInterface $output)
     {
-        $output->writeln(
-            sprintf('<info>Metadata population jobs has been successfully fired for all publications of curation run with id %s</info>', $id)
-        );
+        $this->responder->info($output, ...[
+            'Metadata population jobs has been successfully fired for all publications of curation run with id %s.',
+            $id,
+        ]);
     }
 
-    private function notFound(int $id, $output)
+    private function notFound(int $id, OutputInterface $output)
     {
-        $output->writeln(
-            sprintf('<error>No curation run with id %s</error>', $id)
-        );
+        $this->responder->error($output, 'No curation run with id %s.', $id);
     }
 
-    private function alreadyPopulated(int $id, $output)
+    private function alreadyPopulated(int $id, OutputInterface $output)
     {
-        $output->writeln(
-            sprintf('<info>All publications of curation run with id %s are already populated</info>', $id)
-        );
+        $thsi->responder->info($output, 'All publications of curation run with id %s are already updated.', ...[
+            $id,
+        ]);
     }
 }

@@ -1,15 +1,26 @@
 <?php declare(strict_types=1);
 
-namespace App\Cli\Commands;
+namespace Enyo\Cli\Commands;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Enyo\Cli\Responder;
+
 final class ExampleCommand extends Command
 {
     protected static $defaultName = 'app:example';
+
+    private $responder;
+
+    public function __construct(Responder $responder)
+    {
+        $this->responder = $responder;
+
+        parent::__construct();
+    }
 
     protected function configure()
     {
@@ -21,8 +32,8 @@ final class ExampleCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln(vsprintf('Hello %s', [
-            $input->getArgument('name') ?? 'world',
-        ]));
+        $name = $input->getArgument('name') ?? 'world';
+
+        $this->responder->default('Hello %s.', $output, $name);
     }
 }
