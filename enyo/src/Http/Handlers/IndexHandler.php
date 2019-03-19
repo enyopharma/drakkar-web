@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace App\Http\Handlers;
+namespace Enyo\Http\Handlers;
 
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
