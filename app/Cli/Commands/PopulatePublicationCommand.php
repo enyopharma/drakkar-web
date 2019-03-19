@@ -35,9 +35,10 @@ final class PopulatePublicationCommand extends Command
         $pmid = (int) $input->getArgument('pmid');
 
         return ($this->domain)($pmid)->parsed($this->bind('success', $pmid, $output), [
+            PopulatePublication::NOT_FOUND => $this->bind('notFound', $pmid, $output),
+            PopulatePublication::ALREADY_POPULATED => $this->bind('alreadyPopulated', $pmid, $output),
             PopulatePublication::QUERY_FAILED => $this->bind('queryFailed', $pmid, $output),
             PopulatePublication::PARSING_FAILED => $this->bind('parsingFailed', $pmid, $output),
-            PopulatePublication::NOT_FOUND => $this->bind('notFound', $pmid, $output),
         ]);
     }
 
@@ -51,28 +52,8 @@ final class PopulatePublicationCommand extends Command
     private function success(int $pmid, $output)
     {
         $output->writeln(
-            sprintf('<info>Publication %s successfully populated</info>', $pmid)
+            sprintf('<info>Metadata of publication with pmid %s successfully updated</info>', $pmid)
         );
-    }
-
-    private function queryFailed(int $pmid, $output)
-    {
-        $output->writeln(
-            sprintf('<error>Query failed for publication %s</error>', $pmid)
-        );
-    }
-
-    private function parsingFailed($pmid, $output, array $data)
-    {
-        $output->writeln(
-            vsprintf('<error>Metadata parsing failed with code %s for pmid %s</error>', [
-                $data['error'],
-                $pmid,
-            ]
-        ));
-
-        $output->writeln('Retrieved contents:');
-        $output->writeln($data['contents']);
     }
 
     private function notFound(int $pmid, $output)
@@ -80,5 +61,32 @@ final class PopulatePublicationCommand extends Command
         $output->writeln(
             sprintf('<error>No publication with pmid %s</error>', $pmid)
         );
+    }
+
+    private function alreadyPopulated(int $pmid, $output)
+    {
+        $output->writeln(
+            sprintf('<info>The metadata of publication with pmid %s are already updated</info>', $pmid)
+        );
+    }
+
+    private function queryFailed(int $pmid, $output)
+    {
+        $output->writeln(
+            sprintf('<error>Pubmed query failed for publication %s</error>', $pmid)
+        );
+    }
+
+    private function parsingFailed($pmid, $output, array $data)
+    {
+        $output->writeln(
+            vsprintf('<error>Metadata parsing failed with code %s for publication with pmid %s</error>', [
+                $data['error'],
+                $pmid,
+            ]
+        ));
+
+        $output->writeln('Retrieved contents:');
+        $output->writeln($data['contents']);
     }
 }

@@ -4,9 +4,10 @@ namespace App\Domain;
 
 final class PopulatePublication
 {
-    const QUERY_FAILED = 0;
-    const PARSING_FAILED = 1;
-    const NOT_FOUND = 2;
+    const NOT_FOUND = 0;
+    const ALREADY_POPULATED = 1;
+    const QUERY_FAILED = 2;
+    const PARSING_FAILED = 3;
 
     const SELECT_RUNS_SQL = <<<SQL
         SELECT r.*
@@ -58,6 +59,10 @@ SQL;
 
         if (! $publication = $select_publication_sth->fetch()) {
             return new DomainError(self::NOT_FOUND);
+        }
+
+        if ($publication['populated']) {
+            return new DomainError(self::ALREADY_POPULATED);
         }
 
         $contents = file_get_contents(
