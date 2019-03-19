@@ -40,7 +40,7 @@ SQL;
     public function __invoke(string $type, string $name, int ...$pmids): DomainPayloadInterface
     {
         if (! in_array($type, Run::TYPES)) {
-            return new DomainError(self::INVALID_TYPE);
+            return new DomainPayload(self::INVALID_TYPE);
         }
 
         $insert_run_sth = $this->pdo->prepare(self::INSERT_RUN_SQL);
@@ -58,7 +58,7 @@ SQL;
         $select_publications_sth->execute(array_merge([$type], $pmids));
 
         if ($publication = $select_publications_sth->fetch()) {
-            return new DomainError(self::NOT_UNIQUE, [
+            return new DomainPayload(self::NOT_UNIQUE, [
                 'run' => ['name' => $publication['run_name']],
                 'publication' => ['pmid' => $publication['pmid']],
             ]);

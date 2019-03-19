@@ -29,10 +29,8 @@ SQL;
 
         $update_association_sth->execute([$state, $annotation, $run_id, $publication_id]);
 
-        if ($update_association_sth->rowCount() == 0) {
-            return new DomainError(self::NOT_FOUND);
-        }
-
-        return new DomainSuccess;
+        return $update_association_sth->rowCount() == 0
+            ? new DomainPayload(self::NOT_FOUND)
+            : new DomainSuccess;
     }
 }

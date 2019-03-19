@@ -51,15 +51,15 @@ SQL;
         $select_run_sth->execute([$id]);
 
         if (! $run = $select_run_sth->fetch()) {
-            return new DomainError(self::NOT_FOUND);
+            return new DomainPayload(self::NOT_FOUND);
         }
 
         if (! in_array($state, Publication::STATES)) {
-            return new DomainError(self::INVALID_STATE);
+            return new DomainPayload(self::INVALID_STATE);
         }
 
         if ($page < 1) {
-            return new DomainError(self::UNDERFLOW);
+            return new DomainPayload(self::UNDERFLOW);
         }
 
         // select the curation runs publications number for each state.
@@ -73,7 +73,7 @@ SQL;
         $offset = ($page - 1) * self::LIMIT;
 
         if ($offset != 0 && $nbs[$state] <= $offset) {
-            return new DomainError(self::OVERFLOW, [
+            return new DomainPayload(self::OVERFLOW, [
                 'max' => (int) ($nbs[$state]/self::LIMIT),
             ]);
         }

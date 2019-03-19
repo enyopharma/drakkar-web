@@ -41,7 +41,7 @@ SQL;
         $select_run_sth->execute([$id]);
 
         if (! $run = $select_run_sth->fetch()) {
-            return new DomainError(self::NOT_FOUND);
+            return new DomainPayload(self::NOT_FOUND);
         }
 
         $select_publications_sth->execute([$run['id']]);
@@ -52,8 +52,8 @@ SQL;
             ]));
         }
 
-        return $select_publications_sth->rowCount() > 0
-            ? new DomainSuccess
-            : new DomainError(self::ALREADY_POPULATED);
+        return $select_publications_sth->rowCount() == 0
+            ? new DomainPayload(self::ALREADY_POPULATED)
+            : new DomainSuccess;
     }
 }

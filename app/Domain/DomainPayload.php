@@ -2,18 +2,11 @@
 
 namespace App\Domain;
 
-final class DomainError implements DomainPayloadInterface
+final class DomainPayload implements DomainPayloadInterface
 {
     private $status;
 
     private $data;
-
-    public static function fromPDO(int $status, \PDO $pdo): DomainError
-    {
-        return new self($status, [
-            'message' => join(' - ', $pdo->errorInfo()),
-        ]);
-    }
 
     public function __construct(int $status, array $data = [])
     {
