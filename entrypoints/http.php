@@ -28,8 +28,7 @@ require $root . '/vendor/autoload.php';
  * Build the app container.
  */
  $app = (require $root . '/config/app.php')($root);
- $map = (require $root . '/config/map.php')($app);
- $factories = (require $root . '/config/factories.php')($map);
+ $factories = (require $root . '/config/factories.php')($app);
  $container = (require $root . '/config/container.php')($factories);
 
 /**

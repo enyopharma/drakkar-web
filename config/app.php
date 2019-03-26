@@ -30,7 +30,7 @@ return function (string $root): array {
         /**
          * The parser used to parse container values.
          *
-         * @var \Quanta\Container\Values\ValueParserInterface[]
+         * @var Quanta\Container\Values\ValueParserInterface[]
          */
         'parsers' => [
             new Quanta\Container\Values\EnvVarParser,
@@ -39,14 +39,45 @@ return function (string $root): array {
         ],
 
         /**
-         * The immutable values to register in the container.
+         * The parameters to register in the container.
          *
          * @var array
          */
-        'immutables' => [
+        'parameters' => [
             'app.env' => $env === false ? 'development' : $env,
             'app.debug' => $debug && (strtolower((string) $debug) === 'true' || $debug === '1'),
             'app.root' => $root,
+        ],
+
+        /**
+         * The service provider autodiscovery.
+         *
+         * @var array
+         */
+        'discovery' => [
+            'path' => $root . '/vendor',
+
+            'whitelist' => [
+                '/ServiceProvider/',
+            ],
+
+            'blacklist' => [
+                //
+            ]
+        ],
+
+        /**
+         * The instances autowiring.
+         *
+         * @var array
+         */
+        'autowiring' => [
+            'options' => [
+                //
+            ],
+            'namespaces' => [
+                //
+            ],
         ],
 
         /**
@@ -55,25 +86,30 @@ return function (string $root): array {
          * @var \Interop\Container\ServiceProviderInterface[]
          */
         'providers' => [
-            new Services\Http\NyholmHttpFactoryServiceProvider,
-            new Services\Http\QuantaHttpEntrypointServiceProvider,
-            new Services\Http\HttpDispatcherServiceProvider,
+            //
         ],
 
         /**
          * The glob paths of the project specific configuration files.
          *
-         * @var array
+         * @var string[]
          */
-        'project' => [
-            'php' => array_merge([
-                sprintf('%s/enyo/config/provided/*.php', $root),
-                sprintf('%s/enyo/config/default/*.php', $root),
-                sprintf('%s/config/factories/*.php', $root),
-                sprintf('%s/config/factories/%s/*.php', $root, $env),
-            ], $debug ? [
-                sprintf('%s/config/factories/debug/*.php', $root)
-            ] : []),
+        'files' => array_merge([
+            sprintf('%s/enyo/config/provided/*.php', $root),
+            sprintf('%s/enyo/config/default/*.php', $root),
+            sprintf('%s/config/factories/*.php', $root),
+            sprintf('%s/config/factories/%s/*.php', $root, $env),
+        ], $debug ? [
+            sprintf('%s/config/factories/debug/*.php', $root)
+        ] : []),
+
+        /**
+         * The processing passes to add.
+         *
+         * @var Quanta\Container\Configuration\Passes\ProcessingPassInterface[]
+         */
+        'passes' => [
+            new Quanta\Container\Configuration\Passes\InterfaceAliasingPass,
         ],
 
         /**
