@@ -9,10 +9,21 @@ use App\Domain\InsertRun;
 use App\Domain\PopulateRun;
 use App\Domain\PopulatePublication;
 
-use Enyo\Cli\Responder;
+use App\Cli\Responders\Responder;
+use App\Cli\Responders\PopulateResponder;
 
 return [
     'factories' => [
+        Responder::class => function () {
+            return new Responder;
+        },
+
+        PopulateResponder::class => function ($container) {
+            return new PopulateResponder(
+                $container->get(Responder::class)
+            );
+        },
+
         CreateHHRunCommand::class => function ($container) {
             return new CreateHHRunCommand(
                 $container->get(InsertRun::class),
@@ -30,14 +41,14 @@ return [
         PopulateRunCommand::class => function ($container) {
             return new PopulateRunCommand(
                 $container->get(PopulateRun::class),
-                $container->get(Responder::class)
+                $container->get(PopulateResponder::class)
             );
         },
 
         PopulatePublicationCommand::class => function ($container) {
             return new PopulatePublicationCommand(
                 $container->get(PopulatePublication::class),
-                $container->get(Responder::class)
+                $container->get(PopulateResponder::class)
             );
         },
     ],

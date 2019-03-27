@@ -2,12 +2,13 @@
 
 namespace App\Domain;
 
+use App\Domain\Services\Efetch;
+
 final class PopulatePublication
 {
     const NOT_FOUND = 0;
     const ALREADY_POPULATED = 1;
-    const QUERY_FAILED = 2;
-    const PARSING_FAILED = 3;
+    const EFETCH_ERROR = 2;
 
     const SELECT_RUNS_SQL = <<<SQL
         SELECT r.*
@@ -35,62 +36,53 @@ SQL;
     const UPDATE_PUBLICATION_SQL = <<<SQL
         UPDATE publications
         SET populated = TRUE, metadata = ?
-        WHERE pmid = ?
+        WHERE id = ?
 SQL;
-
-    const REMOTE_URL = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi';
 
     private $pdo;
 
-    public function __construct(\PDO $pdo)
+    private $efetch;
+
+    public function __construct(\PDO $pdo, Efetch $efetch)
     {
         $this->pdo = $pdo;
+        $this->efetch = $efetch;
     }
 
     public function __invoke(int $pmid): DomainPayloadInterface
     {
-        $select_publication_sth = $this->pdo->prepare(self::SELECT_PUBLICATION_SQL);
+        // prepare the queries.
         $select_runs_sth = $this->pdo->prepare(self::SELECT_RUNS_SQL);
+        $select_publication_sth = $this->pdo->prepare(self::SELECT_PUBLICATION_SQL);
         $count_not_populated_sth = $this->pdo->prepare(self::COUNT_NOT_POPULATED_SQL);
-        $update_publication_sth = $this->pdo->prepare(self::UPDATE_PUBLICATION_SQL);
         $update_run_sth = $this->pdo->prepare(self::UPDATE_RUN_SQL);
+        $update_publication_sth = $this->pdo->prepare(self::UPDATE_PUBLICATION_SQL);
 
+        // select the publication.
         $select_publication_sth->execute([$pmid]);
 
         if (! $publication = $select_publication_sth->fetch()) {
-            return new DomainError(self::NOT_FOUND);
+            return new DomainPayload(self::NOT_FOUND);
         }
 
         if ($publication['populated']) {
-            return new DomainError(self::ALREADY_POPULATED);
+            return new DomainPayload(self::ALREADY_POPULATED);
         }
 
-        $contents = file_get_contents(
-            sprintf('%s?%s', self::REMOTE_URL, http_build_query([
-                'db' => 'pubmed',
-                'retmode' => 'json',
-                'id' => $pmid,
-            ])
-        ));
+        // download the metadata.
+        $result = $this->efetch->metadata($publication['pmid']);
 
-        if ($contents === false) {
-            return new DomainError(self::QUERY_FAILED);
+        // return error.
+        if (! $result['success']) {
+            return new DomainPayload(self::EFETCH_ERROR, $result['data']);
         }
 
-        $metadata = json_decode($contents, true);
-
-        if (is_null($metadata)) {
-            return new DomainError(self::PARSING_FAILED, [
-                'error' => json_last_error(),
-                'contents' => $contents,
-            ]);
-        }
-
+        // update publication.
         $this->pdo->beginTransaction();
 
         $update_publication_sth->execute([
-            json_encode($metadata['result'][$pmid] ?? []),
-            $pmid,
+            $result['data']['json'],
+            $publication['id'],
         ]);
 
         $select_runs_sth->execute([$publication['id']]);
@@ -105,6 +97,7 @@ SQL;
 
         $this->pdo->commit();
 
+        // success !
         return new DomainSuccess;
     }
 }

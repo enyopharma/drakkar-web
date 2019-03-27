@@ -5,7 +5,7 @@ namespace App\Cli\Commands;
 use App\Domain\Run;
 use App\Domain\InsertRun;
 
-use Enyo\Cli\Responder;
+use App\Cli\Responders\Responder;
 
 final class CreateVHRunCommand extends AbstractCreateRunCommand
 {

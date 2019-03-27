@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Enyo\Cli;
+namespace App\Cli\Responders;
 
 use Symfony\Component\Console\Output\OutputInterface;
 

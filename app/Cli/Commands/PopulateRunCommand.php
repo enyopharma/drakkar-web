@@ -8,8 +8,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use App\Domain\PopulateRun;
+use App\Domain\Services\Efetch;
 
-use Enyo\Cli\Responder;
+use App\Cli\Responders\PopulateResponder;
 
 final class PopulateRunCommand extends Command
 {
@@ -19,7 +20,7 @@ final class PopulateRunCommand extends Command
 
     private $responder;
 
-    public function __construct(PopulateRun $domain, Responder $responder)
+    public function __construct(PopulateRun $domain, PopulateResponder $responder)
     {
         $this->domain = $domain;
         $this->responder = $responder;
@@ -39,10 +40,15 @@ final class PopulateRunCommand extends Command
     {
         $id = (int) $input->getArgument('id');
 
-        return ($this->domain)($id)->parsed($this->bind('success', $id, $output), [
-            PopulateRun::NOT_FOUND => $this->bind('notFound', $id, $output),
-            PopulateRun::ALREADY_POPULATED => $this->bind('alreadyPopulated', $id, $output),
-        ]);
+        foreach (($this->domain)($id) as $payload) {
+            $payload->parsed($this->bind('success', $output, $id), [
+                PopulateRun::NOT_FOUND => $this->bind('notFound', $output, $id),
+                PopulateRun::ALREADY_POPULATED => $this->bind('alreadyPopulated', $output, $id),
+                PopulateRun::UPDATE_SUCCESS => $this->bind('updateSuccess', $output),
+                PopulateRun::EFETCH_ERROR => $this->bind('efetchError', $output),
+                PopulateRun::SOME_FAILED => $this->bind('someFailed', $output, $id),
+            ]);
+        }
     }
 
     private function bind(string $method, ...$xs)
@@ -52,23 +58,34 @@ final class PopulateRunCommand extends Command
         };
     }
 
-    private function success(int $id, OutputInterface $output)
+    private function success(OutputInterface $output, int $id)
     {
-        $this->responder->info($output, ...[
-            'Metadata population jobs has been successfully fired for all publications of curation run with id %s.',
+        $this->responder->info('Metadata of the publications of the curation run with id %s successfully updated.', ...[
+            $output,
             $id,
         ]);
     }
 
-    private function notFound(int $id, OutputInterface $output)
+    private function notFound(OutputInterface $output, int $id)
     {
-        $this->responder->error($output, 'No curation run with id %s.', $id);
+        $this->responder->error('No curation run with id %s.', $output, $id);
     }
 
-    private function alreadyPopulated(int $id, OutputInterface $output)
+    private function alreadyPopulated(OutputInterface $output, int $id)
     {
-        $thsi->responder->info($output, 'All publications of curation run with id %s are already updated.', ...[
+        $this->responder->info('Metadata of the publications of the curation run with id %s are already updated.', ...[
+            $output,
             $id,
         ]);
+    }
+
+    private function updateSuccess(OutputInterface $output, array $data)
+    {
+        $this->responder->success($output, $data['pmid']);
+    }
+
+    private function efetchError(OutputInterface $output, array $data)
+    {
+        $this->responder->efetchError($output, $data['pmid'], $data);
     }
 }

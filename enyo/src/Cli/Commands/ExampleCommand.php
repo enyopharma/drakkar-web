@@ -7,20 +7,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Enyo\Cli\Responder;
-
 final class ExampleCommand extends Command
 {
     protected static $defaultName = 'app:example';
-
-    private $responder;
-
-    public function __construct(Responder $responder)
-    {
-        $this->responder = $responder;
-
-        parent::__construct();
-    }
 
     protected function configure()
     {
@@ -34,6 +23,6 @@ final class ExampleCommand extends Command
     {
         $name = $input->getArgument('name') ?? 'world';
 
-        $this->responder->default('Hello %s.', $output, $name);
+        $output->writeln(sprintf('Hello %s.', $name));
     }
 }

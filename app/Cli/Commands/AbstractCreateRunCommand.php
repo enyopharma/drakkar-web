@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use App\Domain\InsertRun;
 
-use Enyo\Cli\Responder;
+use App\Cli\Responders\Responder;
 
 abstract class AbstractCreateRunCommand extends Command
 {

@@ -8,8 +8,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use App\Domain\PopulatePublication;
+use App\Domain\Services\Efetch;
 
-use Enyo\Cli\Responder;
+use App\Cli\Responders\PopulateResponder;
 
 final class PopulatePublicationCommand extends Command
 {
@@ -19,7 +20,7 @@ final class PopulatePublicationCommand extends Command
 
     private $responder;
 
-    public function __construct(PopulatePublication $domain, Responder $responder)
+    public function __construct(PopulatePublication $domain, PopulateResponder $responder)
     {
         $this->domain = $domain;
         $this->responder = $responder;
@@ -39,11 +40,10 @@ final class PopulatePublicationCommand extends Command
     {
         $pmid = (int) $input->getArgument('pmid');
 
-        return ($this->domain)($pmid)->parsed($this->bind('success', $pmid, $output), [
-            PopulatePublication::NOT_FOUND => $this->bind('notFound', $pmid, $output),
-            PopulatePublication::ALREADY_POPULATED => $this->bind('alreadyPopulated', $pmid, $output),
-            PopulatePublication::QUERY_FAILED => $this->bind('queryFailed', $pmid, $output),
-            PopulatePublication::PARSING_FAILED => $this->bind('parsingFailed', $pmid, $output),
+        return ($this->domain)($pmid)->parsed($this->bind('success', $output, $pmid), [
+            PopulatePublication::NOT_FOUND => $this->bind('notFound', $output, $pmid),
+            PopulatePublication::ALREADY_POPULATED => $this->bind('alreadyPopulated', $output, $pmid),
+            PopulatePublication::EFETCH_ERROR => $this->bind('efetchError', $output, $pmid),
         ]);
     }
 
@@ -54,44 +54,26 @@ final class PopulatePublicationCommand extends Command
         };
     }
 
-    private function success(int $pmid, OutputInterface $output)
+    private function success(OutputInterface $output, int $pmid)
     {
-        $this->responder->info('Metadata of publication with pmid %s successfully updated.', ...[
+        $this->responder->success($output, $pmid);
+    }
+
+    private function notFound(OutputInterface $output, int $pmid)
+    {
+        $this->responder->error('No publication with pmid %s.', $output, $pmid);
+    }
+
+    private function alreadyPopulated(OutputInterface $output, int $pmid)
+    {
+        $this->responder->info('Metadata of publication with pmid %s are already updated.', ...[
             $output,
             $pmid,
         ]);
     }
 
-    private function notFound(int $pmid, OutputInterface $output)
+    private function efetchError(OutputInterface $output, int $pmid, array $data)
     {
-        $this->responder->error($output, 'No publication with pmid %s.', $pmid);
-    }
-
-    private function alreadyPopulated(int $pmid, OutputInterface $output)
-    {
-        $this->responder->info('The metadata of publication with pmid %s are already updated.', ...[
-            $output,
-            $pmid,
-        ]);
-    }
-
-    private function queryFailed(int $pmid, OutputInterface $output)
-    {
-        $this->responder->error('Pubmed query failed for publication %s.', ...[
-            $output,
-            $pmid,
-        ]);
-    }
-
-    private function parsingFailed(int $pmid, OutputInterface $output, array $data)
-    {
-        $this->responder->error('Metadata parsing failed with code %s for publication with pmid %s.', ...[
-            $output,
-            $data['error'],
-            $pmid,
-        ]);
-
-        $this->responder->default('Retrieved contents:', $output);
-        $this->responder->default($data['contents'], $output);
+        $this->responder->efetchError($output, $pmid, $data);
     }
 }

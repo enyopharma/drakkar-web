@@ -2,15 +2,15 @@
 
 namespace App\Domain;
 
-use App\Queue\Jobs\PopulatePublicationHandler;
-
-use Enyo\Queue\Job;
-use Enyo\Queue\Client;
+use App\Domain\Services\Efetch;
 
 final class PopulateRun
 {
     const NOT_FOUND = 0;
     const ALREADY_POPULATED = 1;
+    const UPDATE_SUCCESS = 2;
+    const EFETCH_ERROR = 3;
+    const SOME_FAILED = 4;
 
     const SELECT_RUN_SQL = <<<SQL
         SELECT * FROM runs WHERE id = ?
@@ -23,37 +23,76 @@ SQL;
         AND p.populated IS FALSE
 SQL;
 
+    const UPDATE_RUN_SQL = <<<SQL
+        UPDATE runs SET populated = TRUE WHERE id = ?
+SQL;
+
+    const UPDATE_PUBLICATION_SQL = <<<SQL
+        UPDATE publications
+        SET populated = TRUE, metadata = ?
+        WHERE id = ?
+SQL;
+
     private $pdo;
 
-    private $client;
+    private $efetch;
 
-    public function __construct(\PDO $pdo, Client $client)
+    public function __construct(\PDO $pdo, Efetch $efetch)
     {
         $this->pdo = $pdo;
-        $this->client = $client;
+        $this->efetch = $efetch;
     }
 
-    public function __invoke(int $id): DomainPayloadInterface
+    public function __invoke(int $id): \Generator
     {
+        // prepare the queries.
         $select_run_sth = $this->pdo->prepare(self::SELECT_RUN_SQL);
         $select_publications_sth = $this->pdo->prepare(self::SELECT_PUBLICATIONS_SQL);
+        $update_run_sth = $this->pdo->prepare(self::UPDATE_RUN_SQL);
+        $update_publication_sth = $this->pdo->prepare(self::UPDATE_PUBLICATION_SQL);
 
+        // select the publication.
         $select_run_sth->execute([$id]);
 
         if (! $run = $select_run_sth->fetch()) {
-            return new DomainPayload(self::NOT_FOUND);
+            yield new DomainPayload(self::NOT_FOUND);
+        } elseif ($run['populated']) {
+            yield new DomainPayload(self::ALREADY_POPULATED);
+        } else {
+            $errors = 0;
+
+            // populate the publications metadata.
+            $select_publications_sth->execute([$run['id']]);
+
+            while ($publication = $select_publications_sth->fetch()) {
+                $result = $this->efetch->metadata($publication['pmid']);
+
+                if ($result['success']) {
+                    $update_publication_sth->execute([
+                        $result['data']['json'],
+                        $publication['id']
+                    ]);
+
+                    yield new DomainPayload(self::UPDATE_SUCCESS, [
+                        'pmid' => $publication['pmid'],
+                    ]);
+                } else {
+                    $errors++;
+
+                    yield new DomainPayload(self::EFETCH_ERROR, array_merge($result['data'], [
+                        'pmid' => $publication['pmid'],
+                    ]));
+                }
+            }
+
+            // update the curation run state when no error happened.
+            if ($errors == 0) {
+                $update_run_sth->execute([$run['id']]);
+
+                yield new DomainSuccess;
+            } else {
+                yield new DomainPayload(self::SOME_FAILED, ['errors' => $errors]);
+            }
         }
-
-        $select_publications_sth->execute([$run['id']]);
-
-        while ($publication = $select_publications_sth->fetch()) {
-            $this->client->enqueue(new Job(PopulatePublicationHandler::class, [
-                'pmid' => $publication['pmid'],
-            ]));
-        }
-
-        return $select_publications_sth->rowCount() == 0
-            ? new DomainPayload(self::ALREADY_POPULATED)
-            : new DomainSuccess;
     }
 }
