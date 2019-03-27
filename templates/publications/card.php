@@ -5,22 +5,37 @@
             data-toggle="collapse"
             href="#pmid-<?= $publication['pmid'] ?>"
         >
-            <?= $publication['title'] == '' ? $publication['pmid'] : $publication['title'] ?>
+            <?= $publication['title'] ?>
         </a>
     </h4>
     <div id="pmid-<?= $publication['pmid'] ?>" class="collapse">
         <div class="card-body">
             <blockquote class="blockquote mb-0">
                 <p>
-                    <?= $publication['abstract'] ?>
-                </p>
-                <p>
-                    <?= $publication['journal'] ?>
+                    <?= nl2br($this->highlighted($publication['type'], $publication['abstract'])) ?>
                 </p>
                 <footer class="blockquote-footer">
-                    <?= $publication['authors'] ?>
+                    <?= implode(', ', $publication['authors']) ?>
                 </footer>
             </blockquote>
+            <div class="row">
+                <div class="col offset-lg-8">
+                    <form method="GET" action="https://www.ncbi.nlm.nih.gov/pubmed/<?= $publication['pmid'] ?>" target="_blank">
+                        <input type="hidden" name="request" value="<?= $publication['pmid'] ?>">
+                        <button type="submit" class="btn btn-block btn-info">
+                            PUBMED <i class="fas fa-external-link-alt"></i>
+                        </button>
+                    </form>
+                </div>
+                <div class="col">
+                    <form method="POST" action="https://sci-hub.tw" target="_blank">
+                        <input type="hidden" name="request" value="<?= $publication['pmid'] ?>">
+                        <button type="submit" class="btn btn-block btn-info">
+                            SCIHUB <i class="fas fa-external-link-alt"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
         <div class="card-footer">
             <form

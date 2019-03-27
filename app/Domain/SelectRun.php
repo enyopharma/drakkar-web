@@ -18,6 +18,10 @@ final class SelectRun
         SELECT * FROM runs WHERE populated IS TRUE AND id = ?
 SQL;
 
+    const SELECT_KEYWORDS_SQL = <<<SQL
+        SELECT pattern FROM keywords WHERE type = ?
+SQL;
+
     const COUNT_PUBLICATIONS_SQL = <<<SQL
         SELECT COUNT(*) FROM associations WHERE run_id = ? AND state = ?
 SQL;
@@ -41,6 +45,7 @@ SQL;
     public function __invoke(int $id, string $state, int $page = 1): DomainPayloadInterface
     {
         $select_run_sth = $this->pdo->prepare(self::SELECT_RUN_STH);
+        $select_keywords_sth = $this->pdo->prepare(self::SELECT_KEYWORDS_SQL);
         $count_publications_sth = $this->pdo->prepare(self::COUNT_PUBLICATIONS_SQL);
         $select_publications_sth = $this->pdo->prepare(self::SELECT_PUBLICATIONS_SQL);
 
@@ -57,6 +62,11 @@ SQL;
         if ($page < 1) {
             return new DomainPayload(self::UNDERFLOW);
         }
+
+        // select the keywords associated to the curation run type.
+        $select_keywords_sth->execute([$run['type']]);
+
+        $keywords = $select_keywords_sth->fetchAll(\PDO::FETCH_COLUMN);
 
         // select the curation runs publications number for each state.
         foreach (Publication::STATES as $s) {
@@ -78,11 +88,17 @@ SQL;
 
         $publications = $select_publications_sth->fetchAll();
 
+        // Return a success with a paginated publication collection.
         return new DomainSuccess([
             'run' => $run,
             'nbs' => $nbs,
             'publications' => new Pagination(
-                new ResultSet($publications), $nbs[$state], $page, self::LIMIT
+                new ResultSet(
+                    new PublicationCollection($run['type'], $publications, $keywords)
+                ),
+                $nbs[$state],
+                $page,
+                self::LIMIT
             ),
         ]);
     }

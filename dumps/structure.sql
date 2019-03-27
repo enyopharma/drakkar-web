@@ -617,6 +617,21 @@ CREATE INDEX sequences_protein_id_key ON public.sequences USING btree (protein_i
 
 
 --
--- PostgreSQL database dump complete
+-- Name: associations associations_pmid_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY public.associations
+    ADD CONSTRAINT associations_pmid_fkey FOREIGN KEY (pmid) REFERENCES public.publications(pmid);
+
+
+--
+-- Name: associations associations_run_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.associations
+    ADD CONSTRAINT associations_run_id_fkey FOREIGN KEY (run_id) REFERENCES public.runs(id);
+
+
+--
+-- PostgreSQL database dump complete
+--

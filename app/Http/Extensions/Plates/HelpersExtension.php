@@ -5,6 +5,7 @@ namespace App\Http\Extensions\Plates;
 use League\Plates\Engine;
 use League\Plates\Extension\ExtensionInterface;
 
+use App\Domain\Run;
 use App\Domain\Publication;
 
 final class HelpersExtension implements ExtensionInterface
@@ -76,6 +77,19 @@ final class HelpersExtension implements ExtensionInterface
 
         $engine->registerFunction('stateMap', function (string $state) {
             return $this->map[$state] ?? [];
+        });
+
+        $engine->registerFunction('highlighted', function (string $type, string $str) {
+            $map = [
+                Run::HH => 'text-primary',
+                Run::VH => 'text-danger',
+            ];
+
+            return preg_replace(
+                '/\*\*([^*]+)\*\*/',
+                sprintf('<span class="%s">$1</span>', $map[$type] ?? ''),
+                $str
+            );
         });
     }
 }
