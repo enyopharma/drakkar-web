@@ -82,7 +82,10 @@ $(document).ready(function () {
 ]) ?>
 <div class="row my-4">
     <div class="col">
-        <?php $this->insert('publications/deck', ['publications' => $publications]) ?>
+        <?php $this->insert('publications/deck', [
+            'type' => $run['type'],
+            'publications' => $publications,
+        ]) ?>
     </div>
 </div>
 <?php $this->insert('pagination/nav', [

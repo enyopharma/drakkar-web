@@ -11,9 +11,11 @@
     <div id="pmid-<?= $publication['pmid'] ?>" class="collapse">
         <div class="card-body">
             <blockquote class="blockquote mb-0">
+                <?php foreach ($publication['abstract'] as $abstract): ?>
                 <p>
-                    <?= nl2br($this->highlighted($publication['type'], $publication['abstract'])) ?>
+                    <?= nl2br($this->highlighted($type, $abstract)) ?>
                 </p>
+                <?php endforeach; ?>
                 <footer class="blockquote-footer">
                     <?= implode(', ', $publication['authors']) ?>
                 </footer>

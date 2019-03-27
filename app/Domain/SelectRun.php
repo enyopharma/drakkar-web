@@ -94,7 +94,7 @@ SQL;
             'nbs' => $nbs,
             'publications' => new Pagination(
                 new ResultSet(
-                    new PublicationCollection($run['type'], $publications, $keywords)
+                    new PublicationCollection($publications, $keywords)
                 ),
                 $nbs[$state],
                 $page,
