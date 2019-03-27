@@ -56,43 +56,53 @@ SQL;
 
         if (! $run = $select_run_sth->fetch()) {
             yield new DomainPayload(self::NOT_FOUND);
-        } elseif ($run['populated']) {
+
+            return;
+        }
+
+        if ($run['populated']) {
             yield new DomainPayload(self::ALREADY_POPULATED);
-        } else {
-            $errors = 0;
 
-            // select the non populated publications of the curation run.
-            $select_publications_sth->execute([$run['id']]);
+            return;
+        }
 
-            while ($publication = $select_publications_sth->fetch()) {
-                $result = $this->efetch->metadata($publication['pmid']);
+        // select the non populated publications of the curation run.
+        $errors = 0;
 
-                if ($result['success']) {
-                    $update_publication_sth->execute([
-                        $result['data']['json'],
-                        $publication['pmid']
-                    ]);
+        $select_publications_sth->execute([$run['id']]);
 
-                    yield new DomainPayload(self::UPDATE_SUCCESS, [
-                        'pmid' => $publication['pmid'],
-                    ]);
-                } else {
-                    $errors++;
+        while ($publication = $select_publications_sth->fetch()) {
+            $result = $this->efetch->metadata($publication['pmid']);
 
-                    yield new DomainPayload(self::EFETCH_ERROR, array_merge($result['data'], [
-                        'pmid' => $publication['pmid'],
-                    ]));
-                }
-            }
+            if ($result['success']) {
+                $update_publication_sth->execute([
+                    $result['data']['json'],
+                    $publication['pmid']
+                ]);
 
-            // update the curation run state when no error happened.
-            if ($errors == 0) {
-                $update_run_sth->execute([$run['id']]);
-
-                yield new DomainSuccess;
+                yield new DomainPayload(self::UPDATE_SUCCESS, [
+                    'pmid' => $publication['pmid'],
+                ]);
             } else {
-                yield new DomainPayload(self::SOME_FAILED, ['errors' => $errors]);
+                $errors++;
+
+                yield new DomainPayload(self::EFETCH_ERROR, array_merge($result['data'], [
+                    'pmid' => $publication['pmid'],
+                ]));
             }
         }
+
+        // return a failure when there is errors.
+        if ($errors > 0) {
+            yield new DomainPayload(self::SOME_FAILED, ['errors' => $errors]);
+
+            return;
+        }
+
+        // update the curation run state when no error happened.
+        $update_run_sth->execute([$run['id']]);
+
+        // success !
+        yield new DomainSuccess;
     }
 }
