@@ -16,7 +16,7 @@ SQL;
 SQL;
 
     const INSERT_ASSOCIATION_SQL = <<<SQL
-        INSERT INTO associations (run_id, publication_id) VALUES (?, ?)
+        INSERT INTO associations (run_id, pmid) VALUES (?, ?)
 SQL;
 
     const SELECT_PUBLICATION_SQL = <<<SQL
@@ -24,10 +24,11 @@ SQL;
 SQL;
 
     const SELECT_PUBLICATIONS_SQL = <<<SQL
-        SELECT r.name AS run_name, p.pmid
-        FROM runs AS r, publications AS p, associations AS a
-        WHERE r.id = a.run_id AND p.id = a.publication_id
-        AND r.type = ? AND p.pmid IN(%s)
+        SELECT r.name AS run_name, a.pmid
+        FROM runs AS r, associations AS a
+        WHERE r.id = a.run_id
+        AND r.type = ?
+        AND a.pmid IN(%s)
 SQL;
 
     private $pdo;
@@ -74,17 +75,16 @@ SQL;
         foreach ($pmids as $pmid) {
             $select_publication_sth->execute([$pmid]);
 
-            if (! $publication = $select_publication_sth->fetch()) {
+            if (! $select_publication_sth->fetch()) {
                 $insert_publication_sth->execute([$pmid]);
-
-                $publication['id'] = $this->pdo->lastInsertId();
             }
 
-            $insert_association_sth->execute([$run['id'], $publication['id']]);
+            $insert_association_sth->execute([$run['id'], $pmid]);
         }
 
         $this->pdo->commit();
 
+        // success !
         return new DomainSuccess(['run' => $run]);
     }
 }

@@ -27,14 +27,14 @@ final class UpdateHandler implements RequestHandlerInterface
         $body = (array) $request->getParsedBody();
 
         $run_id = (int) $attributes['run_id'];
-        $publication_id = (int) $attributes['id'];
+        $pmid = (int) $attributes['pmid'];
         $state = $body['state'];
         $annotation = $body['annotation'];
 
-        $payload = ($this->domain)($run_id, $publication_id, $state, $annotation);
+        $payload = ($this->domain)($run_id, $pmid, $state, $annotation);
 
         return $payload->parsed($this->bind('success'), [
-            UpdatePublicationState::NOT_FOUND => $this->bind('notfound', $run_id, $publication_id)
+            UpdatePublicationState::NOT_FOUND => $this->bind('notfound', $run_id, $pmid)
         ]);
     }
 
@@ -50,7 +50,7 @@ final class UpdateHandler implements RequestHandlerInterface
         return $this->responder->back();
     }
 
-    private function notfound(int $run_id, int $publication_id): ResponseInterface
+    private function notfound(int $run_id, int $pmid): ResponseInterface
     {
         return $this->responder->notfound();
     }

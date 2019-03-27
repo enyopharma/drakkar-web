@@ -9,7 +9,7 @@ final class UpdatePublicationState
     const UPDATE_ASSOCIATION_SQL = <<<SQL
         UPDATE associations
         SET state = ?, annotation = ?, updated_at = NOW()
-        WHERE run_id = ? AND publication_id = ?
+        WHERE run_id = ? AND pmid = ?
 SQL;
 
     private $pdo;
@@ -19,15 +19,11 @@ SQL;
         $this->pdo = $pdo;
     }
 
-    public function __invoke(
-        int $run_id,
-        int $publication_id,
-        string $state,
-        string $annotation
-    ): DomainPayloadInterface {
+    public function __invoke(int $run_id, int $pmid, string $state, string $annotation): DomainPayloadInterface
+    {
         $update_association_sth = $this->pdo->prepare(self::UPDATE_ASSOCIATION_SQL);
 
-        $update_association_sth->execute([$state, $annotation, $run_id, $publication_id]);
+        $update_association_sth->execute([$state, $annotation, $run_id, $pmid]);
 
         return $update_association_sth->rowCount() == 0
             ? new DomainPayload(self::NOT_FOUND)

@@ -54,7 +54,7 @@ SET default_with_oids = false;
 CREATE TABLE public.associations (
     id integer NOT NULL,
     run_id integer NOT NULL,
-    publication_id integer NOT NULL,
+    pmid bigint NOT NULL,
     state character varying(10) DEFAULT 'pending'::character varying NOT NULL,
     annotation text DEFAULT ''::text NOT NULL,
     updated_at timestamp(0) without time zone DEFAULT now() NOT NULL,
@@ -293,31 +293,10 @@ ALTER SEQUENCE public.proteins_id_seq OWNED BY public.proteins.id;
 --
 
 CREATE TABLE public.publications (
-    id integer NOT NULL,
     pmid bigint NOT NULL,
     populated boolean DEFAULT false,
     metadata jsonb
 );
-
-
---
--- Name: publications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.publications_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: publications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.publications_id_seq OWNED BY public.publications.id;
 
 
 --
@@ -438,13 +417,6 @@ ALTER TABLE ONLY public.proteins ALTER COLUMN id SET DEFAULT nextval('public.pro
 
 
 --
--- Name: publications id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.publications ALTER COLUMN id SET DEFAULT nextval('public.publications_id_seq'::regclass);
-
-
---
 -- Name: runs id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -464,6 +436,14 @@ ALTER TABLE ONLY public.sequences ALTER COLUMN id SET DEFAULT nextval('public.se
 
 ALTER TABLE ONLY public.associations
     ADD CONSTRAINT associations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: associations associations_run_id_pmid_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.associations
+    ADD CONSTRAINT associations_run_id_pmid_key UNIQUE (run_id, pmid);
 
 
 --
@@ -519,7 +499,7 @@ ALTER TABLE ONLY public.proteins
 --
 
 ALTER TABLE ONLY public.publications
-    ADD CONSTRAINT publications_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT publications_pkey PRIMARY KEY (pmid);
 
 
 --
@@ -536,27 +516,6 @@ ALTER TABLE ONLY public.runs
 
 ALTER TABLE ONLY public.sequences
     ADD CONSTRAINT sequences_pkey PRIMARY KEY (id);
-
-
---
--- Name: association_run_id_publication_id_key; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX association_run_id_publication_id_key ON public.associations USING btree (run_id, publication_id);
-
-
---
--- Name: associations_publication_id_key; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX associations_publication_id_key ON public.associations USING btree (publication_id);
-
-
---
--- Name: associations_run_id_key; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX associations_run_id_key ON public.associations USING btree (run_id);
 
 
 --
@@ -644,13 +603,6 @@ CREATE INDEX proteins_search_key ON public.proteins USING gin (search public.gin
 
 
 --
--- Name: publications_pmid_key; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX publications_pmid_key ON public.publications USING btree (pmid);
-
-
---
 -- Name: sequences_accession_key; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -665,77 +617,6 @@ CREATE INDEX sequences_protein_id_key ON public.sequences USING btree (protein_i
 
 
 --
--- Name: associations association_run_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.associations
-    ADD CONSTRAINT association_run_id_key FOREIGN KEY (run_id) REFERENCES public.runs(id);
-
-
---
--- Name: associations associations_publication_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.associations
-    ADD CONSTRAINT associations_publication_id_key FOREIGN KEY (publication_id) REFERENCES public.publications(id);
-
-
---
--- Name: descriptions descriptions_association_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.descriptions
-    ADD CONSTRAINT descriptions_association_id_key FOREIGN KEY (association_id) REFERENCES public.associations(id);
-
-
---
--- Name: descriptions descriptions_interactor1_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.descriptions
-    ADD CONSTRAINT descriptions_interactor1_id_key FOREIGN KEY (interactor1_id) REFERENCES public.interactors(id);
-
-
---
--- Name: descriptions descriptions_interactor2_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.descriptions
-    ADD CONSTRAINT descriptions_interactor2_id_key FOREIGN KEY (interactor2_id) REFERENCES public.interactors(id);
-
-
---
--- Name: descriptions descriptions_method_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.descriptions
-    ADD CONSTRAINT descriptions_method_id_key FOREIGN KEY (method_id) REFERENCES public.methods(id);
-
-
---
--- Name: features features_sequence_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.features
-    ADD CONSTRAINT features_sequence_id_key FOREIGN KEY (sequence_id) REFERENCES public.sequences(id);
-
-
---
--- Name: interactors interactors_protein_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.interactors
-    ADD CONSTRAINT interactors_protein_id_key FOREIGN KEY (protein_id) REFERENCES public.proteins(id);
-
-
---
--- Name: sequences sequences_protein_id_key; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.sequences
-    ADD CONSTRAINT sequences_protein_id_key FOREIGN KEY (protein_id) REFERENCES public.proteins(id);
-
-
---
 -- PostgreSQL database dump complete
 --
+

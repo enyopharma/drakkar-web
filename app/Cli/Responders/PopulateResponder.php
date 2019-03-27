@@ -4,6 +4,8 @@ namespace App\Cli\Responders;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
+use App\Domain\Services\Efetch;
+
 final class PopulateResponder
 {
     private $responder;

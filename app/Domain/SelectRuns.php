@@ -13,11 +13,10 @@ final class SelectRuns
 SQL;
 
     const COUNT_PUBLICATIONS_SQL = <<<SQL
-        SELECT a.run_id, COUNT(*)
-        FROM publications AS p, associations AS a
-        WHERE p.id = a.publication_id
-        AND a.state = ?
-        GROUP BY a.run_id
+        SELECT run_id, COUNT(*)
+        FROM associations
+        WHERE state = ?
+        GROUP BY run_id
 SQL;
 
     private $pdo;

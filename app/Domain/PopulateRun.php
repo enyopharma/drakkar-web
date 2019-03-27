@@ -19,7 +19,7 @@ SQL;
     const SELECT_PUBLICATIONS_SQL = <<<SQL
         SELECT p.*
         FROM publications AS p, associations AS a
-        WHERE p.id = a.publication_id AND a.run_id = ?
+        WHERE p.pmid = a.pmid AND a.run_id = ?
         AND p.populated IS FALSE
 SQL;
 
@@ -30,7 +30,7 @@ SQL;
     const UPDATE_PUBLICATION_SQL = <<<SQL
         UPDATE publications
         SET populated = TRUE, metadata = ?
-        WHERE id = ?
+        WHERE pmid = ?
 SQL;
 
     private $pdo;
@@ -51,7 +51,7 @@ SQL;
         $update_run_sth = $this->pdo->prepare(self::UPDATE_RUN_SQL);
         $update_publication_sth = $this->pdo->prepare(self::UPDATE_PUBLICATION_SQL);
 
-        // select the publication.
+        // select the curation run.
         $select_run_sth->execute([$id]);
 
         if (! $run = $select_run_sth->fetch()) {
@@ -61,7 +61,7 @@ SQL;
         } else {
             $errors = 0;
 
-            // populate the publications metadata.
+            // select the non populated publications of the curation run.
             $select_publications_sth->execute([$run['id']]);
 
             while ($publication = $select_publications_sth->fetch()) {
@@ -70,7 +70,7 @@ SQL;
                 if ($result['success']) {
                     $update_publication_sth->execute([
                         $result['data']['json'],
-                        $publication['id']
+                        $publication['pmid']
                     ]);
 
                     yield new DomainPayload(self::UPDATE_SUCCESS, [

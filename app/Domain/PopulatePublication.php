@@ -14,7 +14,7 @@ final class PopulatePublication
         SELECT r.*
         FROM runs AS r, associations AS a
         WHERE r.id = a.run_id
-        AND a.publication_id = ?
+        AND a.pmid = ?
 SQL;
 
     const SELECT_PUBLICATION_SQL = <<<SQL
@@ -24,7 +24,7 @@ SQL;
     const COUNT_NOT_POPULATED_SQL = <<<SQL
         SELECT COUNT(*)
         FROM publications AS p, associations AS a
-        WHERE p.id = a.publication_id
+        WHERE p.pmid = a.pmid
         AND a.run_id = ?
         AND p.populated IS FALSE
 SQL;
@@ -36,7 +36,7 @@ SQL;
     const UPDATE_PUBLICATION_SQL = <<<SQL
         UPDATE publications
         SET populated = TRUE, metadata = ?
-        WHERE id = ?
+        WHERE pmid = ?
 SQL;
 
     private $pdo;
@@ -70,7 +70,7 @@ SQL;
         }
 
         // download the metadata.
-        $result = $this->efetch->metadata($publication['pmid']);
+        $result = $this->efetch->metadata($pmid);
 
         // return error.
         if (! $result['success']) {
@@ -80,12 +80,9 @@ SQL;
         // update publication.
         $this->pdo->beginTransaction();
 
-        $update_publication_sth->execute([
-            $result['data']['json'],
-            $publication['id'],
-        ]);
+        $update_publication_sth->execute([$result['data']['json'], $pmid]);
 
-        $select_runs_sth->execute([$publication['id']]);
+        $select_runs_sth->execute([$pmid]);
 
         while ($run = $select_runs_sth->fetch()) {
             $count_not_populated_sth->execute([$run['id']]);

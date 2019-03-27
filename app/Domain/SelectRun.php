@@ -19,17 +19,13 @@ final class SelectRun
 SQL;
 
     const COUNT_PUBLICATIONS_SQL = <<<SQL
-        SELECT COUNT(*)
-        FROM publications AS p, associations AS a
-        WHERE p.id = a.publication_id
-        AND a.run_id = ?
-        AND a.state = ?
+        SELECT COUNT(*) FROM associations WHERE run_id = ? AND state = ?
 SQL;
 
     const SELECT_PUBLICATIONS_SQL = <<<SQL
         SELECT a.run_id, a.state, p.*
         FROM publications AS p, associations AS a
-        WHERE p.id = a.publication_id
+        WHERE p.pmid = a.pmid
         AND a.run_id = ?
         AND a.state = ?
         LIMIT ? OFFSET ?
