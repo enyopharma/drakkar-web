@@ -20,16 +20,6 @@ services:
         networks:
             - default
             - sso
-    queue:
-        build: .
-        user: ${UID}:${GID}
-        volumes:
-            - .:/app:rw
-        command: php entrypoints/worker.php
-        networks:
-            - default
-        depends_on:
-            - redis
     redis:
         container_name: drakkar_redis
         image: redis
