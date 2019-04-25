@@ -33,52 +33,41 @@ final class ShowHandler implements RequestHandlerInterface
 
         $payload = ($this->domain)($id, $state, $page);
 
-        return $payload->parsed($this->bind('success', $state, $page), [
-            SelectRun::NOT_FOUND => $this->bind('notfound', $id),
-            SelectRun::INVALID_STATE => $this->bind('invalidState', $id),
-            SelectRun::UNDERFLOW => $this->bind('underflow', $id, $state),
-            SelectRun::OVERFLOW => $this->bind('overflow', $id, $state),
+        return $payload->parsed($this->success($state, $page), [
+            SelectRun::NOT_FOUND => [$this->responder, 'notfound'],
+            SelectRun::INVALID_STATE => [$this->responder, 'notfound'],
+            SelectRun::UNDERFLOW => $this->underflow($id, $state),
+            SelectRun::OVERFLOW => $this->overflow($id, $state),
         ]);
     }
 
-    private function bind(string $method, ...$xs)
+    private function success(string $state, int $page): callable
     {
-        return function ($data) use ($method, $xs) {
-            return $this->{$method}(...array_merge($xs, [$data]));
+        return function (array $data) use ($state, $page) {
+            return $this->responder->html('runs/show', array_merge($data, [
+                'state' => $state,
+                'page' => $page,
+            ]));
         };
     }
 
-    private function success(string $state, int $page, array $data): ResponseInterface
+    private function underflow(int $id, string $state): callable
     {
-        return $this->responder->html('runs/show', array_merge($data, [
-            'state' => $state,
-            'page' => $page,
-        ]));
+        return function () use ($id, $state) {
+            return $this->responder->redirect('runs.show', ['id' => $id], [
+                'state' => $state,
+                'page' => 1,
+            ]);
+        };
     }
 
-    private function notfound(int $id): ResponseInterface
+    private function overflow(int $id, string $state): callable
     {
-        return $this->responder->notfound();
-    }
-
-    private function invalidState(int $id): ResponseInterface
-    {
-        return $this->responder->notfound();
-    }
-
-    private function underflow(int $id, string $state): ResponseInterface
-    {
-        return $this->responder->redirect('runs.show', ['id' => $id], [
-            'state' => $state,
-            'page' => 1,
-        ]);
-    }
-
-    private function overflow(int $id, string $state, array $data): ResponseInterface
-    {
-        return $this->responder->redirect('runs.show', ['id' => $id], [
-            'state' => $state,
-            'page' => $data['max'],
-        ]);
+        return function (array $data) use ($id, $state) {
+            return $this->responder->redirect('runs.show', ['id' => $id], [
+                'state' => $state,
+                'page' => $data['max'],
+            ]);
+        };
     }
 }

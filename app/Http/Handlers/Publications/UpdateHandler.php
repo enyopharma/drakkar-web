@@ -33,25 +33,8 @@ final class UpdateHandler implements RequestHandlerInterface
 
         $payload = ($this->domain)($run_id, $pmid, $state, $annotation);
 
-        return $payload->parsed($this->bind('success'), [
-            UpdatePublicationState::NOT_FOUND => $this->bind('notfound', $run_id, $pmid)
+        return $payload->parsed([$this->responder, 'back'], [
+            UpdatePublicationState::NOT_FOUND => [$this->responder, 'notfound'],
         ]);
-    }
-
-    private function bind(string $method, ...$xs)
-    {
-        return function ($data) use ($method, $xs) {
-            return $this->{$method}(...array_merge($xs, [$data]));
-        };
-    }
-
-    private function success(): ResponseInterface
-    {
-        return $this->responder->back();
-    }
-
-    private function notfound(int $run_id, int $pmid): ResponseInterface
-    {
-        return $this->responder->notfound();
     }
 }

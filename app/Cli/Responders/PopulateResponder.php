@@ -41,7 +41,7 @@ final class PopulateResponder
     public function efetchError(OutputInterface $output, int $pmid, array $data): void
     {
         if ($data['type'] == Efetch::DOWNLOAD_ERROR) {
-            $this->downloadFailed($output, $pmid, $data);
+            $this->downloadError($output, $pmid, $data);
         }
 
         if ($data['type'] == Efetch::PARSING_ERROR) {
@@ -58,7 +58,7 @@ final class PopulateResponder
         ]);
     }
 
-    private function downloadFailed(OutputInterface $output, int $pmid, array $data)
+    private function downloadError(OutputInterface $output, int $pmid, array $data)
     {
         $this->responder->error('Failed to download the metadata of publication with pmid %s', ...[
             $output,
@@ -69,7 +69,7 @@ final class PopulateResponder
         $this->responder->default($data['error']);
     }
 
-    private function parsingFailed(OutputInterface $output, int $pmid, array $data)
+    private function parsingError(OutputInterface $output, int $pmid, array $data)
     {
         $this->responder->error('Failed to parse the metadata of publication with pmid %s', ...[
             $output,
@@ -83,7 +83,7 @@ final class PopulateResponder
         }
     }
 
-    private function conversionFailed(OutputInterface $output, int $pmid, array $data)
+    private function conversionError(OutputInterface $output, int $pmid, array $data)
     {
         $this->responder->error('Failed to convert the metadata of publication with pmid %s to json', ...[
             $output,

@@ -41,51 +41,65 @@ final class PopulateRunCommand extends Command
         $id = (int) $input->getArgument('id');
 
         foreach (($this->domain)($id) as $payload) {
-            $payload->parsed($this->bind('success', $output, $id), [
-                PopulateRun::NOT_FOUND => $this->bind('notFound', $output, $id),
-                PopulateRun::ALREADY_POPULATED => $this->bind('alreadyPopulated', $output, $id),
-                PopulateRun::UPDATE_SUCCESS => $this->bind('updateSuccess', $output),
-                PopulateRun::EFETCH_ERROR => $this->bind('efetchError', $output),
-                PopulateRun::SOME_FAILED => $this->bind('someFailed', $output, $id),
+            $payload->parsed($this->success($output, $id), [
+                PopulateRun::NOT_FOUND => $this->notFound($output, $id),
+                PopulateRun::ALREADY_POPULATED => $this->alreadyPopulated($output, $id),
+                PopulateRun::UPDATE_SUCCESS => $this->updateSuccess($output),
+                PopulateRun::EFETCH_ERROR => $this->efetchError($output),
+                PopulateRun::SOME_FAILED => $this->someFailed($output, $id),
             ]);
         }
     }
 
-    private function bind(string $method, ...$xs)
+    private function success(OutputInterface $output, int $id): callable
     {
-        return function ($data) use ($method, $xs) {
-            return $this->{$method}(...array_merge($xs, [$data]));
+        return function () use ($output, $id) {
+            $this->responder->info('Metadata of the publications of the curation run with id %s successfully updated.', ...[
+                $output,
+                $id,
+            ]);
         };
     }
 
-    private function success(OutputInterface $output, int $id)
+    private function notFound(OutputInterface $output, int $id): callable
     {
-        $this->responder->info('Metadata of the publications of the curation run with id %s successfully updated.', ...[
-            $output,
-            $id,
-        ]);
+        return function () use ($output, $id) {
+            $this->responder->error('No curation run with id %s.', $output, $id);
+        };
     }
 
-    private function notFound(OutputInterface $output, int $id)
+    private function alreadyPopulated(OutputInterface $output, int $id): callable
     {
-        $this->responder->error('No curation run with id %s.', $output, $id);
+        return function () use ($output, $id) {
+            $this->responder->info('Metadata of the publications of the curation run with id %s are already updated.', ...[
+                $output,
+                $id,
+            ]);
+        };
     }
 
-    private function alreadyPopulated(OutputInterface $output, int $id)
+    private function updateSuccess(OutputInterface $output): callable
     {
-        $this->responder->info('Metadata of the publications of the curation run with id %s are already updated.', ...[
-            $output,
-            $id,
-        ]);
+        return function (array $data) use ($output) {
+            $this->responder->success($output, $data['pmid']);
+        };
     }
 
-    private function updateSuccess(OutputInterface $output, array $data)
+    private function efetchError(OutputInterface $output): callable
     {
-        $this->responder->success($output, $data['pmid']);
+        return function (array $data) use ($output) {
+            $this->responder->efetchError($output, $data['pmid'], $data);
+        };
     }
 
-    private function efetchError(OutputInterface $output, array $data)
+    private function someFailed(OutputInterface $output, int $id): callable
     {
-        $this->responder->efetchError($output, $data['pmid'], $data);
+        return function (array $data) use ($output, $id) {
+            $this->responder->error('Failed to retrieve metadata of %s publications of the curation run with id %s.', ...[
+                $output,
+                $data['errors'],
+                $id,
+            ]);
+        };
     }
 }

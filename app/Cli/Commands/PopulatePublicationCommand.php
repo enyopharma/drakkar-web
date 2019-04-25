@@ -40,40 +40,41 @@ final class PopulatePublicationCommand extends Command
     {
         $pmid = (int) $input->getArgument('pmid');
 
-        return ($this->domain)($pmid)->parsed($this->bind('success', $output, $pmid), [
-            PopulatePublication::NOT_FOUND => $this->bind('notFound', $output, $pmid),
-            PopulatePublication::ALREADY_POPULATED => $this->bind('alreadyPopulated', $output, $pmid),
-            PopulatePublication::EFETCH_ERROR => $this->bind('efetchError', $output, $pmid),
+        return ($this->domain)($pmid)->parsed($this->success($output, $pmid), [
+            PopulatePublication::NOT_FOUND => $this->notFound($output, $pmid),
+            PopulatePublication::ALREADY_POPULATED => $this->alreadyPopulated($output, $pmid),
+            PopulatePublication::EFETCH_ERROR => $this->efetchError($output, $pmid),
         ]);
     }
 
-    private function bind(string $method, ...$xs)
+    private function success(OutputInterface $output, int $pmid): callable
     {
-        return function ($data) use ($method, $xs) {
-            return $this->{$method}(...array_merge($xs, [$data]));
+        return function () use ($output, $pmid) {
+            $this->responder->success($output, $pmid);
         };
     }
 
-    private function success(OutputInterface $output, int $pmid)
+    private function notFound(OutputInterface $output, int $pmid): callable
     {
-        $this->responder->success($output, $pmid);
+        return function () use ($output, $pmid) {
+            $this->responder->error('No publication with pmid %s.', $output, $pmid);
+        };
     }
 
-    private function notFound(OutputInterface $output, int $pmid)
+    private function alreadyPopulated(OutputInterface $output, int $pmid): callable
     {
-        $this->responder->error('No publication with pmid %s.', $output, $pmid);
+        return function () use ($output, $pmid) {
+            $this->responder->info('Metadata of publication with pmid %s are already updated.', ...[
+                $output,
+                $pmid,
+            ]);
+        };
     }
 
-    private function alreadyPopulated(OutputInterface $output, int $pmid)
+    private function efetchError(OutputInterface $output, int $pmid): callable
     {
-        $this->responder->info('Metadata of publication with pmid %s are already updated.', ...[
-            $output,
-            $pmid,
-        ]);
-    }
-
-    private function efetchError(OutputInterface $output, int $pmid, array $data)
-    {
-        $this->responder->efetchError($output, $pmid, $data);
+        return function (array $data) use ($output, $pmid) {
+            $this->responder->efetchError($output, $pmid, $data);
+        };
     }
 }

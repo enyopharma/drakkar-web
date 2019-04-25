@@ -52,43 +52,42 @@ abstract class AbstractCreateRunCommand extends Command
 
         $payload = ($this->insert)($this->type, $name, ...$pmids);
 
-        return $payload->parsed($this->bind('success', $output), [
-            InsertRun::INVALID_TYPE => $this->bind('invalidType', $output),
-            InsertRun::NOT_UNIQUE => $this->bind('notUnique', $output),
+        return $payload->parsed($this->success($output), [
+            InsertRun::INVALID_TYPE => $this->invalidType($output),
+            InsertRun::NOT_UNIQUE => $this->notUnique($output),
         ]);
     }
 
-    private function bind(string $method, ...$xs)
+    private function success(OutputInterface $output): callable
     {
-        return function ($data) use ($method, $xs) {
-            return $this->{$method}(...array_merge($xs, [$data]));
+        return function (array $data) use ($output) {
+            $this->responder->info('Curation run inserted with id %s.', ...[
+                $output,
+                $data['run']['id'],
+            ]);
         };
     }
 
-    private function success(OutputInterface $output, array $data): void
+    private function invalidType(OutputInterface $output): callable
     {
-        $this->responder->info('Curation run inserted with id %s.', ...[
-            $output,
-            $data['run']['id'],
-        ]);
+        return function () use ($output) {
+            $this->responder->error('Value \'%s\' is not a valid curation run type.', ...[
+                $output,
+                $this->type,
+            ]);
+        };
     }
 
-    private function invalidType(OutputInterface $output): void
+    private function notUnique(OutputInterface $output): callable
     {
-        $this->responder->error('Value \'%s\' is not a valid curation run type.', ...[
-            $output,
-            $this->type,
-        ]);
-    }
-
-    private function notUnique(OutputInterface $output, array $data): void
-    {
-        $this->responder->error('Publication with PMID %s is already associated to a %s curation run (\'%s\').', ...[
-            $output,
-            $data['publication']['pmid'],
-            $this->type,
-            $data['run']['name'],
-        ]);
+        return function (array $data) use ($output) {
+            $this->responder->error('Publication with PMID %s is already associated to a %s curation run (\'%s\').', ...[
+                $output,
+                $data['publication']['pmid'],
+                $this->type,
+                $data['run']['name'],
+            ]);
+        };
     }
 
     private function pmidsFromStdin(): array
