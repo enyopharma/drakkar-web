@@ -2,7 +2,7 @@
 
 namespace Enyo\Data;
 
-final class ResultSet implements \IteratorAggregate
+final class ResultSet implements \IteratorAggregate, \JsonSerializable
 {
     private $iterable;
 
@@ -47,6 +47,11 @@ final class ResultSet implements \IteratorAggregate
                 yield $row;
             }
         }
+    }
+
+    public function jsonSerialize()
+    {
+        return iterator_to_array($this);
     }
 
     private function isPassingConstraints(array $row): bool

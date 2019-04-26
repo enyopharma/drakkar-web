@@ -17,4 +17,9 @@ return function (RouteCollector $collector) {
         App\Http\Handlers\Publications\UpdateHandler::class,
         'runs.publications.update',
     ]);
+
+    $collector->get('/proteins', ...[
+        App\Http\Handlers\Proteins\SelectHandler::class,
+        'proteins.show',
+    ]);
 };

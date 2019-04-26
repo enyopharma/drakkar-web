@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 10.6 (Ubuntu 10.6-0ubuntu0.18.04.1)
--- Dumped by pg_dump version 10.6 (Ubuntu 10.6-0ubuntu0.18.04.1)
+-- Dumped from database version 10.7 (Ubuntu 10.7-0ubuntu0.18.04.1)
+-- Dumped by pg_dump version 10.7 (Ubuntu 10.7-0ubuntu0.18.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -92,8 +92,8 @@ CREATE TABLE public.descriptions (
     method_id integer NOT NULL,
     interactor1_id integer NOT NULL,
     interactor2_id integer NOT NULL,
-    created_at timestamp(0) without time zone NOT NULL,
-    deleted_at timestamp(0) without time zone NOT NULL
+    created_at timestamp(0) without time zone DEFAULT now() NOT NULL,
+    deleted_at timestamp(0) without time zone
 );
 
 
@@ -158,9 +158,7 @@ ALTER SEQUENCE public.features_id_seq OWNED BY public.features.id;
 CREATE TABLE public.interactors (
     id integer NOT NULL,
     protein_id integer NOT NULL,
-    taxon character varying(32) NOT NULL,
     name character varying(32) NOT NULL,
-    full_taxon character varying(64) NOT NULL,
     start integer NOT NULL,
     stop integer NOT NULL,
     mapping json NOT NULL
@@ -226,7 +224,7 @@ CREATE TABLE public.methods (
     id integer NOT NULL,
     psimi_id character varying(7) NOT NULL,
     name character varying(255) NOT NULL,
-    search text NOT NULL
+    search text
 );
 
 
@@ -257,13 +255,11 @@ ALTER SEQUENCE public.methods_id_seq OWNED BY public.methods.id;
 CREATE TABLE public.proteins (
     id integer NOT NULL,
     type character(1) NOT NULL,
-    accession character varying(6) NOT NULL,
-    description text NOT NULL,
-    taxon character varying(255) NOT NULL,
+    taxon_id integer NOT NULL,
+    accession character varying(10) NOT NULL,
     name character varying(255) NOT NULL,
-    full_taxon character varying(255) NOT NULL,
-    strain character varying(255) NOT NULL,
-    search text NOT NULL,
+    description text NOT NULL,
+    search text,
     CONSTRAINT proteins_type_check CHECK (((type)::text = ANY (ARRAY[('h'::character varying)::text, ('v'::character varying)::text])))
 );
 
@@ -561,24 +557,10 @@ CREATE INDEX features_sequence_id_key ON public.features USING btree (sequence_i
 
 
 --
--- Name: interactor_protein_id_start_stop_key; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX interactor_protein_id_start_stop_key ON public.interactors USING btree (protein_id, start, stop);
-
-
---
 -- Name: interactors_protein_id_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX interactors_protein_id_key ON public.interactors USING btree (protein_id);
-
-
---
--- Name: interactors_taxon_name_key; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX interactors_taxon_name_key ON public.interactors USING btree (taxon, name) WHERE ((taxon)::text <> 'H'::text);
 
 
 --
@@ -600,6 +582,13 @@ CREATE UNIQUE INDEX proteins_accession_key ON public.proteins USING btree (acces
 --
 
 CREATE INDEX proteins_search_key ON public.proteins USING gin (search public.gin_trgm_ops);
+
+
+--
+-- Name: proteins_taxon_id_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX proteins_taxon_id_key ON public.proteins USING btree (taxon_id);
 
 
 --
