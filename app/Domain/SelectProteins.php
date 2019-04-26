@@ -22,7 +22,7 @@ SQL;
 
     public function __invoke(string $type, string $q): DomainPayloadInterface
     {
-        $parts = preg_split('/\s+/', $q);
+        $parts = (array) preg_split('/\s+/', $q);
 
         $select_proteins_sth = $this->pdo->prepare(vsprintf(self::SELECT_PROTEINS_SQL, [
             implode(' AND ', array_pad([], count($parts), 'search ILIKE ?')),
