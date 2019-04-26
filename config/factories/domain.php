@@ -44,6 +44,12 @@ return [
             );
         },
 
+        App\Domain\SelectProtein::class => function ($container) {
+            return new App\Domain\SelectProtein(
+                $container->get(PDO::class)
+            );
+        },
+
         App\Domain\SelectProteins::class => function ($container) {
             return new App\Domain\SelectProteins(
                 $container->get(PDO::class)

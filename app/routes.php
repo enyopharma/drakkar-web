@@ -20,6 +20,11 @@ return function (RouteCollector $collector) {
 
     $collector->get('/proteins', ...[
         App\Http\Handlers\Proteins\IndexHandler::class,
+        'proteins.index',
+    ]);
+
+    $collector->get('/proteins/{id}', ...[
+        App\Http\Handlers\Proteins\ShowHandler::class,
         'proteins.show',
     ]);
 };
