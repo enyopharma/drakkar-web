@@ -27,4 +27,9 @@ return function (RouteCollector $collector) {
         App\Http\Handlers\Proteins\ShowHandler::class,
         'proteins.show',
     ]);
+
+    $collector->post('/runs/{run_id}/publications/{pmid}/descriptions', ...[
+        App\Http\Handlers\Descriptions\InsertHandler::class,
+        'runs.publications.descriptions',
+    ]);
 };

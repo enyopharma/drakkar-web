@@ -26,6 +26,12 @@ return [
             );
         },
 
+        App\Domain\InsertDescription::class => function ($container) {
+            return new App\Domain\InsertDescription(
+                $container->get(PDO::class)
+            );
+        },
+
         App\Domain\SelectRun::class => function ($container) {
             return new App\Domain\SelectRun(
                 $container->get(PDO::class)

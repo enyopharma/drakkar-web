@@ -564,6 +564,20 @@ CREATE INDEX interactors_protein_id_key ON public.interactors USING btree (prote
 
 
 --
+-- Name: interactors_protein_id_name_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX interactors_protein_id_name_key ON public.interactors USING btree (protein_id, name);
+
+
+--
+-- Name: interactors_protein_id_start_stop_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX interactors_protein_id_start_stop_key ON public.interactors USING btree (protein_id, start, stop);
+
+
+--
 -- Name: methods_search_key; Type: INDEX; Schema: public; Owner: -
 --
 

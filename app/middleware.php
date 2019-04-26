@@ -10,6 +10,7 @@ use Zend\Expressive\Router\Middleware\DispatchMiddleware;
 
 return function (MiddlewareFactory $factory) {
     return [
+        new Middlewares\JsonPayload,
         $factory(SessionMiddleware::class),
         $factory(HttpMethodMiddleware::class),
         $factory(RouteMiddleware::class),
