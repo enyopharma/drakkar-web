@@ -13,7 +13,7 @@ final class Responder
 {
     private $session;
 
-    private $url;
+    private $generator;
 
     private $engine;
 
@@ -21,12 +21,12 @@ final class Responder
 
     public function __construct(
         Session $session,
-        UrlHelper $url,
+        UrlHelper $generator,
         Engine $engine,
         ResponseFactoryInterface $factory
     ) {
         $this->session = $session;
-        $this->url = $url;
+        $this->generator = $generator;
         $this->engine = $engine;
         $this->factory = $factory;
     }
@@ -46,13 +46,16 @@ final class Responder
         return $this->redirect($this->session->previous());
     }
 
-    public function redirect(string $urlOrName, ...$xs): ResponseInterface
+    public function route(string $name, ...$xs): ResponseInterface
     {
-        $response = $this->factory->createResponse(302);
+        return $this->redirect(($this->generator)($name, ...$xs));
+    }
 
-        return count($xs) > 0
-            ? $response->withHeader('location', ($this->url)($urlOrName, ...$xs))
-            : $response->withHeader('location', $urlOrName);
+    public function redirect(string $url): ResponseInterface
+    {
+        return $this->factory
+            ->createResponse(302)
+            ->withHeader('location', $url);
     }
 
     public function html(string $template, array $data = []): ResponseInterface

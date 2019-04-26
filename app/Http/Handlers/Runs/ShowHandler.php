@@ -54,7 +54,7 @@ final class ShowHandler implements RequestHandlerInterface
     private function underflow(int $id, string $state): callable
     {
         return function () use ($id, $state) {
-            return $this->responder->redirect('runs.show', ['id' => $id], [
+            return $this->responder->route('runs.show', ['id' => $id], [
                 'state' => $state,
                 'page' => 1,
             ]);
@@ -64,7 +64,7 @@ final class ShowHandler implements RequestHandlerInterface
     private function overflow(int $id, string $state): callable
     {
         return function (array $data) use ($id, $state) {
-            return $this->responder->redirect('runs.show', ['id' => $id], [
+            return $this->responder->route('runs.show', ['id' => $id], [
                 'state' => $state,
                 'page' => $data['max'],
             ]);
