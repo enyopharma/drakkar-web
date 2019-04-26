@@ -42,7 +42,7 @@
         <div class="card-footer">
             <form
                 method="POST"
-                action="<?= $this->url('runs.publications.update', $publication) ?>"
+                action="<?= $this->url('runs.publications', $publication) ?>"
             >
                 <input type="hidden" name="_method" value="PUT" />
                 <div class="form-row">

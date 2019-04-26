@@ -15,7 +15,7 @@ return function (RouteCollector $collector) {
 
     $collector->put('/runs/{run_id}/publications/{pmid}', ...[
         App\Http\Handlers\Publications\UpdateHandler::class,
-        'runs.publications.update',
+        'runs.publications',
     ]);
 
     $collector->get('/proteins', ...[
