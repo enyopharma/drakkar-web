@@ -10,7 +10,7 @@ use Enyo\Http\Responder;
 use Enyo\Http\Contents\Json;
 use App\Domain\SelectProteins;
 
-final class SelectHandler implements RequestHandlerInterface
+final class IndexHandler implements RequestHandlerInterface
 {
     private $domain;
 

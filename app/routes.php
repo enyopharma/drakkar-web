@@ -19,7 +19,7 @@ return function (RouteCollector $collector) {
     ]);
 
     $collector->get('/proteins', ...[
-        App\Http\Handlers\Proteins\SelectHandler::class,
+        App\Http\Handlers\Proteins\IndexHandler::class,
         'proteins.show',
     ]);
 };
