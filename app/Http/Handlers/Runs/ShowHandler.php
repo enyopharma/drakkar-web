@@ -6,9 +6,10 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use Enyo\Http\Responder;
 use App\Domain\SelectRun;
 use App\Domain\Publication;
+
+use Enyo\Http\Responders\HtmlResponder;
 
 final class ShowHandler implements RequestHandlerInterface
 {
@@ -16,7 +17,7 @@ final class ShowHandler implements RequestHandlerInterface
 
     private $responder;
 
-    public function __construct(SelectRun $domain, Responder $responder)
+    public function __construct(SelectRun $domain, HtmlResponder $responder)
     {
         $this->domain = $domain;
         $this->responder = $responder;
@@ -44,7 +45,7 @@ final class ShowHandler implements RequestHandlerInterface
     private function success(string $state, int $page): callable
     {
         return function (array $data) use ($state, $page) {
-            return $this->responder->html('runs/show', array_merge($data, [
+            return $this->responder->template('runs/show', array_merge($data, [
                 'state' => $state,
                 'page' => $page,
             ]));

@@ -6,9 +6,9 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use Enyo\Http\Responder;
-use Enyo\Http\Contents\Json;
 use App\Domain\SelectProtein;
+
+use Enyo\Http\Responders\JsonResponder;
 
 final class ShowHandler implements RequestHandlerInterface
 {
@@ -16,7 +16,7 @@ final class ShowHandler implements RequestHandlerInterface
 
     private $responder;
 
-    public function __construct(SelectProtein $domain, Responder $responder)
+    public function __construct(SelectProtein $domain, JsonResponder $responder)
     {
         $this->domain = $domain;
         $this->responder = $responder;
@@ -28,15 +28,8 @@ final class ShowHandler implements RequestHandlerInterface
 
         $id = (int) $attributes['id'];
 
-        return ($this->domain)($id)->parsed($this->success(), [
+        return ($this->domain)($id)->parsed([$this->responder, 'response'], [
             SelectProtein::NOT_FOUND => [$this->responder, 'notfound'],
         ]);
-    }
-
-    private function success(): callable
-    {
-        return function (array $data) {
-            return $this->responder->json(new Json($data));
-        };
     }
 }

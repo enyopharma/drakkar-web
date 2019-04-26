@@ -6,8 +6,9 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use Enyo\Http\Responder;
 use App\Domain\SelectRuns;
+
+use Enyo\Http\Responders\HtmlResponder;
 
 final class IndexHandler implements RequestHandlerInterface
 {
@@ -15,7 +16,7 @@ final class IndexHandler implements RequestHandlerInterface
 
     private $responder;
 
-    public function __construct(SelectRuns $domain, Responder $responder)
+    public function __construct(SelectRuns $domain, HtmlResponder $responder)
     {
         $this->domain = $domain;
         $this->responder = $responder;
@@ -24,7 +25,7 @@ final class IndexHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         return ($this->domain)()->parsed(function (array $data) {
-            return $this->responder->html('runs/index', $data);
+            return $this->responder->template('runs/index', $data);
         });
     }
 }

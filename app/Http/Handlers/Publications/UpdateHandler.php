@@ -6,8 +6,9 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use Enyo\Http\Responder;
 use App\Domain\UpdatePublicationState;
+
+use Enyo\Http\Responders\HtmlResponder;
 
 final class UpdateHandler implements RequestHandlerInterface
 {
@@ -15,7 +16,7 @@ final class UpdateHandler implements RequestHandlerInterface
 
     private $responder;
 
-    public function __construct(UpdatePublicationState $domain, Responder $responder)
+    public function __construct(UpdatePublicationState $domain, HtmlResponder $responder)
     {
         $this->domain = $domain;
         $this->responder = $responder;

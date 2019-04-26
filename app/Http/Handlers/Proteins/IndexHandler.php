@@ -6,9 +6,9 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use Enyo\Http\Responder;
-use Enyo\Http\Contents\Json;
 use App\Domain\SelectProteins;
+
+use Enyo\Http\Responders\JsonResponder;
 
 final class IndexHandler implements RequestHandlerInterface
 {
@@ -16,7 +16,7 @@ final class IndexHandler implements RequestHandlerInterface
 
     private $responder;
 
-    public function __construct(SelectProteins $domain, Responder $responder)
+    public function __construct(SelectProteins $domain, JsonResponder $responder)
     {
         $this->domain = $domain;
         $this->responder = $responder;
@@ -29,8 +29,6 @@ final class IndexHandler implements RequestHandlerInterface
         $type = $query['type'] ?? '';
         $q = $query['q'] ?? '';
 
-        return ($this->domain)($type, $q)->parsed(function (array $data) {
-            return $this->responder->json(new Json($data));
-        });
+        return ($this->domain)($type, $q)->parsed([$this->responder, 'response']);
     }
 }

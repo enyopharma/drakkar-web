@@ -6,75 +6,30 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\ResponseFactoryInterface;
+
+use Enyo\Http\Responders\HtmlResponder;
+use Enyo\Http\Responders\JsonResponder;
 
 final class NotFoundMiddleware implements MiddlewareInterface
 {
-    private $factory;
+    private $html;
 
-    public function __construct(ResponseFactoryInterface $factory)
+    private $json;
+
+    public function __construct(HtmlResponder $html, JsonResponder $json)
     {
-        $this->factory = $factory;
+        $this->html = $html;
+        $this->json = $json;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $accept = $request->getHeaderLine('accept');
 
-        $response = $this->factory->createResponse(404, 'Not found');
-
-        if (stripos($accept, 'text/html') !== false) {
-            return $this->html($response);
-        }
-
         if (stripos($accept, 'application/json') !== false) {
-            return $this->json($response);
+            return $this->json->notfound();
         }
 
-        return $this->plain($response);
-    }
-
-    private function html(ResponseInterface $response): ResponseInterface
-    {
-        $body = $response->getBody();
-
-        $body->write(<<<EOT
-<!DOCTYPE html>
-<html>
-    <head>
-        <title>Not found</title>
-    </head>
-    <body>
-        <h1>Not found</h1>
-    </body>
-</html>
-EOT
-        );
-
-        return $response
-            ->withHeader('content-type', 'text/html')
-            ->withBody($body);
-    }
-
-    private function json(ResponseInterface $response): ResponseInterface
-    {
-        $body = $response->getBody();
-
-        $body->write(json_encode(new Contents\Json([], 404, 'Not found')));
-
-        return $response
-            ->withHeader('content-type', 'application/json')
-            ->withBody($body);
-    }
-
-    private function plain(ResponseInterface $response): ResponseInterface
-    {
-        $body = $response->getBody();
-
-        $body->write('404 - not found');
-
-        return $response
-            ->withHeader('content-type', 'text/plain')
-            ->withBody($body);
+        return $this->html->notfound();
     }
 }

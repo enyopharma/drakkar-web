@@ -6,15 +6,22 @@ use League\Plates\Engine;
 use Zend\Expressive\Helper\UrlHelper;
 
 use Enyo\Http\Session;
-use Enyo\Http\Responder;
+use Enyo\Http\Responders\HtmlResponder;
+use Enyo\Http\Responders\JsonResponder;
 
 return [
     'factories' => [
-        Responder::class => function ($container) {
-            return new Responder(
+        HtmlResponder::class => function ($container) {
+            return new HtmlResponder(
                 $container->get(Session::class),
                 $container->get(UrlHelper::class),
                 $container->get(Engine::class),
+                $container->get(ResponseFactoryInterface::class)
+            );
+        },
+
+        JsonResponder::class => function ($container) {
+            return new JsonResponder(
                 $container->get(ResponseFactoryInterface::class)
             );
         },
