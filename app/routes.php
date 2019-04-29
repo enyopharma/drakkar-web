@@ -23,7 +23,7 @@ return function (RouteCollector $collector) {
         'proteins.index',
     ]);
 
-    $collector->get('/proteins/{id}', ...[
+    $collector->get('/proteins/{accession}', ...[
         App\Http\Handlers\Proteins\ShowHandler::class,
         'proteins.show',
     ]);

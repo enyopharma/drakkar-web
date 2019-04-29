@@ -9,7 +9,7 @@ final class SelectProtein
     const SELECT_PROTEIN_SQL = <<<SQL
         SELECT accession, name, description
         FROM proteins
-        WHERE id = ?
+        WHERE accession = ?
 SQL;
 
     private $pdo;
@@ -19,11 +19,11 @@ SQL;
         $this->pdo = $pdo;
     }
 
-    public function __invoke(int $id): DomainPayloadInterface
+    public function __invoke(string $accession): DomainPayloadInterface
     {
         $select_protein_sth = $this->pdo->prepare(self::SELECT_PROTEIN_SQL);
 
-        $select_protein_sth->execute([$id]);
+        $select_protein_sth->execute([$accession]);
 
         if ($protein = $select_protein_sth->fetch()) {
             return new DomainSuccess([

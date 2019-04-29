@@ -26,9 +26,9 @@ final class ShowHandler implements RequestHandlerInterface
     {
         $attributes = (array) $request->getAttributes();
 
-        $id = (int) $attributes['id'];
+        $accession = $attributes['accession'];
 
-        return ($this->domain)($id)->parsed([$this->responder, 'response'], [
+        return ($this->domain)($accession)->parsed([$this->responder, 'response'], [
             SelectProtein::NOT_FOUND => [$this->responder, 'notfound'],
         ]);
     }
