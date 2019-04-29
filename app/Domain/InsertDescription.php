@@ -27,7 +27,7 @@ SQL;
 SQL;
 
     const SELECT_PROTEIN_STH = <<<SQL
-        SELECT type, name FROM proteins WHERE id = ?
+        SELECT id, type, accession, name FROM proteins WHERE id = ?
 SQL;
 
     const SELECT_INTERACTOR_NAME_STH = <<<SQL
@@ -43,6 +43,13 @@ SQL;
         FROM interactors
         WHERE protein_id = ?
         AND name = ?
+SQL;
+
+    const SELECT_SEQUENCE_STH = <<<SQL
+        SELECT sequence
+        FROM sequences
+        WHERE protein_id = ?
+        AND accession = ?
 SQL;
 
     const SELECT_DESCRIPTION_STH = <<<SQL
@@ -89,6 +96,7 @@ SQL;
         $select_protein_sth = $this->pdo->prepare(self::SELECT_PROTEIN_STH);
         $select_interactor_name_sth = $this->pdo->prepare(self::SELECT_INTERACTOR_NAME_STH);
         $select_interactor_pos_sth = $this->pdo->prepare(self::SELECT_INTERACTOR_POS_STH);
+        $select_sequence_sth = $this->pdo->prepare(self::SELECT_SEQUENCE_STH);
         $select_description_sth = $this->pdo->prepare(self::SELECT_DESCRIPTION_STH);
         $insert_interactor_sth = $this->pdo->prepare(self::INSERT_INTERACTOR_STH);
         $insert_description_sth = $this->pdo->prepare(self::INSERT_DESCRIPTION_STH);
@@ -136,24 +144,45 @@ SQL;
         // ensure type of interactor1 is human.
         if ($protein1['type'] != Protein::H) {
             return new DomainPayload(self::INTERACTOR_TYPE_ERROR, [
-                'n' => 1,
-                'expected' => Protein::H,
+                'n' => 1, 'expected' => Protein::H,
             ]);
         }
 
         // ensure type of interactor2 is matching the curation run type.
         if ($association['type'] == Run::HH && $protein2['type'] == Protein::V) {
             return new DomainPayload(self::INTERACTOR_TYPE_ERROR, [
-                'n' => 2,
-                'expected' => Protein::H,
+                'n' => 2, 'expected' => Protein::H,
             ]);
         }
 
         if ($association['type'] == Run::VH && $protein2['type'] == Protein::H) {
             return new DomainPayload(self::INTERACTOR_TYPE_ERROR, [
-                'n' => 2,
-                'expected' => Protein::V,
+                'n' => 2, 'expected' => Protein::V,
             ]);
+        }
+
+        // ensure coordinates of interactor1 are valid.
+        $select_sequence_sth->execute([
+            $protein1['id'],
+            $protein1['accession'],
+        ]);
+
+        $sequence = $select_sequence_sth->fetch();
+
+        if ($interactor1['stop'] > strlen($sequence['sequence'])) {
+            return new DomainPayload(self::INTERACTOR_POS_ERROR, ['n' => 1]);
+        }
+
+        // ensure coordinates of interactor2 are valid.
+        $select_sequence_sth->execute([
+            $protein2['id'],
+            $protein2['accession'],
+        ]);
+
+        $sequence = $select_sequence_sth->fetch();
+
+        if ($interactor2['stop'] > strlen($sequence['sequence'])) {
+            return new DomainPayload(self::INTERACTOR_POS_ERROR, ['n' => 2]);
         }
 
         // ensure interactor1 name is consistant with start and stop.
@@ -165,7 +194,9 @@ SQL;
 
         if ($row = $select_interactor_name_sth->fetch()) {
             if ($row['name'] != $interactor1['name']) {
-                return new DomainPayload(self::INTERACTOR_NAME_ERROR, ['n' => 1, 'expected' => $row]);
+                return new DomainPayload(self::INTERACTOR_NAME_ERROR, [
+                    'n' => 1, 'expected' => $row,
+                ]);
             }
         }
 
@@ -178,7 +209,9 @@ SQL;
 
         if ($row = $select_interactor_name_sth->fetch()) {
             if ($row['name'] != $interactor2['name']) {
-                return new DomainPayload(self::INTERACTOR_NAME_ERROR, ['n' => 2, 'expected' => $row]);
+                return new DomainPayload(self::INTERACTOR_NAME_ERROR, [
+                    'n' => 2, 'expected' => $row,
+                ]);
             }
         }
 
@@ -190,7 +223,9 @@ SQL;
 
         if ($row = $select_interactor_pos_sth->fetch()) {
             if ($row['start'] != $interactor1['start'] || $row['stop'] != $interactor1['stop']) {
-                return new DomainPayload(self::INTERACTOR_POS_ERROR, ['n' => 1, 'expected' => $row]);
+                return new DomainPayload(self::INTERACTOR_POS_ERROR, [
+                    'n' => 1, 'expected' => $row,
+                ]);
             }
         }
 
@@ -202,7 +237,45 @@ SQL;
 
         if ($row = $select_interactor_pos_sth->fetch()) {
             if ($row['start'] != $interactor2['start'] || $row['stop'] != $interactor2['stop']) {
-                return new DomainPayload(self::INTERACTOR_POS_ERROR, ['n' => 2, 'expected' => $row]);
+                return new DomainPayload(self::INTERACTOR_POS_ERROR, [
+                    'n' => 2, 'expected' => $row,
+                ]);
+            }
+        }
+
+        // ensure mapping of interactor1 is valid.
+        foreach ($interactor1['mapping'] as $accession => $mapping) {
+            $select_sequence_sth->execute([
+                $interactor1['protein_id'],
+                $accession,
+            ]);
+
+            if (! $sequence = $select_sequence_sth->fetch()) {
+                return new DomainPayload(self::INTERACTOR_MAPPING_ERROR, ['n' => 1]);
+            }
+
+            foreach ($mapping as $alignment) {
+                if ($alignment['stop'] > strlen($sequence['sequence'])) {
+                    return new DomainPayload(self::INTERACTOR_MAPPING_ERROR, ['n' => 1]);
+                }
+            }
+        }
+
+        // ensure mapping of interactor2 is valid.
+        foreach ($interactor2['mapping'] as $accession => $mapping) {
+            $select_sequence_sth->execute([
+                $interactor2['protein_id'],
+                $accession,
+            ]);
+
+            if (! $sequence = $select_sequence_sth->fetch()) {
+                return new DomainPayload(self::INTERACTOR_MAPPING_ERROR, ['n' => 2]);
+            }
+
+            foreach ($mapping as $alignment) {
+                if ($alignment['stop'] > strlen($sequence['sequence'])) {
+                    return new DomainPayload(self::INTERACTOR_MAPPING_ERROR, ['n' => 2]);
+                }
             }
         }
 
@@ -264,7 +337,15 @@ SQL;
             'name' => (string) $interactor['name'] ?? '',
             'start' => (int) $interactor['start'] ?? 0,
             'stop' => (int) $interactor['stop'] ?? 0,
-            'mapping' => (array) $interactor['mapping'] ?? [],
+            'mapping' => array_map(function  ($mapping) {
+                return array_map(function ($alignment) {
+                    return [
+                        'start' => (int) $alignment['start'] ?? 0,
+                        'stop' => (int) $alignment['stop'] ?? 0,
+                        'sequence' => (string) $alignment['sequence'] ?? '',
+                    ];
+                }, $mapping);
+            }, (array) $interactor['mapping'] ?? []),
         ];
     }
 
@@ -288,6 +369,26 @@ SQL;
 
         if (array_filter($interactor['mapping'], 'is_array') < count($interactor['mapping'])) {
             return false;
+        }
+
+        foreach ($interactor['mapping'] as $mapping) {
+            foreach ($mapping as $alignment) {
+                if ($alignment['start'] < 1) {
+                    return false;
+                }
+
+                if ($alignment['stop'] < $alignment['start']) {
+                    return false;
+                }
+
+                if ($alignment['sequence'] == '') {
+                    return false;
+                }
+
+                if (preg_match('/^[GAVLIMFWPSTCYNQDEKRH]+$/i', $alignment['sequence']) !== 1) {
+                    return false;
+                }
+            }
         }
 
         return true;

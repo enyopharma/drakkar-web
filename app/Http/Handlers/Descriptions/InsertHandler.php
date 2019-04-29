@@ -49,6 +49,7 @@ final class InsertHandler implements RequestHandlerInterface
             InsertDescription::INTERACTOR_TYPE_ERROR => $this->failure('interactor type error'),
             InsertDescription::INTERACTOR_NAME_ERROR => $this->failure('interactor name error'),
             InsertDescription::INTERACTOR_POS_ERROR => $this->failure('interactor pos error'),
+            InsertDescription::INTERACTOR_MAPPING_ERROR => $this->failure('interactor mapping error'),
             InsertDescription::NOT_UNIQUE => $this->failure('description already exists'),
         ]);
     }
