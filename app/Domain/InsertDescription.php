@@ -23,11 +23,13 @@ final class InsertDescription
 SQL;
 
     const SELECT_METHOD_STH = <<<SQL
-        SELECT * FROM methods WHERE id = ?
+        SELECT * FROM methods WHERE psimi_id = ?
 SQL;
 
     const SELECT_PROTEIN_STH = <<<SQL
-        SELECT id, type, accession, name FROM proteins WHERE id = ?
+        SELECT id, type, name
+        FROM proteins
+        WHERE accession = ?
 SQL;
 
     const SELECT_INTERACTOR_NAME_STH = <<<SQL
@@ -86,7 +88,7 @@ SQL;
     public function __invoke(
         int $run_id,
         int $pmid,
-        int $method_id,
+        string $psimi_id,
         array $interactor1,
         array $interactor2
     ): DomainPayloadInterface {
@@ -121,21 +123,21 @@ SQL;
         }
 
         // ensure method exists.
-        $select_method_sth->execute([$method_id]);
+        $select_method_sth->execute([$psimi_id]);
 
         if (! $method = $select_method_sth->fetch()) {
             return new DomainPayload(self::METHOD_NOT_FOUND);
         }
 
         // ensure protein of interactor1 exists.
-        $select_protein_sth->execute([$interactor1['protein_id']]);
+        $select_protein_sth->execute([$interactor1['accession']]);
 
         if (! $protein1 = $select_protein_sth->fetch()) {
             return new DomainPayload(self::PROTEIN_NOT_FOUND, ['n' => 1]);
         }
 
         // ensure protein of interactor2 exists.
-        $select_protein_sth->execute([$interactor2['protein_id']]);
+        $select_protein_sth->execute([$interactor2['accession']]);
 
         if (! $protein2 = $select_protein_sth->fetch()) {
             return new DomainPayload(self::PROTEIN_NOT_FOUND, ['n' => 2]);
@@ -164,7 +166,7 @@ SQL;
         // ensure coordinates of interactor1 are valid.
         $select_sequence_sth->execute([
             $protein1['id'],
-            $protein1['accession'],
+            $interactor1['accession'],
         ]);
 
         $sequence = $select_sequence_sth->fetch();
@@ -176,7 +178,7 @@ SQL;
         // ensure coordinates of interactor2 are valid.
         $select_sequence_sth->execute([
             $protein2['id'],
-            $protein2['accession'],
+            $interactor2['accession'],
         ]);
 
         $sequence = $select_sequence_sth->fetch();
@@ -187,7 +189,7 @@ SQL;
 
         // ensure interactor1 name is consistant with start and stop.
         $select_interactor_name_sth->execute([
-            $interactor1['protein_id'],
+            $protein1['id'],
             $interactor1['start'],
             $interactor1['stop'],
         ]);
@@ -202,7 +204,7 @@ SQL;
 
         // ensure interactor2 name is consistant with start and stop.
         $select_interactor_name_sth->execute([
-            $interactor2['protein_id'],
+            $protein2['id'],
             $interactor2['start'],
             $interactor2['stop'],
         ]);
@@ -217,7 +219,7 @@ SQL;
 
         // ensure interactor1 start and stop is consistent with name.
         $select_interactor_pos_sth->execute([
-            $interactor1['protein_id'],
+            $protein1['id'],
             $interactor1['name'],
         ]);
 
@@ -231,7 +233,7 @@ SQL;
 
         // ensure interactor2 start and stop is consistent with name.
         $select_interactor_pos_sth->execute([
-            $interactor2['protein_id'],
+            $protein2['id'],
             $interactor2['name'],
         ]);
 
@@ -246,7 +248,7 @@ SQL;
         // ensure mapping of interactor1 is valid.
         foreach ($interactor1['mapping'] as $accession => $mapping) {
             $select_sequence_sth->execute([
-                $interactor1['protein_id'],
+                $protein1['id'],
                 $accession,
             ]);
 
@@ -264,7 +266,7 @@ SQL;
         // ensure mapping of interactor2 is valid.
         foreach ($interactor2['mapping'] as $accession => $mapping) {
             $select_sequence_sth->execute([
-                $interactor2['protein_id'],
+                $protein2['id'],
                 $accession,
             ]);
 
@@ -283,8 +285,8 @@ SQL;
         $select_description_sth->execute([
             $association['id'],
             $method['id'],
-            $interactor1['protein_id'],
-            $interactor2['protein_id'],
+            $protein1['id'],
+            $protein2['id'],
             $interactor2['start'],
             $interactor2['stop'],
         ]);
@@ -297,7 +299,7 @@ SQL;
         $this->pdo->beginTransaction();
 
         $insert_interactor_sth->execute([
-            $interactor1['protein_id'],
+            $protein1['id'],
             $interactor1['name'],
             $interactor1['start'],
             $interactor1['stop'],
@@ -307,7 +309,7 @@ SQL;
         $interactor1['id'] = $this->pdo->lastInsertId();
 
         $insert_interactor_sth->execute([
-            $interactor2['protein_id'],
+            $protein2['id'],
             $interactor2['name'],
             $interactor2['start'],
             $interactor2['stop'],
@@ -333,7 +335,7 @@ SQL;
     private function sanitizedInteractor(array $interactor): array
     {
         return [
-            'protein_id' => (int) $interactor['protein_id'] ?? 0,
+            'accession' => (string) $interactor['accession'] ?? '',
             'name' => (string) $interactor['name'] ?? '',
             'start' => (int) $interactor['start'] ?? 0,
             'stop' => (int) $interactor['stop'] ?? 0,
@@ -351,7 +353,7 @@ SQL;
 
     private function isInteractorValid(array $interactor): bool
     {
-        if ($interactor['protein_id'] < 1) {
+        if ($interactor['accession'] == '') {
             return false;
         }
 

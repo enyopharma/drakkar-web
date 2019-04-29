@@ -29,14 +29,14 @@ final class InsertHandler implements RequestHandlerInterface
 
         $run_id = (int) $attributes['run_id'];
         $pmid = (int) $attributes['pmid'];
-        $method_id = (int) $body['method_id'];
+        $psimi_id = $body['psimi_id'] ?? '';
         $interactor1 = $body['interactor1'] ?? [];
         $interactor2 = $body['interactor2'] ?? [];
 
         $payload = ($this->domain)(
             $run_id,
             $pmid,
-            $method_id,
+            $psimi_id,
             $interactor1,
             $interactor2
         );
