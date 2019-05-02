@@ -18,6 +18,16 @@ return function (RouteCollector $collector) {
         'runs.publications',
     ]);
 
+    $collector->get('/runs/{run_id}/publications/{pmid}/descriptions/create', ...[
+        App\Http\Handlers\Descriptions\CreateHandler::class,
+        'runs.publications.descriptions.create',
+    ]);
+
+    $collector->get('/methods', ...[
+        App\Http\Handlers\Methods\IndexHandler::class,
+        'methods.index',
+    ]);
+
     $collector->get('/proteins', ...[
         App\Http\Handlers\Proteins\IndexHandler::class,
         'proteins.index',
