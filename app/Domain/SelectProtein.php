@@ -14,7 +14,7 @@ final class SelectProtein
         AND p.accession = ?
 SQL;
 
-    const SELECT_INTERACTORS_SQL = <<<SQL
+    const SELECT_MATURES_SQL = <<<SQL
         SELECT name, start, stop
         FROM interactors
         WHERE protein_id = ?
@@ -31,14 +31,14 @@ SQL;
     public function __invoke(string $accession): DomainPayloadInterface
     {
         $select_protein_sth = $this->pdo->prepare(self::SELECT_PROTEIN_SQL);
-        $select_interactors_sth = $this->pdo->prepare(self::SELECT_INTERACTORS_SQL);
+        $select_matures_sth = $this->pdo->prepare(self::SELECT_MATURES_SQL);
 
         $select_protein_sth->execute([$accession]);
 
         if ($protein = $select_protein_sth->fetch()) {
-            $select_interactors_sth->execute([$protein['id']]);
+            $select_matures_sth->execute([$protein['id']]);
 
-            $protein['interactors'] = $select_interactors_sth->fetchall();
+            $protein['matures'] = $select_matures_sth->fetchall();
 
             return new DomainSuccess([
                 'protein' => $protein,
