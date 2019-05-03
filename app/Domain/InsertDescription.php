@@ -7,12 +7,13 @@ final class InsertDescription
     const ASSOCIATION_NOT_FOUND = 0;
     const METHOD_NOT_FOUND = 1;
     const PROTEIN_NOT_FOUND = 2;
-    const INTERACTOR_FORMAT_ERROR = 3;
-    const INTERACTOR_TYPE_ERROR = 4;
-    const INTERACTOR_NAME_ERROR = 5;
-    const INTERACTOR_POS_ERROR = 6;
-    const INTERACTOR_MAPPING_ERROR = 7;
-    const NOT_UNIQUE = 8;
+    const METHOD_FORMAT_ERROR = 3;
+    const INTERACTOR_FORMAT_ERROR = 4;
+    const INTERACTOR_TYPE_ERROR = 5;
+    const INTERACTOR_NAME_ERROR = 6;
+    const INTERACTOR_POS_ERROR = 7;
+    const INTERACTOR_MAPPING_ERROR = 8;
+    const NOT_UNIQUE = 9;
 
     const SELECT_ASSOCIATION_STH = <<<SQL
         SELECT r.type, a.*
@@ -88,7 +89,7 @@ SQL;
     public function __invoke(
         int $run_id,
         int $pmid,
-        string $psimi_id,
+        array $method,
         array $interactor1,
         array $interactor2
     ): DomainPayloadInterface {
@@ -104,8 +105,13 @@ SQL;
         $insert_description_sth = $this->pdo->prepare(self::INSERT_DESCRIPTION_STH);
 
         // ensure interactor arrays are valid.
+        $method = $this->sanitizedMethod($method);
         $interactor1 = $this->sanitizedInteractor($interactor1);
         $interactor2 = $this->sanitizedInteractor($interactor2);
+
+        if (! $this->isMethodValid($method)) {
+            return new DomainPayload(self::METHOD_FORMAT_ERROR);
+        }
 
         if (! $this->isInteractorValid($interactor1)) {
             return new DomainPayload(self::INTERACTOR_FORMAT_ERROR, ['n' => 1]);
@@ -123,21 +129,21 @@ SQL;
         }
 
         // ensure method exists.
-        $select_method_sth->execute([$psimi_id]);
+        $select_method_sth->execute([$method['psimi_id']]);
 
         if (! $method = $select_method_sth->fetch()) {
             return new DomainPayload(self::METHOD_NOT_FOUND);
         }
 
         // ensure protein of interactor1 exists.
-        $select_protein_sth->execute([$interactor1['accession']]);
+        $select_protein_sth->execute([$interactor1['protein']['accession']]);
 
         if (! $protein1 = $select_protein_sth->fetch()) {
             return new DomainPayload(self::PROTEIN_NOT_FOUND, ['n' => 1]);
         }
 
         // ensure protein of interactor2 exists.
-        $select_protein_sth->execute([$interactor2['accession']]);
+        $select_protein_sth->execute([$interactor2['protein']['accession']]);
 
         if (! $protein2 = $select_protein_sth->fetch()) {
             return new DomainPayload(self::PROTEIN_NOT_FOUND, ['n' => 2]);
@@ -166,7 +172,7 @@ SQL;
         // ensure coordinates of interactor1 are valid.
         $select_sequence_sth->execute([
             $protein1['id'],
-            $interactor1['accession'],
+            $interactor1['protein']['accession'],
         ]);
 
         $sequence = $select_sequence_sth->fetch();
@@ -178,7 +184,7 @@ SQL;
         // ensure coordinates of interactor2 are valid.
         $select_sequence_sth->execute([
             $protein2['id'],
-            $interactor2['accession'],
+            $interactor2['protein']['accession'],
         ]);
 
         $sequence = $select_sequence_sth->fetch();
@@ -332,10 +338,19 @@ SQL;
         return new DomainSuccess(['description' => $description]);
     }
 
+    private function sanitizedMethod(array $method): array
+    {
+        return [
+            'psimi_id' => (string) $method['psimi_id'] ?? '',
+        ];
+    }
+
     private function sanitizedInteractor(array $interactor): array
     {
         return [
-            'accession' => (string) $interactor['accession'] ?? '',
+            'protein' => [
+                'accession' => (string) $interactor['protein']['accession'] ?? '',
+            ],
             'name' => (string) $interactor['name'] ?? '',
             'start' => (int) $interactor['start'] ?? 0,
             'stop' => (int) $interactor['stop'] ?? 0,
@@ -351,9 +366,14 @@ SQL;
         ];
     }
 
+    private function isMethodValid(array $method): bool
+    {
+        return $method['psimi_id'] != '';
+    }
+
     private function isInteractorValid(array $interactor): bool
     {
-        if ($interactor['accession'] == '') {
+        if ($interactor['protein']['accession'] == '') {
             return false;
         }
 
