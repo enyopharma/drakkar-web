@@ -10,6 +10,7 @@ Encore
 
     // will create web/build/app.js and web/build/app.css
     .addEntry('app', './assets/js/app.js')
+    .addEntry('form', './assets/js/bundles/form.js')
 
     // allow sass/scss files to be processed
     .enableSassLoader()
@@ -27,6 +28,9 @@ Encore
 
     // create hashed filenames (e.g. app.abc123.css)
     .enableVersioning()
+
+    // enable reactjs
+    .enableReactPreset()
 ;
 
 module.exports = Encore.getWebpackConfig();
