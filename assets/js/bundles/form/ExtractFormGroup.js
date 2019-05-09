@@ -1,25 +1,28 @@
 import React, { useState } from 'react'
 
+import extract from '../extract.js'
+
 const ExtractFormGroup = ({ sequence, update, error }) => {
     const [from, setFrom] = useState('')
     const [to, setTo] = useState('')
 
-    const extract = () => {
-        const source = sequence.toLowerCase()
-        const target1 = from.trim().toLowerCase()
-        const target2 = to.trim().toLowerCase()
-        const start1 = source.indexOf(target1) + 1
-        const start2 = source.indexOf(target2) + 1
-        const stop1 = start1 + target1.length - 1
-        const stop2 = start2 + target2.length - 1
+    const handleClick = () => {
+        if (from.trim() == '' || to.trim() == '') return
 
-        start1 == 0 || start2 == 0 || stop1 >= start2
-            ? error('subsequence not found')
-            : update(start1, stop2)
+        const [start1, stop1] = extract(from, sequence)
+        const [start2, stop2] = extract(to, sequence)
+
+        if (start1 == 0 || start2 == 0 || stop1 >= start2) {
+            error('subsequence not found')
+            return
+        }
+
+        update(start1, stop2)
+        error('')
     }
 
     return (
-        <div className="form-group row">
+        <div className="row">
             <div className="col">
                 <input
                     type="text"
@@ -39,7 +42,11 @@ const ExtractFormGroup = ({ sequence, update, error }) => {
                 />
             </div>
             <div className="col-3">
-                <button type="button" className="btn btn-block btn-info" onClick={e => extract()}>
+                <button
+                    type="button"
+                    className="btn btn-block btn-info"
+                    onClick={handleClick}
+                >
                     Extract coordinates
                 </button>
             </div>

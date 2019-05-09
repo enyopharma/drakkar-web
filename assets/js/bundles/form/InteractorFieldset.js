@@ -1,7 +1,7 @@
 import React from 'react'
 
-import Conditional from './Conditional'
 import UniprotSection from './UniprotSection'
+import MappingSection from './MappingSection'
 import SequenceSection from './SequenceSection'
 
 const color = type => type == 'h' ? 'primary' : 'danger'
@@ -14,13 +14,12 @@ const InteractorFieldset = ({ i, type, interactor, actions }) => (
             Interactor {i}
         </legend>
         <UniprotSection type={type} protein={interactor.protein} actions={actions} />
-        <Conditional state={interactor.protein != null}>
-            <SequenceSection
-                type={type}
-                interactor={interactor}
-                update={actions.updateMature}
-            />
-        </Conditional>
+        {interactor.protein == null ? null : (
+        <React.Fragment>
+            <SequenceSection type={type} interactor={interactor} update={actions.updateMature} />
+            <MappingSection type={type} interactor={interactor} />
+        </React.Fragment>
+        )}
     </fieldset>
 )
 

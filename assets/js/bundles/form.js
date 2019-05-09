@@ -143,11 +143,13 @@ const reducers = {
     name: (state = '', action) => {
         switch (action.type) {
             case SELECT_PROTEIN:
-                return action.protein.name
-            case UPDATE_MATURE:
-                return action.mature.name
+                return action.protein.type == 'h'
+                    ? action.protein.name
+                    : ''
             case UNSELECT_PROTEIN:
                 return ''
+            case UPDATE_MATURE:
+                return action.mature.name
             default:
                 return state
         }
@@ -156,9 +158,9 @@ const reducers = {
     start: (state = 0, action) => {
         switch (action.type) {
             case SELECT_PROTEIN:
-                return 1
+                return action.protein.type == 'h' ? 1 : ''
             case UNSELECT_PROTEIN:
-                return 0
+                return ''
             case UPDATE_MATURE:
                 return action.mature.start
             default:
@@ -169,9 +171,11 @@ const reducers = {
     stop: (state = 0, action) => {
         switch (action.type) {
             case SELECT_PROTEIN:
-                return action.protein.sequence.length
+                return action.protein.type == 'h'
+                    ? action.protein.sequence.length
+                    : ''
             case UNSELECT_PROTEIN:
-                return 0
+                return ''
             case UPDATE_MATURE:
                 return action.mature.stop
             default:

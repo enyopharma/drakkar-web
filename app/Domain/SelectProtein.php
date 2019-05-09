@@ -7,7 +7,7 @@ final class SelectProtein
     const NOT_FOUND = 0;
 
     const SELECT_PROTEIN_SQL = <<<SQL
-        SELECT p.id, p.accession, p.name, p.description, s.sequence
+        SELECT p.*, s.sequence
         FROM proteins AS p, sequences AS s
         WHERE p.id = s.protein_id
         AND s.is_canonical IS TRUE

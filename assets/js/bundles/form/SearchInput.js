@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
 
-import Conditional from './Conditional'
-
 const SearchInput = ({ search, select, format, children }) => {
     const [visible, setVisible] = useState(false);
     const [active, setActive] = useState(0);
@@ -49,24 +47,24 @@ const SearchInput = ({ search, select, format, children }) => {
                 onChange={handleChange}
                 onKeyDown={handleKeyDown}
             />
-            <Conditional state={visible}>
-                <div style={{position: 'relative'}}>
-                    <div style={{position: 'absolute', width: '100%', zIndex: 100}}>
-                        <ul className="list-group">
-                        {results.slice(0, 5).map((result, index) => (
-                            <li
-                                key={index}
-                                className={'list-group-item' + (active == index ? ' active' : '')}
-                                onMouseOver={e => setActive(index)}
-                                onMouseDown={e => resultSelected(index, result)}
-                            >
-                                {format(result)}
-                            </li>
-                        ))}
-                        </ul>
-                    </div>
+            {! visible ? null : (
+            <div style={{position: 'relative'}}>
+                <div style={{position: 'absolute', width: '100%', zIndex: 100}}>
+                    <ul className="list-group">
+                    {results.slice(0, 5).map((result, index) => (
+                        <li
+                            key={index}
+                            className={'list-group-item' + (active == index ? ' active' : '')}
+                            onMouseOver={e => setActive(index)}
+                            onMouseDown={e => resultSelected(index, result)}
+                        >
+                            {format(result)}
+                        </li>
+                    ))}
+                    </ul>
                 </div>
-            </Conditional>
+            </div>
+            )}
         </React.Fragment>
     )
 }
