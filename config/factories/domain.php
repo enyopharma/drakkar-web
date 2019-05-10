@@ -50,6 +50,12 @@ return [
             );
         },
 
+        App\Domain\SelectMethods::class => function ($container) {
+            return new App\Domain\SelectMethods(
+                $container->get(PDO::class)
+            );
+        },
+
         App\Domain\SelectProtein::class => function ($container) {
             return new App\Domain\SelectProtein(
                 $container->get(PDO::class)
