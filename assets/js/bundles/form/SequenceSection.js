@@ -69,9 +69,6 @@ const SequenceSection = ({ type, interactor, update }) => {
                     )}
                 </div>
             </div>
-            {type == 'h' ? null : (
-            <MatureProteinSection interactor={interactor} update={update} />
-            )}
             <div className="form-group row">
                 <div className="col">
                     <div style={{
@@ -94,6 +91,9 @@ const SequenceSection = ({ type, interactor, update }) => {
                     </div>
                 </div>
             </div>
+            {type == 'h' ? null : (
+            <MatureProteinSection interactor={interactor} update={update} />
+            )}
         </React.Fragment>
     )
 }
