@@ -3,11 +3,7 @@ import React, { useState } from 'react'
 const MatureProteinList = ({ matures, select }) => {
     const [active, setActive] = useState(null)
 
-    return matures.length == 0 ? (
-        <p>
-            No sequence defined yet.
-        </p>
-    ) : (
+    return (
         <ul className="list-group">
             {matures.map((mature, index) => (
                 <li

@@ -1,6 +1,6 @@
-export default function (subsequence, sequence) {
+export default function (sequence, subsequence) {
     const source = sequence.toLowerCase()
-    const target = subsequence.trim().toLowerCase()
+    const target = subsequence.toLowerCase()
     const start = source.indexOf(target) + 1
     const stop = start + target.length - 1
 

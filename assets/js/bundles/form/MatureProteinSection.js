@@ -15,7 +15,7 @@ const MatureProteinSection = ({ interactor, update }) => {
     const [stop, setStop] = useState(matures.length == 0 ? sequence.length : '')
     const [error, setError] = useState('')
 
-    const isValid = name.trim().length > 0
+    const isValid = name.trim() != ''
         && start != ''
         && stop != ''
         && start <= stop
@@ -28,6 +28,11 @@ const MatureProteinSection = ({ interactor, update }) => {
     }
 
     const selectCoordinates = (start, stop) => {
+        if (start == 0) {
+            setError('Invalid subsequence')
+            return
+        }
+
         setStart(start)
         setStop(stop)
         setError('')
@@ -46,9 +51,7 @@ const MatureProteinSection = ({ interactor, update }) => {
     }
 
     const handleReset = () => {
-        setStart(1)
-        setStop(sequence.length)
-        setError('')
+        selectCoordinates(1, sequence.length)
     }
 
     return ! editing ? (
@@ -64,7 +67,31 @@ const MatureProteinSection = ({ interactor, update }) => {
         </div>
     ) : (
         <React.Fragment>
-            <MatureProteinList matures={matures} select={selectMature} />
+            {matures.length == 0 ? (
+            <p>
+                No sequence defined on this uniprot entry yet.
+            </p>
+            ) : (
+            <React.Fragment>
+                <p>
+                    Existing sequences on this uniprot entry:
+                </p>
+                <div className="row">
+                    <div className="col">
+                        <MatureProteinList matures={matures} select={selectMature} />
+                    </div>
+                </div>
+            </React.Fragment>
+            )}
+            {error == '' ? (
+            <p>
+                Sequence selection tool:
+            </p>
+            ) : (
+            <p className="text-danger">
+                {error}
+            </p>
+            )}
             <div className="row">
                 <div className="col-3">
                     <input
@@ -104,27 +131,14 @@ const MatureProteinSection = ({ interactor, update }) => {
                     </button>
                 </div>
             </div>
-            <SubsequenceFormGroup
-                sequence={sequence}
-                update={selectCoordinates}
-                error={setError}
-            >
+            <SubsequenceFormGroup sequence={sequence} update={selectCoordinates}>
                 Extract coordinates
             </SubsequenceFormGroup>
-            <ExtractFormGroup
-                sequence={sequence}
-                update={selectCoordinates}
-                error={setError}
-            >
+            <ExtractFormGroup sequence={sequence} update={selectCoordinates}>
                 Extract coordinates
             </ExtractFormGroup>
             <div className="row">
-                <div className="col-9">
-                {error == '' ? null : (
-                <p className="text-danger form-control-plaintext">{error}</p>
-                )}
-                </div>
-                <div className="col-3">
+                <div className="col offset-9">
                     <button
                         type="button"
                         className="btn btn-block btn-info"

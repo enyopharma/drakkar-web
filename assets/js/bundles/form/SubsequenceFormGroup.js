@@ -2,21 +2,15 @@ import React, { useState } from 'react'
 
 import extract from '../extract.js'
 
-const SubsequenceFormGroup = ({ sequence, update, error, children }) => {
+const SubsequenceFormGroup = ({ sequence, update, children }) => {
     const [subsequence, setSubsequence] = useState('')
 
     const handleClick = () => {
         if (subsequence.trim() == '') return
 
-        const [start, stop] = extract(subsequence, sequence)
-
-        if (start == 0) {
-            error('subsequence not found')
-            return
-        }
+        const [start, stop] = extract(sequence, subsequence.trim())
 
         update(start, stop)
-        setSubsequence('')
     }
 
     return (
@@ -35,7 +29,7 @@ const SubsequenceFormGroup = ({ sequence, update, error, children }) => {
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={handleClick}
-                    disabled={subsequence == ''}
+                    disabled={subsequence.trim() == ''}
                 >
                     {children}
                 </button>
