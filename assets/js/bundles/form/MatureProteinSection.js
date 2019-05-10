@@ -5,7 +5,7 @@ import ExtractFormGroup from './ExtractFormGroup'
 import MatureProteinList from './MatureProteinList'
 import SubsequenceFormGroup from './SubsequenceFormGroup'
 
-const MatureProteinSection = ({ interactor, update }) => {
+const MatureProteinSection = ({ interactor, processing, update }) => {
     const sequence = interactor.protein.sequence
     const matures = interactor.protein.matures
 
@@ -43,10 +43,14 @@ const MatureProteinSection = ({ interactor, update }) => {
     }
 
     const handleEdit = () => {
+        const name = interactor.name
+        const start = interactor.start
+        const stop = interactor.stop
+        update({name: '', start: '', stop: ''})
         setEditing(true)
-        setName(interactor.name)
-        setStart(interactor.start)
-        setStop(interactor.stop)
+        setName(name)
+        setStart(start)
+        setStop(stop)
         setError('')
     }
 
@@ -60,6 +64,7 @@ const MatureProteinSection = ({ interactor, update }) => {
                 <button
                     className="btn btn-sm btn-block btn-outline-warning"
                     onClick={handleEdit}
+                    disabled={processing}
                 >
                     <i className="fas fa-edit" />&nbsp;Edit sequence
                 </button>
