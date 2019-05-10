@@ -1,17 +1,15 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import MatureProteinList from './MatureProteinList'
 import MatureProteinSection from './MatureProteinSection'
 
-const SequenceSection = ({ type, interactor, update }) => {
+const SequenceSection = ({ type, interactor, processing, update }) => {
     const start = interactor.start
     const stop = interactor.stop
     const sequence = interactor.protein.sequence
 
     const before = start == '' ? '' : sequence.slice(0, start - 1)
-
     const after = stop == '' ? '' : sequence.slice(stop, sequence.length)
-
     const selected = (start == '' || stop == '') ? sequence : sequence.slice(
         start - 1,
         stop,
@@ -92,7 +90,11 @@ const SequenceSection = ({ type, interactor, update }) => {
                 </div>
             </div>
             {type == 'h' ? null : (
-                <MatureProteinSection interactor={interactor} update={update} />
+                <MatureProteinSection
+                    interactor={interactor}
+                    processing={processing}
+                    update={update}
+                />
             )}
         </React.Fragment>
     )
