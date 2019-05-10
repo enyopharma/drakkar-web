@@ -15,10 +15,10 @@ const InteractorFieldset = ({ i, type, interactor, actions }) => (
         </legend>
         <UniprotSection type={type} protein={interactor.protein} actions={actions} />
         {interactor.protein == null ? null : (
-        <React.Fragment>
-            <SequenceSection type={type} interactor={interactor} update={actions.updateMature} />
-            <MappingSection type={type} interactor={interactor} />
-        </React.Fragment>
+            <React.Fragment>
+                <SequenceSection type={type} interactor={interactor} update={actions.updateMature} />
+                <MappingSection type={type} interactor={interactor} />
+            </React.Fragment>
         )}
     </fieldset>
 )

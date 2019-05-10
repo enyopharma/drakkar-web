@@ -50,22 +50,22 @@ const SequenceSection = ({ type, interactor, update }) => {
                 </div>
                 <div className="col">
                     {(interactor.name == '' || interactor.start == '' || interactor.stop == '') ? (
-                    <button
-                        className="btn btn-block btn-outline-danger"
-                        disabled
-                    >
-                        <i className="fas fa-exclamation-triangle" />
-                        &nbsp;
-                        Please select a sequence.
-                    </button>
+                        <button
+                            className="btn btn-block btn-outline-danger"
+                            disabled
+                        >
+                            <i className="fas fa-exclamation-triangle" />
+                            &nbsp;
+                            Please select a sequence.
+                        </button>
                     ) : (
-                    <button
-                        className="btn btn-block btn-outline-success"
-                        onClick={e => setEditing(true)}
-                        disabled
-                    >
-                        <i className="fas fa-check" />&nbsp;Sequence is valid
-                    </button>
+                        <button
+                            className="btn btn-block btn-outline-success"
+                            onClick={e => setEditing(true)}
+                            disabled
+                        >
+                            <i className="fas fa-check" />&nbsp;Sequence is valid
+                        </button>
                     )}
                 </div>
             </div>
@@ -92,7 +92,7 @@ const SequenceSection = ({ type, interactor, update }) => {
                 </div>
             </div>
             {type == 'h' ? null : (
-            <MatureProteinSection interactor={interactor} update={update} />
+                <MatureProteinSection interactor={interactor} update={update} />
             )}
         </React.Fragment>
     )

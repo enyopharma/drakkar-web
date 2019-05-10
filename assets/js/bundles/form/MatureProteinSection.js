@@ -68,30 +68,25 @@ const MatureProteinSection = ({ interactor, update }) => {
     ) : (
         <React.Fragment>
             {matures.length == 0 ? (
-            <p>
-                No sequence defined on this uniprot entry yet.
-            </p>
-            ) : (
-            <React.Fragment>
                 <p>
-                    Existing sequences on this uniprot entry:
+                    No sequence defined on this uniprot entry yet.
                 </p>
-                <div className="row">
-                    <div className="col">
-                        <MatureProteinList matures={matures} select={selectMature} />
-                    </div>
-                </div>
-            </React.Fragment>
-            )}
-            {error == '' ? (
-            <p>
-                Sequence selection tool:
-            </p>
             ) : (
-            <p className="text-danger">
-                {error}
-            </p>
+                <React.Fragment>
+                    <p>
+                        Existing sequences on this uniprot entry:
+                    </p>
+                    <div className="row">
+                        <div className="col">
+                            <MatureProteinList matures={matures} select={selectMature} />
+                        </div>
+                    </div>
+                </React.Fragment>
             )}
+            {error == ''
+                ? <p>Sequence selection tool:</p>
+                : <p className="text-danger">{error}</p>
+            }
             <div className="row">
                 <div className="col-3">
                     <input
