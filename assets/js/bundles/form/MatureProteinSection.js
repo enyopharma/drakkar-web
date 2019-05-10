@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 
+import CoordinateField from './CoordinateField'
 import ExtractFormGroup from './ExtractFormGroup'
 import MatureProteinList from './MatureProteinList'
 import SubsequenceFormGroup from './SubsequenceFormGroup'
@@ -44,24 +45,6 @@ const MatureProteinSection = ({ interactor, update }) => {
         setError('')
     }
 
-    const handleStartChange = (e) => {
-        if (e.target.value == '') { setStart(''); return }
-
-        let value = parseInt(e.target.value)
-        if (value < 1) value = 1
-        if (value > sequence.length) value = sequence.length
-        setStart(value)
-    }
-
-    const handleStopChange = (e) => {
-        if (e.target.value == '') { setStop(''); return }
-
-        let value = parseInt(e.target.value)
-        if (value < 1) value = 1
-        if (value > sequence.length) value = sequence.length
-        setStop(value)
-    }
-
     const handleReset = () => {
         setStart(1)
         setStop(sequence.length)
@@ -93,26 +76,22 @@ const MatureProteinSection = ({ interactor, update }) => {
                     />
                 </div>
                 <div className="col-3">
-                    <input
-                        type="number"
-                        min="1"
-                        max={sequence.length}
-                        className="form-control"
-                        placeholder="Start"
+                    <CoordinateField
                         value={start}
-                        onChange={handleStartChange}
-                    />
+                        update={setStart}
+                        max={sequence.length}
+                    >
+                        Start
+                    </CoordinateField>
                 </div>
                 <div className="col-3">
-                    <input
-                        type="number"
-                        min="1"
-                        max={sequence.length}
-                        className="form-control"
-                        placeholder="Stop"
+                    <CoordinateField
                         value={stop}
-                        onChange={handleStopChange}
-                    />
+                        update={setStop}
+                        max={sequence.length}
+                    >
+                        Stop
+                    </CoordinateField>
                 </div>
                 <div className="col-3">
                     <button
