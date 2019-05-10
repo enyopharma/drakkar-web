@@ -1,10 +1,7 @@
 import React, { useState } from 'react'
 
 import UniprotSection from './UniprotSection'
-import MappingSection from './MappingSection'
-import SequenceSection from './SequenceSection'
-
-const color = type => type == 'h' ? 'primary' : 'danger'
+import InteractorEditor from './InteractorEditor'
 
 const InteractorFieldset = ({ i, type, interactor, actions }) => {
     const [processing, setProcessing] = useState(false)
@@ -12,26 +9,25 @@ const InteractorFieldset = ({ i, type, interactor, actions }) => {
     return (
         <fieldset>
             <legend>
-                <i className={'fas fa-circle small text-' + color(type)}></i>
+                <i className={'fas fa-circle small text-' + (type == 'h' ? 'primary' : 'danger')} />
                 &nbsp;
                 Interactor {i}
             </legend>
-            <UniprotSection type={type} protein={interactor.protein} actions={actions} />
+            <UniprotSection
+                type={type}
+                protein={interactor.protein}
+                processing={processing}
+                select={actions.selectProtein}
+                unselect={actions.unselectProtein}
+            />
             {interactor.protein == null ? null : (
-                <React.Fragment>
-                    <SequenceSection
-                        type={type}
-                        interactor={interactor}
-                        processing={processing}
-                        update={actions.updateMature}
-                    />
-                    <MappingSection
-                        type={type}
-                        interactor={interactor}
-                        processing={processing}
-                        setProcessing={setProcessing}
-                    />
-                </React.Fragment>
+                <InteractorEditor
+                    type={type}
+                    interactor={interactor}
+                    processing={processing}
+                    setProcessing={setProcessing}
+                    actions={actions}
+                />
             )}
         </fieldset>
     )

@@ -1,10 +1,9 @@
 import React from 'react'
+import fetch from 'cross-fetch'
 import { render } from 'react-dom'
 import { createStore, applyMiddleware } from 'redux'
 import { Provider, connect } from 'react-redux'
-import qs from 'query-string'
 import thunk from 'redux-thunk'
-import fetch from 'cross-fetch'
 
 import Form from './form/Form'
 
@@ -15,12 +14,6 @@ const UNSELECT_METHOD = n++
 const SELECT_PROTEIN = n++
 const UNSELECT_PROTEIN = n++
 const UPDATE_MATURE = n++
-
-const searchMethod = (q, update) => (dispatch) => {
-    fetch('/methods?' + qs.stringify({q: q}))
-        .then(response => response.json(), error => console.log(error))
-        .then(json => update(json.data.methods))
-}
 
 const selectMethod = (method) => {
     return {
@@ -33,12 +26,6 @@ const unselectMethod = () => {
     return {
         type: UNSELECT_METHOD,
     }
-}
-
-const searchProtein = (i, type, q, update) => (dispatch) => {
-    fetch('/proteins?' + qs.stringify({type: type, q: q}))
-        .then(response => response.json(), error => console.log(error))
-        .then(json => update(json.data.proteins))
 }
 
 const selectProtein = (i, protein) => (dispatch) => {
@@ -72,18 +59,15 @@ const mapDispatchToProps = dispatch => {
     return {
         actions: {
             method: {
-                searchMethod: (q, update) => dispatch(searchMethod(q, update)),
                 selectMethod: (method) => dispatch(selectMethod(method)),
                 unselectMethod: () => dispatch(unselectMethod()),
             },
             interactor1: {
-                searchProtein: (type, q, update) => dispatch(searchProtein(1, type, q, update)),
                 selectProtein: (protein) => dispatch(selectProtein(1, protein)),
                 unselectProtein: () => dispatch(unselectProtein(1)),
                 updateMature: (mature) => dispatch(updateMature(1, mature)),
             },
             interactor2: {
-                searchProtein: (type, q, update) => dispatch(searchProtein(2, type, q, update)),
                 selectProtein: (protein) => dispatch(selectProtein(2, protein)),
                 unselectProtein: () => dispatch(unselectProtein(2)),
                 updateMature: (mature) => dispatch(updateMature(2, mature)),

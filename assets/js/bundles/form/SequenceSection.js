@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import MatureProteinList from './MatureProteinList'
-import MatureProteinSection from './MatureProteinSection'
+import MatureProteinEditor from './MatureProteinEditor'
 
-const SequenceSection = ({ type, interactor, processing, update }) => {
+const SequenceSection = ({ type, interactor, update, editing, processing, setEditing }) => {
     const start = interactor.start
     const stop = interactor.stop
     const sequence = interactor.protein.sequence
@@ -47,21 +47,14 @@ const SequenceSection = ({ type, interactor, processing, update }) => {
                     />
                 </div>
                 <div className="col">
-                    {(interactor.name == '' || interactor.start == '' || interactor.stop == '') ? (
-                        <button
-                            className="btn btn-block btn-outline-danger"
-                            disabled
-                        >
+                    {editing ? (
+                        <button className="btn btn-block btn-outline-danger" disabled>
                             <i className="fas fa-exclamation-triangle" />
                             &nbsp;
                             Please select a sequence.
                         </button>
                     ) : (
-                        <button
-                            className="btn btn-block btn-outline-success"
-                            onClick={e => setEditing(true)}
-                            disabled
-                        >
+                        <button className="btn btn-block btn-outline-success" disabled>
                             <i className="fas fa-check" />&nbsp;Sequence is valid
                         </button>
                     )}
@@ -89,11 +82,24 @@ const SequenceSection = ({ type, interactor, processing, update }) => {
                     </div>
                 </div>
             </div>
-            {type == 'h' ? null : (
-                <MatureProteinSection
+            {type == 'h' || editing ? null : (
+                <div className="row">
+                    <div className="col offset-9">
+                        <button
+                            className="btn btn-sm btn-block btn-outline-warning"
+                            onClick={e => setEditing(true)}
+                            disabled={processing}
+                        >
+                            <i className="fas fa-edit" />&nbsp;Edit sequence
+                        </button>
+                    </div>
+                </div>
+            )}
+            {type == 'h' || ! editing ? null : (
+                <MatureProteinEditor
                     interactor={interactor}
-                    processing={processing}
                     update={update}
+                    cancel={e => setEditing(false)}
                 />
             )}
         </React.Fragment>

@@ -5,15 +5,14 @@ import ExtractFormGroup from './ExtractFormGroup'
 import MatureProteinList from './MatureProteinList'
 import SubsequenceFormGroup from './SubsequenceFormGroup'
 
-const MatureProteinSection = ({ interactor, processing, update }) => {
+const MatureProteinEditor = ({ interactor, update, cancel }) => {
     const sequence = interactor.protein.sequence
     const matures = interactor.protein.matures
 
-    const [editing, setEditing] = useState(true)
+    const [error, setError] = useState('')
     const [name, setName] = useState(matures.length == 0 ? interactor.protein.name : '')
     const [start, setStart] = useState(matures.length == 0 ? 1 : '')
     const [stop, setStop] = useState(matures.length == 0 ? sequence.length : '')
-    const [error, setError] = useState('')
 
     const isValid = name.trim() != ''
         && start != ''
@@ -24,10 +23,10 @@ const MatureProteinSection = ({ interactor, processing, update }) => {
 
     const selectMature = (mature) => {
         update(mature)
-        setEditing(false)
+        cancel()
     }
 
-    const selectCoordinates = (start, stop) => {
+    const setCoordinates = (start, stop) => {
         if (start == 0) {
             setError('Invalid subsequence')
             return
@@ -42,35 +41,11 @@ const MatureProteinSection = ({ interactor, processing, update }) => {
         selectMature({name: name.trim(), start: start, stop: stop})
     }
 
-    const handleEdit = () => {
-        const name = interactor.name
-        const start = interactor.start
-        const stop = interactor.stop
-        update({name: '', start: '', stop: ''})
-        setEditing(true)
-        setName(name)
-        setStart(start)
-        setStop(stop)
-        setError('')
-    }
-
     const handleReset = () => {
-        selectCoordinates(1, sequence.length)
+        setCoordinates(1, sequence.length)
     }
 
-    return ! editing ? (
-        <div className="row">
-            <div className="col offset-9">
-                <button
-                    className="btn btn-sm btn-block btn-outline-warning"
-                    onClick={handleEdit}
-                    disabled={processing}
-                >
-                    <i className="fas fa-edit" />&nbsp;Edit sequence
-                </button>
-            </div>
-        </div>
-    ) : (
+    return (
         <React.Fragment>
             {matures.length == 0 ? (
                 <p>
@@ -131,10 +106,10 @@ const MatureProteinSection = ({ interactor, processing, update }) => {
                     </button>
                 </div>
             </div>
-            <SubsequenceFormGroup sequence={sequence} update={selectCoordinates}>
+            <SubsequenceFormGroup sequence={sequence} update={setCoordinates}>
                 Extract coordinates
             </SubsequenceFormGroup>
-            <ExtractFormGroup sequence={sequence} update={selectCoordinates}>
+            <ExtractFormGroup sequence={sequence} update={setCoordinates}>
                 Extract coordinates
             </ExtractFormGroup>
             <div className="row">
@@ -152,4 +127,4 @@ const MatureProteinSection = ({ interactor, processing, update }) => {
     )
 }
 
-export default MatureProteinSection;
+export default MatureProteinEditor;

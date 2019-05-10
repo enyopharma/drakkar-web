@@ -9,21 +9,18 @@ const Form = ({ type, method, interactor1, interactor2, actions }) => (
             method={method}
             actions={actions.method}
         />
-        <hr />
         <InteractorFieldset
             i={1}
             type="h"
             interactor={interactor1}
             actions={actions.interactor1}
         />
-        <hr />
         <InteractorFieldset
             i={2}
             type={type == 'hh' ? 'h' : 'v'}
             interactor={interactor2}
             actions={actions.interactor2}
         />
-        <hr />
     </form>
 )
 

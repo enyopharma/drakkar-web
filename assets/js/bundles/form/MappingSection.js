@@ -1,16 +1,23 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-import MappingImg from './MappingImg'
+import MappingEditor from './MappingEditor'
 
-const MappingSection = ({ type, interactor }) => {
-    const length = interactor.protein.sequence.length
-    const start = interactor.start == '' ? 1 : interactor.start
-    const stop = interactor.stop == '' ? length : interactor.stop
-
+const MappingSection = ({ type, interactor, editing, processing, setProcessing }) => {
     return (
         <React.Fragment>
             <h4>Mapping</h4>
-            <MappingImg type={type} start={start} stop={stop} length={length} />
+            {editing ? (
+                <p>
+                    Please select a sequence first.
+                </p>
+            ) : (
+                <MappingEditor
+                    type={type}
+                    interactor={interactor}
+                    processing={processing}
+                    setProcessing={setProcessing}
+                />
+            )}
         </React.Fragment>
     )
 }
