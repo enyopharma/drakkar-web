@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import extract from '../extract.js'
 
-const SubsequenceFormGroup = ({ sequence, update, error }) => {
+const SubsequenceFormGroup = ({ sequence, update, error, children }) => {
     const [subsequence, setSubsequence] = useState('')
 
     const handleClick = () => {
@@ -35,8 +35,9 @@ const SubsequenceFormGroup = ({ sequence, update, error }) => {
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={handleClick}
+                    disabled={subsequence == ''}
                 >
-                    Extract coordinates
+                    {children}
                 </button>
             </div>
         </div>

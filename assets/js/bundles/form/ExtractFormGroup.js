@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import extract from '../extract.js'
 
-const ExtractFormGroup = ({ sequence, update, error }) => {
+const ExtractFormGroup = ({ sequence, update, error, children }) => {
     const [from, setFrom] = useState('')
     const [to, setTo] = useState('')
 
@@ -18,7 +18,8 @@ const ExtractFormGroup = ({ sequence, update, error }) => {
         }
 
         update(start1, stop2)
-        error('')
+        setFrom('')
+        setTo('')
     }
 
     return (
@@ -46,8 +47,9 @@ const ExtractFormGroup = ({ sequence, update, error }) => {
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={handleClick}
+                    disabled={from == '' || to == ''}
                 >
-                    Extract coordinates
+                    {children}
                 </button>
             </div>
         </div>

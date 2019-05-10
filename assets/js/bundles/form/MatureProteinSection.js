@@ -125,8 +125,20 @@ const MatureProteinSection = ({ interactor, update }) => {
                     </button>
                 </div>
             </div>
-            <SubsequenceFormGroup sequence={sequence} update={selectCoordinates} error={setError} />
-            <ExtractFormGroup sequence={sequence} update={selectCoordinates} error={setError} />
+            <SubsequenceFormGroup
+                sequence={sequence}
+                update={selectCoordinates}
+                error={setError}
+            >
+                Extract coordinates
+            </SubsequenceFormGroup>
+            <ExtractFormGroup
+                sequence={sequence}
+                update={selectCoordinates}
+                error={setError}
+            >
+                Extract coordinates
+            </ExtractFormGroup>
             <div className="row">
                 <div className="col-9">
                 {error == '' ? null : (
