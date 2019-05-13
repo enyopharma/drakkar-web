@@ -1,16 +1,19 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import { extract } from '../shared'
 
-const SubsequenceFormGroup = ({ sequence, update, children }) => {
+const SubsequenceFormGroup = ({ sequence, set, children }) => {
     const [subsequence, setSubsequence] = useState('')
+    const [valid, setValid] = useState(true)
+
+    useEffect(() => setValid(true), [subsequence])
 
     const handleClick = () => {
         if (subsequence.trim() == '') return
 
         const [start, stop] = extract(sequence, subsequence.trim())
 
-        update(start, stop)
+        start > 0 ? set(start, stop) : setValid(false)
     }
 
     return (
@@ -18,7 +21,7 @@ const SubsequenceFormGroup = ({ sequence, update, children }) => {
             <div className="col-9">
                 <input
                     type="text"
-                    className="form-control"
+                    className={'form-control' + (valid ? '' : ' is-invalid')}
                     placeholder="Subsequence..."
                     value={subsequence}
                     onChange={e => setSubsequence(e.target.value)}

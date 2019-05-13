@@ -9,17 +9,20 @@ const MatureProteinEditor = ({ interactor, update, cancel }) => {
     const sequence = interactor.protein.sequence
     const matures = interactor.protein.matures
 
-    const [error, setError] = useState('')
     const [name, setName] = useState(matures.length == 0 ? interactor.protein.name : '')
     const [start, setStart] = useState(matures.length == 0 ? 1 : '')
     const [stop, setStop] = useState(matures.length == 0 ? sequence.length : '')
 
-    const isValid = name.trim() != ''
+    const isNameValid = matures.filter(m => m.name == name.trim()).length == 0
+
+    const areCoordinatesValid = start == '' || stop == ''
+        || (start <= stop && matures.filter(m => m.start == start && m.stop == stop).length == 0)
+
+    const isMatureValid = name.trim() != ''
         && start != ''
         && stop != ''
-        && start <= stop
-        && matures.filter(m => m.name == name).length == 0
-        && matures.filter(m => m.start == start && m.stop == stop).length == 0
+        && isNameValid
+        && areCoordinatesValid
 
     const selectMature = (mature) => {
         update(mature)
@@ -27,14 +30,8 @@ const MatureProteinEditor = ({ interactor, update, cancel }) => {
     }
 
     const setCoordinates = (start, stop) => {
-        if (start == 0) {
-            setError('Invalid subsequence')
-            return
-        }
-
         setStart(start)
         setStop(stop)
-        setError('')
     }
 
     const handleValidate = () => {
@@ -63,15 +60,11 @@ const MatureProteinEditor = ({ interactor, update, cancel }) => {
                     </div>
                 </React.Fragment>
             )}
-            {error == ''
-                ? <p>Sequence selection tool:</p>
-                : <p className="text-danger">{error}</p>
-            }
             <div className="row">
                 <div className="col-3">
                     <input
                         type="text"
-                        className="form-control"
+                        className={'form-control' + (isNameValid ? '' : ' is-invalid')}
                         placeholder="Name"
                         value={name}
                         onChange={e => setName(e.target.value)}
@@ -80,8 +73,9 @@ const MatureProteinEditor = ({ interactor, update, cancel }) => {
                 <div className="col-3">
                     <CoordinateField
                         value={start}
-                        update={setStart}
+                        set={setStart}
                         max={sequence.length}
+                        valid={areCoordinatesValid}
                     >
                         Start
                     </CoordinateField>
@@ -89,8 +83,9 @@ const MatureProteinEditor = ({ interactor, update, cancel }) => {
                 <div className="col-3">
                     <CoordinateField
                         value={stop}
-                        update={setStop}
+                        set={setStop}
                         max={sequence.length}
+                        valid={areCoordinatesValid}
                     >
                         Stop
                     </CoordinateField>
@@ -100,16 +95,16 @@ const MatureProteinEditor = ({ interactor, update, cancel }) => {
                         type="button"
                         className="btn btn-block btn-primary"
                         onClick={handleValidate}
-                        disabled={! isValid}
+                        disabled={! isMatureValid}
                     >
                         Validate
                     </button>
                 </div>
             </div>
-            <SubsequenceFormGroup sequence={sequence} update={setCoordinates}>
+            <SubsequenceFormGroup sequence={sequence} set={setCoordinates}>
                 Extract coordinates
             </SubsequenceFormGroup>
-            <ExtractFormGroup sequence={sequence} update={setCoordinates}>
+            <ExtractFormGroup sequence={sequence} set={setCoordinates}>
                 Extract coordinates
             </ExtractFormGroup>
             <div className="row">

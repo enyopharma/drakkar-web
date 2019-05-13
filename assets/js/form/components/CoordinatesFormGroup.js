@@ -1,24 +1,29 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
 import CoordinateField from './CoordinateField'
 
-const CoordinatesFormGroup = ({ max, select, children }) => {
+const CoordinatesFormGroup = ({ sequence, set, children }) => {
+    const max = sequence.length
+
     const [start, setStart] = useState('')
     const [stop, setStop] = useState('')
+    const [valid, setValid] = useState(true)
 
-    const handleClick = () => {
-        select(start, stop)
-    }
+    useEffect(() => setValid(true), [start, stop])
+
+    const handleClick = () => start <= stop
+        ? set(sequence.slice(start - 1, stop))
+        : setValid(false)
 
     return (
         <div className="row">
             <div className="col">
-                <CoordinateField value={start} update={setStart} max={max}>
+                <CoordinateField value={start} set={setStart} max={max} valid={valid}>
                     Start
                 </CoordinateField>
             </div>
             <div className="col">
-                <CoordinateField value={stop} update={setStop} max={max}>
+                <CoordinateField value={stop} set={setStop} max={max} valid={valid}>
                     Stop
                 </CoordinateField>
             </div>

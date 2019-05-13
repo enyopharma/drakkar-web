@@ -6,28 +6,21 @@ import FeaturesFormGroup from './FeaturesFormGroup'
 import CoordinatesFormGroup from './CoordinatesFormGroup'
 
 const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
-    const max = interactor.stop - interactor.start + 1
-    const sequence = interactor.protein.sequence
+    const sequence = interactor.protein.sequence.slice(
+        interactor.start - 1,
+        interactor.stop,
+    )
 
     const [target, setTarget] = useState('')
-    const [error, setError] = useState('')
 
     const setCoordinates = (start, stop) => {
-        if (start == 0) { setError('Invalid coordinates'); return }
-        if (start > stop) { setError('Invalid coordinates'); return }
-        if (start < interactor.start) { setError('Invalid coordinates'); return }
-        if (stop > interactor.stop) { setError('Invalid coordinates'); return }
-
-        const target = sequence.slice(start - 1, stop);
-
-        setTarget(target)
-        setError('')
+        setTarget(sequence.slice(start - 1, stop))
     }
 
-    const setCoordinatesWithOffset = (start, stop) => {
+    const setFeature = feature => {
         setCoordinates(
-            interactor.start + start -1,
-            interactor.start + stop -1,
+            feature.start - interactor.start + 1,
+            feature.stop - interactor.start + 1,
         )
     }
 
@@ -39,18 +32,17 @@ const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
 
     return (
         <React.Fragment>
-            {error == ''
-                ? <p>Sequence mapping tool</p>
-                : <p className="text-danger">{error}</p>
-            }
-            <FeaturesFormGroup interactor={interactor} select={setCoordinates}>
-                Extract sequence
+            <FeaturesFormGroup
+                interactor={interactor}
+                set={setFeature}
+            >
+                Extract sequence to map
             </FeaturesFormGroup>
-            <CoordinatesFormGroup max={max} select={setCoordinatesWithOffset}>
-                Extract sequence
+            <CoordinatesFormGroup sequence={sequence} set={setTarget}>
+                Extract sequence to map
             </CoordinatesFormGroup>
-            <ExtractFormGroup sequence={sequence} update={setCoordinates}>
-                Extract sequence
+            <ExtractFormGroup sequence={sequence} set={setCoordinates}>
+                Extract sequence to map
             </ExtractFormGroup>
             <div className="row">
                 <div className="col">

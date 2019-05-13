@@ -6,7 +6,7 @@ const features = [
     { name: 'feature 3', start: 200, stop: 225 },
 ]
 
-const FeaturesFormGroup = ({ interactor, select, children }) => {
+const FeaturesFormGroup = ({ interactor, set, children }) => {
     const [feature, setFeature] = useState('')
 
     const isFeatureEnabled = (feature) => {
@@ -15,7 +15,7 @@ const FeaturesFormGroup = ({ interactor, select, children }) => {
     }
 
     const handleClick = () => {
-        select(features[feature].start, features[feature].stop)
+        set(features[feature])
     }
 
     return (
