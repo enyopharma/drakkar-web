@@ -10,7 +10,7 @@ Encore
 
     // will create web/build/app.js and web/build/app.css
     .addEntry('app', './assets/js/app.js')
-    .addEntry('form', './assets/js/bundles/form.js')
+    .addEntry('form', './assets/js/form/index.js')
 
     // allow sass/scss files to be processed
     .enableSassLoader()

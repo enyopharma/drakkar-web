@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import extract from '../extract.js'
+import { extract } from '../shared'
 
 const SubsequenceFormGroup = ({ sequence, update, children }) => {
     const [subsequence, setSubsequence] = useState('')
