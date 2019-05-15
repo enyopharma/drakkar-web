@@ -7,9 +7,10 @@ services:
             - .:/app:ro
         networks:
             - default
-            - web
-        environment:
-            - VIRTUAL_HOST=${APP_HOST}:80
+            - proxy
+        labels:
+            - traefik.enable=true
+            - traefik.frontend.rule=Host:${APP_HOST}
         depends_on:
             - app
     app:
@@ -24,9 +25,7 @@ services:
         container_name: drakkar_redis
         image: redis
 networks:
-    web:
-        external:
-            name: enyo_proxy
+    proxy:
+        external: true
     sso:
-        external:
-            name: enyo_sso
+        external: true
