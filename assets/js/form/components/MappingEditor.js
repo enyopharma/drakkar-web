@@ -1,5 +1,5 @@
 import fetch from 'cross-fetch'
-import handle from '../../client'
+import { useChannel } from '../../hooks'
 import React, { useState, useEffect } from 'react'
 
 import MappingList from './MappingList'
@@ -19,12 +19,12 @@ const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
         ? Object.assign({}, canonical, interactor.protein.isoforms)
         : canonical
 
-    const [query, setQuery] = useState('')
-
-    useEffect(() => handle('alignment', (payload) => {
-        console.log(payload)
+    const id = useChannel('alignment', (payload) => {
+        console.log('client: ' + payload)
         setProcessing(false)
-    }), [])
+    }, [])
+
+    const [query, setQuery] = useState('')
 
     const setCoordinates = (start, stop) => {
         setQuery(sequence.slice(start - 1, stop))
