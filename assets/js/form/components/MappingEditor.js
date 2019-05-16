@@ -1,13 +1,11 @@
 import fetch from 'cross-fetch'
-import React, { useState } from 'react'
+import handle from '../../client'
+import React, { useState, useEffect } from 'react'
 
-import Client from '../../client'
 import MappingList from './MappingList'
 import ExtractFormGroup from './ExtractFormGroup'
 import FeaturesFormGroup from './FeaturesFormGroup'
 import CoordinatesFormGroup from './CoordinatesFormGroup'
-
-const client = new Client;
 
 const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
     const sequence = interactor.protein.sequence.slice(
@@ -22,6 +20,11 @@ const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
         : canonical
 
     const [query, setQuery] = useState('')
+
+    useEffect(() => handle('alignment', (payload) => {
+        console.log(payload)
+        setProcessing(false)
+    }), [])
 
     const setCoordinates = (start, stop) => {
         setQuery(sequence.slice(start - 1, stop))
@@ -44,7 +47,7 @@ const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
                 'content-type': 'application/json',
             },
             body: JSON.stringify({
-                id: client.id,
+                id: id,
                 query: query,
                 subjects: subjects,
             })

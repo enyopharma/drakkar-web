@@ -20,6 +20,7 @@
     "redux-thunk": "^2.3.0",
     "sass-loader": "^7.1.0",
     "uuid": "^3.3.2",
-    "webpack-notifier": "^1.7.0"
+    "webpack-notifier": "^1.7.0",
+    "websocket": "^1.0.28"
   }
 }

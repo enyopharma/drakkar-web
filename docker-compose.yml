@@ -13,6 +13,22 @@ services:
             - traefik.frontend.rule=Host:${APP_HOST}
         depends_on:
             - app
+    socket:
+        image: node:12.2.0
+        command: ["node", "/app/entrypoints/socket.js"]
+        volumes:
+            - .:/app:ro
+        networks:
+            - default
+            - proxy
+        expose:
+            - 80
+        depends_on:
+            - redis
+        labels:
+            - traefik.enable=true
+            - traefik.frontend.entryPoints=socket
+            - traefik.frontend.rule=Host:${APP_HOST}
     app:
         build: .
         user: ${UID}:${GID}
@@ -22,7 +38,6 @@ services:
             - default
             - sso
     redis:
-        container_name: drakkar_redis
         image: redis
 networks:
     proxy:

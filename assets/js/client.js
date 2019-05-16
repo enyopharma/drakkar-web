@@ -1,34 +1,25 @@
 const uuidv4 = require('uuid/v4');
 
-export default class {
-    constructor() {
-        this.id = uuidv4()
-        this.url = ['ws://', window.location.host, ':3000'].join('')
+const handle = (from, handler) => {
+    const id = uuidv4()
+    const socket = new WebSocket(`ws://${window.location.host}:3000`, 'app')
+
+    // this message will be sent back by the server ensuring the connection is ok.
+    socket.onopen = () => socket.send(JSON.stringify({
+        payload: `Connected to server with id ${id}.`
+    }))
+
+    socket.onmessage = event => {
+        const message = JSON.parse(event.data)
+
+        id == message.id && from == message.from
+            ? handler(message.payload)
+            : console.log(message.payload)
     }
 
-    connect() {
-        this.socket = new WebSocket(this.url)
+    socket.onclose = event => console.log('Disconnected from server.')
 
-        this.socket.onopen = event => {
-            console.log(`Connected to ${this.url} with client id ${this.id}.`)
-        }
-    }
-
-    onmessage(target, handler) {
-        if (! this.socket) this.connect();
-
-        this.socket.onmessage = event => {
-            const data = JSON.parse(event.data)
-
-            if (this.id == data.id && this.target == data.target) {
-                handler(data.payload)
-            }
-        }
-    }
-
-    close() {
-        if (this.socket) this.socket.close()
-
-        console.log(`Disconnected from ${this.url}.`)
-    }
+    return () => socket.close()
 }
+
+export default handle;
