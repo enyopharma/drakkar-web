@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 10.7 (Ubuntu 10.7-0ubuntu0.18.04.1)
--- Dumped by pg_dump version 10.7 (Ubuntu 10.7-0ubuntu0.18.04.1)
+-- Dumped from database version 10.8 (Ubuntu 10.8-0ubuntu0.18.04.1)
+-- Dumped by pg_dump version 10.8 (Ubuntu 10.8-0ubuntu0.18.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -12,6 +12,7 @@ SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
 SET check_function_bodies = false;
+SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
@@ -337,7 +338,7 @@ ALTER SEQUENCE public.runs_id_seq OWNED BY public.runs.id;
 CREATE TABLE public.sequences (
     id integer NOT NULL,
     protein_id integer NOT NULL,
-    accession character varying(10) NOT NULL,
+    accession character varying(12) NOT NULL,
     is_canonical boolean NOT NULL,
     sequence text NOT NULL
 );
@@ -480,6 +481,14 @@ ALTER TABLE ONLY public.keywords
 
 ALTER TABLE ONLY public.methods
     ADD CONSTRAINT methods_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: methods methods_psimi_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.methods
+    ADD CONSTRAINT methods_psimi_id_key UNIQUE (psimi_id);
 
 
 --
