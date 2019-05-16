@@ -13,13 +13,13 @@ final class StartAlignment
 
     public function __invoke(string $id, string $query, array $subjects)
     {
-        $this->client->rpush('alignment', [
+        $this->client->rpush('alignment', json_encode([
             'id' => $id,
             'payload' => [
                 'query' => $query,
                 'subjects' => $subjects,
             ],
-        ]);
+        ]));
 
         return new DomainSuccess;
     }
