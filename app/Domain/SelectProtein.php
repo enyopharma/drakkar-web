@@ -16,7 +16,7 @@ final class SelectProtein
     ];
 
     const SELECT_PROTEIN_SQL = <<<SQL
-        SELECT p.*, s.sequence
+        SELECT p.id, p.type, p.accession, p.name, p.description, s.sequence
         FROM proteins AS p, sequences AS s
         WHERE p.id = s.protein_id
         AND s.is_canonical IS TRUE
@@ -59,11 +59,7 @@ SQL;
         $select_protein_sth = $this->pdo->prepare(self::SELECT_PROTEIN_SQL);
         $select_isoforms_sth = $this->pdo->prepare(self::SELECT_ISOFORMS_SQL);
         $select_matures_sth = $this->pdo->prepare(self::SELECT_MATURES_SQL);
-        $select_features_sth = $this->pdo->prepare(vsprintf(self::SELECT_FEATURES_SQL, [
-            implode(', ', array_map(function () {
-                return '\'' . $domain . '\'';
-            }, self::DOMAINS))
-        ]));
+        $select_features_sth = $this->pdo->prepare(self::SELECT_FEATURES_SQL);
 
         $select_protein_sth->execute([$accession]);
 
@@ -72,7 +68,7 @@ SQL;
             $select_matures_sth->execute([$protein['id']]);
             $select_features_sth->execute([$protein['id']]);
 
-            $protein['isoforms'] = $select_isoforms_sth->fetchall();
+            $protein['isoforms'] = $select_isoforms_sth->fetchall(\PDO::FETCH_KEY_PAIR);
             $protein['matures'] = $select_matures_sth->fetchall();
             $protein['features'] = $select_features_sth->fetchall();
 
