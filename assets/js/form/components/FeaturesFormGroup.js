@@ -21,6 +21,7 @@ const FeaturesFormGroup = ({ interactor, set, children }) => {
                     value={feature}
                     className="form-control"
                     onChange={e => setFeature(e.target.value)}
+                    disabled={features.length == 0}
                 >
                     <option value="">Please select a feature</option>
                     {features.map((feature, index) => (
