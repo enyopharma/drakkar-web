@@ -1,9 +1,13 @@
+import fetch from 'cross-fetch'
 import React, { useState } from 'react'
 
+import Client from '../../client'
 import MappingList from './MappingList'
 import ExtractFormGroup from './ExtractFormGroup'
 import FeaturesFormGroup from './FeaturesFormGroup'
 import CoordinatesFormGroup from './CoordinatesFormGroup'
+
+const client = new Client;
 
 const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
     const sequence = interactor.protein.sequence.slice(
@@ -11,10 +15,16 @@ const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
         interactor.stop,
     )
 
-    const [target, setTarget] = useState('')
+    const canonical = { [interactor.protein.accession]: sequence }
+
+    const subjects = interactor.start == 1 && interactor.stop == interactor.protein.sequence.length
+        ? Object.assign({}, canonical, interactor.protein.isoforms)
+        : canonical
+
+    const [query, setQuery] = useState('')
 
     const setCoordinates = (start, stop) => {
-        setTarget(sequence.slice(start - 1, stop))
+        setQuery(sequence.slice(start - 1, stop))
     }
 
     const setFeature = feature => {
@@ -27,7 +37,22 @@ const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
     const handleClick = () => {
         setProcessing(true)
 
-        setTimeout(() => setProcessing(false), 5000)
+        const request = fetch('/jobs/alignments', {
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: client.id,
+                query: query,
+                subjects: subjects,
+            })
+        })
+
+        request
+            .then(response => response.json(), error => console.log(error))
+            .then(json => console.log(json))
     }
 
     return (
@@ -38,7 +63,7 @@ const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
             >
                 Extract sequence to map
             </FeaturesFormGroup>
-            <CoordinatesFormGroup sequence={sequence} set={setTarget}>
+            <CoordinatesFormGroup sequence={sequence} set={setQuery}>
                 Extract sequence to map
             </CoordinatesFormGroup>
             <ExtractFormGroup sequence={sequence} set={setCoordinates}>
@@ -49,8 +74,8 @@ const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
                     <textarea
                         className="form-control"
                         placeholder="Sequence to map"
-                        value={target}
-                        onChange={e => setTarget(e.target.value)}
+                        value={query}
+                        onChange={e => setQuery(e.target.value)}
                     />
                 </div>
             </div>
@@ -60,7 +85,7 @@ const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
                         type="button"
                         className="btn btn-block btn-primary"
                         onClick={handleClick}
-                        disabled={processing || target.trim() == ''}
+                        disabled={processing || query.trim() == ''}
                     >
                         {! processing
                             ? <i className="fas fa-cogs" />

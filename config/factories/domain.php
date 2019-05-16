@@ -63,5 +63,11 @@ return [
                 $container->get(PDO::class)
             );
         },
+
+        App\Domain\StartAlignment::class => function ($container) {
+            return new App\Domain\StartAlignment(
+                $container->get(Predis\Client::class)
+            );
+        },
     ],
 ];

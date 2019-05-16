@@ -18,6 +18,11 @@ return function (RouteCollector $collector) {
         'runs.publications',
     ]);
 
+    $collector->post('/runs/{run_id}/publications/{pmid}/descriptions', ...[
+        App\Http\Handlers\Descriptions\InsertHandler::class,
+        'runs.publications.descriptions',
+    ]);
+
     $collector->get('/runs/{run_id}/publications/{pmid}/descriptions/create', ...[
         App\Http\Handlers\Descriptions\CreateHandler::class,
         'runs.publications.descriptions.create',
@@ -38,8 +43,8 @@ return function (RouteCollector $collector) {
         'proteins.show',
     ]);
 
-    $collector->post('/runs/{run_id}/publications/{pmid}/descriptions', ...[
-        App\Http\Handlers\Descriptions\InsertHandler::class,
-        'runs.publications.descriptions',
+    $collector->post('/jobs/alignments', ...[
+        App\Http\Handlers\Jobs\AlignmentHandler::class,
+        'jobs.alignment',
     ]);
 };
