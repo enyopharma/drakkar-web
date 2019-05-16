@@ -2,10 +2,6 @@
 
 return [
     'factories' => [
-        App\Domain\Services\Efetch::class => function () {
-            return new App\Domain\Services\Efetch;
-        },
-
         App\Domain\InsertRun::class => function ($container) {
             return new App\Domain\InsertRun(
                 $container->get(PDO::class)
@@ -15,14 +11,14 @@ return [
         App\Domain\PopulateRun::class => function ($container) {
             return new App\Domain\PopulateRun(
                 $container->get(PDO::class),
-                $container->get(App\Domain\Services\Efetch::class)
+                $container->get(App\Services\Efetch::class)
             );
         },
 
         App\Domain\PopulatePublication::class => function ($container) {
             return new App\Domain\PopulatePublication(
                 $container->get(PDO::class),
-                $container->get(App\Domain\Services\Efetch::class)
+                $container->get(App\Services\Efetch::class)
             );
         },
 

@@ -2,7 +2,7 @@
 
 namespace App\Domain;
 
-use App\Domain\Services\Efetch;
+use App\Services\Efetch;
 
 final class PopulatePublication
 {
