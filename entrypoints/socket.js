@@ -36,12 +36,11 @@ ws.on('request', function (request) {
 
     // send to the client every message sent to a redis pubsub channel.
     redis.on('pmessage', function (pattern, channel, serialized) {
-        var message = JSON.parse(serialized)
+        console.log(channel, serialized)
 
         connection.sendUTF(JSON.stringify({
-            id: message.id,
             channel: channel,
-            payload: message.payload,
+            payload: JSON.parse(serialized),
         }));
     });
 });

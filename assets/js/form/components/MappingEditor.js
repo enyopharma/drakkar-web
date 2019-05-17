@@ -1,6 +1,6 @@
 import fetch from 'cross-fetch'
-import { useChannel } from '../../hooks'
-import React, { useState, useEffect } from 'react'
+import { useSocket } from '../../hooks'
+import React, { useState } from 'react'
 
 import MappingList from './MappingList'
 import ExtractFormGroup from './ExtractFormGroup'
@@ -19,12 +19,14 @@ const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
         ? Object.assign({}, canonical, interactor.protein.isoforms)
         : canonical
 
-    const id = useChannel('alignment', (payload) => {
-        console.log('client: ' + payload)
-        setProcessing(false)
-    }, [])
-
+    const [id, setId] = useState('')
     const [query, setQuery] = useState('')
+
+    useSocket(id, (payload) => {
+        setId('')
+        setProcessing(false)
+        console.log(payload)
+    }, [id])
 
     const setCoordinates = (start, stop) => {
         setQuery(sequence.slice(start - 1, stop))
@@ -47,7 +49,6 @@ const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
                 'content-type': 'application/json',
             },
             body: JSON.stringify({
-                id: id,
                 query: query,
                 subjects: subjects,
             })
@@ -55,7 +56,7 @@ const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
 
         request
             .then(response => response.json(), error => console.log(error))
-            .then(json => console.log(json))
+            .then(json => setId(json.data.id))
     }
 
     return (

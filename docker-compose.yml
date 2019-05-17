@@ -37,6 +37,14 @@ services:
         networks:
             - default
             - sso
+    worker:
+        image: enyopharma/alignment:7.2
+        user: ${UID}:${GID}
+        volumes:
+            - .:/app:rw
+            - ./process/worker.conf:/etc/process.conf:ro
+        depends_on:
+            - redis
     redis:
         image: redis
 networks:

@@ -1,26 +1,34 @@
 import { useEffect } from 'react';
 
-const uuidv4 = require('uuid/v4');
-
-const useChannel = (channel, handler, state) => {
-    const id = uuidv4()
-
+const useSocket = (id, handler, state) => {
     useEffect(() => {
+        if (id == '') return;
+
         const socket = new WebSocket(`ws://${window.location.host}:3000`, 'app')
 
         // this message will be sent back by the server ensuring the connection is ok.
         socket.onopen = () => socket.send(JSON.stringify({
-            id: id,
-            payload: `Connected to server with id ${id}.`
+            channel: 'echo',
+            payload: {
+                id: id,
+                message: `Listening for job with id '${id}'.`,
+            },
         }))
 
         socket.onmessage = event => {
             const message = JSON.parse(event.data)
 
-            if (id == message.id) {
-                channel == message.channel
-                    ? handler(message.payload)
-                    : console.log(message.payload)
+            const channel = message.channel;
+            const payload = message.payload;
+
+            if (payload.id == id) {
+                if (channel == 'echo') {
+                    console.log(payload.message)
+                    return;
+                }
+
+                handler(payload)
+                socket.close()
             }
         }
 
@@ -28,8 +36,6 @@ const useChannel = (channel, handler, state) => {
 
         return () => socket.close()
     }, state)
-
-    return id
 }
 
-export { useChannel };
+export { useSocket };
