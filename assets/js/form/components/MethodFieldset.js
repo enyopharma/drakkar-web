@@ -5,16 +5,12 @@ import React, { useState, useEffect } from 'react'
 import SearchField from './SearchField'
 
 const MethodFieldset = ({ method, actions }) => {
-    const [q, setQ] = useState('');
-    const [methods, setMethods] = useState([]);
-
-    useEffect(() => {
-        fetch('/methods?' + qs.stringify({q: q}))
-            .then(response => response.json(), error => console.log(error))
-            .then(json => setMethods(json.data.methods))
-    }, [q])
-
-    const format = method => [method.psimi_id, method.name].join(' - ')
+    const search = q => fetch('/methods?' + qs.stringify({q: q}))
+        .then(response => response.json(), error => console.log(error))
+        .then(json => json.data.methods.map(method => ({
+            value: method,
+            label: [method.psimi_id, method.name].join(' - '),
+        })))
 
     return (
         <fieldset>
@@ -25,17 +21,14 @@ const MethodFieldset = ({ method, actions }) => {
             </legend>
             <div className="form-group row">
                 <div className="col">
-                    {method == null ? (
-                        <SearchField
-                            value={q}
-                            results={methods}
-                            search={setQ}
-                            select={actions.selectMethod}
-                            format={format}
-                        >
-                            Search a method...
-                        </SearchField>
-                    ) : (
+                    <SearchField
+                        display={method == null}
+                        search={search}
+                        select={actions.selectMethod}
+                    >
+                        Search a method...
+                    </SearchField>
+                    {method == null ? null : (
                         <div className="alert alert-info">
                             <strong>{method.psimi_id}</strong> - {method.name}
                             <button

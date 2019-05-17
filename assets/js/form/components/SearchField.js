@@ -1,60 +1,46 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 
-const SearchField = ({ value, results, search, select, format, children }) => {
-    const max = 5;
-
-    const [active, setActive] = useState(0)
+const SearchField = ({ search, select, display = true, max=5, children }) => {
+    const [query, setQuery] = useState('');
+    const [results, setResults] = useState([]);
     const [visible, setVisible] = useState(false)
+    const [active, setActive] = useState(0)
 
-    const selectResult = (result) => {
-        search('')
-        setVisible(false)
-        setActive(0)
-        select(result)
-    }
+    useEffect(() => {
+        if (query.trim().length > 0) search(query)
+            .then(results => setResults(results))
+    }, [query])
 
-    const handleChange = e => {
-        setVisible(true)
-        setActive(0)
-        search(e.target.value.trim())
-    }
+    useEffect(() => setActive(0), [visible])
 
     const handleKeyDown = e => {
-        if (e.keyCode == 13) {
-            setVisible(false)
-            selectResult(results[active])
-        }
+        const k = e.keyCode;
 
-        const length = results.slice(0, max).length
+        if (k == 13 || k == 27 || k == 38 || k == 40) {
+            const length = results.length > max
+                ? results.slice(0, max).length
+                : results.length
 
-        if (e.keyCode == 27) {
-            setVisible(false)
-            setActive(0)
-        }
+            if (k == 13) select(results[active].value)
+            if (k == 38) setActive(active == 0 ? length - 1 : active - 1)
+            if (k == 40) setActive((active + 1) % length)
 
-        if (e.keyCode == 38 && visible) {
-            setActive(active == 0 ? length - 1 : active - 1)
-        }
 
-        if (e.keyCode == 40 && visible) {
-            setActive((active + 1) % length)
-        }
-
-        if (e.keyCode == 38 || e.keyCode == 40) {
-            setVisible(true)
+            setVisible(k == 38 || k == 40)
         }
     }
 
-    return (
+    return ! display ? null : (
         <React.Fragment>
             <input
                 type="text"
                 placeholder={children}
                 className="form-control"
-                value={value}
+                value={query}
+                onClick={e => setVisible(true)}
                 onFocus={e => setVisible(true)}
                 onBlur={e => setVisible(false)}
-                onChange={handleChange}
+                onChange={e => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
             />
             {! visible ? null : (
@@ -66,9 +52,9 @@ const SearchField = ({ value, results, search, select, format, children }) => {
                             key={index}
                             className={'list-group-item' + (active == index ? ' active' : '')}
                             onMouseOver={e => setActive(index)}
-                            onMouseDown={e => selectResult(result)}
+                            onMouseDown={e => select(result.value)}
                         >
-                            {format(result)}
+                            {result.label}
                         </li>
                     ))}
                     </ul>
