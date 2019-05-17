@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
+let timeout = null;
+
 const SearchField = ({ search, select, display = true, max=5, children }) => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
@@ -7,11 +9,21 @@ const SearchField = ({ search, select, display = true, max=5, children }) => {
     const [active, setActive] = useState(0)
 
     useEffect(() => {
-        if (query.trim().length > 0) search(query)
-            .then(results => setResults(results))
+        if (timeout) clearTimeout(timeout)
+
+        if (query.trim() == '') return
+
+        timeout = setTimeout(() => {
+            search(query).then(results => setResults(results))
+        }, 100)
     }, [query])
 
     useEffect(() => setActive(0), [visible])
+
+    const selectValue = value => {
+        setVisible(false)
+        select(value)
+    }
 
     const handleKeyDown = e => {
         const k = e.keyCode;
@@ -21,12 +33,9 @@ const SearchField = ({ search, select, display = true, max=5, children }) => {
                 ? results.slice(0, max).length
                 : results.length
 
-            if (k == 13) select(results[active].value)
+            if (k == 13) selectValue(results[active].value)
             if (k == 38) setActive(active == 0 ? length - 1 : active - 1)
             if (k == 40) setActive((active + 1) % length)
-
-
-            setVisible(k == 38 || k == 40)
         }
     }
 
@@ -52,7 +61,7 @@ const SearchField = ({ search, select, display = true, max=5, children }) => {
                             key={index}
                             className={'list-group-item' + (active == index ? ' active' : '')}
                             onMouseOver={e => setActive(index)}
-                            onMouseDown={e => select(result.value)}
+                            onMouseDown={e => selectValue(result.value)}
                         >
                             {result.label}
                         </li>
