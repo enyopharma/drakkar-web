@@ -40,14 +40,14 @@ while (true) {
 
     $payload = json_decode($serialized, true);
 
-    $alignments = [];
+    $occurences = [];
 
     foreach ($payload['subjects'] as $accession => $sequence) {
         for ($i = 0; $i < rand(1, 3); $i++) {
             $start = rand(1, strlen($sequence) - strlen($payload['query']));
             $stop = $start + strlen($payload['query']) - 1;
 
-            $alignments[$accession][] = [
+            $occurences[$accession][] = [
                 'start' => $start,
                 'stop' => $stop,
                 'identity' => 99.3,
@@ -57,9 +57,9 @@ while (true) {
 
     $client->publish('alignment', json_encode([
         'id' => $payload['id'],
-        'mapping' => [
+        'alignment' => [
             'sequence' => $payload['query'],
-            'alignments' => $alignments,
+            'occurences' => $occurences,
         ],
     ]));
 }

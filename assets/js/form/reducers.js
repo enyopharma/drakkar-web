@@ -85,6 +85,12 @@ const reducers = {
                 return []
             case actions.UNSELECT_PROTEIN:
                 return []
+            case actions.ADD_ALIGNMENT:
+                return state.concat(action.alignment)
+            case actions.REMOVE_ALIGNMENT:
+                let newState = [...state];
+                newState.splice(action.index, 1);
+                return newState;
             default:
                 return state
         }

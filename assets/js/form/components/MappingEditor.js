@@ -2,12 +2,21 @@ import fetch from 'cross-fetch'
 import { useSocket } from '../../hooks'
 import React, { useState } from 'react'
 
-import MappingList from './MappingList'
 import ExtractFormGroup from './ExtractFormGroup'
 import FeaturesFormGroup from './FeaturesFormGroup'
 import CoordinatesFormGroup from './CoordinatesFormGroup'
 
-const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
+const MappingEditor = ({ type, interactor, processing, setProcessing, add }) => {
+    const [id, setId] = useState('')
+    const [query, setQuery] = useState('')
+
+    useSocket(id, (payload) => {
+        setId('')
+        setProcessing(false)
+        console.log(payload)
+        add(payload.alignment)
+    }, [id])
+
     const sequence = interactor.protein.sequence.slice(
         interactor.start - 1,
         interactor.stop,
@@ -19,14 +28,9 @@ const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
         ? Object.assign({}, canonical, interactor.protein.isoforms)
         : canonical
 
-    const [id, setId] = useState('')
-    const [query, setQuery] = useState('')
-
-    useSocket(id, (payload) => {
-        setId('')
-        setProcessing(false)
-        console.log(payload)
-    }, [id])
+    const isQueryValid = query.trim() != '' && interactor.mapping.filter(alignment => {
+        return alignment.sequence == query.trim()
+    }).length == 0
 
     const setCoordinates = (start, stop) => {
         setQuery(sequence.slice(start - 1, stop))
@@ -49,7 +53,7 @@ const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
                 'content-type': 'application/json',
             },
             body: JSON.stringify({
-                query: query,
+                query: query.trim(),
                 subjects: subjects,
             })
         })
@@ -80,6 +84,7 @@ const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
                         placeholder="Sequence to map"
                         value={query}
                         onChange={e => setQuery(e.target.value)}
+                        readOnly={processing}
                     />
                 </div>
             </div>
@@ -89,7 +94,7 @@ const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
                         type="button"
                         className="btn btn-block btn-primary"
                         onClick={handleClick}
-                        disabled={processing || query.trim() == ''}
+                        disabled={processing || ! isQueryValid}
                     >
                         {! processing
                             ? <i className="fas fa-cogs" />
@@ -100,7 +105,6 @@ const MappingEditor = ({ type, interactor, processing, setProcessing }) => {
                     </button>
                 </div>
             </div>
-            <MappingList type={type} interactor={interactor} />
         </React.Fragment>
     )
 }

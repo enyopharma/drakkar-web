@@ -11,10 +11,10 @@ const InteractorEditor = ({ type, interactor, processing, setProcessing, actions
             <SequenceSection
                 type={type}
                 interactor={interactor}
-                update={actions.updateMature}
                 editing={editing}
                 processing={processing}
                 setEditing={setEditing}
+                actions={actions}
             />
             <MappingSection
                 type={type}
@@ -22,6 +22,7 @@ const InteractorEditor = ({ type, interactor, processing, setProcessing, actions
                 editing={editing}
                 processing={processing}
                 setProcessing={setProcessing}
+                actions={actions}
             />
         </React.Fragment>
     )

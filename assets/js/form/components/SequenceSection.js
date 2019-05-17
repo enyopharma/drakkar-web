@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import MatureProteinList from './MatureProteinList'
 import MatureProteinEditor from './MatureProteinEditor'
 
-const SequenceSection = ({ type, interactor, update, editing, processing, setEditing }) => {
+const SequenceSection = ({ type, interactor, editing, processing, setEditing, actions }) => {
     const start = interactor.start
     const stop = interactor.stop
     const sequence = interactor.protein.sequence
@@ -98,7 +98,7 @@ const SequenceSection = ({ type, interactor, update, editing, processing, setEdi
             {type == 'h' || ! editing ? null : (
                 <MatureProteinEditor
                     interactor={interactor}
-                    update={update}
+                    update={actions.updateMature}
                     cancel={e => setEditing(false)}
                 />
             )}

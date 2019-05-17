@@ -39,4 +39,20 @@ export default {
             mature: mature,
         }
     },
+
+    addAlignment: (i, alignment) => {
+        return {
+            i: i,
+            type: actions.ADD_ALIGNMENT,
+            alignment: alignment,
+        }
+    },
+
+    removeAlignment: (i, index) => {
+        return {
+            i: i,
+            type: actions.REMOVE_ALIGNMENT,
+            index: index,
+        }
+    }
 }
