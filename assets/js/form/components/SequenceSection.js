@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 
+import MappingImg from './MappingImg'
 import MatureProteinList from './MatureProteinList'
 import MatureProteinEditor from './MatureProteinEditor'
 
@@ -82,20 +83,21 @@ const SequenceSection = ({ type, interactor, editing, processing, setEditing, ac
                     </div>
                 </div>
             </div>
-            {type == 'h' || editing ? null : (
-                <div className="row">
-                    <div className="col offset-9">
-                        <button
-                            className="btn btn-sm btn-block btn-outline-warning"
-                            onClick={e => setEditing(true)}
-                            disabled={processing}
-                        >
-                            <i className="fas fa-edit" />&nbsp;Edit sequence
-                        </button>
-                    </div>
+            <div className="row">
+                <div className="col">
+                    <MappingImg type={type} start={start} stop={stop} length={sequence.length} />
                 </div>
-            )}
-            {type == 'h' || ! editing ? null : (
+                <div className="col-1">
+                    <button
+                        className="btn btn-block btn-warning"
+                        onClick={e => setEditing(true)}
+                        disabled={type == 'h' || processing || editing}
+                    >
+                        <i className="fas fa-edit" />
+                    </button>
+                </div>
+            </div>
+            {! editing ? null : (
                 <MatureProteinEditor
                     interactor={interactor}
                     update={actions.updateMature}
