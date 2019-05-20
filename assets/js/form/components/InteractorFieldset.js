@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import UniprotSection from './UniprotSection'
+import UniprotField from './UniprotField'
 import InteractorEditor from './InteractorEditor'
 
 const InteractorFieldset = ({ i, type, interactor, actions }) => {
@@ -13,12 +13,17 @@ const InteractorFieldset = ({ i, type, interactor, actions }) => {
                 &nbsp;
                 Interactor {i}
             </legend>
-            <UniprotSection
-                type={type}
-                protein={interactor.protein}
-                processing={processing}
-                actions={actions}
-            />
+            <div className="row">
+                <div className="col">
+                    <UniprotField
+                        type={type}
+                        protein={interactor.protein}
+                        processing={processing}
+                        select={actions.selectProtein}
+                        unselect={actions.unselectProtein}
+                    />
+                </div>
+            </div>
             {interactor.protein == null ? null : (
                 <InteractorEditor
                     type={type}

@@ -24,7 +24,7 @@ const UniprotField = ({ type, protein, processing, select, unselect }) => {
                 </SearchField>
             </div>
             {protein == null ? null : (
-                <div className={'alert alert-' + (type == 'h' ? 'primary' : 'danger')}>
+                <div className={'mb-0 alert alert-' + (type == 'h' ? 'primary' : 'danger')}>
                     <strong>{protein.accession}</strong> - {protein.name} - {protein.description}
                     <button
                         type="button"

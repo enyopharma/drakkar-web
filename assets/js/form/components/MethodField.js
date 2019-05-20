@@ -20,7 +20,7 @@ const MethodField = ({ method, select, unselect }) => {
                 </SearchField>
             </div>
             {method == null ? null : (
-                <div className="alert alert-info">
+                <div className="mb-0 alert alert-info">
                     <strong>{method.psimi_id}</strong> - {method.name}
                     <button
                         type="button"
