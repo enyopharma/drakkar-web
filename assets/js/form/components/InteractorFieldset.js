@@ -17,8 +17,7 @@ const InteractorFieldset = ({ i, type, interactor, actions }) => {
                 type={type}
                 protein={interactor.protein}
                 processing={processing}
-                select={actions.selectProtein}
-                unselect={actions.unselectProtein}
+                actions={actions}
             />
             {interactor.protein == null ? null : (
                 <InteractorEditor

@@ -14,13 +14,11 @@ const MethodField = ({ method, select, unselect }) => {
 
     return (
         <React.Fragment>
-            <SearchField
-                display={method == null}
-                search={search}
-                select={select}
-            >
-                Search a method...
-            </SearchField>
+            <div style={{display: method == null ? 'block' : 'none'}}>
+                <SearchField value={method} search={search} select={select}>
+                    Search a method...
+                </SearchField>
+            </div>
             {method == null ? null : (
                 <div className="alert alert-info">
                     <strong>{method.psimi_id}</strong> - {method.name}

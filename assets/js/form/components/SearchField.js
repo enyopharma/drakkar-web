@@ -1,24 +1,23 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 
-let timeout = null;
-
-const SearchField = ({ search, select, display = true, max=5, children }) => {
+const SearchField = ({ search, select, max=5, children }) => {
+    const timeout = useRef(null)
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [visible, setVisible] = useState(false)
     const [active, setActive] = useState(0)
 
     useEffect(() => {
-        if (timeout) clearTimeout(timeout)
+        if (timeout.current) clearTimeout(timeout.current)
 
-        if (query.trim() == '') return
-
-        timeout = setTimeout(() => {
-            search(query).then(results => setResults(results))
+        timeout.current = setTimeout(() => {
+            query.trim() == ''
+                ? setResults([])
+                : search(query).then(results => setResults(results))
         }, 100)
     }, [query])
 
-    useEffect(() => setActive(0), [visible])
+    useEffect(() => setActive(0), [results])
 
     const selectValue = value => {
         setVisible(false)
@@ -26,34 +25,42 @@ const SearchField = ({ search, select, display = true, max=5, children }) => {
     }
 
     const handleKeyDown = e => {
-        const k = e.keyCode;
-
-        if (k == 13 || k == 27 || k == 38 || k == 40) {
-            const length = results.length > max
-                ? results.slice(0, max).length
-                : results.length
-
-            if (k == 13) selectValue(results[active].value)
-            if (k == 38) setActive(active == 0 ? length - 1 : active - 1)
-            if (k == 40) setActive((active + 1) % length)
+        if (e.keyCode == 27) {
+            setVisible(false)
+            return
         }
+
+        if (! visible && (e.keyCode == 38 || e.keyCode == 40)) {
+            setVisible(true)
+            return
+        }
+
+        if (e.keyCode == 13 && results[active]) {
+            selectValue(results[active].value)
+            return
+        }
+
+        const length = results.length > max
+            ? results.slice(0, max).length
+            : results.length
+
+        if (e.keyCode == 38) setActive(active == 0 ? length - 1 : active - 1)
+        if (e.keyCode == 40) setActive((active + 1) % length)
     }
 
-    return ! display ? null : (
+    return (
         <React.Fragment>
             <input
                 type="text"
                 placeholder={children}
                 className="form-control"
                 value={query}
-                onClick={e => setVisible(true)}
                 onFocus={e => setVisible(true)}
                 onBlur={e => setVisible(false)}
                 onChange={e => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
             />
-            {! visible ? null : (
-            <div style={{position: 'relative'}}>
+            <div style={{position: 'relative', display: visible && results.length > 0 ? 'block' : 'none'}}>
                 <div style={{position: 'absolute', width: '100%', zIndex: 100}}>
                     <ul className="list-group">
                     {results.slice(0, max).map((result, index) => (
@@ -69,7 +76,6 @@ const SearchField = ({ search, select, display = true, max=5, children }) => {
                     </ul>
                 </div>
             </div>
-            )}
         </React.Fragment>
     )
 }
