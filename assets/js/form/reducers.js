@@ -39,7 +39,7 @@ const reducers = {
     name: (state = '', action) => {
         switch (action.type) {
             case actions.SELECT_PROTEIN:
-                return action.protein.type == 'h'
+                return action.protein.type == 'h' || action.protein.matures.length == 0
                     ? action.protein.name
                     : ''
             case actions.UNSELECT_PROTEIN:
@@ -54,7 +54,9 @@ const reducers = {
     start: (state = 0, action) => {
         switch (action.type) {
             case actions.SELECT_PROTEIN:
-                return action.protein.type == 'h' ? 1 : ''
+                return action.protein.type == 'h' || action.protein.matures.length == 0
+                    ? 1
+                    : ''
             case actions.UNSELECT_PROTEIN:
                 return ''
             case actions.UPDATE_MATURE:
@@ -67,7 +69,7 @@ const reducers = {
     stop: (state = 0, action) => {
         switch (action.type) {
             case actions.SELECT_PROTEIN:
-                return action.protein.type == 'h'
+                return action.protein.type == 'h' || action.protein.matures.length == 0
                     ? action.protein.sequence.length
                     : ''
             case actions.UNSELECT_PROTEIN:

@@ -9,9 +9,9 @@ const MatureProteinEditor = ({ interactor, update, cancel }) => {
     const sequence = interactor.protein.sequence
     const matures = interactor.protein.matures
 
-    const [name, setName] = useState(matures.length == 0 ? interactor.protein.name : '')
-    const [start, setStart] = useState(matures.length == 0 ? 1 : '')
-    const [stop, setStop] = useState(matures.length == 0 ? sequence.length : '')
+    const [name, setName] = useState(interactor.name)
+    const [start, setStart] = useState(interactor.start)
+    const [stop, setStop] = useState(interactor.stop)
 
     const isNameValid = matures.filter(m => m.name == name.trim()).length == 0
 
