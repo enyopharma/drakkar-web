@@ -1,50 +1,74 @@
-import React, { useState } from 'react'
+import React, { useReducer } from 'react'
 
 import CoordinateField from './CoordinateField'
 import ExtractFormGroup from './ExtractFormGroup'
 import MatureProteinList from './MatureProteinList'
 import SubsequenceFormGroup from './SubsequenceFormGroup'
 
-const MatureProteinEditor = ({ interactor, update, cancel }) => {
-    const sequence = interactor.protein.sequence
-    const matures = interactor.protein.matures
-
-    const [name, setName] = useState(interactor.name)
-    const [start, setStart] = useState(interactor.start)
-    const [stop, setStop] = useState(interactor.stop)
-
-    const isNameValid = matures.filter(m => m.name == name.trim()).length == 0
-
-    const areCoordinatesValid = start == '' || stop == ''
-        || (start <= stop && matures.filter(m => m.start == start && m.stop == stop).length == 0)
-
-    const isMatureValid = name.trim() != ''
-        && start != ''
-        && stop != ''
-        && isNameValid
-        && areCoordinatesValid
-
-    const selectMature = (mature) => {
-        update(mature)
-        cancel()
+const reducer = (state, action) => {
+    switch (action.type) {
+        case 'set.name':
+            return { name: action.name, start: state.start, stop: state.stop }
+        break;
+        case 'set.start':
+            return { name: state.name, start: action.start, stop: state.stop }
+        break;
+        case 'set.stop':
+            return { name: state.name, start: state.start, stop: action.stop }
+        break;
+        case 'set.coordinates':
+            return { name: state.name, start: action.start, stop: action.stop }
+        break;
+        default:
+            throw new Error(`MatureProteinEditor: invalid state ${action.type}.`)
     }
+}
 
-    const setCoordinates = (start, stop) => {
-        setStart(start)
-        setStop(stop)
-    }
+const MatureProteinEditor = ({ name, start, stop, protein, update }) => {
+    const [state, dispatch] = useReducer(reducer, { name: name, start: start, stop: stop })
+
+    const setName = name => dispatch({ type: 'set.name', name: name })
+    const setStart = start => dispatch({ type: 'set.start', start: start })
+    const setStop = stop => dispatch({ type: 'set.stop', stop: stop })
+    const setCoordinates = (start, stop) => dispatch({ type: 'set.coordinates', start: start, stop: stop })
+
+    const isNameSet = state.name.trim() != ''
+
+    const areCoordinatesSet = state.start != '' && state.stop != ''
+
+    const doesNameExist = protein.matures.filter(m => {
+        return m.name == state.name.trim()
+    }).length > 0
+
+    const doCoordinatesExist = protein.matures.filter(m => {
+        return m.start == state.start
+            && m.stop == state.stop
+    }).length > 0
+
+    const doesMatureExist = protein.matures.filter(m => {
+        return m.name == state.name.trim()
+            && m.start == state.start
+            && m.stop == state.stop
+    }).length > 0
+
+    const isNameValid = ! isNameSet || ! doesNameExist || doesMatureExist
+
+    const areCoordinatesValid = ! areCoordinatesSet || ! doCoordinatesExist || doesMatureExist
+
+    const isMatureValid = isNameSet && areCoordinatesSet
+        && (doesMatureExist || (! doesNameExist && ! doCoordinatesExist))
 
     const handleValidate = () => {
-        selectMature({name: name.trim(), start: start, stop: stop})
+        update({name: state.name.trim(), start: state.start, stop: state.stop})
     }
 
     const handleReset = () => {
-        setCoordinates(1, sequence.length)
+        setCoordinates(1, protein.sequence.length)
     }
 
     return (
         <React.Fragment>
-            {matures.length == 0 ? (
+            {protein.matures.length == 0 ? (
                 <p>
                     No sequence defined on this uniprot entry yet.
                 </p>
@@ -55,7 +79,7 @@ const MatureProteinEditor = ({ interactor, update, cancel }) => {
                     </p>
                     <div className="row">
                         <div className="col">
-                            <MatureProteinList matures={matures} select={selectMature} />
+                            <MatureProteinList matures={protein.matures} select={update} />
                         </div>
                     </div>
                 </React.Fragment>
@@ -66,15 +90,15 @@ const MatureProteinEditor = ({ interactor, update, cancel }) => {
                         type="text"
                         className={'form-control' + (isNameValid ? '' : ' is-invalid')}
                         placeholder="Name"
-                        value={name}
+                        value={state.name}
                         onChange={e => setName(e.target.value)}
                     />
                 </div>
                 <div className="col-3">
                     <CoordinateField
-                        value={start}
+                        value={state.start}
                         set={setStart}
-                        max={sequence.length}
+                        max={protein.sequence.length}
                         valid={areCoordinatesValid}
                     >
                         Start
@@ -82,9 +106,9 @@ const MatureProteinEditor = ({ interactor, update, cancel }) => {
                 </div>
                 <div className="col-3">
                     <CoordinateField
-                        value={stop}
+                        value={state.stop}
                         set={setStop}
-                        max={sequence.length}
+                        max={protein.sequence.length}
                         valid={areCoordinatesValid}
                     >
                         Stop
@@ -101,10 +125,10 @@ const MatureProteinEditor = ({ interactor, update, cancel }) => {
                     </button>
                 </div>
             </div>
-            <SubsequenceFormGroup sequence={sequence} set={setCoordinates}>
+            <SubsequenceFormGroup sequence={protein.sequence} set={setCoordinates}>
                 Extract coordinates
             </SubsequenceFormGroup>
-            <ExtractFormGroup sequence={sequence} set={setCoordinates}>
+            <ExtractFormGroup sequence={protein.sequence} set={setCoordinates}>
                 Extract coordinates
             </ExtractFormGroup>
             <div className="row">

@@ -59,6 +59,7 @@ const SearchField = ({ search, select, max=5, children }) => {
                 onBlur={e => setVisible(false)}
                 onChange={e => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
+                style={{height: 'auto', padding: '0.75rem'}}
             />
             <div style={{position: 'relative', display: visible && results.length > 0 ? 'block' : 'none'}}>
                 <div style={{position: 'absolute', width: '100%', zIndex: 100}}>

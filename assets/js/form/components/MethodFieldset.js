@@ -9,7 +9,7 @@ const MethodFieldset = ({ method, actions }) => (
             &nbsp;
             Method
         </legend>
-        <div className="form-group row">
+        <div className="row">
             <div className="col">
                 <MethodField
                     method={method}

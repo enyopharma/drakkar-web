@@ -1,34 +1,21 @@
-import fetch from 'cross-fetch'
-import { useSocket } from '../../hooks'
 import React, { useState } from 'react'
 
 import ExtractFormGroup from './ExtractFormGroup'
 import FeaturesFormGroup from './FeaturesFormGroup'
 import CoordinatesFormGroup from './CoordinatesFormGroup'
 
-const MappingEditor = ({ type, interactor, processing, setProcessing, add }) => {
-    const [id, setId] = useState('')
+const MappingEditor = ({ start, stop, protein, mapping, processing, fire }) => {
     const [query, setQuery] = useState('')
 
-    useSocket(id, (payload) => {
-        setId('')
-        setProcessing(false)
-        console.log(payload)
-        add(payload.alignment)
-    }, [id])
+    const sequence = protein.sequence.slice(start - 1, stop)
 
-    const sequence = interactor.protein.sequence.slice(
-        interactor.start - 1,
-        interactor.stop,
-    )
+    const canonical = { [protein.accession]: sequence }
 
-    const canonical = { [interactor.protein.accession]: sequence }
-
-    const subjects = interactor.start == 1 && interactor.stop == interactor.protein.sequence.length
-        ? Object.assign({}, canonical, interactor.protein.isoforms)
+    const subjects = start == 1 && stop == protein.sequence.length
+        ? Object.assign({}, canonical, protein.isoforms)
         : canonical
 
-    const isQueryValid = query.trim() != '' && interactor.mapping.filter(alignment => {
+    const isQueryValid = query.trim() != '' && mapping.filter(alignment => {
         return alignment.sequence == query.trim()
     }).length == 0
 
@@ -36,40 +23,41 @@ const MappingEditor = ({ type, interactor, processing, setProcessing, add }) => 
         setQuery(sequence.slice(start - 1, stop))
     }
 
-    const setFeature = feature => {
-        setCoordinates(
-            feature.start - interactor.start + 1,
-            feature.stop - interactor.start + 1,
-        )
+    const selectFeature = feature => {
+        setCoordinates(feature.start - start + 1, feature.stop - start + 1)
     }
 
     const handleClick = () => {
-        setProcessing(true)
-
-        const request = fetch('/jobs/alignments', {
-            method: 'POST',
-            headers: {
-                'accept': 'application/json',
-                'content-type': 'application/json',
-            },
-            body: JSON.stringify({
-                query: query.trim(),
-                subjects: subjects,
-            })
-        })
-
-        request
-            .then(response => response.json(), error => console.log(error))
-            .then(json => setId(json.data.id))
+        fire(query, subjects)
     }
+
+//    const fireAlignment = () => {
+//        const request = fetch('/jobs/alignments', {
+//            method: 'POST',
+//            headers: {
+//                'accept': 'application/json',
+//                'content-type': 'application/json',
+//            },
+//            body: JSON.stringify({
+//                query: query.trim(),
+//                subjects: subjects,
+//            })
+//        })
+//
+//        request
+//            .then(response => response.json(), error => console.log(error))
+//            .then(json => setId(json.data.id))
+//    }
 
     return (
         <React.Fragment>
             <FeaturesFormGroup
-                interactor={interactor}
-                set={setFeature}
+                start={start}
+                stop={stop}
+                features={protein.features}
+                select={selectFeature}
             >
-                Extract sequence to map
+                Extract feature sequence
             </FeaturesFormGroup>
             <CoordinatesFormGroup sequence={sequence} set={setQuery}>
                 Extract sequence to map

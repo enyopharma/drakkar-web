@@ -1,31 +1,25 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import MappingImg from './MappingImg'
 import MatureProteinList from './MatureProteinList'
-import MatureProteinEditor from './MatureProteinEditor'
 
-const SequenceSection = ({ type, interactor, editing, processing, setEditing, actions }) => {
-    const start = interactor.start
-    const stop = interactor.stop
-    const sequence = interactor.protein.sequence
-
-    const before = start == '' ? '' : sequence.slice(0, start - 1)
-    const after = stop == '' ? '' : sequence.slice(stop, sequence.length)
-    const selected = (start == '' || stop == '') ? sequence : sequence.slice(
+const SequenceSection = ({ name, start, stop, protein, editing, processing, edit }) => {
+    const before = start == '' ? '' : protein.sequence.slice(0, start - 1)
+    const after = stop == '' ? '' : protein.sequence.slice(stop, protein.sequence.length)
+    const selected = (start == '' || stop == '') ? protein.sequence : protein.sequence.slice(
         start - 1,
         stop,
     )
 
     return (
         <React.Fragment>
-            <h4>Sequence</h4>
             <div className="row">
                 <div className="col">
                     <input
                         type="text"
                         className="form-control"
                         placeholder="Name"
-                        value={interactor.name}
+                        value={name}
                         readOnly
                     />
                 </div>
@@ -34,7 +28,7 @@ const SequenceSection = ({ type, interactor, editing, processing, setEditing, ac
                         type="text"
                         className="form-control"
                         placeholder="Start"
-                        value={interactor.start}
+                        value={start}
                         readOnly
                     />
                 </div>
@@ -43,12 +37,12 @@ const SequenceSection = ({ type, interactor, editing, processing, setEditing, ac
                         type="text"
                         className="form-control"
                         placeholder="Stop"
-                        value={interactor.stop}
+                        value={stop}
                         readOnly
                     />
                 </div>
                 <div className="col">
-                    {editing ? (
+                    {protein.type == 'v' && editing ? (
                         <button className="btn btn-block btn-outline-danger" disabled>
                             <i className="fas fa-exclamation-triangle" />
                             &nbsp;
@@ -61,7 +55,7 @@ const SequenceSection = ({ type, interactor, editing, processing, setEditing, ac
                     )}
                 </div>
             </div>
-            <div className="form-group row">
+            <div className="row">
                 <div className="col">
                     <div style={{
                         overflowWrap: 'break-word',
@@ -75,7 +69,7 @@ const SequenceSection = ({ type, interactor, editing, processing, setEditing, ac
                         border: '1px solid #ced4da',
                         backgroundColor: '#e9ecef',
                     }}>
-                        {before == '' && after == '' ? sequence :(
+                        {before == '' && after == '' ? protein.sequence :(
                             <React.Fragment>
                                 {before}<strong>{selected}</strong>{after}
                             </React.Fragment>
@@ -85,25 +79,23 @@ const SequenceSection = ({ type, interactor, editing, processing, setEditing, ac
             </div>
             <div className="row">
                 <div className="col">
-                    <MappingImg type={type} start={start} stop={stop} length={sequence.length} />
+                    <MappingImg
+                        type={protein.type}
+                        start={start}
+                        stop={stop}
+                        length={protein.sequence.length}
+                    />
                 </div>
                 <div className="col-1">
                     <button
                         className="btn btn-block btn-warning"
-                        onClick={e => setEditing(true)}
-                        disabled={type == 'h' || processing || editing}
+                        onClick={edit}
+                        disabled={protein.type == 'h' || editing || processing}
                     >
                         <i className="fas fa-edit" />
                     </button>
                 </div>
             </div>
-            {! editing ? null : (
-                <MatureProteinEditor
-                    interactor={interactor}
-                    update={actions.updateMature}
-                    cancel={e => setEditing(false)}
-                />
-            )}
         </React.Fragment>
     )
 }

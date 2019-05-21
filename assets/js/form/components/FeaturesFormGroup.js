@@ -1,17 +1,10 @@
 import React, { useState } from 'react'
 
-const FeaturesFormGroup = ({ interactor, set, children }) => {
-    const features = interactor.protein.features
-
+const FeaturesFormGroup = ({ start, stop, features, select, children }) => {
     const [feature, setFeature] = useState('')
 
-    const isFeatureEnabled = (feature) => {
-        return interactor.start <= feature.start
-            && interactor.stop >= feature.stop
-    }
-
     const handleClick = () => {
-        set(features[feature])
+        select(features[feature])
     }
 
     return (
@@ -24,8 +17,8 @@ const FeaturesFormGroup = ({ interactor, set, children }) => {
                     disabled={features.length == 0}
                 >
                     <option value="">Please select a feature</option>
-                    {features.map((feature, index) => (
-                        <option key={index} value={index} disabled={! isFeatureEnabled(feature)}>
+                    {features.map((feature, i) => (
+                        <option key={i} value={i} disabled={feature.start < start || feature.stop > stop}>
                             {feature.key} - {feature.description} ({feature.start}, {feature.stop})
                         </option>
                     ))}
