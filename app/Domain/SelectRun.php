@@ -27,7 +27,7 @@ SQL;
 SQL;
 
     const SELECT_PUBLICATIONS_SQL = <<<SQL
-        SELECT a.run_id, a.state, p.*
+        SELECT a.run_id, a.annotation, a.state, p.*
         FROM publications AS p, associations AS a
         WHERE p.pmid = a.pmid
         AND a.run_id = ?

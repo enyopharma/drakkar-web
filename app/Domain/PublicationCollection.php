@@ -35,6 +35,7 @@ final class PublicationCollection implements \IteratorAggregate
                 'run_id' => $publication['run_id'],
                 'pmid' => $publication['pmid'],
                 'state' => $publication['state'],
+                'annotation' => $publication['annotation'],
                 'title' => $article['ArticleTitle'] ?? $publication['pmid'],
                 'abstract' => $abstract,
                 'journal' => $article['Journal']['Title'] ?? '',
