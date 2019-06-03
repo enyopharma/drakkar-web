@@ -20,11 +20,11 @@ const reducer = (state, action) => {
             return { name: state.name, start: action.start, stop: action.stop }
         break;
         default:
-            throw new Error(`MatureProteinEditor: invalid state ${action.type}.`)
+            throw new Error(`MatureProtein: invalid state ${action.type}.`)
     }
 }
 
-const MatureProteinEditor = ({ name, start, stop, protein, update }) => {
+const MatureProtein = ({ name, start, stop, protein, update }) => {
     const [state, dispatch] = useReducer(reducer, { name: name, start: start, stop: stop })
 
     const setName = name => dispatch({ type: 'set.name', name: name })
@@ -77,11 +77,7 @@ const MatureProteinEditor = ({ name, start, stop, protein, update }) => {
                     <p>
                         Existing sequences on this uniprot entry:
                     </p>
-                    <div className="row">
-                        <div className="col">
-                            <MatureProteinList matures={protein.matures} select={update} />
-                        </div>
-                    </div>
+                    <MatureProteinList matures={protein.matures} select={update} />
                 </React.Fragment>
             )}
             <div className="row">
@@ -146,4 +142,4 @@ const MatureProteinEditor = ({ name, start, stop, protein, update }) => {
     )
 }
 
-export default MatureProteinEditor;
+export default MatureProtein;

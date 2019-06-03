@@ -3,8 +3,8 @@ import React, { useReducer } from 'react'
 import api from '../api'
 import Mapping from './Mapping'
 import UniprotField from './UniprotField'
+import MatureProtein from './MatureProtein'
 import SequenceSection from './SequenceSection'
-import MatureProteinEditor from './MatureProteinEditor'
 
 const reducer = (state, action) => {
     switch (action.type) {
@@ -107,7 +107,7 @@ const InteractorFieldset = ({ i, type, interactor, actions }) => {
                         edit={startEditing}
                     />
                     {interactor.protein.type == 'h' || ! state.editing ? null : (
-                        <MatureProteinEditor
+                        <MatureProtein
                             name={interactor.name}
                             start={interactor.start}
                             stop={interactor.stop}
