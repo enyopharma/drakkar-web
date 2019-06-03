@@ -28,26 +28,8 @@ const MappingEditor = ({ start, stop, protein, mapping, processing, fire }) => {
     }
 
     const handleClick = () => {
-        fire(query, subjects)
+        fire(query.trim(), subjects)
     }
-
-//    const fireAlignment = () => {
-//        const request = fetch('/jobs/alignments', {
-//            method: 'POST',
-//            headers: {
-//                'accept': 'application/json',
-//                'content-type': 'application/json',
-//            },
-//            body: JSON.stringify({
-//                query: query.trim(),
-//                subjects: subjects,
-//            })
-//        })
-//
-//        request
-//            .then(response => response.json(), error => console.log(error))
-//            .then(json => setId(json.data.id))
-//    }
 
     return (
         <React.Fragment>

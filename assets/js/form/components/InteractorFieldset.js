@@ -1,5 +1,6 @@
 import React, { useReducer } from 'react'
 
+import api from '../api'
 import Mapping from './Mapping'
 import UniprotField from './UniprotField'
 import MappingEditor from './MappingEditor'
@@ -55,12 +56,14 @@ const InteractorFieldset = ({ i, type, interactor, actions }) => {
         actions.updateMature(mature)
     }
 
-    const fireAlignment = (sequence, subjects) => {
+    const fireAlignment = (query, subjects) => {
         startProcessing()
-        setTimeout(() => {
+
+        api.alignment(query, subjects, (alignment) => {
+            console.log(alignment)
+            actions.addAlignment({ sequence: query })
             stopProcessing()
-            actions.addAlignment({sequence: sequence})
-        }, 5000)
+        })
     }
 
     const removeAlignment = i => {

@@ -13,8 +13,8 @@ const SearchField = ({ search, select, max=5, children }) => {
         timeout.current = setTimeout(() => {
             query.trim() == ''
                 ? setResults([])
-                : search(query).then(results => setResults(results))
-        }, 100)
+                : search(query, results => setResults(results))
+        }, 500)
     }, [query])
 
     useEffect(() => setActive(0), [results])

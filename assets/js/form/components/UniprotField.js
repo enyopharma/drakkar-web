@@ -1,25 +1,32 @@
-import qs from 'query-string'
-import fetch from 'cross-fetch'
 import React from 'react'
 
+import api from '../api'
 import SearchField from './SearchField'
 
 const UniprotField = ({ type, protein, processing, select, unselect }) => {
-    const search = q => fetch('/proteins?' + qs.stringify({type: type, q: q}))
-        .then(response => response.json(), error => console.log(error))
-        .then(json => json.data.proteins.map(protein => ({
-            value: protein,
-            label: [
-                protein.accession,
-                protein.name,
-                protein.description,
-            ].join(' - '),
-        })))
+    const searchProteins = (q, handler) => {
+        api.protein.search(type, q, proteins => {
+            handler(proteins.map(protein => ({
+                value: protein,
+                label: [
+                    protein.accession,
+                    protein.name,
+                    protein.description,
+                ].join(' - '),
+            })))
+        })
+    }
+
+    const selectProtein = (protein) => {
+        api.protein.select(protein.accession, (protein) => {
+            select(protein)
+        })
+    }
 
     return (
         <React.Fragment>
             <div style={{display: protein == null ? 'block' : 'none'}}>
-                <SearchField value={protein} search={search} select={select}>
+                <SearchField value={protein} search={searchProteins} select={selectProtein}>
                     Search an uniprot entry...
                 </SearchField>
             </div>

@@ -26,10 +26,11 @@ final class AlignmentHandler implements RequestHandlerInterface
     {
         $body = (array) $request->getParsedBody();
 
+        $id = (string) $body['id'] ?? '';
         $query = (string) $body['query'] ?? '';
         $subjects = (array) $body['subjects'] ?? [];
 
-        $payload = ($this->domain)($query, $subjects);
+        $payload = ($this->domain)($id, $query, $subjects);
 
         return $payload->parsed([$this->responder, 'response']);
     }

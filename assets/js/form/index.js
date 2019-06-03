@@ -2,7 +2,6 @@ import React from 'react'
 import { render } from 'react-dom'
 import { createStore, applyMiddleware } from 'redux'
 import { Provider, connect } from 'react-redux'
-import thunk from 'redux-thunk'
 
 import Form from './components/Form'
 import actions from './actions'
@@ -54,7 +53,7 @@ window.form = {
     },
 
     edit: (id, type, state) => {
-        let store = createStore(reducer, state, applyMiddleware(thunk))
+        let store = createStore(reducer, state)
 
         render(
             <Provider store={store}><App type={type} /></Provider>,

@@ -1,4 +1,3 @@
-import fetch from 'cross-fetch'
 import actions from './actions'
 
 export default {
@@ -15,14 +14,12 @@ export default {
         }
     },
 
-    selectProtein: (i, protein) => (dispatch) => {
-        fetch('/proteins/' + protein.accession)
-            .then(response => response.json(), error => console.log(error))
-            .then(json => dispatch({
-                i: i,
-                type: actions.SELECT_PROTEIN,
-                protein: json.data.protein,
-            }))
+    selectProtein: (i, protein) => {
+        return {
+            i: i,
+            type: actions.SELECT_PROTEIN,
+            protein: protein,
+        }
     },
 
     unselectProtein: i => {
