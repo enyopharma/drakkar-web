@@ -17,7 +17,7 @@ const Mapping = ({ start, stop, protein, mapping, processing, fire, removeAlignm
         : canonical
 
     const isQueryValid = query.trim() != '' && mapping.filter(alignment => {
-        return alignment.sequence == query.trim()
+        return alignment.sequence.toUpperCase() == query.toUpperCase().trim()
     }).length == 0
 
     const setCoordinates = (start, stop) => {
@@ -29,7 +29,7 @@ const Mapping = ({ start, stop, protein, mapping, processing, fire, removeAlignm
     }
 
     const handleClick = () => {
-        fire(query.trim(), subjects)
+        fire(query.toUpperCase().trim(), subjects)
     }
 
     return (

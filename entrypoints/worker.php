@@ -36,30 +36,47 @@ while (true) {
 
     echo sprintf('%s - %s', $queue, $serialized) . PHP_EOL;
 
-    sleep(1);
-
     $payload = json_decode($serialized, true);
+
+    $query = strtoupper($payload['query']);
 
     $isoforms = [];
 
     foreach ($payload['subjects'] as $accession => $sequence) {
-        $occurences = [];
+        $sequence = strtoupper($sequence);
 
-        for ($i = 0; $i < rand(1, 3); $i++) {
-            $start = rand(1, 600);
-            $stop = rand($start, 712);
+        $cmd = implode(' ', ['/bin/alignment', $sequence, $query]);
 
-            $occurences[] = [
-                'start' => $start,
-                'stop' => $stop,
-                'identity' => 99.5,
-            ];
+        $process = new Symfony\Component\Process\Process($cmd);
+
+        try {
+            $process->mustRun();
+
+            $output = $process->getOutput();
+
+            $output = preg_replace('/[\r\n]+$/', '', trim($output));
+
+            if (! empty($output)) {
+                $lines = explode("\n", $output);
+
+                $isoforms[] = [
+                    'accession' => $accession,
+                    'occurences' => array_map(function ($line) {
+                        list($start, $stop, $identity) = explode(';', $line);
+
+                         return [
+                             'start' => $start,
+                             'stop' => $stop,
+                             'identity' => $identity,
+                         ];
+                    }, $lines),
+                ];
+            }
         }
 
-        $isoforms[] = [
-            'accession' => $accession,
-            'occurences' => $occurences,
-        ];
+        catch (Symfony\Component\Process\Exception\ProcessFailedException $e) {
+            echo $e->getMessage();
+        }
     }
 
     $client->publish('alignment', json_encode([
