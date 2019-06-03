@@ -7,9 +7,9 @@ const IsoformList = ({ type, subjects, isoforms, removeIsoform, removeOccurence 
     const max = Math.max(...Object.values(subjects).map(sequence => sequence.length))
 
     return isoforms.length == 0 ? null : (
-        <ul className="list-unstyled">
+        <ul className="list-group list-group-flush">
             {isoforms.map((isoform, j) => (
-                <li key={j}>
+                <li key={j} className="list-group-item">
                     <h5>
                         {isoform.accession}
                     </h5>
@@ -24,7 +24,7 @@ const IsoformList = ({ type, subjects, isoforms, removeIsoform, removeOccurence 
                         </div>
                         <div className="col-1">
                             <button
-                                className="btn btn-block btn-sm btn-warning"
+                                className="btn btn-block btn-warning"
                                 onClick={() => removeIsoform(j)}
                             >
                                 <i className="fas fa-trash" />
