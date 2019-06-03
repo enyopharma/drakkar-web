@@ -32,14 +32,18 @@ const mapDispatchToProps = dispatch => {
                 unselectProtein: () => dispatch(creators.unselectProtein(1)),
                 updateMature: mature => dispatch(creators.updateMature(1, mature)),
                 addAlignment: alignment => dispatch(creators.addAlignment(1, alignment)),
-                removeAlignment: index => dispatch(creators.removeAlignment(1, index)),
+                removeAlignment: ix => dispatch(creators.removeAlignment(1, ix)),
+                removeIsoform: (ix, jx) => dispatch(creators.removeIsoform(1, ix, jx)),
+                removeOccurence: (ix, jx, kx) => dispatch(creators.removeOccurence(1, ix, jx, kx)),
             },
             interactor2: {
                 selectProtein: protein => dispatch(creators.selectProtein(2, protein)),
                 unselectProtein: () => dispatch(creators.unselectProtein(2)),
                 updateMature: mature => dispatch(creators.updateMature(2, mature)),
                 addAlignment: alignment => dispatch(creators.addAlignment(2, alignment)),
-                removeAlignment: index => dispatch(creators.removeAlignment(2, index)),
+                removeAlignment: ix => dispatch(creators.removeAlignment(2, ix)),
+                removeIsoform: (ix, jx) => dispatch(creators.removeIsoform(2, ix, jx)),
+                removeOccurence: (ix, jx, kx) => dispatch(creators.removeOccurence(2, ix, jx, kx)),
             },
         }
     }

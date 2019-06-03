@@ -43,9 +43,22 @@ while (true) {
     $isoforms = [];
 
     foreach ($payload['subjects'] as $accession => $sequence) {
+        $occurences = [];
+
+        for ($i = 0; $i < rand(1, 3); $i++) {
+            $start = rand(1, 600);
+            $stop = rand($start, 712);
+
+            $occurences[] = [
+                'start' => $start,
+                'stop' => $stop,
+                'identity' => 99.5,
+            ];
+        }
+
         $isoforms[] = [
             'accession' => $accession,
-            'occurences' => [],
+            'occurences' => $occurences,
         ];
     }
 

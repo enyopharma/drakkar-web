@@ -3,7 +3,6 @@ import React, { useReducer } from 'react'
 import api from '../api'
 import Mapping from './Mapping'
 import UniprotField from './UniprotField'
-import MappingEditor from './MappingEditor'
 import SequenceSection from './SequenceSection'
 import MatureProteinEditor from './MatureProteinEditor'
 
@@ -60,14 +59,21 @@ const InteractorFieldset = ({ i, type, interactor, actions }) => {
         startProcessing()
 
         api.alignment(query, subjects, (alignment) => {
-            console.log(alignment)
-            actions.addAlignment({ sequence: query })
+            actions.addAlignment(alignment)
             stopProcessing()
         })
     }
 
     const removeAlignment = i => {
         actions.removeAlignment(i)
+    }
+
+    const removeIsoform = (i, j) => {
+        actions.removeIsoform(i, j)
+    }
+
+    const removeOccurence = (i, j, k) => {
+        actions.removeOccurence(i, j, k)
     }
 
     return (
@@ -115,23 +121,17 @@ const InteractorFieldset = ({ i, type, interactor, actions }) => {
                             Please select a sequence first.
                         </p>
                     ) : (
-                        <React.Fragment>
-                            <MappingEditor
-                                start={interactor.start}
-                                stop={interactor.stop}
-                                protein={interactor.protein}
-                                mapping={interactor.mapping}
-                                processing={state.processing}
-                                fire={fireAlignment}
-                            />
-                            <Mapping
-                                start={interactor.start}
-                                stop={interactor.stop}
-                                protein={interactor.protein}
-                                mapping={interactor.mapping}
-                                removeAlignment={removeAlignment}
-                            />
-                        </React.Fragment>
+                        <Mapping
+                            start={interactor.start}
+                            stop={interactor.stop}
+                            protein={interactor.protein}
+                            mapping={interactor.mapping}
+                            processing={state.processing}
+                            fire={fireAlignment}
+                            removeAlignment={removeAlignment}
+                            removeIsoform={removeIsoform}
+                            removeOccurence={removeOccurence}
+                        />
                     )}
                 </React.Fragment>
             )}

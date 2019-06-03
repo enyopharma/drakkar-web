@@ -45,11 +45,30 @@ export default {
         }
     },
 
-    removeAlignment: (i, index) => {
+    removeAlignment: (i, ix) => {
         return {
             i: i,
             type: actions.REMOVE_ALIGNMENT,
-            index: index,
+            ix: ix,
         }
-    }
+    },
+
+    removeIsoform: (i, ix, jx) => {
+        return {
+            i: i,
+            type: actions.REMOVE_ISOFORM,
+            ix: ix,
+            jx: jx,
+        }
+    },
+
+    removeOccurence: (i, ix, jx, kx) => {
+        return {
+            i: i,
+            type: actions.REMOVE_OCCURENCE,
+            ix: ix,
+            jx: jx,
+            kx: kx,
+        }
+    },
 }
