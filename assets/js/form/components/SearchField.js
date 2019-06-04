@@ -6,15 +6,24 @@ const SearchField = ({ search, select, max=5, children }) => {
     const [results, setResults] = useState([]);
     const [visible, setVisible] = useState(false)
     const [active, setActive] = useState(0)
+    const [searching, setSearching] = useState(false)
 
     useEffect(() => {
+        setSearching(query.trim() != '')
+
         if (timeout.current) clearTimeout(timeout.current)
 
         timeout.current = setTimeout(() => {
-            query.trim() == ''
-                ? setResults([])
-                : search(query, results => setResults(results))
-        }, 500)
+            if (query.trim() == '') {
+                setResults([])
+                setSearching(false)
+                return
+            }
+            search(query, results => {
+                setResults(results)
+                setSearching(false)
+            })
+        }, 400)
     }, [query])
 
     useEffect(() => setActive(0), [results])
@@ -50,16 +59,26 @@ const SearchField = ({ search, select, max=5, children }) => {
 
     return (
         <React.Fragment>
-            <input
-                type="text"
-                placeholder={children}
-                className="form-control form-control-lg"
-                value={query}
-                onFocus={e => setVisible(true)}
-                onBlur={e => setVisible(false)}
-                onChange={e => setQuery(e.target.value)}
-                onKeyDown={handleKeyDown}
-            />
+            <div className="input-group">
+                <div className="input-group-prepend">
+                    <span className="input-group-text">
+                        {searching
+                            ? <span className="spinner-border spinner-border-sm"></span>
+                            : <i className="fas fa-search" />
+                        }
+                    </span>
+                </div>
+                <input
+                    type="text"
+                    placeholder={children}
+                    className="form-control form-control-lg"
+                    value={query}
+                    onFocus={e => setVisible(true)}
+                    onBlur={e => setVisible(false)}
+                    onChange={e => setQuery(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                />
+            </div>
             <div style={{position: 'relative', display: visible && results.length > 0 ? 'block' : 'none'}}>
                 <div style={{position: 'absolute', width: '100%', zIndex: 100}}>
                     <ul className="list-group">
