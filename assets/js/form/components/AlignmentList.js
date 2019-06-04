@@ -3,11 +3,7 @@ import React from 'react'
 import IsoformList from './IsoformList'
 
 const AlignmentList = ({ type, subjects, alignments, remove }) => {
-    return alignments.length == 0 ? (
-        <p>
-            No alignment yet.
-        </p>
-    ) : (
+    return alignments.length == 0 ? null : (
         <React.Fragment>
             {alignments.map((alignment, i) => (
                 <div key={i} className="row">

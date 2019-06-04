@@ -1,24 +1,20 @@
 import React from 'react'
 
-import MethodField from './MethodField'
+import MethodSection from './MethodSection'
 
-const MethodFieldset = ({ method, actions }) => (
+const MethodSectionset = ({ method, actions }) => (
     <fieldset>
         <legend>
             <i className="fas fa-circle small text-info" />
             &nbsp;
             Method
         </legend>
-        <div className="row">
-            <div className="col">
-                <MethodField
-                    method={method}
-                    select={actions.selectMethod}
-                    unselect={actions.unselectMethod}
-                />
-            </div>
-        </div>
+        <MethodSection
+            method={method}
+            select={actions.selectMethod}
+            unselect={actions.unselectMethod}
+        />
     </fieldset>
 )
 
-export default MethodFieldset
+export default MethodSectionset

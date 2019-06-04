@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 
 import api from '../api'
-import Mapping from './Mapping'
-import UniprotField from './UniprotField'
-import MatureProtein from './MatureProtein'
+import UniprotSection from './UniprotSection'
+import MappingSection from './MappingSection'
 import SequenceSection from './SequenceSection'
 
 const InteractorFieldset = ({ i, type, interactor, actions }) => {
@@ -48,55 +47,46 @@ const InteractorFieldset = ({ i, type, interactor, actions }) => {
                 &nbsp;
                 Interactor {i}
             </legend>
-            <div className="row">
-                <div className="col">
-                    <UniprotField
-                        type={type}
-                        protein={interactor.protein}
-                        editable={! processing}
-                        select={selectProtein}
-                        unselect={unselectProtein}
-                    />
-                </div>
-            </div>
-            {interactor.protein == null ? null : (
-                <React.Fragment>
-                    <h4>Sequence</h4>
-                    <SequenceSection
-                        name={interactor.name}
-                        start={interactor.start}
-                        stop={interactor.stop}
-                        protein={interactor.protein}
-                        valid={! editing}
-                        editable={type == 'v' && ! editing && ! processing}
-                        edit={startEditing}
-                    />
-                    {! editing ? null : (
-                        <MatureProtein
-                            name={interactor.name}
-                            start={interactor.start}
-                            stop={interactor.stop}
-                            protein={interactor.protein}
-                            update={updateMature}
-                        />
-                    )}
-                    <h4>Mapping</h4>
-                    {editing ? (
-                        <p>
-                            Please select a sequence first.
-                        </p>
-                    ) : (
-                        <Mapping
-                            start={interactor.start}
-                            stop={interactor.stop}
-                            protein={interactor.protein}
-                            mapping={interactor.mapping}
-                            processing={processing}
-                            fire={fireAlignment}
-                            remove={removeMapping}
-                        />
-                    )}
-                </React.Fragment>
+            <h3>Uniprot</h3>
+            <UniprotSection
+                type={type}
+                protein={interactor.protein}
+                editable={! processing}
+                select={selectProtein}
+                unselect={unselectProtein}
+            />
+            <h3>Sequence</h3>
+            {interactor.protein == null ? (
+                <p>
+                    Please select an uniprot entry first.
+                </p>
+            ) : (
+                <SequenceSection
+                    name={interactor.name}
+                    start={interactor.start}
+                    stop={interactor.stop}
+                    protein={interactor.protein}
+                    editing={editing}
+                    editable={type == 'v' && ! editing && ! processing}
+                    edit={startEditing}
+                    update={updateMature}
+                />
+            )}
+            <h3>Mapping</h3>
+            {interactor.protein == null || editing ? (
+                <p>
+                    Please select a sequence first.
+                </p>
+            ) : (
+                <MappingSection
+                    start={interactor.start}
+                    stop={interactor.stop}
+                    protein={interactor.protein}
+                    mapping={interactor.mapping}
+                    processing={processing}
+                    fire={fireAlignment}
+                    remove={removeMapping}
+                />
             )}
         </fieldset>
     )

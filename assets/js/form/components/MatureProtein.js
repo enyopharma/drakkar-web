@@ -1,54 +1,34 @@
-import React, { useReducer } from 'react'
+import React, { useState } from 'react'
 
 import CoordinateField from './CoordinateField'
 import ExtractFormGroup from './ExtractFormGroup'
 import MatureProteinList from './MatureProteinList'
 import SubsequenceFormGroup from './SubsequenceFormGroup'
 
-const reducer = (state, action) => {
-    switch (action.type) {
-        case 'set.name':
-            return { name: action.name, start: state.start, stop: state.stop }
-        break;
-        case 'set.start':
-            return { name: state.name, start: action.start, stop: state.stop }
-        break;
-        case 'set.stop':
-            return { name: state.name, start: state.start, stop: action.stop }
-        break;
-        case 'set.coordinates':
-            return { name: state.name, start: action.start, stop: action.stop }
-        break;
-        default:
-            throw new Error(`MatureProtein: invalid state ${action.type}.`)
-    }
-}
-
 const MatureProtein = ({ name, start, stop, protein, update }) => {
-    const [state, dispatch] = useReducer(reducer, { name: name, start: start, stop: stop })
+    const [lname, setName] = useState(name)
+    const [lstart, setStart] = useState(start)
+    const [lstop, setStop] = useState(stop)
 
-    const setName = name => dispatch({ type: 'set.name', name: name })
-    const setStart = start => dispatch({ type: 'set.start', start: start })
-    const setStop = stop => dispatch({ type: 'set.stop', stop: stop })
-    const setCoordinates = (start, stop) => dispatch({ type: 'set.coordinates', start: start, stop: stop })
+    const setCoordinates = (start, stop) => {
+        setStart(start)
+        setStop(stop)
+    }
 
-    const isNameSet = state.name.trim() != ''
+    const isNameSet = lname.trim() != ''
 
-    const areCoordinatesSet = state.start != '' && state.stop != ''
+    const areCoordinatesSet = lstart != '' && lstop != ''
 
     const doesNameExist = protein.matures.filter(m => {
-        return m.name == state.name.trim()
+        return m.name == lname.trim()
     }).length > 0
 
     const doCoordinatesExist = protein.matures.filter(m => {
-        return m.start == state.start
-            && m.stop == state.stop
+        return m.start == lstart && m.stop == lstop
     }).length > 0
 
     const doesMatureExist = protein.matures.filter(m => {
-        return m.name == state.name.trim()
-            && m.start == state.start
-            && m.stop == state.stop
+        return m.name == lname.trim() && m.start == lstart && m.stop == lstop
     }).length > 0
 
     const isNameValid = ! isNameSet || ! doesNameExist || doesMatureExist
@@ -59,7 +39,7 @@ const MatureProtein = ({ name, start, stop, protein, update }) => {
         && (doesMatureExist || (! doesNameExist && ! doCoordinatesExist))
 
     const handleValidate = () => {
-        update({name: state.name.trim(), start: state.start, stop: state.stop})
+        update({name: lname.trim(), start: lstart, stop: lstop})
     }
 
     const handleReset = () => {
@@ -86,13 +66,13 @@ const MatureProtein = ({ name, start, stop, protein, update }) => {
                         type="text"
                         className={'form-control' + (isNameValid ? '' : ' is-invalid')}
                         placeholder="Name"
-                        value={state.name}
+                        value={lname}
                         onChange={e => setName(e.target.value)}
                     />
                 </div>
                 <div className="col-3">
                     <CoordinateField
-                        value={state.start}
+                        value={lstart}
                         set={setStart}
                         max={protein.sequence.length}
                         valid={areCoordinatesValid}
@@ -102,7 +82,7 @@ const MatureProtein = ({ name, start, stop, protein, update }) => {
                 </div>
                 <div className="col-3">
                     <CoordinateField
-                        value={state.stop}
+                        value={lstop}
                         set={setStop}
                         max={protein.sequence.length}
                         valid={areCoordinatesValid}

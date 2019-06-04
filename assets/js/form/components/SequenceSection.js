@@ -1,9 +1,9 @@
 import React from 'react'
 
 import MappingImg from './MappingImg'
-import MatureProteinList from './MatureProteinList'
+import MatureProtein from './MatureProtein'
 
-const SequenceSection = ({ name, start, stop, protein, valid, editable, edit }) => {
+const SequenceSection = ({ name, start, stop, protein, editing, editable, edit, update }) => {
     const before = start == '' ? '' : protein.sequence.slice(0, start - 1)
     const after = stop == '' ? '' : protein.sequence.slice(stop, protein.sequence.length)
     const selected = (start == '' || stop == '') ? protein.sequence : protein.sequence.slice(
@@ -42,15 +42,15 @@ const SequenceSection = ({ name, start, stop, protein, valid, editable, edit }) 
                     />
                 </div>
                 <div className="col">
-                    {valid ? (
-                        <button className="btn btn-block btn-outline-success" disabled>
-                            <i className="fas fa-check" />&nbsp;Sequence is valid
-                        </button>
-                    ) : (
+                    {editing ? (
                         <button className="btn btn-block btn-outline-danger" disabled>
                             <i className="fas fa-exclamation-triangle" />
                             &nbsp;
                             Please select a sequence.
+                        </button>
+                    ) : (
+                        <button className="btn btn-block btn-outline-success" disabled>
+                            <i className="fas fa-check" />&nbsp;Sequence is valid
                         </button>
                     )}
                 </div>
@@ -96,6 +96,15 @@ const SequenceSection = ({ name, start, stop, protein, valid, editable, edit }) 
                     </button>
                 </div>
             </div>
+            {! editing ? null : (
+                <MatureProtein
+                    name={name}
+                    start={start}
+                    stop={stop}
+                    protein={protein}
+                    update={update}
+                />
+            )}
         </React.Fragment>
     )
 }

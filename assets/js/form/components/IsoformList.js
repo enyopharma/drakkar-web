@@ -14,9 +14,9 @@ const IsoformList = ({ type, subjects, isoforms, remove }) => {
         <ul className="list-group list-group-flush">
             {isoforms.map((isoform, j) => (
                 <li key={j} className="list-group-item">
-                    <h5>
+                    <h4>
                         {isoform.accession}
-                    </h5>
+                    </h4>
                     <div className="row">
                         <div className="col">
                             <MappingImg
