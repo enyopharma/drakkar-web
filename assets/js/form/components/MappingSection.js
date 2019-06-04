@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import AlignmentList from './AlignmentList'
+import Alignment from './Alignment'
 import ExtractFormGroup from './ExtractFormGroup'
 import FeaturesFormGroup from './FeaturesFormGroup'
 import CoordinatesFormGroup from './CoordinatesFormGroup'
@@ -15,6 +15,19 @@ const MappingSection = ({ start, stop, protein, mapping, processing, fire, remov
     const subjects = start == 1 && stop == protein.sequence.length
         ? Object.assign({}, canonical, protein.isoforms)
         : canonical
+
+    const alignments = mapping.map(alignment => {
+        return {
+            sequence: alignment.sequence,
+            isoforms: alignment.isoforms.map(isoform => {
+                return {
+                    accession: isoform.accession,
+                    sequence: subjects[isoform.accession],
+                    occurences: isoform.occurences,
+                }
+            })
+        }
+    })
 
     const isQueryValid = query.trim() != '' && mapping.filter(alignment => {
         return alignment.sequence.toUpperCase() == query.toUpperCase().trim()
@@ -85,12 +98,17 @@ const MappingSection = ({ start, stop, protein, mapping, processing, fire, remov
                     </button>
                 </div>
             </div>
-            <AlignmentList
-                type={protein.type}
-                subjects={subjects}
-                alignments={mapping}
-                remove={remove}
-            />
+            {alignments.map((alignment, i) => (
+                <div key={i} className="row">
+                    <div className="col">
+                        <Alignment
+                            type={protein.type}
+                            alignment={alignment}
+                            remove={(...idxs) => remove(i, ...idxs)}
+                        />
+                    </div>
+                </div>
+            ))}
         </React.Fragment>
     )
 }
