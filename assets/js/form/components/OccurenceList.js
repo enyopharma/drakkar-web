@@ -2,7 +2,7 @@ import React from 'react'
 
 import MappingImg from './MappingImg'
 
-const OccurenceList = ({ type, length, occurences, removeOccurence }) => {
+const OccurenceList = ({ type, length, occurences, remove }) => {
     return occurences.length == 0 ? (
         <p>
             No occurence of the sequence on this isoform.
@@ -23,7 +23,7 @@ const OccurenceList = ({ type, length, occurences, removeOccurence }) => {
                         <div className="col-1">
                             <button
                                 className="btn btn-block btn-sm btn-warning"
-                                onClick={() => removeOccurence(k)}
+                                onClick={() => remove(k)}
                             >
                                 <i className="fas fa-trash" />
                             </button>

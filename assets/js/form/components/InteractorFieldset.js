@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react'
+import React, { useState } from 'react'
 
 import api from '../api'
 import Mapping from './Mapping'
@@ -6,74 +6,39 @@ import UniprotField from './UniprotField'
 import MatureProtein from './MatureProtein'
 import SequenceSection from './SequenceSection'
 
-const reducer = (state, action) => {
-    switch (action.type) {
-        case 'set.editing':
-            return { editing: action.value, processing: false }
-        break
-        case 'start.editing':
-            return { editing: true, processing: false }
-        break
-        case 'stop.editing':
-            return { editing: false, processing: false }
-        break
-
-        case 'start.processing':
-            return { editing: false, processing: true }
-        break
-        case 'stop.processing':
-            return { editing: false, processing: false }
-        break
-        default:
-            throw new Error(`InteractorFieldset: invalid state ${action.type}.`)
-    }
-}
-
 const InteractorFieldset = ({ i, type, interactor, actions }) => {
-    const [state, dispatch] = useReducer(reducer, {
-        editing: type == 'v',
-        processing: false,
-    })
-
-    const setEditing = (value) => dispatch({type: 'set.editing', value: value})
-    const startEditing = () => dispatch({type: 'start.editing'})
-    const stopEditing = () => dispatch({type: 'stop.editing'})
-    const startProcessing = () => dispatch({type: 'start.processing'})
-    const stopProcessing = () => dispatch({type: 'stop.processing'})
+    const [editing, setEditing] = useState(type == 'v')
+    const [processing, setProcessing] = useState(false)
 
     const selectProtein = (protein) => {
+        setEditing(type == 'v')
         actions.selectProtein(protein)
     }
 
     const unselectProtein = () => {
-        setEditing(type == 'v')
         actions.unselectProtein()
     }
 
+    const startEditing = () => {
+        setEditing(true)
+    }
+
     const updateMature = mature => {
-        stopEditing()
+        setEditing(false)
         actions.updateMature(mature)
     }
 
     const fireAlignment = (query, subjects) => {
-        startProcessing()
+        setProcessing(true)
 
         api.alignment(query, subjects, (alignment) => {
             actions.addAlignment(alignment)
-            stopProcessing()
+            setProcessing(false)
         })
     }
 
-    const removeAlignment = i => {
-        actions.removeAlignment(i)
-    }
-
-    const removeIsoform = (i, j) => {
-        actions.removeIsoform(i, j)
-    }
-
-    const removeOccurence = (i, j, k) => {
-        actions.removeOccurence(i, j, k)
+    const removeMapping = (...idxs) => {
+        actions.removeMapping(...idxs)
     }
 
     return (
@@ -88,7 +53,7 @@ const InteractorFieldset = ({ i, type, interactor, actions }) => {
                     <UniprotField
                         type={type}
                         protein={interactor.protein}
-                        processing={state.processing}
+                        editable={! processing}
                         select={selectProtein}
                         unselect={unselectProtein}
                     />
@@ -102,11 +67,11 @@ const InteractorFieldset = ({ i, type, interactor, actions }) => {
                         start={interactor.start}
                         stop={interactor.stop}
                         protein={interactor.protein}
-                        editing={state.editing}
-                        processing={state.processing}
+                        valid={! editing}
+                        editable={type == 'v' && ! editing && ! processing}
                         edit={startEditing}
                     />
-                    {interactor.protein.type == 'h' || ! state.editing ? null : (
+                    {! editing ? null : (
                         <MatureProtein
                             name={interactor.name}
                             start={interactor.start}
@@ -116,7 +81,7 @@ const InteractorFieldset = ({ i, type, interactor, actions }) => {
                         />
                     )}
                     <h4>Mapping</h4>
-                    {state.editing ? (
+                    {editing ? (
                         <p>
                             Please select a sequence first.
                         </p>
@@ -126,11 +91,9 @@ const InteractorFieldset = ({ i, type, interactor, actions }) => {
                             stop={interactor.stop}
                             protein={interactor.protein}
                             mapping={interactor.mapping}
-                            processing={state.processing}
+                            processing={processing}
                             fire={fireAlignment}
-                            removeAlignment={removeAlignment}
-                            removeIsoform={removeIsoform}
-                            removeOccurence={removeOccurence}
+                            remove={removeMapping}
                         />
                     )}
                 </React.Fragment>

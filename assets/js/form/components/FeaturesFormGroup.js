@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const FeaturesFormGroup = ({ start, stop, features, select, children }) => {
+const FeaturesFormGroup = ({ start, stop, features, enabled = true, select, children }) => {
     const [feature, setFeature] = useState('')
 
     const handleClick = () => {
@@ -29,7 +29,7 @@ const FeaturesFormGroup = ({ start, stop, features, select, children }) => {
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={handleClick}
-                    disabled={feature == ''}
+                    disabled={! enabled || feature == ''}
                 >
                     {children}
                 </button>

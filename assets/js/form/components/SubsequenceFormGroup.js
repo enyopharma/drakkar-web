@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 
 import { extract } from '../shared'
 
-const SubsequenceFormGroup = ({ sequence, set, children }) => {
+const SubsequenceFormGroup = ({ sequence, enabled = true, set, children }) => {
     const [subsequence, setSubsequence] = useState('')
     const [valid, setValid] = useState(true)
 
@@ -32,7 +32,7 @@ const SubsequenceFormGroup = ({ sequence, set, children }) => {
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={handleClick}
-                    disabled={subsequence.trim() == ''}
+                    disabled={! enabled || subsequence.trim() == ''}
                 >
                     {children}
                 </button>

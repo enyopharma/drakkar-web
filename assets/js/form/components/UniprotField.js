@@ -3,7 +3,7 @@ import React from 'react'
 import api from '../api'
 import SearchField from './SearchField'
 
-const UniprotField = ({ type, protein, processing, select, unselect }) => {
+const UniprotField = ({ type, protein, editable, select, unselect }) => {
     const searchProteins = (q, handler) => {
         api.protein.search(type, q, proteins => {
             handler(proteins.map(protein => ({
@@ -31,13 +31,13 @@ const UniprotField = ({ type, protein, processing, select, unselect }) => {
                 </SearchField>
             </div>
             {protein == null ? null : (
-                <div className={'mb-0 alert alert-' + (type == 'h' ? 'primary' : 'danger')}>
+                <div className={'mb-0 alert alert-' + (protein.type == 'h' ? 'primary' : 'danger')}>
                     <strong>{protein.accession}</strong> - {protein.name} - {protein.description}
                     <button
                         type="button"
                         className="close"
                         onClick={unselect}
-                        disabled={processing}
+                        disabled={! editable}
                     >
                         <span>&times;</span>
                     </button>

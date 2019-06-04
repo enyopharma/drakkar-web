@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 
 import { extract } from '../shared'
 
-const ExtractFormGroup = ({ sequence, set, children }) => {
+const ExtractFormGroup = ({ sequence, enabled = true, set, children }) => {
     const [from, setFrom] = useState('')
     const [to, setTo] = useState('')
     const [valid, setValid] = useState(true)
@@ -45,7 +45,7 @@ const ExtractFormGroup = ({ sequence, set, children }) => {
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={handleClick}
-                    disabled={from.trim() == '' || to.trim() == ''}
+                    disabled={! enabled || from.trim() == '' || to.trim() == ''}
                 >
                     {children}
                 </button>

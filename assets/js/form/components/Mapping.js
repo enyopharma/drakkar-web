@@ -5,7 +5,7 @@ import ExtractFormGroup from './ExtractFormGroup'
 import FeaturesFormGroup from './FeaturesFormGroup'
 import CoordinatesFormGroup from './CoordinatesFormGroup'
 
-const Mapping = ({ start, stop, protein, mapping, processing, fire, removeAlignment, removeIsoform, removeOccurence }) => {
+const Mapping = ({ start, stop, protein, mapping, processing, fire, remove }) => {
     const [query, setQuery] = useState('')
 
     const sequence = protein.sequence.slice(start - 1, stop)
@@ -38,14 +38,23 @@ const Mapping = ({ start, stop, protein, mapping, processing, fire, removeAlignm
                 start={start}
                 stop={stop}
                 features={protein.features}
+                enabled={! processing}
                 select={selectFeature}
             >
                 Extract feature sequence
             </FeaturesFormGroup>
-            <CoordinatesFormGroup sequence={sequence} set={setQuery}>
+            <CoordinatesFormGroup
+                sequence={sequence}
+                enabled={! processing}
+                set={setQuery}
+            >
                 Extract sequence to map
             </CoordinatesFormGroup>
-            <ExtractFormGroup sequence={sequence} set={setCoordinates}>
+            <ExtractFormGroup
+                sequence={sequence}
+                enabled={! processing}
+                set={setCoordinates}
+            >
                 Extract sequence to map
             </ExtractFormGroup>
             <div className="row">
@@ -67,9 +76,9 @@ const Mapping = ({ start, stop, protein, mapping, processing, fire, removeAlignm
                         onClick={handleClick}
                         disabled={processing || ! isQueryValid}
                     >
-                        {! processing
-                            ? <i className="fas fa-cogs" />
-                            : <span className="spinner-border spinner-border-sm"></span>
+                        {processing
+                            ? <span className="spinner-border spinner-border-sm"></span>
+                            : <i className="fas fa-cogs" />
                         }
                         &nbsp;
                         Start alignment
@@ -80,9 +89,7 @@ const Mapping = ({ start, stop, protein, mapping, processing, fire, removeAlignm
                 type={protein.type}
                 subjects={subjects}
                 alignments={mapping}
-                removeAlignment={removeAlignment}
-                removeIsoform={removeIsoform}
-                removeOccurence={removeOccurence}
+                remove={remove}
             />
         </React.Fragment>
     )

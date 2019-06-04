@@ -3,10 +3,14 @@ import React from 'react'
 import MappingImg from './MappingImg'
 import OccurenceList from './OccurenceList'
 
-const IsoformList = ({ type, subjects, isoforms, removeIsoform, removeOccurence }) => {
+const IsoformList = ({ type, subjects, isoforms, remove }) => {
     const max = Math.max(...Object.values(subjects).map(sequence => sequence.length))
 
-    return isoforms.length == 0 ? null : (
+    return isoforms.length == 0 ? (
+        <div className="card-body">
+            No isoform contains this sequence.
+        </div>
+    ) : (
         <ul className="list-group list-group-flush">
             {isoforms.map((isoform, j) => (
                 <li key={j} className="list-group-item">
@@ -25,7 +29,7 @@ const IsoformList = ({ type, subjects, isoforms, removeIsoform, removeOccurence 
                         <div className="col-1">
                             <button
                                 className="btn btn-block btn-warning"
-                                onClick={() => removeIsoform(j)}
+                                onClick={() => remove(j)}
                             >
                                 <i className="fas fa-trash" />
                             </button>
@@ -35,7 +39,7 @@ const IsoformList = ({ type, subjects, isoforms, removeIsoform, removeOccurence 
                         type={type}
                         length={max}
                         occurences={isoform.occurences}
-                        removeOccurence={k => removeOccurence(j, k)}
+                        remove={k => remove(j, k)}
                     />
                 </li>
             ))}

@@ -2,7 +2,7 @@ import React from 'react'
 
 import IsoformList from './IsoformList'
 
-const AlignmentList = ({ type, subjects, alignments, removeAlignment, removeIsoform, removeOccurence }) => {
+const AlignmentList = ({ type, subjects, alignments, remove }) => {
     return alignments.length == 0 ? (
         <p>
             No alignment yet.
@@ -26,7 +26,7 @@ const AlignmentList = ({ type, subjects, alignments, removeAlignment, removeIsof
                                     <div className="col-1">
                                         <button
                                             className="btn btn-block btn-warning"
-                                            onClick={() => removeAlignment(i)}
+                                            onClick={() => remove(i)}
                                         >
                                             <i className="fas fa-trash" />
                                         </button>
@@ -37,8 +37,7 @@ const AlignmentList = ({ type, subjects, alignments, removeAlignment, removeIsof
                                 type={type}
                                 subjects={subjects}
                                 isoforms={alignment.isoforms}
-                                removeIsoform={j => removeIsoform(i, j)}
-                                removeOccurence={(j, k) => removeOccurence(i, j, k)}
+                                remove={(...idxs) => remove(i, ...idxs)}
                             />
                         </div>
                     </div>

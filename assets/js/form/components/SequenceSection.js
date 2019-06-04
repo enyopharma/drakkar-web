@@ -3,7 +3,7 @@ import React from 'react'
 import MappingImg from './MappingImg'
 import MatureProteinList from './MatureProteinList'
 
-const SequenceSection = ({ name, start, stop, protein, editing, processing, edit }) => {
+const SequenceSection = ({ name, start, stop, protein, valid, editable, edit }) => {
     const before = start == '' ? '' : protein.sequence.slice(0, start - 1)
     const after = stop == '' ? '' : protein.sequence.slice(stop, protein.sequence.length)
     const selected = (start == '' || stop == '') ? protein.sequence : protein.sequence.slice(
@@ -42,15 +42,15 @@ const SequenceSection = ({ name, start, stop, protein, editing, processing, edit
                     />
                 </div>
                 <div className="col">
-                    {protein.type == 'v' && editing ? (
+                    {valid ? (
+                        <button className="btn btn-block btn-outline-success" disabled>
+                            <i className="fas fa-check" />&nbsp;Sequence is valid
+                        </button>
+                    ) : (
                         <button className="btn btn-block btn-outline-danger" disabled>
                             <i className="fas fa-exclamation-triangle" />
                             &nbsp;
                             Please select a sequence.
-                        </button>
-                    ) : (
-                        <button className="btn btn-block btn-outline-success" disabled>
-                            <i className="fas fa-check" />&nbsp;Sequence is valid
                         </button>
                     )}
                 </div>
@@ -90,7 +90,7 @@ const SequenceSection = ({ name, start, stop, protein, editing, processing, edit
                     <button
                         className="btn btn-block btn-warning"
                         onClick={edit}
-                        disabled={protein.type == 'h' || editing || processing}
+                        disabled={! editable}
                     >
                         <i className="fas fa-edit" />
                     </button>

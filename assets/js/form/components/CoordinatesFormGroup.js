@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 
 import CoordinateField from './CoordinateField'
 
-const CoordinatesFormGroup = ({ sequence, set, children }) => {
+const CoordinatesFormGroup = ({ sequence, enabled = true, set, children }) => {
     const max = sequence.length
 
     const [start, setStart] = useState('')
@@ -32,7 +32,7 @@ const CoordinatesFormGroup = ({ sequence, set, children }) => {
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={handleClick}
-                    disabled={start == '' || stop == ''}
+                    disabled={! enabled || start == '' || stop == ''}
                 >
                     {children}
                 </button>

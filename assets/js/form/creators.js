@@ -45,30 +45,34 @@ export default {
         }
     },
 
-    removeAlignment: (i, ix) => {
-        return {
-            i: i,
-            type: actions.REMOVE_ALIGNMENT,
-            ix: ix,
+    removeMapping: (i, ...idxs) => {
+        if (idxs.length == 1) {
+            return {
+                i: i,
+                type: actions.REMOVE_ALIGNMENT,
+                ix: idxs[0],
+            }
         }
-    },
 
-    removeIsoform: (i, ix, jx) => {
-        return {
-            i: i,
-            type: actions.REMOVE_ISOFORM,
-            ix: ix,
-            jx: jx,
+        if (idxs.length == 2) {
+            return {
+                i: i,
+                type: actions.REMOVE_ISOFORM,
+                ix: idxs[0],
+                jx: idxs[1],
+            }
         }
-    },
 
-    removeOccurence: (i, ix, jx, kx) => {
-        return {
-            i: i,
-            type: actions.REMOVE_OCCURENCE,
-            ix: ix,
-            jx: jx,
-            kx: kx,
+        if (idxs.length == 3) {
+            return {
+                i: i,
+                type: actions.REMOVE_OCCURENCE,
+                ix: idxs[0],
+                jx: idxs[1],
+                kx: idxs[2],
+            }
         }
+
+        return {}
     },
 }
