@@ -4,14 +4,12 @@ import api from '../api'
 import SearchField from './SearchField'
 
 const MethodSection = ({ method, select, unselect }) => {
-    const searchMethods = (q, handler) => {
-        api.method.search(q, methods => {
-            handler(methods.map(method => ({
-                value: method,
-                label: [method.psimi_id, method.name].join(' - '),
-            })))
-        })
-    }
+    const searchMethods = q => api.method.search(q).then(methods => {
+        return methods.map(method => ({
+            value: method,
+            label: [method.psimi_id, method.name].join(' - '),
+        }))
+    })
 
     const selectMethod = method => select(method)
 

@@ -4,25 +4,19 @@ import fetch from 'cross-fetch'
 const uuid = require('uuid/v4')
 
 const method = {
-    search: (q, handler) => {
-        fetch('/methods?' + qs.stringify({q: q}))
-            .then(response => response.json(), error => console.log(error))
-            .then(json => handler(json.data.methods))
-    }
+    search: q => fetch('/methods?' + qs.stringify({q: q}))
+        .then(response => response.json())
+        .then(json => json.data.methods)
 }
 
 const protein = {
-    search: (type, q, handler) => {
-        fetch('/proteins?' + qs.stringify({type: type, q: q}))
-            .then(response => response.json(), error => console.log(error))
-            .then(json => handler(json.data.proteins))
-    },
+    search: (type, q) => fetch('/proteins?' + qs.stringify({type: type, q: q}))
+        .then(response => response.json(), error => console.log(error))
+        .then(json => json.data.proteins),
 
-    select: (accession, handler) => {
-        fetch('/proteins/' + accession)
-            .then(response => response.json(), error => console.log(error))
-            .then(json => handler(json.data.protein))
-    },
+    select: accession => fetch('/proteins/' + accession)
+        .then(response => response.json(), error => console.log(error))
+        .then(json => json.data.protein),
 }
 
 const alignment = (query, subjects, handler) => {

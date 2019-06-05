@@ -4,24 +4,20 @@ import api from '../api'
 import SearchField from './SearchField'
 
 const UniprotSection = ({ type, protein, editable, select, unselect }) => {
-    const searchProteins = (q, handler) => {
-        api.protein.search(type, q, proteins => {
-            handler(proteins.map(protein => ({
-                value: protein,
-                label: [
-                    protein.accession,
-                    protein.name,
-                    protein.description,
-                ].join(' - '),
-            })))
-        })
-    }
+    const searchProteins = q => api.protein.search(type, q).then(proteins => {
+        return proteins.map(protein => ({
+            value: protein,
+            label: [
+                protein.accession,
+                protein.name,
+                protein.description,
+            ].join(' - '),
+        }))
+    })
 
-    const selectProtein = (protein) => {
-        api.protein.select(protein.accession, (protein) => {
-            select(protein)
-        })
-    }
+    const selectProtein = protein => api.protein.select(protein.accession)
+        .then(protein => select(protein))
+        .catch(error => console.log(error))
 
     return (
         <div className="row">

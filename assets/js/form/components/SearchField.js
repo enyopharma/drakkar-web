@@ -9,24 +9,23 @@ const SearchField = ({ search, select, max=5, children }) => {
     const [searching, setSearching] = useState(false)
 
     useEffect(() => {
-        setSearching(query.trim() != '')
-
         if (timeout.current) clearTimeout(timeout.current)
 
-        timeout.current = setTimeout(() => {
-            if (query.trim() == '') {
-                setResults([])
-                setSearching(false)
-                return
-            }
-            search(query, results => {
-                setResults(results)
-                setSearching(false)
-            })
-        }, 400)
+        setResults([])
+        setSearching(query.trim() != '')
+
+        if (query.trim() != '') {
+            timeout.current = setTimeout(() => {
+                search(query)
+                    .then(results => setResults(results))
+                    .catch(error => console.log(error))
+                    .finally(() => setSearching(false))
+            }, 400)
+        }
     }, [query])
 
     useEffect(() => setActive(0), [results])
+    useEffect(() => setVisible(! searching), [searching])
 
     const selectValue = value => {
         setVisible(false)
@@ -34,27 +33,29 @@ const SearchField = ({ search, select, max=5, children }) => {
     }
 
     const handleKeyDown = e => {
-        if (e.keyCode == 27) {
-            setVisible(false)
-            return
-        }
-
-        if (! visible && (e.keyCode == 38 || e.keyCode == 40)) {
-            setVisible(true)
-            return
-        }
-
-        if (e.keyCode == 13 && results[active]) {
-            selectValue(results[active].value)
-            return
-        }
-
         const length = results.length > max
             ? results.slice(0, max).length
             : results.length
 
-        if (e.keyCode == 38) setActive(active == 0 ? length - 1 : active - 1)
-        if (e.keyCode == 40) setActive((active + 1) % length)
+        if (! visible && (e.keyCode == 38 || e.keyCode == 40)) {
+            setVisible(true)
+        }
+
+        if (visible && e.keyCode == 27) {
+            setVisible(false)
+        }
+
+        if (visible && e.keyCode == 13 && results[active]) {
+            selectValue(results[active].value)
+        }
+
+        if (visible && e.keyCode == 38) {
+            setActive(active == 0 ? length - 1 : active - 1)
+        }
+
+        if (visible && e.keyCode == 40) {
+            setActive((active + 1) % length)
+        }
     }
 
     return (
@@ -73,6 +74,7 @@ const SearchField = ({ search, select, max=5, children }) => {
                     placeholder={children}
                     className="form-control form-control-lg"
                     value={query}
+                    onClick={e => setVisible(true)}
                     onFocus={e => setVisible(true)}
                     onBlur={e => setVisible(false)}
                     onChange={e => setQuery(e.target.value)}
