@@ -45,34 +45,11 @@ export default {
         }
     },
 
-    removeMapping: (i, ...idxs) => {
-        if (idxs.length == 1) {
-            return {
-                i: i,
-                type: actions.REMOVE_ALIGNMENT,
-                ix: idxs[0],
-            }
+    removeAlignment: (i, index) => {
+        return {
+            i: i,
+            type: actions.REMOVE_ALIGNMENT,
+            index: index,
         }
-
-        if (idxs.length == 2) {
-            return {
-                i: i,
-                type: actions.REMOVE_ISOFORM,
-                ix: idxs[0],
-                jx: idxs[1],
-            }
-        }
-
-        if (idxs.length == 3) {
-            return {
-                i: i,
-                type: actions.REMOVE_OCCURENCE,
-                ix: idxs[0],
-                jx: idxs[1],
-                kx: idxs[2],
-            }
-        }
-
-        return {}
     },
 }

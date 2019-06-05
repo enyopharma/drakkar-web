@@ -11,12 +11,12 @@ final class StartAlignment
         $this->client = $client;
     }
 
-    public function __invoke(string $id, string $query, array $subjects)
+    public function __invoke(string $id, string $query, array $sequences)
     {
         $this->client->rpush('default', json_encode([
             'id' => $id,
             'query' => $query,
-            'subjects' => $subjects,
+            'sequences' => $sequences,
         ]));
 
         return new DomainSuccess;

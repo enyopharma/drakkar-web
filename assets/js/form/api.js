@@ -19,7 +19,7 @@ const protein = {
         .then(json => json.data.protein),
 }
 
-const alignment = (query, subjects, handler) => {
+const alignment = (query, sequences, handler) => {
     const id = uuid()
 
     const socket = new WebSocket(`ws://${window.location.host}:3000`, 'app')
@@ -58,7 +58,7 @@ const alignment = (query, subjects, handler) => {
         body: JSON.stringify({
             id: id,
             query: query,
-            subjects: subjects,
+            sequences: sequences,
         })
     })
 

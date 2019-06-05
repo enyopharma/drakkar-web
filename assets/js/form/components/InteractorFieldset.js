@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 
-import api from '../api'
 import UniprotSection from './UniprotSection'
 import MappingSection from './MappingSection'
 import SequenceSection from './SequenceSection'
@@ -18,26 +17,40 @@ const InteractorFieldset = ({ i, type, interactor, actions }) => {
         actions.unselectProtein()
     }
 
-    const startEditing = () => {
+    const editSequence = () => {
         setEditing(true)
     }
 
-    const updateMature = mature => {
+    const updateSequence = mature => {
         setEditing(false)
         actions.updateMature(mature)
     }
 
-    const fireAlignment = (query, subjects) => {
-        setProcessing(true)
-
-        api.alignment(query, subjects, (alignment) => {
-            actions.addAlignment(alignment)
-            setProcessing(false)
-        })
+    const addAlignment = alignment => {
+        actions.addAlignment(alignment)
     }
 
-    const removeMapping = (...idxs) => {
-        actions.removeMapping(...idxs)
+    const removeAlignment = i => {
+        actions.removeAlignment(i)
+    }
+
+    // compute width of the sequence associated to the given accession.
+    const width = accession => {
+        if (interactor.protein != null) {
+            if (accession == interactor.protein.accession) {
+                return interactor.stop - interactor.start + 1
+            }
+
+            const isoforms = interactor.protein.isoforms.filter(isoform => {
+                return accession == isoform.accession
+            })
+
+            if (isoforms.length == 1) {
+                return isoforms.first().sequence.length
+            }
+        }
+
+        throw new Error(`Invalid accession '${accession}'.`)
     }
 
     return (
@@ -68,8 +81,8 @@ const InteractorFieldset = ({ i, type, interactor, actions }) => {
                     protein={interactor.protein}
                     editing={editing}
                     editable={type == 'v' && ! editing && ! processing}
-                    edit={startEditing}
-                    update={updateMature}
+                    edit={editSequence}
+                    update={updateSequence}
                 />
             )}
             <h3>Mapping</h3>
@@ -84,8 +97,9 @@ const InteractorFieldset = ({ i, type, interactor, actions }) => {
                     protein={interactor.protein}
                     mapping={interactor.mapping}
                     processing={processing}
-                    fire={fireAlignment}
-                    remove={removeMapping}
+                    setProcessing={setProcessing}
+                    add={addAlignment}
+                    remove={removeAlignment}
                 />
             )}
         </fieldset>

@@ -1,12 +1,8 @@
 import React from 'react'
 
-import Isoform from './Isoform'
+import MappingImg from './MappingImg'
 
-const Alignment = ({ type, alignment, remove }) => {
-    const length = Math.max(...alignment.isoforms.map(isoform => {
-        return isoform.sequence.length
-    }))
-
+const Alignment = ({ type, width, subjects, alignment, remove }) => {
     return (
         <div className="card">
             <div className="card-header">
@@ -30,14 +26,31 @@ const Alignment = ({ type, alignment, remove }) => {
                 </div>
             </div>
             <ul className="list-group list-group-flush">
-                {alignment.isoforms.map((isoform, j) => (
+                {alignment.results.map((result, j) => (
                     <li key={j} className="list-group-item">
-                        <Isoform
-                            type={type}
-                            length={length}
-                            isoform={isoform}
-                            remove={(...idxs) => remove(j, ...idxs)}
-                        />
+                        <h4>
+                            {result.accession}
+                        </h4>
+                        <p>
+                            <MappingImg
+                                type={type}
+                                start={1}
+                                stop={subjects[result.accession].length}
+                                width={width}
+                            />
+                        </p>
+                        <ul className="list-unstyled">
+                            {result.occurences.map((occurence, k) => (
+                                <li key={k}>
+                                    <MappingImg
+                                        type={type}
+                                        start={occurence.start}
+                                        stop={occurence.stop}
+                                        width={width}
+                                    />
+                                </li>
+                            ))}
+                        </ul>
                     </li>
                 ))}
             </ul>

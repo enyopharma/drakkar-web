@@ -83,7 +83,7 @@ const SequenceSection = ({ name, start, stop, protein, editing, editable, edit, 
                         type={protein.type}
                         start={start}
                         stop={stop}
-                        length={protein.sequence.length}
+                        width={protein.sequence.length}
                     />
                 </div>
                 <div className="col-1">

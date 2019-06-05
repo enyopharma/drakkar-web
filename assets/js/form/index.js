@@ -32,14 +32,14 @@ const mapDispatchToProps = dispatch => {
                 unselectProtein: () => dispatch(creators.unselectProtein(1)),
                 updateMature: mature => dispatch(creators.updateMature(1, mature)),
                 addAlignment: alignment => dispatch(creators.addAlignment(1, alignment)),
-                removeMapping: (...idxs) => dispatch(creators.removeMapping(1, ...idxs)),
+                removeAlignment: index => dispatch(creators.removeAlignment(1, index)),
             },
             interactor2: {
                 selectProtein: protein => dispatch(creators.selectProtein(2, protein)),
                 unselectProtein: () => dispatch(creators.unselectProtein(2)),
                 updateMature: mature => dispatch(creators.updateMature(2, mature)),
                 addAlignment: alignment => dispatch(creators.addAlignment(2, alignment)),
-                removeMapping: (...idxs) => dispatch(creators.removeMapping(2, ...idxs)),
+                removeAlignment: index => dispatch(creators.removeAlignment(2, index)),
             },
         }
     }

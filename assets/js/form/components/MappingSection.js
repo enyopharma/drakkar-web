@@ -1,12 +1,15 @@
 import React, { useState } from 'react'
 
+import api from '../api'
 import Alignment from './Alignment'
+import MappingModal from './MappingModal'
 import ExtractFormGroup from './ExtractFormGroup'
 import FeaturesFormGroup from './FeaturesFormGroup'
 import CoordinatesFormGroup from './CoordinatesFormGroup'
 
-const MappingSection = ({ start, stop, protein, mapping, processing, fire, remove }) => {
+const MappingSection = ({ start, stop, protein, mapping, processing, setProcessing, add, remove }) => {
     const [query, setQuery] = useState('')
+    const [alignment, setAlignment] = useState(null)
 
     const sequence = protein.sequence.slice(start - 1, stop)
 
@@ -16,18 +19,7 @@ const MappingSection = ({ start, stop, protein, mapping, processing, fire, remov
         ? Object.assign({}, canonical, protein.isoforms)
         : canonical
 
-    const alignments = mapping.map(alignment => {
-        return {
-            sequence: alignment.sequence,
-            isoforms: alignment.isoforms.map(isoform => {
-                return {
-                    accession: isoform.accession,
-                    sequence: subjects[isoform.accession],
-                    occurences: isoform.occurences,
-                }
-            })
-        }
-    })
+    const width = Math.max(...Object.values(subjects).map(subject => subject.length))
 
     const isQueryValid = query.trim() != '' && mapping.filter(alignment => {
         return alignment.sequence.toUpperCase() == query.toUpperCase().trim()
@@ -41,8 +33,27 @@ const MappingSection = ({ start, stop, protein, mapping, processing, fire, remov
         setCoordinates(feature.start - start + 1, feature.stop - start + 1)
     }
 
-    const handleClick = () => {
-        fire(query.toUpperCase().trim(), subjects)
+    const fireAlignment = () => {
+        setProcessing(true)
+
+        api.alignment(query, subjects, alignment => {
+            setAlignment(alignment)
+        })
+    }
+
+    const cancelAlignment = () => {
+        setAlignment(null)
+        setProcessing(false)
+    }
+
+    const addAlignment = alignment => {
+        add(alignment)
+        setAlignment(null)
+        setProcessing(false)
+    }
+
+    const removeAlignment = i => {
+        remove(i)
     }
 
     return (
@@ -86,7 +97,7 @@ const MappingSection = ({ start, stop, protein, mapping, processing, fire, remov
                     <button
                         type="button"
                         className="btn btn-block btn-primary"
-                        onClick={handleClick}
+                        onClick={fireAlignment}
                         disabled={processing || ! isQueryValid}
                     >
                         {processing
@@ -98,17 +109,29 @@ const MappingSection = ({ start, stop, protein, mapping, processing, fire, remov
                     </button>
                 </div>
             </div>
-            {alignments.map((alignment, i) => (
+            {mapping.map((alignment, i) => (
                 <div key={i} className="row">
                     <div className="col">
                         <Alignment
                             type={protein.type}
+                            width={width}
+                            subjects={subjects}
                             alignment={alignment}
-                            remove={(...idxs) => remove(i, ...idxs)}
+                            remove={() => removeAlignment(i)}
                         />
                     </div>
                 </div>
             ))}
+            {alignment == null ? null : (
+                <MappingModal
+                    type={protein.type}
+                    width={width}
+                    subjects={subjects}
+                    alignment={alignment}
+                    save={addAlignment}
+                    close={cancelAlignment}
+                />
+            )}
         </React.Fragment>
     )
 }
