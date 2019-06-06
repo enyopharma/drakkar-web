@@ -6,7 +6,7 @@ import MappingImg from './MappingImg';
 const indexes = alignment => {
     const indexes = []
 
-    alignment.results.map((r, i) => {
+    alignment.isoforms.map((r, i) => {
         r.occurences.map((o, j) => indexes.push([i, j]))
     })
 
@@ -15,22 +15,26 @@ const indexes = alignment => {
 
 const filteredAlignment = (alignment, selected) => {
     return Object.assign({}, alignment, {
-        results: alignment.results.map((result, i) => {
-            return Object.assign({}, result, {
-                occurences: result.occurences.filter((o, j) => {
+        isoforms: alignment.isoforms.map((isoform, i) => {
+            return Object.assign({}, isoform, {
+                occurences: isoform.occurences.filter((o, j) => {
                     return selected.filter(s => s[0] == i && s[1] == j).length == 1
                 })
             })
-        }).filter(result => result.occurences.length > 0)
+        }).filter(isoform => isoform.occurences.length > 0)
     })
 }
 
-const MappingModal = ({ type, width, subjects, alignment, save, close }) => {
+const MappingModal = ({ i, type, alignment, add, cancel }) => {
     const [selected, setSelected] = useState(indexes(alignment))
 
     const filtered = filteredAlignment(alignment, selected)
 
-    const isValid = filtered.results.length > 0
+    const maxwidth = Math.max(
+        ...alignment.isoforms.map(isoform => isoform.sequence.length)
+    )
+
+    const isValid = filtered.isoforms.length > 0
 
     const select = (i, j) => {
         setSelected(Array.concat([], selected, [[i, j]]))
@@ -56,9 +60,9 @@ const MappingModal = ({ type, width, subjects, alignment, save, close }) => {
         <Modal visible={true} dialogClassName="modal-lg">
             <div className="modal-header">
                 <h5 className="modal-title">
-                    Mapping result
+                    Mapping result on interactor {i}
                 </h5>
-                <button type="button" className="close" onClick={close}>
+                <button type="button" className="close" onClick={e => cancel()}>
                     &times;
                 </button>
             </div>
@@ -73,27 +77,27 @@ const MappingModal = ({ type, width, subjects, alignment, save, close }) => {
                     />
                 </p>
                 <ul className="list-unstyled">
-                    {alignment.results.map((result, i) => (
+                    {alignment.isoforms.map((isoform, i) => (
                         <li key={i}>
-                            <h4>{result.accession}</h4>
+                            <h4>{isoform.accession}</h4>
                             <div className="row">
                                 <div className="col-11">
                                     <MappingImg
                                         type={type}
                                         start={1}
-                                        stop={subjects[result.accession].length}
-                                        width={width}
+                                        stop={isoform.sequence.length}
+                                        width={maxwidth}
                                         active={isIsoformSelected(i)}
                                     />
                                 </div>
                             </div>
-                            {result.occurences.length == 0 ? (
+                            {isoform.occurences.length == 0 ? (
                                 <p>
                                     No alignment of the sequence on this isoform.
                                 </p>
                             ) : (
                                 <ul className="list-unstyled">
-                                    {result.occurences.map((occurence, j) => (
+                                    {isoform.occurences.map((occurence, j) => (
                                         <li key={j}>
                                             <div className="row">
                                                 <div className="col-11">
@@ -101,7 +105,7 @@ const MappingModal = ({ type, width, subjects, alignment, save, close }) => {
                                                         type={type}
                                                         start={occurence.start}
                                                         stop={occurence.stop}
-                                                        width={width}
+                                                        width={maxwidth}
                                                         active={isOccurenceSelected(i, j)}
                                                     />
                                                 </div>
@@ -124,9 +128,9 @@ const MappingModal = ({ type, width, subjects, alignment, save, close }) => {
             <div className="modal-footer">
                 <button
                     type="button"
-                    className="btn btn-block btn-info"
+                    className="btn btn-block btn-primary"
                     disabled={! isValid}
-                    onClick={e => save(filtered)}
+                    onClick={e => add(filtered)}
                 >
                     Save selected
                 </button>

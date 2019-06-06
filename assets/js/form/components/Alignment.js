@@ -1,8 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import MappingImg from './MappingImg'
 
-const Alignment = ({ type, width, subjects, alignment, remove }) => {
+const Alignment = ({ type, alignment, remove }) => {
+    const maxwidth = Math.max(
+        ...alignment.isoforms.map(isoform => isoform.sequence.length)
+    )
+
     return (
         <div className="card">
             <div className="card-header">
@@ -26,27 +30,27 @@ const Alignment = ({ type, width, subjects, alignment, remove }) => {
                 </div>
             </div>
             <ul className="list-group list-group-flush">
-                {alignment.results.map((result, j) => (
+                {alignment.isoforms.map((isoform, j) => (
                     <li key={j} className="list-group-item">
                         <h4>
-                            {result.accession}
+                            {isoform.accession}
                         </h4>
                         <p>
                             <MappingImg
                                 type={type}
                                 start={1}
-                                stop={subjects[result.accession].length}
-                                width={width}
+                                stop={isoform.sequence.length}
+                                width={maxwidth}
                             />
                         </p>
                         <ul className="list-unstyled">
-                            {result.occurences.map((occurence, k) => (
+                            {isoform.occurences.map((occurence, k) => (
                                 <li key={k}>
                                     <MappingImg
                                         type={type}
                                         start={occurence.start}
                                         stop={occurence.stop}
-                                        width={width}
+                                        width={maxwidth}
                                     />
                                 </li>
                             ))}
@@ -58,4 +62,4 @@ const Alignment = ({ type, width, subjects, alignment, remove }) => {
     )
 }
 
-export default Alignment
+export default Alignment;

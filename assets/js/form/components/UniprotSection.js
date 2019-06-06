@@ -3,8 +3,8 @@ import React from 'react'
 import api from '../api'
 import SearchField from './SearchField'
 
-const UniprotSection = ({ type, protein, editable, select, unselect }) => {
-    const searchProteins = q => api.protein.search(type, q).then(proteins => {
+const UniprotSection = ({ type, selected, editable, select, unselect }) => {
+    const search = q => api.protein.search(type, q).then(proteins => {
         return proteins.map(protein => ({
             value: protein,
             label: [
@@ -15,21 +15,17 @@ const UniprotSection = ({ type, protein, editable, select, unselect }) => {
         }))
     })
 
-    const selectProtein = protein => api.protein.select(protein.accession)
-        .then(protein => select(protein))
-        .catch(error => console.log(error))
-
     return (
         <div className="row">
             <div className="col">
-                <div style={{display: protein == null ? 'block' : 'none'}}>
-                    <SearchField search={searchProteins} select={selectProtein}>
+                <div style={{display: selected == null ? 'block' : 'none'}}>
+                    <SearchField search={search} select={select}>
                         Search an uniprot entry...
                     </SearchField>
                 </div>
-                {protein == null ? null : (
-                    <div className={'mb-0 alert alert-' + (protein.type == 'h' ? 'primary' : 'danger')}>
-                        <strong>{protein.accession}</strong> - {protein.name} - {protein.description}
+                {selected == null ? null : (
+                    <div className={'mb-0 alert alert-' + (type == 'h' ? 'primary' : 'danger')}>
+                        <strong>{selected.accession}</strong> - {selected.name} - {selected.description}
                         <button
                             type="button"
                             className="close"

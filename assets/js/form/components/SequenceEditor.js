@@ -5,30 +5,30 @@ import ExtractFormGroup from './ExtractFormGroup'
 import MatureProteinList from './MatureProteinList'
 import SubsequenceFormGroup from './SubsequenceFormGroup'
 
-const MatureProtein = ({ name, start, stop, protein, update }) => {
-    const [lname, setName] = useState(name)
-    const [lstart, setStart] = useState(start)
-    const [lstop, setStop] = useState(stop)
+const SequenceEditor = ({ sequence, mature, matures, update }) => {
+    const [name, setName] = useState(mature.name)
+    const [start, setStart] = useState(mature.start)
+    const [stop, setStop] = useState(mature.stop)
 
     const setCoordinates = (start, stop) => {
         setStart(start)
         setStop(stop)
     }
 
-    const isNameSet = lname.trim() != ''
+    const isNameSet = name.trim() != ''
 
-    const areCoordinatesSet = lstart != '' && lstop != ''
+    const areCoordinatesSet = start != '' && stop != ''
 
-    const doesNameExist = protein.matures.filter(m => {
-        return m.name == lname.trim()
+    const doesNameExist = matures.filter(m => {
+        return m.name == name.trim()
     }).length > 0
 
-    const doCoordinatesExist = protein.matures.filter(m => {
-        return m.start == lstart && m.stop == lstop
+    const doCoordinatesExist = matures.filter(m => {
+        return m.start == start && m.stop == stop
     }).length > 0
 
-    const doesMatureExist = protein.matures.filter(m => {
-        return m.name == lname.trim() && m.start == lstart && m.stop == lstop
+    const doesMatureExist = matures.filter(m => {
+        return m.name == name.trim() && m.start == start && m.stop == stop
     }).length > 0
 
     const isNameValid = ! isNameSet || ! doesNameExist || doesMatureExist
@@ -39,16 +39,16 @@ const MatureProtein = ({ name, start, stop, protein, update }) => {
         && (doesMatureExist || (! doesNameExist && ! doCoordinatesExist))
 
     const handleValidate = () => {
-        update({name: lname.trim(), start: lstart, stop: lstop})
+        update({name: name.trim(), start: start, stop: stop})
     }
 
     const handleReset = () => {
-        setCoordinates(1, protein.sequence.length)
+        setCoordinates(1, sequence.length)
     }
 
     return (
         <React.Fragment>
-            {protein.matures.length == 0 ? (
+            {matures.length == 0 ? (
                 <p>
                     No sequence defined on this uniprot entry yet.
                 </p>
@@ -57,7 +57,7 @@ const MatureProtein = ({ name, start, stop, protein, update }) => {
                     <p>
                         Existing sequences on this uniprot entry:
                     </p>
-                    <MatureProteinList matures={protein.matures} select={update} />
+                    <MatureProteinList matures={matures} select={update} />
                 </React.Fragment>
             )}
             <div className="row">
@@ -66,15 +66,15 @@ const MatureProtein = ({ name, start, stop, protein, update }) => {
                         type="text"
                         className={'form-control' + (isNameValid ? '' : ' is-invalid')}
                         placeholder="Name"
-                        value={lname}
+                        value={name}
                         onChange={e => setName(e.target.value)}
                     />
                 </div>
                 <div className="col-3">
                     <CoordinateField
-                        value={lstart}
+                        value={start}
                         set={setStart}
-                        max={protein.sequence.length}
+                        max={sequence.length}
                         valid={areCoordinatesValid}
                     >
                         Start
@@ -82,9 +82,9 @@ const MatureProtein = ({ name, start, stop, protein, update }) => {
                 </div>
                 <div className="col-3">
                     <CoordinateField
-                        value={lstop}
+                        value={stop}
                         set={setStop}
-                        max={protein.sequence.length}
+                        max={sequence.length}
                         valid={areCoordinatesValid}
                     >
                         Stop
@@ -101,10 +101,10 @@ const MatureProtein = ({ name, start, stop, protein, update }) => {
                     </button>
                 </div>
             </div>
-            <SubsequenceFormGroup sequence={protein.sequence} set={setCoordinates}>
+            <SubsequenceFormGroup sequence={sequence} set={setCoordinates}>
                 Extract coordinates
             </SubsequenceFormGroup>
-            <ExtractFormGroup sequence={protein.sequence} set={setCoordinates}>
+            <ExtractFormGroup sequence={sequence} set={setCoordinates}>
                 Extract coordinates
             </ExtractFormGroup>
             <div className="row">
@@ -122,4 +122,4 @@ const MatureProtein = ({ name, start, stop, protein, update }) => {
     )
 }
 
-export default MatureProtein;
+export default SequenceEditor;

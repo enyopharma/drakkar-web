@@ -3,27 +3,25 @@ import React from 'react'
 import api from '../api'
 import SearchField from './SearchField'
 
-const MethodSection = ({ method, select, unselect }) => {
-    const searchMethods = q => api.method.search(q).then(methods => {
+const MethodSection = ({ selected, select, unselect }) => {
+    const search = q => api.method.search(q).then(methods => {
         return methods.map(method => ({
             value: method,
             label: [method.psimi_id, method.name].join(' - '),
         }))
     })
 
-    const selectMethod = method => select(method)
-
     return (
         <div className="row">
             <div className="col">
-                <div style={{display: method == null ? 'block' : 'none'}}>
-                    <SearchField value={method} search={searchMethods} select={selectMethod}>
+                <div style={{display: selected == null ? 'block' : 'none'}}>
+                    <SearchField search={search} select={select}>
                         Search a method...
                     </SearchField>
                 </div>
-                {method == null ? null : (
+                {selected == null ? null : (
                     <div className="mb-0 alert alert-info">
-                        <strong>{method.psimi_id}</strong> - {method.name}
+                        <strong>{selected.psimi_id}</strong> - {selected.name}
                         <button
                             type="button"
                             className="close"

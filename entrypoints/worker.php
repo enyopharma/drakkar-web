@@ -36,7 +36,7 @@ while (true) {
 
     $payload = json_decode($serialized, true);
 
-    $results = [];
+    $isoforms = [];
 
     $query = strtoupper($payload['query']);
 
@@ -63,7 +63,7 @@ while (true) {
             //
         }
 
-        $results[] = [
+        $isoforms[] = [
             'accession' => $accession,
             'occurences' => array_map(function ($line) {
                 list($start, $stop, $identity) = explode(';', $line);
@@ -81,7 +81,7 @@ while (true) {
         'id' => $payload['id'],
         'alignment' => [
             'sequence' => $query,
-            'results' => $results,
+            'isoforms' => $isoforms,
         ],
     ]));
 }
