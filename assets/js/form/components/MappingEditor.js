@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 
 import ExtractFormGroup from './ExtractFormGroup'
-import FeaturesFormGroup from './FeaturesFormGroup'
+import DomainsFormGroup from './DomainsFormGroup'
 import CoordinatesFormGroup from './CoordinatesFormGroup'
 
 const MappingEditor = ({ processing, mature, mapped, fire }) => {
@@ -20,13 +20,13 @@ const MappingEditor = ({ processing, mature, mapped, fire }) => {
 
     return (
         <React.Fragment>
-            <FeaturesFormGroup
-                features={mature.features}
+            <DomainsFormGroup
+                domains={mature.domains}
                 enabled={! processing}
                 select={selectFeature}
             >
                 Extract feature sequence
-            </FeaturesFormGroup>
+            </DomainsFormGroup>
             <CoordinatesFormGroup
                 sequence={mature.sequence}
                 enabled={! processing}

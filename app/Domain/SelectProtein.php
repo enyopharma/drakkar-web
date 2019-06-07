@@ -6,15 +6,6 @@ final class SelectProtein
 {
     const NOT_FOUND = 0;
 
-    const DOMAINS = [
-        'TOPO_DOM',
-        'TRANSMEM',
-        'INTRAMEM',
-        'DOMAIN',
-        'REGION',
-        'MOTIF',
-    ];
-
     const SELECT_PROTEIN_SQL = <<<SQL
         SELECT p.id, p.type, p.accession, p.name, p.description, s.sequence
         FROM proteins AS p, sequences AS s
@@ -37,7 +28,17 @@ SQL;
         GROUP BY name, start, stop
 SQL;
 
-    const SELECT_FEATURES_SQL = <<<SQL
+    const SELECT_CHAINS_SQL = <<<SQL
+        SELECT f.key, f.description, f.start, f.stop
+        FROM sequences AS s, features AS f
+        WHERE s.id = f.sequence_id
+        AND s.is_canonical IS TRUE
+        AND s.protein_id = ?
+        AND f.key = 'CHAIN'
+        ORDER BY start ASC, stop ASC
+SQL;
+
+    const SELECT_DOMAINS_SQL = <<<SQL
         SELECT f.key, f.description, f.start, f.stop
         FROM sequences AS s, features AS f
         WHERE s.id = f.sequence_id
@@ -59,18 +60,21 @@ SQL;
         $select_protein_sth = $this->pdo->prepare(self::SELECT_PROTEIN_SQL);
         $select_isoforms_sth = $this->pdo->prepare(self::SELECT_ISOFORMS_SQL);
         $select_matures_sth = $this->pdo->prepare(self::SELECT_MATURES_SQL);
-        $select_features_sth = $this->pdo->prepare(self::SELECT_FEATURES_SQL);
+        $select_chains_sth = $this->pdo->prepare(self::SELECT_CHAINS_SQL);
+        $select_domains_sth = $this->pdo->prepare(self::SELECT_DOMAINS_SQL);
 
         $select_protein_sth->execute([$accession]);
 
         if ($protein = $select_protein_sth->fetch()) {
             $select_isoforms_sth->execute([$protein['id']]);
             $select_matures_sth->execute([$protein['id']]);
-            $select_features_sth->execute([$protein['id']]);
+            $select_chains_sth->execute([$protein['id']]);
+            $select_domains_sth->execute([$protein['id']]);
 
             $protein['isoforms'] = $select_isoforms_sth->fetchall(\PDO::FETCH_KEY_PAIR);
             $protein['matures'] = $select_matures_sth->fetchall();
-            $protein['features'] = $select_features_sth->fetchall();
+            $protein['chains'] = $select_chains_sth->fetchall();
+            $protein['domains'] = $select_domains_sth->fetchall();
 
             return new DomainSuccess([
                 'protein' => $protein,

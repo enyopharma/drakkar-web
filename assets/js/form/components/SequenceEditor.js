@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 
 import CoordinateField from './CoordinateField'
+import ChainsFormGroup from './ChainsFormGroup'
 import ExtractFormGroup from './ExtractFormGroup'
 import MatureProteinList from './MatureProteinList'
 import SubsequenceFormGroup from './SubsequenceFormGroup'
@@ -101,6 +102,9 @@ const SequenceEditor = ({ sequence, mature, matures, update }) => {
                     </button>
                 </div>
             </div>
+            <ChainsFormGroup chains={mature.chains} set={setCoordinates}>
+                Extract coordinates
+            </ChainsFormGroup>
             <SubsequenceFormGroup sequence={sequence} set={setCoordinates}>
                 Extract coordinates
             </SubsequenceFormGroup>

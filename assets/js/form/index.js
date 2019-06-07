@@ -33,18 +33,26 @@ const getsequences = ({ start, stop, protein }) => {
         : canonical
 }
 
-const getfeatures = ({ start, stop, protein }) => {
+const getchains = ({ start, stop, protein }) => {
     if (start == '' || stop == '' || protein == null) {
         return []
     }
 
-    return protein.features.map(feature => {
+    return protein.chains
+}
+
+const getdomains = ({ start, stop, protein }) => {
+    if (start == '' || stop == '' || protein == null) {
+        return []
+    }
+
+    return protein.domains.map(domain => {
         return {
-            key: feature.key,
-            description: feature.description,
-            start: feature.start - start + 1,
-            stop: feature.stop - start + 1,
-            valid: feature.start >= start && feature.stop <= stop,
+            key: domain.key,
+            description: domain.description,
+            start: domain.start - start + 1,
+            stop: domain.stop - start + 1,
+            valid: domain.start >= start && domain.stop <= stop,
         }
     })
 }
@@ -56,7 +64,8 @@ const getmature = (data) => {
         stop: data.stop,
         sequence: getmatureseq(data),
         sequences: getsequences(data),
-        features: getfeatures(data),
+        chains: getchains(data),
+        domains: getdomains(data),
     }
 }
 
@@ -116,7 +125,6 @@ const mapStateToInteractorProps = (i, type, ui, data) => {
             editor: {
                 processing: ui.processing,
                 mature: mature,
-                features: data.protein ? data.protein.features : [],
                 mapped: data.mapping.map(alignment => alignment.sequence.toUpperCase()),
             },
             modal: {
