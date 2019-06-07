@@ -33,6 +33,22 @@ const getsequences = ({ start, stop, protein }) => {
         : canonical
 }
 
+const getfeatures = ({ start, stop, protein }) => {
+    if (start == '' || stop == '' || protein == null) {
+        return []
+    }
+
+    return protein.features.map(feature => {
+        return {
+            key: feature.key,
+            description: feature.description,
+            start: feature.start - start + 1,
+            stop: feature.stop - start + 1,
+            valid: feature.start >= start && feature.stop <= stop,
+        }
+    })
+}
+
 const getmature = (data) => {
     return {
         name: data.name,
@@ -40,6 +56,7 @@ const getmature = (data) => {
         stop: data.stop,
         sequence: getmatureseq(data),
         sequences: getsequences(data),
+        features: getfeatures(data),
     }
 }
 

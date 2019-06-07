@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-const FeaturesFormGroup = ({ start, stop, features, enabled = true, select, children }) => {
+const FeaturesFormGroup = ({ features, enabled = true, select, children }) => {
     const [feature, setFeature] = useState('')
 
     const handleClick = () => {
@@ -18,8 +18,11 @@ const FeaturesFormGroup = ({ start, stop, features, enabled = true, select, chil
                 >
                     <option value="">Please select a feature</option>
                     {features.map((feature, i) => (
-                        <option key={i} value={i} disabled={feature.start < start || feature.stop > stop}>
-                            {feature.key} - {feature.description} ({feature.start}, {feature.stop})
+                        <option key={i} value={i} disabled={! feature.valid}>
+                            {feature.key} - {feature.description} [{feature.valid
+                                ? [feature.start, feature.stop].join(', ')
+                                : 'out of selected sequence'
+                            }]
                         </option>
                     ))}
                 </select>

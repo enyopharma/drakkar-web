@@ -4,7 +4,7 @@ import ExtractFormGroup from './ExtractFormGroup'
 import FeaturesFormGroup from './FeaturesFormGroup'
 import CoordinatesFormGroup from './CoordinatesFormGroup'
 
-const MappingEditor = ({ processing, mature, features, mapped, fire }) => {
+const MappingEditor = ({ processing, mature, mapped, fire }) => {
     const [query, setQuery] = useState('')
 
     const isQueryValid = query.trim() != ''
@@ -15,15 +15,13 @@ const MappingEditor = ({ processing, mature, features, mapped, fire }) => {
     }
 
     const selectFeature = feature => {
-        setCoordinates(feature.start - mature.start + 1, feature.stop - mature.start + 1)
+        setCoordinates(feature.start, feature.stop)
     }
 
     return (
         <React.Fragment>
             <FeaturesFormGroup
-                start={mature.start}
-                stop={mature.stop}
-                features={features}
+                features={mature.features}
                 enabled={! processing}
                 select={selectFeature}
             >
