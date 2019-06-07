@@ -58,7 +58,7 @@ const MappingEditor = ({ processing, protein, fire }) => {
                     <button
                         type="button"
                         className="btn btn-block btn-primary"
-                        onClick={e => fire(query)}
+                        onClick={e => fire(query, protein.sequences)}
                         disabled={processing || ! isQueryValid}
                     >
                         {processing

@@ -39,7 +39,6 @@ const mapStateToInteractorProps = (i, type, ui, data) => {
         },
         mapping: {
             selecting: ui.alignment != null,
-            sequences: protein.sequences,
             display: {
                 protein: protein,
             },
@@ -99,9 +98,7 @@ const mergeInteractorProps = (i, type, props, actions) => {
         mapping: {
             selecting: props.mapping.selecting,
             display: Object.assign(props.mapping.display, actions.mapping.display),
-            editor: Object.assign(props.mapping.editor, actions.mapping.editor, {
-                fire: query => actions.mapping.editor.fire(query, props.mapping.sequences)
-            }),
+            editor: Object.assign(props.mapping.editor, actions.mapping.editor),
             modal: Object.assign(props.mapping.modal, actions.mapping.modal),
         }
     }
