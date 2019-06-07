@@ -1,12 +1,17 @@
 import React from 'react'
 
-const SequenceDisplay = ({ sequence, mature, valid }) => {
-    const before = mature.start == '' ? '' : sequence.slice(0, mature.start - 1)
-    const after = mature.stop == '' ? '' : sequence.slice(mature.stop, sequence.length)
-    const selected = (mature.start == '' || mature.stop == '') ? sequence : sequence.slice(
-        mature.start - 1,
-        mature.stop
-    )
+const SequenceDisplay = ({ source, protein, valid }) => {
+    const before = protein.start != ''
+        ? source.sequence.slice(0, protein.start - 1)
+        : ''
+
+    const after = protein.stop != ''
+        ? source.sequence.slice(protein.stop, source.sequence.length)
+        : ''
+
+    const sequence = (protein.start != '' && protein.stop != '')
+        ? source.sequence.slice(protein.start - 1, protein.stop)
+        : source.sequence;
 
     return (
         <React.Fragment>
@@ -16,7 +21,7 @@ const SequenceDisplay = ({ sequence, mature, valid }) => {
                         type="text"
                         className="form-control"
                         placeholder="Name"
-                        value={mature.name}
+                        value={protein.name}
                         readOnly
                     />
                 </div>
@@ -25,7 +30,7 @@ const SequenceDisplay = ({ sequence, mature, valid }) => {
                         type="text"
                         className="form-control"
                         placeholder="Start"
-                        value={mature.start}
+                        value={protein.start}
                         readOnly
                     />
                 </div>
@@ -34,7 +39,7 @@ const SequenceDisplay = ({ sequence, mature, valid }) => {
                         type="text"
                         className="form-control"
                         placeholder="Stop"
-                        value={mature.stop}
+                        value={protein.stop}
                         readOnly
                     />
                 </div>
@@ -68,7 +73,7 @@ const SequenceDisplay = ({ sequence, mature, valid }) => {
                     }}>
                         {before == '' && after == '' ? sequence : (
                             <React.Fragment>
-                                {before}<strong>{selected}</strong>{after}
+                                {before}<strong>{sequence}</strong>{after}
                             </React.Fragment>
                         )}
                     </div>

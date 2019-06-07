@@ -4,14 +4,15 @@ import ExtractFormGroup from './ExtractFormGroup'
 import DomainsFormGroup from './DomainsFormGroup'
 import CoordinatesFormGroup from './CoordinatesFormGroup'
 
-const MappingEditor = ({ processing, mature, mapped, fire }) => {
+const MappingEditor = ({ processing, protein, fire }) => {
     const [query, setQuery] = useState('')
 
-    const isQueryValid = query.trim() != ''
-        && ! mapped.includes(query.toUpperCase().trim())
+    const isQueryValid = protein.mapping.filter(mapping => {
+        return query.toUpperCase().trim() == mapping.sequence.toUpperCase().trim()
+    }).length == 0
 
     const setCoordinates = (start, stop) => {
-        setQuery(mature.sequence.slice(start - 1, stop))
+        setQuery(protein.sequence.slice(start - 1, stop))
     }
 
     const selectFeature = feature => {
@@ -21,21 +22,21 @@ const MappingEditor = ({ processing, mature, mapped, fire }) => {
     return (
         <React.Fragment>
             <DomainsFormGroup
-                domains={mature.domains}
+                domains={protein.domains}
                 enabled={! processing}
                 select={selectFeature}
             >
                 Extract feature sequence
             </DomainsFormGroup>
             <CoordinatesFormGroup
-                sequence={mature.sequence}
+                sequence={protein.sequence}
                 enabled={! processing}
                 set={setQuery}
             >
                 Extract sequence to map
             </CoordinatesFormGroup>
             <ExtractFormGroup
-                sequence={mature.sequence}
+                sequence={protein.sequence}
                 enabled={! processing}
                 set={setCoordinates}
             >

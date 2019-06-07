@@ -5,90 +5,14 @@ import { Provider, connect } from 'react-redux'
 import thunk from 'redux-thunk';
 
 import Form from './components/Form'
-import actions from './actions'
-import creators from './creators'
 import reducer from './reducer'
-
-const getsequence = ({ protein }) => {
-    return protein == null ? '' : protein.sequence
-}
-
-const getmatureseq = ({ start, stop, protein }) => {
-    if (start == '' || stop == '' || protein == null) {
-        return ''
-    }
-
-    return protein.sequence.slice(start - 1, stop)
-}
-
-const getsequences = ({ start, stop, protein }) => {
-    const mature = getmatureseq(({ start, stop, protein }))
-
-    if (mature == '') return []
-
-    const canonical = { [protein.accession]: mature }
-
-    return start == 1 && stop == protein.sequence.length
-        ? Object.assign({}, canonical, protein.isoforms)
-        : canonical
-}
-
-const getchains = ({ start, stop, protein }) => {
-    if (start == '' || stop == '' || protein == null) {
-        return []
-    }
-
-    return protein.chains
-}
-
-const getdomains = ({ start, stop, protein }) => {
-    if (start == '' || stop == '' || protein == null) {
-        return []
-    }
-
-    return protein.domains.map(domain => {
-        return {
-            key: domain.key,
-            description: domain.description,
-            start: domain.start - start + 1,
-            stop: domain.stop - start + 1,
-            valid: domain.start >= start && domain.stop <= stop,
-        }
-    })
-}
-
-const getmature = (data) => {
-    return {
-        name: data.name,
-        start: data.start,
-        stop: data.stop,
-        sequence: getmatureseq(data),
-        sequences: getsequences(data),
-        chains: getchains(data),
-        domains: getdomains(data),
-    }
-}
-
-const formatAlignment = (alignment, sequences) => {
-    if (alignment == null) return {}
-
-    // inject the sequence of the isoforms.
-    return Object.assign(alignment, {
-        isoforms: alignment.isoforms.map(isoform => {
-            return Object.assign(isoform, {
-                sequence: sequences[isoform.accession]
-            })
-        })
-    })
-}
-
-const formatMapping = (mapping, sequences) => {
-    return mapping.map(alignment => formatAlignment(alignment, sequences))
-}
+import creators from './creators'
+import formatters from './formatters'
 
 const mapStateToInteractorProps = (i, type, ui, data) => {
-    const sequence = getsequence(data)
-    const mature = getmature(data)
+    const source = formatters.source(data)
+    const protein = formatters.protein(data)
+    const alignment = formatters.alignment(ui.alignment, protein.sequences)
 
     return {
         protein: {
@@ -100,37 +24,33 @@ const mapStateToInteractorProps = (i, type, ui, data) => {
             editing: ui.editing,
             display: {
                 valid: ! ui.editing,
-                sequence: sequence,
-                mature: mature,
+                source: source,
+                protein: protein,
             },
             toggle: {
-                type: type,
-                sequence: sequence,
-                mature: mature,
                 editable: type == 'v' && ! ui.editing && ! ui.processing,
+                source: source,
+                protein: protein,
             },
             editor: {
-                sequence: sequence,
-                mature: mature,
-                matures: data.protein ? data.protein.matures : [],
+                source: source,
+                protein: protein,
             }
         },
         mapping: {
             selecting: ui.alignment != null,
-            sequences: mature.sequences,
+            sequences: protein.sequences,
             display: {
-                type: type,
-                mapping: formatMapping(data.mapping, mature.sequences),
+                protein: protein,
             },
             editor: {
                 processing: ui.processing,
-                mature: mature,
-                mapped: data.mapping.map(alignment => alignment.sequence.toUpperCase()),
+                protein: protein,
             },
             modal: {
                 i: i,
                 type: type,
-                alignment: formatAlignment(ui.alignment, mature.sequences),
+                alignment: formatters.alignment(ui.alignment, protein.sequences),
             },
         }
     }

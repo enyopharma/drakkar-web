@@ -2,15 +2,15 @@ import React, { useState } from 'react'
 
 import Alignment from './Alignment'
 
-const MappingDisplay = ({ type, mapping, remove }) => {
+const MappingDisplay = ({ protein, remove }) => {
     return (
         <React.Fragment>
-            {mapping.map((alignment, i) => (
+            {protein.mapping.map((alignment, i) => (
                 <div key={i} className="row">
                     <div className="col">
                         <Alignment
                             key={i}
-                            type={type}
+                            type={protein.type}
                             alignment={alignment}
                             remove={() => remove(i)}
                         />

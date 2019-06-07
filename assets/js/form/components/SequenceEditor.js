@@ -6,10 +6,10 @@ import ExtractFormGroup from './ExtractFormGroup'
 import MatureProteinList from './MatureProteinList'
 import SubsequenceFormGroup from './SubsequenceFormGroup'
 
-const SequenceEditor = ({ sequence, mature, matures, update }) => {
-    const [name, setName] = useState(mature.name)
-    const [start, setStart] = useState(mature.start)
-    const [stop, setStop] = useState(mature.stop)
+const SequenceEditor = ({ source, protein, update }) => {
+    const [name, setName] = useState(protein.name)
+    const [start, setStart] = useState(protein.start)
+    const [stop, setStop] = useState(protein.stop)
 
     const setCoordinates = (start, stop) => {
         setStart(start)
@@ -20,15 +20,15 @@ const SequenceEditor = ({ sequence, mature, matures, update }) => {
 
     const areCoordinatesSet = start != '' && stop != ''
 
-    const doesNameExist = matures.filter(m => {
+    const doesNameExist = source.matures.filter(m => {
         return m.name == name.trim()
     }).length > 0
 
-    const doCoordinatesExist = matures.filter(m => {
+    const doCoordinatesExist = source.matures.filter(m => {
         return m.start == start && m.stop == stop
     }).length > 0
 
-    const doesMatureExist = matures.filter(m => {
+    const doesMatureExist = source.matures.filter(m => {
         return m.name == name.trim() && m.start == start && m.stop == stop
     }).length > 0
 
@@ -44,12 +44,12 @@ const SequenceEditor = ({ sequence, mature, matures, update }) => {
     }
 
     const handleReset = () => {
-        setCoordinates(1, sequence.length)
+        setCoordinates(1, source.sequence.length)
     }
 
     return (
         <React.Fragment>
-            {matures.length == 0 ? (
+            {source.matures.length == 0 ? (
                 <p>
                     No sequence defined on this uniprot entry yet.
                 </p>
@@ -58,7 +58,7 @@ const SequenceEditor = ({ sequence, mature, matures, update }) => {
                     <p>
                         Existing sequences on this uniprot entry:
                     </p>
-                    <MatureProteinList matures={matures} select={update} />
+                    <MatureProteinList matures={source.matures} select={update} />
                 </React.Fragment>
             )}
             <div className="row">
@@ -75,7 +75,7 @@ const SequenceEditor = ({ sequence, mature, matures, update }) => {
                     <CoordinateField
                         value={start}
                         set={setStart}
-                        max={sequence.length}
+                        max={source.sequence.length}
                         valid={areCoordinatesValid}
                     >
                         Start
@@ -85,7 +85,7 @@ const SequenceEditor = ({ sequence, mature, matures, update }) => {
                     <CoordinateField
                         value={stop}
                         set={setStop}
-                        max={sequence.length}
+                        max={source.sequence.length}
                         valid={areCoordinatesValid}
                     >
                         Stop
@@ -102,13 +102,15 @@ const SequenceEditor = ({ sequence, mature, matures, update }) => {
                     </button>
                 </div>
             </div>
-            <ChainsFormGroup chains={mature.chains} set={setCoordinates}>
-                Extract coordinates
-            </ChainsFormGroup>
-            <SubsequenceFormGroup sequence={sequence} set={setCoordinates}>
+            {source.chains.length == 0 ? null : (
+                <ChainsFormGroup chains={source.chains} set={setCoordinates}>
+                    Extract coordinates
+                </ChainsFormGroup>
+            )}
+            <SubsequenceFormGroup sequence={source.sequence} set={setCoordinates}>
                 Extract coordinates
             </SubsequenceFormGroup>
-            <ExtractFormGroup sequence={sequence} set={setCoordinates}>
+            <ExtractFormGroup sequence={source.sequence} set={setCoordinates}>
                 Extract coordinates
             </ExtractFormGroup>
             <div className="row">
