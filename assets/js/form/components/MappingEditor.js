@@ -7,7 +7,7 @@ import CoordinatesFormGroup from './CoordinatesFormGroup'
 const MappingEditor = ({ processing, protein, fire }) => {
     const [query, setQuery] = useState('')
 
-    const isQueryValid = protein.mapping.filter(mapping => {
+    const isQueryValid = query.trim() != '' && protein.mapping.filter(mapping => {
         return query.toUpperCase().trim() == mapping.sequence.toUpperCase().trim()
     }).length == 0
 

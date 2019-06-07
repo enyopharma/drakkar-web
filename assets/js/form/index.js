@@ -114,6 +114,22 @@ const mapStateToProps = (state, { i1type, i2type }) => {
         },
         interactor1: mapStateToInteractorProps(1, i1type, state.ui.interactor1, state.data.interactor1),
         interactor2: mapStateToInteractorProps(2, i2type, state.ui.interactor2, state.data.interactor2),
+        actions: {
+            saving: state.ui.saving,
+            feedback: state.ui.feedback,
+            savable: ! state.ui.interactor1.editing && ! state.ui.interactor2.editing
+                    && ! state.ui.interactor1.processing && ! state.ui.interactor2.processing
+                    && state.data.method != null
+                    && state.data.interactor1.protein != null
+                    && state.data.interactor1.name != ''
+                    && state.data.interactor1.start != ''
+                    && state.data.interactor1.stop != ''
+                    && state.data.interactor2.protein != null
+                    && state.data.interactor2.name != ''
+                    && state.data.interactor2.start != ''
+                    && state.data.interactor2.stop != '',
+            resetable: ! state.ui.interactor1.processing && ! state.ui.interactor2.processing,
+        },
     }
 }
 
@@ -125,18 +141,23 @@ const mapDispatchToProps = (dispatch, { i1type, i2type }) => {
         },
         interactor1: mapDispatchToInteractorProps(1, i1type, dispatch),
         interactor2: mapDispatchToInteractorProps(2, i2type, dispatch),
+        actions: {
+            save: () => dispatch(creators.save()),
+            reset: () => dispatch(creators.reset()),
+        },
     }
 }
 
-const merge = (props, actions, { i1type, i2type }) => {
+const mergeProps = (props, actions, { i1type, i2type }) => {
     return {
         method: Object.assign(props.method, actions.method),
         interactor1: mergeInteractorProps(1, i1type, props.interactor1, actions.interactor1),
         interactor2: mergeInteractorProps(2, i2type, props.interactor2, actions.interactor2),
+        actions: Object.assign(props.actions, actions.actions),
     }
 }
 
-const App = connect(mapStateToProps, mapDispatchToProps, merge)(Form);
+const App = connect(mapStateToProps, mapDispatchToProps, mergeProps)(Form);
 
 window.form = {
     create: (id, type, run_id, pmid) => {

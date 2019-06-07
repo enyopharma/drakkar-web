@@ -91,4 +91,28 @@ export default {
             }
         }
     },
+
+    save: () => {
+        return (dispatch, getState) =>  {
+            dispatch({
+                type: actions.FIRE_SAVE,
+            })
+
+            setTimeout(() => {
+                console.log(getState().data)
+
+                dispatch({
+                    type: actions.SHOW_FEEDBACK,
+                    success: true,
+                    message: getState().data,
+                })
+            }, 5000)
+        }
+    },
+
+    reset: () => {
+        return {
+            type: actions.RESET,
+        }
+    },
 }
