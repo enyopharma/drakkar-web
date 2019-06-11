@@ -8,18 +8,4 @@ return [
             return new Application;
         },
     ],
-
-    'extensions' => [
-        Application::class => function ($container, Application $app) {
-            if ($container->has('cli.commands')) {
-                $commands = $container->get('cli.commands');
-
-                foreach ($commands as $command) {
-                    $app->add($command);
-                }
-            }
-
-            return $app;
-        },
-    ],
 ];

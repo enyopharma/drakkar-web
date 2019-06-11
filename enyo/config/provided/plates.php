@@ -15,18 +15,4 @@ return [
             return new Engine(...$xs);
         },
     ],
-
-    'extensions' => [
-        Engine::class => function ($container, Engine $engine) {
-            if ($container->has('plates.extensions')) {
-                $extensions = $container->get('plates.extensions');
-
-                foreach ($extensions as $extension) {
-                    $engine->loadExtension($extension);
-                }
-            }
-
-            return $engine;
-        },
-    ],
 ];

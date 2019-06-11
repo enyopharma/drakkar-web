@@ -16,6 +16,10 @@ return [
         'plates.templates.extension' => 'php',
     ],
 
+    'mappers' => [
+        'plates.extensions' => ExtensionInterface::class,
+    ],
+
     'factories' => [
         UrlExtension::class => function ($container) {
             return new UrlExtension(
@@ -34,11 +38,13 @@ return [
         Engine::class => function ($container, Engine $engine) {
             $engine->addData(['session' => $container->get(Session::class)]);
 
+            $extensions = $container->get('plates.extensions');
+
+            foreach ($extensions as $extension) {
+                $engine->loadExtension($extension);
+            }
+
             return $engine;
         },
-    ],
-
-    'mappers' => [
-        'plates.extensions' => ExtensionInterface::class,
     ],
 ];
