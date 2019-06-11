@@ -54,7 +54,7 @@ const MappingEditor = ({ processing, protein, fire }) => {
                 </div>
             </div>
             <div className="row">
-                <div className="col">
+                <div className="col-3 offset-9">
                     <button
                         type="button"
                         className="btn btn-block btn-primary"
