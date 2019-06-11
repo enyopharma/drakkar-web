@@ -6,20 +6,24 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\Domain\SelectRun;
-use App\Domain\Publication;
+use App\ReadModel\PrecurationProjection;
 
+use Enyo\ReadModel\NotFoundException;
+use Enyo\ReadModel\OverflowException;
+use Enyo\ReadModel\UnderflowException;
 use Enyo\Http\Responders\HtmlResponder;
 
 final class ShowHandler implements RequestHandlerInterface
 {
-    private $domain;
+    private $runs;
+
+    private $publications;
 
     private $responder;
 
-    public function __construct(SelectRun $domain, HtmlResponder $responder)
+    public function __construct(PrecurationProjection $runs, HtmlResponder $responder)
     {
-        $this->domain = $domain;
+        $this->runs = $runs;
         $this->responder = $responder;
     }
 
@@ -29,46 +33,34 @@ final class ShowHandler implements RequestHandlerInterface
         $query = (array) $request->getQueryParams();
 
         $id = (int) $attributes['id'];
-        $state = $query['state'] ?? Publication::PENDING;
-        $page = (int) $query['page'];
+        $state = $query['state'] ?? \App\Domain\Publication::PENDING;
+        $page = (int) ($query['page'] ?? 1);
+        $limit = (int) ($query['limit'] ?? 20);
 
-        $payload = ($this->domain)($id, $state, $page);
-
-        return $payload->parsed($this->success($state, $page), [
-            SelectRun::NOT_FOUND => [$this->responder, 'notfound'],
-            SelectRun::INVALID_STATE => [$this->responder, 'notfound'],
-            SelectRun::UNDERFLOW => $this->underflow($id, $state),
-            SelectRun::OVERFLOW => $this->overflow($id, $state),
-        ]);
-    }
-
-    private function success(string $state, int $page): callable
-    {
-        return function (array $data) use ($state, $page) {
-            return $this->responder->template('runs/show', array_merge($data, [
+        try {
+            return $this->responder->template('runs/show', [
                 'state' => $state,
                 'page' => $page,
-            ]));
-        };
-    }
+                'run' => $this->runs->id($id, $state, $page, $limit),
+            ]);
+        }
 
-    private function underflow(int $id, string $state): callable
-    {
-        return function () use ($id, $state) {
+        catch (NotFoundException $e) {
+            return $this->responder->notfound();
+        }
+
+        catch (UnderflowException $e) {
             return $this->responder->route('runs.show', ['id' => $id], [
                 'state' => $state,
                 'page' => 1,
             ]);
-        };
-    }
+        }
 
-    private function overflow(int $id, string $state): callable
-    {
-        return function (array $data) use ($id, $state) {
+        catch (OverflowException $e) {
             return $this->responder->route('runs.show', ['id' => $id], [
                 'state' => $state,
-                'page' => $data['max'],
+                'page' => $page - 1,
             ]);
-        };
+        }
     }
 }

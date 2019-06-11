@@ -1,7 +1,7 @@
 <div class="card">
     <h4 class="card-header">
         <a
-            class="<?= $this->stateMap($publication['state'])['styles']['text'] ?>"
+            class="<?= $this->textclass($publication['state']) ?>"
             data-toggle="collapse"
             href="#pmid-<?= $publication['pmid'] ?>"
         >
@@ -13,7 +13,7 @@
             <blockquote class="blockquote mb-0">
                 <?php foreach ($publication['abstract'] as $abstract): ?>
                 <p>
-                    <?= nl2br($this->highlighted($type, $abstract)) ?>
+                    <?= nl2br($this->highlighted($type, $abstract, $publication['patterns'])) ?>
                 </p>
                 <?php endforeach; ?>
                 <footer class="blockquote-footer">
@@ -60,9 +60,9 @@
                         <button
                             type="submit"
                             name="state"
-                            value="<?= $this->selected() ?>"
+                            value="<?= $selected ?>"
                             class="btn btn-block btn-primary"
-                            <?= $this->isSelected($publication['state']) ? 'disabled' : '' ?>
+                            <?= $publication['selected'] ? 'disabled' : '' ?>
                         >
                             Selected
                         </button>
@@ -71,9 +71,9 @@
                         <button
                             type="submit"
                             name="state"
-                            value="<?= $this->discarded() ?>"
+                            value="<?= $discarded ?>"
                             class="btn btn-block btn-danger"
-                            <?= $this->isDiscarded($publication['state']) ? 'disabled' : '' ?>
+                            <?= $publication['discarded'] ? 'disabled' : '' ?>
                         >
                             Discarded
                         </button>
@@ -82,9 +82,9 @@
                         <button
                             type="submit"
                             name="state"
-                            value="<?= $this->curated() ?>"
+                            value="<?= $curated ?>"
                             class="btn btn-block btn-success"
-                            <?= $this->isSelected($publication['state']) ? '' : 'disabled' ?>
+                            <?= $publication['curated'] ? '' : 'disabled' ?>
                         >
                             Curated
                         </button>

@@ -6,26 +6,26 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\Domain\SelectRuns;
+use App\ReadModel\RunSumupProjection;
 
 use Enyo\Http\Responders\HtmlResponder;
 
 final class IndexHandler implements RequestHandlerInterface
 {
-    private $domain;
+    private $runs;
 
     private $responder;
 
-    public function __construct(SelectRuns $domain, HtmlResponder $responder)
+    public function __construct(RunSumupProjection $runs, HtmlResponder $responder)
     {
-        $this->domain = $domain;
+        $this->runs = $runs;
         $this->responder = $responder;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        return ($this->domain)()->parsed(function (array $data) {
-            return $this->responder->template('runs/index', $data);
-        });
+        return $this->responder->template('runs/index', [
+            'runs' => $this->runs->all(),
+        ]);
     }
 }

@@ -40,7 +40,7 @@
 </div>
 
 <h2>Curation runs</h2>
-<?php if ($runs->count() == 0): ?>
+<?php if (count($runs) == 0): ?>
 <p>
     There is no curation run.
 </p>
@@ -69,19 +69,19 @@
             </td>
             <td class="text-center">
                 <span class="text-warning">
-                    <?= $this->e($run['nbs'][$this->pending()]) ?>
+                    <?= $this->e($run['nbs'][$pending]) ?>
                 </span>
                 -
                 <span class="text-primary">
-                    <?= $this->e($run['nbs'][$this->selected()]) ?>
+                    <?= $this->e($run['nbs'][$selected]) ?>
                 </span>
                 -
                 <span class="text-danger">
-                    <?= $this->e($run['nbs'][$this->discarded()]) ?>
+                    <?= $this->e($run['nbs'][$discarded]) ?>
                 </span>
                 -
                 <span class="text-success">
-                    <?= $this->e($run['nbs'][$this->curated()]) ?>
+                    <?= $this->e($run['nbs'][$curated]) ?>
                 </span>
             </td>
             <td class="text-center">

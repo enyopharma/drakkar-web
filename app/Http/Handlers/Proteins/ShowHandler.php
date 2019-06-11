@@ -6,19 +6,20 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\Domain\SelectProtein;
+use App\ReadModel\ProteinProjection;
 
+use Enyo\ReadModel\NotFoundException;
 use Enyo\Http\Responders\JsonResponder;
 
 final class ShowHandler implements RequestHandlerInterface
 {
-    private $domain;
+    private $proteins;
 
     private $responder;
 
-    public function __construct(SelectProtein $domain, JsonResponder $responder)
+    public function __construct(ProteinProjection $proteins, JsonResponder $responder)
     {
-        $this->domain = $domain;
+        $this->proteins = $proteins;
         $this->responder = $responder;
     }
 
@@ -28,8 +29,14 @@ final class ShowHandler implements RequestHandlerInterface
 
         $accession = $attributes['accession'];
 
-        return ($this->domain)($accession)->parsed([$this->responder, 'response'], [
-            SelectProtein::NOT_FOUND => [$this->responder, 'notfound'],
-        ]);
+        try {
+            return $this->responder->response([
+                'protein' => $this->proteins->accession($accession),
+            ]);
+        }
+
+        catch (NotFoundException $e) {
+            return $this->responder->notfound();
+        }
     }
 }

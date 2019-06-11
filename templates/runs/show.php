@@ -14,7 +14,7 @@ $(document).ready(function () {
 </script>
 <?php $this->end(); ?>
 
-<?php if ($this->isPending($state)): ?>
+<?php if ($state == $pending): ?>
 <?php $this->push('scripts'); ?>
 <script type="text/javascript">
 $(document).ready(function () {
@@ -35,61 +35,61 @@ $(document).ready(function () {
 <ul class="nav nav-tabs nav-fill my-4">
     <li class="nav-item">
         <a
-            class="nav-link text-warning <?= $this->isPending($state) ? 'active' : '' ?>"
-            href="<?= $this->url('runs.show', $run, ['state' => $this->pending()]) ?>"
+            class="nav-link text-warning <?= $state == $pending ? 'active' : '' ?>"
+            href="<?= $this->url('runs.show', $run, ['state' => $pending]) ?>"
         >
-            Pending (<?= $nbs[$this->pending()] ?>)
+            Pending (<?= $run['nbs'][$pending] ?>)
         </a>
     </li>
     <li class="nav-item">
         <a
-            class="nav-link text-primary <?= $this->isSelected($state) ? 'active' : '' ?>"
-            href="<?= $this->url('runs.show', $run, ['state' => $this->selected()]) ?>"
+            class="nav-link text-primary <?= $state == $selected ? 'active' : '' ?>"
+            href="<?= $this->url('runs.show', $run, ['state' => $selected]) ?>"
         >
-            Selected (<?= $nbs[$this->selected()] ?>)
+            Selected (<?= $run['nbs'][$selected] ?>)
         </a>
     </li>
     <li class="nav-item">
         <a
-            class="nav-link text-danger <?= $this->isDiscarded($state) ? 'active' : '' ?>"
-            href="<?= $this->url('runs.show', $run, ['state' => $this->discarded()]) ?>"
+            class="nav-link text-danger <?= $state == $discarded ? 'active' : '' ?>"
+            href="<?= $this->url('runs.show', $run, ['state' => $discarded]) ?>"
         >
-            Discarded (<?= $nbs[$this->discarded()] ?>)
+            Discarded (<?= $run['nbs'][$discarded] ?>)
         </a>
     </li>
     <li class="nav-item">
         <a
-            class="nav-link text-success <?= $this->isCurated($state) ? 'active' : '' ?>"
-            href="<?= $this->url('runs.show', $run, ['state' => $this->curated()]) ?>"
+            class="nav-link text-success <?= $state == $curated ? 'active' : '' ?>"
+            href="<?= $this->url('runs.show', $run, ['state' => $curated]) ?>"
         >
-            Curated (<?= $nbs[$this->curated()] ?>)
+            Curated (<?= $run['nbs'][$curated] ?>)
         </a>
     </li>
 </ul>
 
 <h2 class="my-4">
-    <?= $this->stateMap($state)['header'] ?>
+    <?= $this->header($state) ?>
 </h2>
 
-<?php if ($publications->count() == 0): ?>
+<?php if ($run['publications']->count() == 0): ?>
 <p>
-    <?= $this->stateMap($state)['empty'] ?>
+    <?= $this->empty($state) ?>
 </p>
 <?php else: ?>
 <?php $this->insert('pagination/nav', [
-    'pagination' => $publications,
+    'pagination' => $run['publications'],
     'url' => $this->partialUrl('runs.show', $run, ['state' => $state]),
 ]) ?>
 <div class="row my-4">
     <div class="col">
         <?php $this->insert('publications/deck', [
             'type' => $run['type'],
-            'publications' => $publications,
+            'publications' => $run['publications'],
         ]) ?>
     </div>
 </div>
 <?php $this->insert('pagination/nav', [
-    'pagination' => $publications,
+    'pagination' => $run['publications'],
     'url' => $this->partialUrl('runs.show', $run, ['state' => $state]),
 ]) ?>
 <?php endif ?>

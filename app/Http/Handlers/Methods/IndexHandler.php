@@ -6,19 +6,19 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\Domain\SelectMethods;
+use App\ReadModel\MethodProjection;
 
 use Enyo\Http\Responders\JsonResponder;
 
 final class IndexHandler implements RequestHandlerInterface
 {
-    private $domain;
+    private $methods;
 
     private $responder;
 
-    public function __construct(SelectMethods $domain, JsonResponder $responder)
+    public function __construct(MethodProjection $methods, JsonResponder $responder)
     {
-        $this->domain = $domain;
+        $this->methods = $methods;
         $this->responder = $responder;
     }
 
@@ -28,6 +28,8 @@ final class IndexHandler implements RequestHandlerInterface
 
         $q = $query['q'] ?? '';
 
-        return ($this->domain)($q)->parsed([$this->responder, 'response']);
+        return $this->responder->response([
+            'methods' => $this->methods->search($q),
+        ]);
     }
 }

@@ -1,10 +1,10 @@
 <?php declare(strict_types=1);
 
-namespace Enyo\Data;
+namespace Enyo\ReadModel;
 
-final class Pagination implements \IteratorAggregate
+final class Pagination implements ResultSetInterface
 {
-    private $rs;
+    private $rset;
 
     private $total;
 
@@ -12,9 +12,9 @@ final class Pagination implements \IteratorAggregate
 
     private $limit;
 
-    public function __construct(ResultSet $rs, int $total, int $page, int $limit)
+    public function __construct(ResultSetInterface $rset, int $total, int $page, int $limit)
     {
-        $this->rs = $rs;
+        $this->rset = $rset;
         $this->total = $total;
         $this->page = $page;
         $this->limit = $limit;
@@ -22,12 +22,22 @@ final class Pagination implements \IteratorAggregate
 
     public function count(): int
     {
-        return $this->rs->count();
+        return $this->rset->count();
     }
 
-    public function chunks(int $size = 10): \Generator
+    public function getIterator()
     {
-        return $this->rs->chunks($size);
+        return $this->rset;
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->rset->jsonSerialize();
+    }
+
+    public function map(callable $cb): ResultSetInterface
+    {
+        return new Pagination($this->rset->map($cb));
     }
 
     public function page(): int
@@ -73,11 +83,6 @@ final class Pagination implements \IteratorAggregate
             $this->range($this->page - 3, $this->page + 3),
             $this->range($total - 1, $total)
         ];
-    }
-
-    public function getIterator()
-    {
-        return $this->rs;
     }
 
     private function link(int $page): array

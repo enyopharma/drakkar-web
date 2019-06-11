@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Enyo\Data;
+namespace Enyo\ReadModel;
 
 final class PaginationLink
 {

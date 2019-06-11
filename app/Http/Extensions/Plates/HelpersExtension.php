@@ -14,28 +14,28 @@ final class HelpersExtension implements ExtensionInterface
         Publication::PENDING => [
             'header' => 'Pending publication',
             'empty' => 'There is no pending publication.',
-            'styles' => [
+            'classes' => [
                 'text' => 'text-warning',
             ],
         ],
         Publication::SELECTED => [
             'header' => 'Selected publication',
             'empty' => 'There is no selected publication.',
-            'styles' => [
+            'classes' => [
                 'text' => 'text-primary',
             ],
         ],
         Publication::DISCARDED => [
             'header' => 'Discarded publication',
             'empty' => 'There is no discarded publication.',
-            'styles' => [
+            'classes' => [
                 'text' => 'text-danger',
             ],
         ],
         Publication::CURATED => [
             'header' => 'Curated publication',
             'empty' => 'There is no curated publication.',
-            'styles' => [
+            'classes' => [
                 'text' => 'text-success',
             ],
         ],
@@ -43,53 +43,28 @@ final class HelpersExtension implements ExtensionInterface
 
     public function register(Engine $engine)
     {
-        $engine->registerFunction('pending', function () {
-            return Publication::PENDING;
+        $engine->registerFunction('header', function (string $state) {
+            return $this->map[$state]['header'] ?? '';
         });
 
-        $engine->registerFunction('selected', function () {
-            return Publication::SELECTED;
+        $engine->registerFunction('empty', function (string $state) {
+            return $this->map[$state]['empty'] ?? '';
         });
 
-        $engine->registerFunction('discarded', function () {
-            return Publication::DISCARDED;
+        $engine->registerFunction('textclass', function (string $state) {
+            return $this->map[$state]['classes']['text'] ?? '';
         });
 
-        $engine->registerFunction('curated', function () {
-            return Publication::CURATED;
-        });
-
-        $engine->registerFunction('isPending', function (string $state) {
-            return $state === Publication::PENDING;
-        });
-
-        $engine->registerFunction('isSelected', function (string $state) {
-            return $state === Publication::SELECTED;
-        });
-
-        $engine->registerFunction('isDiscarded', function (string $state) {
-            return $state === Publication::DISCARDED;
-        });
-
-        $engine->registerFunction('isCurated', function (string $state) {
-            return $state === Publication::CURATED;
-        });
-
-        $engine->registerFunction('stateMap', function (string $state) {
-            return $this->map[$state] ?? [];
-        });
-
-        $engine->registerFunction('highlighted', function (string $type, string $str) {
+        $engine->registerFunction('highlighted', function (string $type, string $str, array $patterns) {
             $map = [
                 Run::HH => 'text-primary',
                 Run::VH => 'text-danger',
             ];
 
-            return preg_replace(
-                '/\*\*([^*]+)\*\*/',
-                sprintf('<span class="%s">$1</span>', $map[$type] ?? ''),
-                $str
-            );
+            $replacement = sprintf('<span class="%s">$1</span>', $map[$type] ?? '');
+            $replacements = array_pad([], count($patterns), $replacement);
+
+            return preg_replace($patterns, $replacements, $str);
         });
     }
 }

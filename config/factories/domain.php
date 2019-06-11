@@ -28,38 +28,8 @@ return [
             );
         },
 
-        App\Domain\SelectRun::class => function ($container) {
-            return new App\Domain\SelectRun(
-                $container->get(PDO::class)
-            );
-        },
-
-        App\Domain\SelectRuns::class => function ($container) {
-            return new App\Domain\SelectRuns(
-                $container->get(PDO::class)
-            );
-        },
-
         App\Domain\UpdatePublicationState::class => function ($container) {
             return new App\Domain\UpdatePublicationState(
-                $container->get(PDO::class)
-            );
-        },
-
-        App\Domain\SelectMethods::class => function ($container) {
-            return new App\Domain\SelectMethods(
-                $container->get(PDO::class)
-            );
-        },
-
-        App\Domain\SelectProtein::class => function ($container) {
-            return new App\Domain\SelectProtein(
-                $container->get(PDO::class)
-            );
-        },
-
-        App\Domain\SelectProteins::class => function ($container) {
-            return new App\Domain\SelectProteins(
                 $container->get(PDO::class)
             );
         },

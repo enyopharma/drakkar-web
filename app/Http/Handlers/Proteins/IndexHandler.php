@@ -6,19 +6,19 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\Domain\SelectProteins;
+use App\ReadModel\ProteinProjection;
 
 use Enyo\Http\Responders\JsonResponder;
 
 final class IndexHandler implements RequestHandlerInterface
 {
-    private $domain;
+    private $proteins;
 
     private $responder;
 
-    public function __construct(SelectProteins $domain, JsonResponder $responder)
+    public function __construct(ProteinProjection $proteins, JsonResponder $responder)
     {
-        $this->domain = $domain;
+        $this->proteins = $proteins;
         $this->responder = $responder;
     }
 
@@ -29,6 +29,8 @@ final class IndexHandler implements RequestHandlerInterface
         $type = $query['type'] ?? '';
         $q = $query['q'] ?? '';
 
-        return ($this->domain)($type, $q)->parsed([$this->responder, 'response']);
+        return $this->responder->response([
+            'proteins' => $this->proteins->search($type, $q),
+        ]);
     }
 }
