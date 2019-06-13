@@ -1,37 +1,12 @@
 <?php declare(strict_types=1);
 
-use App\Domain;
-use App\Cli\Commands;
-use App\Cli\Responders;
+use Enyo\InstanceFactory;
 
-return function ($container, $app) {
-    $responder = new Responders\Responder;
-
-    $app->add(
-        new Commands\CreateHHRunCommand(
-            $container->get(Domain\InsertRun::class),
-            $responder
-        )
-    );
-
-    $app->add(
-        new Commands\CreateVHRunCommand(
-            $container->get(Domain\InsertRun::class),
-            $responder
-        )
-    );
-
-    $app->add(
-        new Commands\PopulateRunCommand(
-            $container->get(Domain\PopulateRun::class),
-            new Responders\PopulateResponder($responder)
-        )
-    );
-
-    $app->add(
-        new Commands\PopulatePublicationCommand(
-            $container->get(Domain\PopulatePublication::class),
-            new Responders\PopulateResponder($responder)
-        )
-    );
+return function (InstanceFactory $factory) {
+    return [
+        $factory(App\Cli\Commands\CreateHHRunCommand::class),
+        $factory(App\Cli\Commands\CreateVHRunCommand::class),
+        $factory(App\Cli\Commands\PopulateRunCommand::class),
+        $factory(App\Cli\Commands\PopulatePublicationCommand::class),
+    ];
 };

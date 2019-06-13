@@ -2,7 +2,6 @@
 
 use League\Plates\Engine;
 
-use App\Domain\Publication;
 use App\Http\Extensions\Plates\HelpersExtension;
 
 return [
@@ -15,10 +14,10 @@ return [
     'extensions' => [
         Engine::class => function ($container, Engine $engine) {
             $engine->addData([
-                'pending' => Publication::PENDING,
-                'selected' => Publication::SELECTED,
-                'discarded' => Publication::DISCARDED,
-                'curated' => Publication::CURATED,
+                'pending' => App\Domain\Publication::PENDING,
+                'selected' => App\Domain\Publication::SELECTED,
+                'discarded' => App\Domain\Publication::DISCARDED,
+                'curated' => App\Domain\Publication::CURATED,
             ]);
 
             return $engine;

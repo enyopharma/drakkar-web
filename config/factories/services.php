@@ -1,9 +1,11 @@
 <?php declare(strict_types=1);
 
+use App\Services\Efetch;
+
 return [
     'factories' => [
-        App\Services\Efetch::class => function () {
-            return new App\Services\Efetch;
+        Efetch::class => function () {
+            return new Efetch;
         },
     ],
 ];

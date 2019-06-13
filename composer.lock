@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5841817a1cb54efa142b0664e729504e",
+    "content-hash": "9af0652fb775a50ed590070486d87cd2",
     "packages": [
         {
             "name": "cache/adapter-common",
@@ -1810,32 +1810,32 @@
         },
         {
             "name": "quanta/http-entrypoint",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quantaphp/http-entrypoint.git",
-                "reference": "8adefd108ae4217b39b5809193fd564b9bbb2c96"
+                "reference": "d9c36f03351666df5164528f390bab63c0701837"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/http-entrypoint/zipball/8adefd108ae4217b39b5809193fd564b9bbb2c96",
-                "reference": "8adefd108ae4217b39b5809193fd564b9bbb2c96",
+                "url": "https://api.github.com/repos/quantaphp/http-entrypoint/zipball/d9c36f03351666df5164528f390bab63c0701837",
+                "reference": "d9c36f03351666df5164528f390bab63c0701837",
                 "shasum": ""
             },
             "require": {
-                "nyholm/psr7-server": "^0.3.0",
                 "php": ">=7.0",
                 "psr/http-message": "^1.0",
                 "psr/http-server-handler": "^1.0"
             },
             "require-dev": {
                 "eloquent/phony-kahlan": "^2.0",
-                "kahlan/kahlan": "^4.0"
+                "kahlan/kahlan": "^4.0",
+                "phpstan/phpstan": "^0.11.8"
             },
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Quanta\\": "src"
+                    "Quanta\\Http\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1856,20 +1856,20 @@
                 "psr-15",
                 "request-handler"
             ],
-            "time": "2018-11-22T13:33:13+00:00"
+            "time": "2019-06-13T11:30:32+00:00"
         },
         {
-            "name": "quanta/middleware",
-            "version": "0.1.2",
+            "name": "quanta/http-middleware",
+            "version": "0.2.0",
             "source": {
                 "type": "git",
-                "url": "https://github.com/quantaphp/middleware.git",
-                "reference": "8a20d700ebc8e3159a107641b1e093fec4d1778d"
+                "url": "https://github.com/quantaphp/http-middleware.git",
+                "reference": "39d723df650780158c012c8e70e344ee34765c17"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/middleware/zipball/8a20d700ebc8e3159a107641b1e093fec4d1778d",
-                "reference": "8a20d700ebc8e3159a107641b1e093fec4d1778d",
+                "url": "https://api.github.com/repos/quantaphp/http-middleware/zipball/39d723df650780158c012c8e70e344ee34765c17",
+                "reference": "39d723df650780158c012c8e70e344ee34765c17",
                 "shasum": ""
             },
             "require": {
@@ -1880,7 +1880,8 @@
             },
             "require-dev": {
                 "eloquent/phony-kahlan": "^2.0",
-                "kahlan/kahlan": "^4.0"
+                "kahlan/kahlan": "^4.5",
+                "phpstan/phpstan": "^0.11.8"
             },
             "type": "library",
             "autoload": {
@@ -1899,14 +1900,14 @@
                 }
             ],
             "description": "Minimalist library for dispatching Psr-15 middleware",
-            "homepage": "https://github.com/quanta/middleware",
+            "homepage": "https://github.com/quantaphp/http-middleware",
             "keywords": [
                 "dispatcher",
                 "middleware",
                 "psr-15",
                 "request-handler"
             ],
-            "time": "2019-02-19T16:19:11+00:00"
+            "time": "2019-06-13T11:42:05+00:00"
         },
         {
             "name": "seld/cli-prompt",
@@ -1957,168 +1958,6 @@
             "time": "2017-03-18T11:32:45+00:00"
         },
         {
-            "name": "services/http-dispatcher",
-            "version": "0.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-services/http-dispatcher.git",
-                "reference": "b742489208c6abf9b8abe7b3974e9b0dcaca0b68"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-services/http-dispatcher/zipball/b742489208c6abf9b8abe7b3974e9b0dcaca0b68",
-                "reference": "b742489208c6abf9b8abe7b3974e9b0dcaca0b68",
-                "shasum": ""
-            },
-            "require": {
-                "container-interop/service-provider": "^0.4.0",
-                "php": ">=7.0",
-                "psr/container": "^1.0",
-                "psr/http-message": "^1.0",
-                "psr/http-server-handler": "^1.0",
-                "psr/http-server-middleware": "^1.0",
-                "quanta/middleware": "^0.1.2"
-            },
-            "require-dev": {
-                "eloquent/phony-kahlan": "^2.0",
-                "kahlan/kahlan": "^4.0",
-                "phpstan/phpstan": "^0.11.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Services\\Http\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "pmall",
-                    "email": "pierre.mallinjoud@gmail.com"
-                }
-            ],
-            "description": "Provides a Psr-15 middleware dispatcher",
-            "homepage": "https://github.com/php-services/http-dispatcher",
-            "keywords": [
-                "dispatcher",
-                "middleware",
-                "psr-15",
-                "request-handler",
-                "service-provider"
-            ],
-            "time": "2019-02-20T11:15:00+00:00"
-        },
-        {
-            "name": "services/http-entrypoint-quanta",
-            "version": "0.1.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-services/http-entrypoint-quanta.git",
-                "reference": "25aed222d770518faaf627274b4a8f17db411f1f"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-services/http-entrypoint-quanta/zipball/25aed222d770518faaf627274b4a8f17db411f1f",
-                "reference": "25aed222d770518faaf627274b4a8f17db411f1f",
-                "shasum": ""
-            },
-            "require": {
-                "container-interop/service-provider": "^0.4.0",
-                "nyholm/psr7-server": "^0.3.0",
-                "php": ">=7.0",
-                "psr/container": "^1.0",
-                "psr/http-message": "^1.0",
-                "psr/http-server-handler": "^1.0",
-                "quanta/http-entrypoint": "^0.1.0",
-                "zendframework/zend-httphandlerrunner": "^1.0"
-            },
-            "require-dev": {
-                "eloquent/phony-kahlan": "^2.0",
-                "kahlan/kahlan": "^4.5",
-                "phpstan/phpstan": "^0.11.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Services\\Http\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "pmall",
-                    "email": "pierre.mallinjoud@gmail.com"
-                }
-            ],
-            "description": "Provides quanta http entrypoint for Psr-15 applications",
-            "homepage": "https://github.com/php-services/http-entrypoint-quanta",
-            "keywords": [
-                "psr-15",
-                "request-handler",
-                "service-provider"
-            ],
-            "time": "2019-02-20T11:39:17+00:00"
-        },
-        {
-            "name": "services/http-factory-nyholm",
-            "version": "0.2.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/php-services/http-factory-nyholm.git",
-                "reference": "1493ccb0cf9f9113aff4a18f2521f02144c810bb"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/php-services/http-factory-nyholm/zipball/1493ccb0cf9f9113aff4a18f2521f02144c810bb",
-                "reference": "1493ccb0cf9f9113aff4a18f2521f02144c810bb",
-                "shasum": ""
-            },
-            "require": {
-                "container-interop/service-provider": "^0.4.0",
-                "nyholm/psr7": "^1.0",
-                "php": ">=7.0",
-                "psr/container": "^1.0",
-                "psr/http-factory": "^1.0"
-            },
-            "require-dev": {
-                "eloquent/phony-kahlan": "^2.0",
-                "kahlan/kahlan": "^4.0",
-                "phpstan/phpstan": "^0.11.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Services\\Http\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "pmall",
-                    "email": "pierre.mallinjoud@gmail.com"
-                }
-            ],
-            "description": "Provides nyholm Psr-17 http-factory implementation",
-            "homepage": "https://github.com/php-services/http-factory-nyholm",
-            "keywords": [
-                "http-factory",
-                "http-message",
-                "psr-17",
-                "psr-7",
-                "service-provider"
-            ],
-            "time": "2019-02-20T11:26:29+00:00"
-        },
-        {
             "name": "slashtrace/slashtrace",
             "version": "1.1.2",
             "source": {
@@ -2162,16 +2001,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v4.3.0",
+            "version": "v4.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "707b619d2c3bedf0224d56f95f77dabc60102305"
+                "reference": "d50bbeeb0e17e6dd4124ea391eff235e932cbf64"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/707b619d2c3bedf0224d56f95f77dabc60102305",
-                "reference": "707b619d2c3bedf0224d56f95f77dabc60102305",
+                "url": "https://api.github.com/repos/symfony/console/zipball/d50bbeeb0e17e6dd4124ea391eff235e932cbf64",
+                "reference": "d50bbeeb0e17e6dd4124ea391eff235e932cbf64",
                 "shasum": ""
             },
             "require": {
@@ -2233,7 +2072,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2019-05-27T08:16:38+00:00"
+            "time": "2019-06-05T13:25:51+00:00"
         },
         {
             "name": "symfony/polyfill-ctype",
@@ -2520,16 +2359,16 @@
         },
         {
             "name": "symfony/process",
-            "version": "v4.3.0",
+            "version": "v4.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/process.git",
-                "reference": "a5e3dd4e93a364668034a3cb6efa963d0b33ab45"
+                "reference": "856d35814cf287480465bb7a6c413bb7f5f5e69c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/process/zipball/a5e3dd4e93a364668034a3cb6efa963d0b33ab45",
-                "reference": "a5e3dd4e93a364668034a3cb6efa963d0b33ab45",
+                "url": "https://api.github.com/repos/symfony/process/zipball/856d35814cf287480465bb7a6c413bb7f5f5e69c",
+                "reference": "856d35814cf287480465bb7a6c413bb7f5f5e69c",
                 "shasum": ""
             },
             "require": {
@@ -2565,7 +2404,7 @@
             ],
             "description": "Symfony Process Component",
             "homepage": "https://symfony.com",
-            "time": "2019-05-26T20:47:49+00:00"
+            "time": "2019-05-30T16:10:05+00:00"
         },
         {
             "name": "symfony/service-contracts",
@@ -3708,16 +3547,16 @@
         },
         {
             "name": "phpstan/phpdoc-parser",
-            "version": "0.3.4",
+            "version": "0.3.5",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpdoc-parser.git",
-                "reference": "ab518a5fc8f1d90f58bd2c5552ba915e2c477b66"
+                "reference": "8c4ef2aefd9788238897b678a985e1d5c8df6db4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/ab518a5fc8f1d90f58bd2c5552ba915e2c477b66",
-                "reference": "ab518a5fc8f1d90f58bd2c5552ba915e2c477b66",
+                "url": "https://api.github.com/repos/phpstan/phpdoc-parser/zipball/8c4ef2aefd9788238897b678a985e1d5c8df6db4",
+                "reference": "8c4ef2aefd9788238897b678a985e1d5c8df6db4",
                 "shasum": ""
             },
             "require": {
@@ -3751,7 +3590,7 @@
                 "MIT"
             ],
             "description": "PHPDoc parser with support for nullable, intersection and generic types",
-            "time": "2019-05-28T11:40:00+00:00"
+            "time": "2019-06-07T19:13:52+00:00"
         },
         {
             "name": "phpstan/phpstan",
@@ -3829,7 +3668,7 @@
         },
         {
             "name": "symfony/finder",
-            "version": "v4.3.0",
+            "version": "v4.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/finder.git",

@@ -20,6 +20,7 @@
         "league/plates": "^3.3",
         "middlewares/payload": "^2.1",
         "monolog/monolog": "^1.24",
+        "nyholm/psr7": "^1.1",
         "nyholm/psr7-server": "^0.3.0",
         "predis/predis": "^1.1",
         "psr/container": "^1.0",
@@ -33,15 +34,15 @@
         "quanta/container-compilation": "^0.5.0",
         "quanta/container-configuration": "^0.6.0",
         "quanta/container-interop": "0.3.0",
-        "services/http-dispatcher": "^0.1.0",
-        "services/http-entrypoint-quanta": "^0.1.0",
-        "services/http-factory-nyholm": "^0.2.0",
+        "quanta/http-entrypoint": "^0.2.0",
+        "quanta/http-middleware": "^0.2.0",
         "slashtrace/slashtrace": "^1.1",
         "symfony/console": "^4.2",
         "symfony/process": "^4.3",
         "vlucas/phpdotenv": "^2.5",
         "zendframework/zend-expressive-fastroute": "^3.0",
-        "zendframework/zend-expressive-helpers": "^5.1"
+        "zendframework/zend-expressive-helpers": "^5.1",
+        "zendframework/zend-httphandlerrunner": "^1.1"
     },
     "autoload": {
         "psr-4": {

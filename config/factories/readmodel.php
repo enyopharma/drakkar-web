@@ -1,42 +1,49 @@
 <?php declare(strict_types=1);
 
+use App\ReadModel\RunProjection;
+use App\ReadModel\MethodProjection;
+use App\ReadModel\ProteinProjection;
+use App\ReadModel\RunSumupProjection;
+use App\ReadModel\PublicationProjection;
+use App\ReadModel\PrecurationProjection;
+
 return [
     'factories' => [
-        App\ReadModel\RunProjection::class => function ($container) {
-            return new App\ReadModel\RunProjection(
+        RunProjection::class => function ($container) {
+            return new RunProjection(
                 $container->get(PDO::class)
             );
         },
 
-        App\ReadModel\PublicationProjection::class => function ($container) {
-            return new App\ReadModel\PublicationProjection(
+        PublicationProjection::class => function ($container) {
+            return new PublicationProjection(
                 $container->get(PDO::class)
             );
         },
 
-        App\ReadModel\MethodProjection::class => function ($container) {
-            return new App\ReadModel\MethodProjection(
+        MethodProjection::class => function ($container) {
+            return new MethodProjection(
                 $container->get(PDO::class)
             );
         },
 
-        App\ReadModel\ProteinProjection::class => function ($container) {
-            return new App\ReadModel\ProteinProjection(
+        ProteinProjection::class => function ($container) {
+            return new ProteinProjection(
                 $container->get(PDO::class)
             );
         },
 
-        App\ReadModel\RunSumupProjection::class => function ($container) {
-            return new App\ReadModel\RunSumupProjection(
+        RunSumupProjection::class => function ($container) {
+            return new RunSumupProjection(
                 $container->get(PDO::class),
-                $container->get(App\ReadModel\RunProjection::class)
+                $container->get(RunProjection::class)
             );
         },
 
-        App\ReadModel\PrecurationProjection::class => function ($container) {
-            return new App\ReadModel\PrecurationProjection(
-                $container->get(App\ReadModel\RunProjection::class),
-                $container->get(App\ReadModel\PublicationProjection::class)
+        PrecurationProjection::class => function ($container) {
+            return new PrecurationProjection(
+                $container->get(RunProjection::class),
+                $container->get(PublicationProjection::class)
             );
         },
     ],

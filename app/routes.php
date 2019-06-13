@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-use Enyo\Http\RouteCollector;
+use Enyo\Http\Routing\RouteCollector;
 
 return function (RouteCollector $collector) {
     $collector->get('/', ...[
@@ -26,6 +26,11 @@ return function (RouteCollector $collector) {
     $collector->get('/runs/{run_id}/publications/{pmid}/descriptions/create', ...[
         App\Http\Handlers\Descriptions\CreateHandler::class,
         'runs.publications.descriptions.create',
+    ]);
+
+    $collector->get('/runs/{run_id}/publications/{pmid}/descriptions/{id}', ...[
+        App\Http\Handlers\Descriptions\EditHandler::class,
+        'runs.publications.descriptions.edit',
     ]);
 
     $collector->get('/methods', ...[

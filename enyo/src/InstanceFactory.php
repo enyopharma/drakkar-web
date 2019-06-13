@@ -15,36 +15,17 @@ final class InstanceFactory
 
     public function __invoke(string $class)
     {
-        $parameters = $this->parameters($class);
-
         try {
-            $arguments = array_map([$this, 'argument'], $parameters);
-        }
-
-        catch (\LogicException $e) {
-            throw  new \LogicException(
-                sprintf('Unable to autowire function %s::__construct()', $class), 0, $e
+            return new $class(
+                ...array_map([$this, 'argument'], $this->parameters($class))
             );
         }
 
-        return new $class(...$arguments);
-    }
-
-    private function parameters(string $class): array
-    {
-        try {
-            $reflection = new \ReflectionClass($class);
+        catch (\Throwable $e) {
+            throw new \LogicException(
+                sprintf('Unable to instantiate %s', $class), 0, $e
+            );
         }
-
-        catch (\ReflectionException $e) {
-            return [];
-        }
-
-        $constructor = $reflection->getConstructor();
-
-        return ! is_null($constructor)
-            ? $constructor->getParameters()
-            : [];
     }
 
     private function argument(\ReflectionParameter $parameter)
@@ -62,7 +43,24 @@ final class InstanceFactory
         }
 
         throw new \LogicException(
-            sprintf('No argument for parameter $%s', $parameter->getName())
+            sprintf('Unable to bind an argument to %s', $parameter)
         );
+    }
+
+    private function parameters(string $class): array
+    {
+        try {
+            $reflection = new \ReflectionClass($class);
+        }
+
+        catch (\ReflectionException $e) {
+            return [];
+        }
+
+        $constructor = $reflection->getConstructor();
+
+        return ! is_null($constructor)
+            ? $constructor->getParameters()
+            : [];
     }
 }

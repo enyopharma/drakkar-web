@@ -39,4 +39,4 @@ require $root . '/vendor/autoload.php';
 /**
  * Run the http application.
  */
-$container->get(Quanta\HttpEntrypoint::class)->run();
+$container->get(Quanta\Http\Entrypoint::class)->run();

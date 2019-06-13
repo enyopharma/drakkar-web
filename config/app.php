@@ -95,8 +95,7 @@ return function (string $root): array {
          * @var string[]
          */
         'files' => array_merge([
-            sprintf('%s/enyo/config/provided/*.php', $root),
-            sprintf('%s/enyo/config/default/*.php', $root),
+            sprintf('%s/enyo/config/*.php', $root),
             sprintf('%s/config/factories/*.php', $root),
             sprintf('%s/config/factories/%s/*.php', $root, $env),
         ], $debug ? [
@@ -109,7 +108,7 @@ return function (string $root): array {
          * @var Quanta\Container\Configuration\Passes\ProcessingPassInterface[]
          */
         'passes' => [
-            new Quanta\Container\Configuration\Passes\InterfaceAliasingPass,
+            //
         ],
 
         /**
