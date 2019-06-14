@@ -98,15 +98,15 @@ export default {
                 type: actions.FIRE_SAVE,
             })
 
-            setTimeout(() => {
-                console.log(getState().data)
+            const state = getState();
 
-                dispatch({
-                    type: actions.SHOW_FEEDBACK,
-                    success: true,
-                    message: getState().data,
-                })
-            }, 5000)
+            console.log(state.data);
+
+            api.save(state.run_id, state.pmid, state.data, response => dispatch({
+                type: actions.SHOW_FEEDBACK,
+                success: response.success,
+                message: response.reason,
+            }))
         }
     },
 

@@ -14,17 +14,17 @@ use Enyo\ReadModel\ResultSetInterface;
 final class PublicationProjection
 {
     const SELECT_FROM_PMID_SQL = <<<SQL
-        SELECT a.run_id, a.annoations, a.state, p.*
-        FROM publications AS p, associations AS a
-        WHERE p.pmid = a.pmid
+        SELECT r.id AS run_id, r.type AS run_type, r.name AS run_name, a.annotation, a.state, p.*
+        FROM runs AS r, publications AS p, associations AS a
+        WHERE r.id = a.run_id AND p.pmid = a.pmid
         AND a.run_id = ?
         AND p.pmid = ?
 SQL;
 
     const PAGINATE_PUBLICATIONS_SQL = <<<SQL
-        SELECT a.run_id, a.annotation, a.state, p.*
-        FROM publications AS p, associations AS a
-        WHERE p.pmid = a.pmid
+        SELECT r.id AS run_id, r.type AS run_type, r.name AS run_name, a.annotation, a.state, p.*
+        FROM runs AS r, publications AS p, associations AS a
+        WHERE r.id = a.run_id AND p.pmid = a.pmid
         AND a.run_id = ?
         AND a.state = ?
         ORDER BY a.updated_at DESC, a.id ASC
@@ -125,6 +125,11 @@ SQL;
         $article = $metadata['PubmedArticle']['MedlineCitation']['Article'] ?? [];
 
         return [
+            'run' => [
+                'id' => $publication['run_id'],
+                'type' => $publication['run_type'],
+                'name' => $publication['run_name'],
+            ],
             'run_id' => $publication['run_id'],
             'pmid' => $publication['pmid'],
             'state' => $publication['state'],

@@ -1,3 +1,5 @@
+<div class="row">
+<div class="col">
 <div class="card">
     <h4 class="card-header">
         <a
@@ -13,7 +15,7 @@
             <blockquote class="blockquote mb-0">
                 <?php foreach ($publication['abstract'] as $abstract): ?>
                 <p>
-                    <?= nl2br($this->highlighted($type, $abstract, $publication['patterns'])) ?>
+                    <?= nl2br($this->highlighted($abstract, $publication['run']['type'], $publication['patterns'])) ?>
                 </p>
                 <?php endforeach; ?>
                 <footer class="blockquote-footer">
@@ -93,4 +95,6 @@
             </form>
         </div>
     </div>
+</div>
+</div>
 </div>

@@ -6,14 +6,19 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+use App\ReadModel\PublicationProjection;
+
 use Enyo\Http\Responders\HtmlResponder;
 
 final class CreateHandler implements RequestHandlerInterface
 {
+    private $publications;
+
     private $responder;
 
-    public function __construct(HtmlResponder $responder)
+    public function __construct(PublicationProjection $publications, HtmlResponder $responder)
     {
+        $this->publications = $publications;
         $this->responder = $responder;
     }
 
@@ -24,12 +29,10 @@ final class CreateHandler implements RequestHandlerInterface
         $run_id = (int) $attributes['run_id'];
         $pmid = (int) $attributes['pmid'];
 
+
+
         return $this->responder->template('descriptions/create', [
-            'type' => 'vh',
-            'description' => [
-                'run_id' => $run_id,
-                'pmid' => $pmid,
-            ],
+            'publication' => $this->publications->pmid($run_id, $pmid),
         ]);
     }
 }

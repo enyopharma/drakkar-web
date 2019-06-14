@@ -55,7 +55,7 @@ final class HelpersExtension implements ExtensionInterface
             return $this->map[$state]['classes']['text'] ?? '';
         });
 
-        $engine->registerFunction('highlighted', function (string $type, string $str, array $patterns) {
+        $engine->registerFunction('highlighted', function (string $str, string $type, array $patterns) {
             $map = [
                 Run::HH => 'text-primary',
                 Run::VH => 'text-danger',

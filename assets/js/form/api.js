@@ -65,4 +65,22 @@ const alignment = (query, sequences, handler) => {
     request.then(response => {}, error => console.log(error))
 }
 
-export default { method, protein, alignment }
+const save = (run_id, pmid, description, handler) => {
+    const url = `/runs/${run_id}/publications/${pmid}/descriptions`
+
+    const request = fetch(url, {
+        method: 'POST',
+        headers: {
+            'accept': 'application/json',
+            'content-type': 'application/json',
+        },
+        body: JSON.stringify(description)
+    })
+
+    request
+        .then(response => response.json(), response => response.json())
+        .then(json => handler(json))
+
+}
+
+export default { method, protein, alignment, save }

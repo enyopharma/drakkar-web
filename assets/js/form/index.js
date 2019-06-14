@@ -158,17 +158,16 @@ const App = connect(mapStateToProps, mapDispatchToProps, mergeProps)(Form);
 
 window.form = {
     create: (id, type, run_id, pmid) => {
-        window.form.edit(id, type, {
-            run_id: run_id,
-            pmid: pmid,
-        })
+        window.form.edit(id, type, run_id, pmid)
     },
 
-    edit: (id, type, data) => {
+    edit: (id, type, run_id, pmid, data = {}) => {
         const i1type = 'h'
         const i2type = type == 'hh' ? 'h' : 'v'
 
-        let store = createStore(reducer, { data: data }, applyMiddleware(thunk))
+        const state = { run_id: run_id, pmid: pmid, data: data }
+
+        let store = createStore(reducer, state, applyMiddleware(thunk))
 
         render(
             <Provider store={store}><App i1type={i1type} i2type={i2type} /></Provider>,

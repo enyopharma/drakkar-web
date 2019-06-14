@@ -3,6 +3,7 @@
 use App\Domain\InsertRun;
 use App\Domain\PopulateRun;
 use App\Domain\StartAlignment;
+use App\Domain\InsertDescription;
 use App\Domain\PopulatePublication;
 use App\Domain\UpdatePublicationState;
 
@@ -37,6 +38,12 @@ return [
         StartAlignment::class => function ($container) {
             return new StartAlignment(
                 $container->get(Predis\Client::class)
+            );
+        },
+
+        InsertDescription::class => function ($container) {
+            return new InsertDescription(
+                $container->get(PDO::class)
             );
         },
     ],

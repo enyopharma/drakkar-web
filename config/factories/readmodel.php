@@ -4,6 +4,8 @@ use App\ReadModel\RunProjection;
 use App\ReadModel\MethodProjection;
 use App\ReadModel\ProteinProjection;
 use App\ReadModel\RunSumupProjection;
+use App\ReadModel\InteractorProjection;
+use App\ReadModel\DescriptionProjection;
 use App\ReadModel\PublicationProjection;
 use App\ReadModel\PrecurationProjection;
 
@@ -44,6 +46,14 @@ return [
             return new PrecurationProjection(
                 $container->get(RunProjection::class),
                 $container->get(PublicationProjection::class)
+            );
+        },
+
+        DescriptionProjection::class => function ($container) {
+            return new DescriptionProjection(
+                $container->get(PDO::class),
+                $container->get(MethodProjection::class),
+                $container->get(InteractorProjection::class)
             );
         },
     ],

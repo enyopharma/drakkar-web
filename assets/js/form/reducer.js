@@ -223,6 +223,8 @@ const data = (state = {}, action) => {
 
 export default (state, action) => {
     return {
+        run_id: state.run_id,
+        pmid: state.pmid,
         ui: ui(state.ui, action),
         data: data(state.data, action),
     }

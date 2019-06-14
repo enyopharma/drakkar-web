@@ -14,12 +14,12 @@ final class JsonResponder
         $this->factory = $factory;
     }
 
-    public function notfound(): ResponseInterface
+    public function notfound(string $reason = 'not found'): ResponseInterface
     {
-        return $this->response([], 404, 'not found');
+        return $this->response([], 404, $reason);
     }
 
-    public function unprocessable(string $reason = '', $data = []): ResponseInterface
+    public function unprocessable(string $reason = 'invalid data', $data = []): ResponseInterface
     {
         return $this->response($data, 422, $reason);
     }

@@ -69,9 +69,9 @@ while (true) {
                 list($start, $stop, $identity) = explode(';', $line);
 
                  return [
-                     'start' => $start,
-                     'stop' => $stop,
-                     'identity' => $identity,
+                     'start' => (int) $start,
+                     'stop' => (int) $stop,
+                     'identity' => (float) round($identity, 2),
                  ];
             }, $lines),
         ];

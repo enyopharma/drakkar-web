@@ -4,16 +4,8 @@ namespace App\Domain;
 
 final class InsertDescription
 {
-    const ASSOCIATION_NOT_FOUND = 0;
-    const METHOD_NOT_FOUND = 1;
-    const PROTEIN_NOT_FOUND = 2;
-    const METHOD_FORMAT_ERROR = 3;
-    const INTERACTOR_FORMAT_ERROR = 4;
-    const INTERACTOR_TYPE_ERROR = 5;
-    const INTERACTOR_NAME_ERROR = 6;
-    const INTERACTOR_POS_ERROR = 7;
-    const INTERACTOR_MAPPING_ERROR = 8;
-    const NOT_UNIQUE = 9;
+    const NOT_FOUND = 0;
+    const UNPROCESSABLE = 1;
 
     const SELECT_ASSOCIATION_STH = <<<SQL
         SELECT r.type, a.*
@@ -86,13 +78,19 @@ SQL;
         $this->pdo = $pdo;
     }
 
-    public function __invoke(
-        int $run_id,
-        int $pmid,
-        array $method,
-        array $interactor1,
-        array $interactor2
-    ): DomainPayloadInterface {
+    public function __invoke(DescriptionInput $input): DomainPayloadInterface {
+        try {
+            $run = $input->run();
+            $publication = $input->publication();
+            $method = $input->method();
+            $interactor1 = $input->interactor1();
+            $interactor2 = $input->interactor2();
+        }
+
+        catch (\UnexpectedValueException $e) {
+            return new DomainPayload(self::UNPROCESSABLE, ['reason' => $e->getMessage()]);
+        }
+
         // prepare the queries.
         $select_association_sth = $this->pdo->prepare(self::SELECT_ASSOCIATION_STH);
         $select_method_sth = $this->pdo->prepare(self::SELECT_METHOD_STH);
@@ -104,93 +102,64 @@ SQL;
         $insert_interactor_sth = $this->pdo->prepare(self::INSERT_INTERACTOR_STH);
         $insert_description_sth = $this->pdo->prepare(self::INSERT_DESCRIPTION_STH);
 
-        // ensure interactor arrays are valid.
-        $method = $this->sanitizedMethod($method);
-        $interactor1 = $this->sanitizedInteractor($interactor1);
-        $interactor2 = $this->sanitizedInteractor($interactor2);
-
-        if (! $this->isMethodValid($method)) {
-            return new DomainPayload(self::METHOD_FORMAT_ERROR);
-        }
-
-        if (! $this->isInteractorValid($interactor1)) {
-            return new DomainPayload(self::INTERACTOR_FORMAT_ERROR, ['n' => 1]);
-        }
-
-        if (! $this->isInteractorValid($interactor2)) {
-            return new DomainPayload(self::INTERACTOR_FORMAT_ERROR, ['n' => 2]);
-        }
-
         // ensure association exists.
-        $select_association_sth->execute([$run_id, $pmid]);
+        $select_association_sth->execute([$run['id'], $publication['pmid']]);
 
         if (! $association = $select_association_sth->fetch()) {
-            return new DomainPayload(self::ASSOCIATION_NOT_FOUND);
+            return $this->notfound('Association not found');
         }
 
         // ensure method exists.
         $select_method_sth->execute([$method['psimi_id']]);
 
         if (! $method = $select_method_sth->fetch()) {
-            return new DomainPayload(self::METHOD_NOT_FOUND);
+            return $this->unprocessable('Method not found');
         }
 
         // ensure protein of interactor1 exists.
         $select_protein_sth->execute([$interactor1['protein']['accession']]);
 
         if (! $protein1 = $select_protein_sth->fetch()) {
-            return new DomainPayload(self::PROTEIN_NOT_FOUND, ['n' => 1]);
+            return $this->unprocessable('Interactor 1 protein not found');
         }
 
         // ensure protein of interactor2 exists.
         $select_protein_sth->execute([$interactor2['protein']['accession']]);
 
         if (! $protein2 = $select_protein_sth->fetch()) {
-            return new DomainPayload(self::PROTEIN_NOT_FOUND, ['n' => 2]);
+            return $this->unprocessable('Interactor 2 protein not found');
         }
 
         // ensure type of interactor1 is human.
         if ($protein1['type'] != Protein::H) {
-            return new DomainPayload(self::INTERACTOR_TYPE_ERROR, [
-                'n' => 1, 'expected' => Protein::H,
-            ]);
+            return $this->unprocessable('Interactor 1 protein must be a human protein');
         }
 
         // ensure type of interactor2 is matching the curation run type.
         if ($association['type'] == Run::HH && $protein2['type'] == Protein::V) {
-            return new DomainPayload(self::INTERACTOR_TYPE_ERROR, [
-                'n' => 2, 'expected' => Protein::H,
-            ]);
+            return $this->unprocessable('Interactor 2 protein must be a human protein');
         }
 
         if ($association['type'] == Run::VH && $protein2['type'] == Protein::H) {
-            return new DomainPayload(self::INTERACTOR_TYPE_ERROR, [
-                'n' => 2, 'expected' => Protein::V,
-            ]);
+            return $this->unprocessable('Interactor 2 protein must be a viral protein');
         }
 
         // ensure coordinates of interactor1 are valid.
-        $select_sequence_sth->execute([
-            $protein1['id'],
-            $interactor1['protein']['accession'],
-        ]);
+        $select_sequence_sth->execute([$protein1['id'], $interactor1['protein']['accession']]);
 
         $sequence = $select_sequence_sth->fetch();
 
         if ($interactor1['stop'] > strlen($sequence['sequence'])) {
-            return new DomainPayload(self::INTERACTOR_POS_ERROR, ['n' => 1]);
+            return $this->unprocessable('Interactor 1 stop is greater than the protein sequence length');
         }
 
         // ensure coordinates of interactor2 are valid.
-        $select_sequence_sth->execute([
-            $protein2['id'],
-            $interactor2['protein']['accession'],
-        ]);
+        $select_sequence_sth->execute([$protein2['id'], $interactor2['protein']['accession']]);
 
         $sequence = $select_sequence_sth->fetch();
 
         if ($interactor2['stop'] > strlen($sequence['sequence'])) {
-            return new DomainPayload(self::INTERACTOR_POS_ERROR, ['n' => 2]);
+            return $this->unprocessable('Interactor 2 stop is greater than the protein sequence length');
         }
 
         // ensure interactor1 name is consistant with start and stop.
@@ -202,9 +171,7 @@ SQL;
 
         if ($row = $select_interactor_name_sth->fetch()) {
             if ($row['name'] != $interactor1['name']) {
-                return new DomainPayload(self::INTERACTOR_NAME_ERROR, [
-                    'n' => 1, 'expected' => $row,
-                ]);
+                return $this->unprocessable('Interactor 1 name is not valid');
             }
         }
 
@@ -217,23 +184,16 @@ SQL;
 
         if ($row = $select_interactor_name_sth->fetch()) {
             if ($row['name'] != $interactor2['name']) {
-                return new DomainPayload(self::INTERACTOR_NAME_ERROR, [
-                    'n' => 2, 'expected' => $row,
-                ]);
+                return $this->unprocessable('Interactor 2 name is not valid');
             }
         }
 
         // ensure interactor1 start and stop is consistent with name.
-        $select_interactor_pos_sth->execute([
-            $protein1['id'],
-            $interactor1['name'],
-        ]);
+        $select_interactor_pos_sth->execute([$protein1['id'], $interactor1['name']]);
 
         if ($row = $select_interactor_pos_sth->fetch()) {
             if ($row['start'] != $interactor1['start'] || $row['stop'] != $interactor1['stop']) {
-                return new DomainPayload(self::INTERACTOR_POS_ERROR, [
-                    'n' => 1, 'expected' => $row,
-                ]);
+                return $this->unprocessable('Interactor 1 coordinates are not valid');
             }
         }
 
@@ -245,44 +205,40 @@ SQL;
 
         if ($row = $select_interactor_pos_sth->fetch()) {
             if ($row['start'] != $interactor2['start'] || $row['stop'] != $interactor2['stop']) {
-                return new DomainPayload(self::INTERACTOR_POS_ERROR, [
-                    'n' => 2, 'expected' => $row,
-                ]);
+                return $this->unprocessable('Interactor 2 coordinates are not valid');
             }
         }
 
         // ensure mapping of interactor1 is valid.
-        foreach ($interactor1['mapping'] as $accession => $mapping) {
-            $select_sequence_sth->execute([
-                $protein1['id'],
-                $accession,
-            ]);
+        foreach ($interactor1['mapping'] as $alignment) {
+            foreach ($alignment['isoforms'] as $isoform) {
+                $select_sequence_sth->execute([$protein1['id'], $isoform['accession']]);
 
-            if (! $sequence = $select_sequence_sth->fetch()) {
-                return new DomainPayload(self::INTERACTOR_MAPPING_ERROR, ['n' => 1]);
-            }
+                if (! $sequence = $select_sequence_sth->fetch()) {
+                    return $this->unprocessable('Interactor 1 mapping is not valid');
+                }
 
-            foreach ($mapping as $alignment) {
-                if ($alignment['stop'] > strlen($sequence['sequence'])) {
-                    return new DomainPayload(self::INTERACTOR_MAPPING_ERROR, ['n' => 1]);
+                foreach ($isoform['occurences'] as $occurence) {
+                    if ($occurence['stop'] > strlen($sequence['sequence'])) {
+                        return $this->unprocessable('Interactor 1 mapping is not valid');
+                    }
                 }
             }
         }
 
         // ensure mapping of interactor2 is valid.
-        foreach ($interactor2['mapping'] as $accession => $mapping) {
-            $select_sequence_sth->execute([
-                $protein2['id'],
-                $accession,
-            ]);
+        foreach ($interactor2['mapping'] as $alignment) {
+            foreach ($alignment['isoforms'] as $isoform) {
+                $select_sequence_sth->execute([$protein2['id'], $isoform['accession']]);
 
-            if (! $sequence = $select_sequence_sth->fetch()) {
-                return new DomainPayload(self::INTERACTOR_MAPPING_ERROR, ['n' => 2]);
-            }
+                if (! $sequence = $select_sequence_sth->fetch()) {
+                    return $this->unprocessable('Interactor 2 mapping is not valid');
+                }
 
-            foreach ($mapping as $alignment) {
-                if ($alignment['stop'] > strlen($sequence['sequence'])) {
-                    return new DomainPayload(self::INTERACTOR_MAPPING_ERROR, ['n' => 2]);
+                foreach ($isoform['occurences'] as $occurence) {
+                    if ($occurence['stop'] > strlen($sequence['sequence'])) {
+                        return $this->unprocessable('Interactor 2 mapping is not valid');
+                    }
                 }
             }
         }
@@ -298,7 +254,7 @@ SQL;
         ]);
 
         if ($description = $select_description_sth->fetch()) {
-            return new DomainPayload(self::NOT_UNIQUE);
+            return $this->unprocessable('Description already exists');
         }
 
         // insert the description.
@@ -338,81 +294,13 @@ SQL;
         return new DomainSuccess(['description' => $description]);
     }
 
-    private function sanitizedMethod(array $method): array
+    private function notfound(string $reason): DomainPayloadInterface
     {
-        return [
-            'psimi_id' => (string) $method['psimi_id'] ?? '',
-        ];
+        return new DomainPayload(self::NOT_FOUND, ['reason' => $reason]);
     }
 
-    private function sanitizedInteractor(array $interactor): array
+    private function unprocessable(string $reason): DomainPayloadInterface
     {
-        return [
-            'protein' => [
-                'accession' => (string) $interactor['protein']['accession'] ?? '',
-            ],
-            'name' => (string) $interactor['name'] ?? '',
-            'start' => (int) $interactor['start'] ?? 0,
-            'stop' => (int) $interactor['stop'] ?? 0,
-            'mapping' => array_map(function  ($mapping) {
-                return array_map(function ($alignment) {
-                    return [
-                        'start' => (int) $alignment['start'] ?? 0,
-                        'stop' => (int) $alignment['stop'] ?? 0,
-                        'sequence' => (string) $alignment['sequence'] ?? '',
-                    ];
-                }, $mapping);
-            }, (array) $interactor['mapping'] ?? []),
-        ];
-    }
-
-    private function isMethodValid(array $method): bool
-    {
-        return $method['psimi_id'] != '';
-    }
-
-    private function isInteractorValid(array $interactor): bool
-    {
-        if ($interactor['protein']['accession'] == '') {
-            return false;
-        }
-
-        if ($interactor['name'] == '' || strlen($interactor['name']) > 32) {
-            return false;
-        }
-
-        if ($interactor['start'] < 1) {
-            return false;
-        }
-
-        if ($interactor['stop'] < $interactor['start']) {
-            return false;
-        }
-
-        if (array_filter($interactor['mapping'], 'is_array') < count($interactor['mapping'])) {
-            return false;
-        }
-
-        foreach ($interactor['mapping'] as $mapping) {
-            foreach ($mapping as $alignment) {
-                if ($alignment['start'] < 1) {
-                    return false;
-                }
-
-                if ($alignment['stop'] < $alignment['start']) {
-                    return false;
-                }
-
-                if ($alignment['sequence'] == '') {
-                    return false;
-                }
-
-                if (preg_match('/^[GAVLIMFWPSTCYNQDEKRH]+$/i', $alignment['sequence']) !== 1) {
-                    return false;
-                }
-            }
-        }
-
-        return true;
+        return new DomainPayload(self::UNPROCESSABLE, ['reason' => $reason]);
     }
 }
