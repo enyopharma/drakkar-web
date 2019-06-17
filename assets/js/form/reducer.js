@@ -15,7 +15,7 @@ const saving = (state = false, action) => {
     switch (action.type) {
         case actions.FIRE_SAVE:
             return true
-        case actions.SHOW_FEEDBACK:
+        case actions.HANDLE_SAVE:
             return false
         default:
             return state
@@ -24,7 +24,7 @@ const saving = (state = false, action) => {
 
 const feedback = (state = null, action) => {
     switch (action.type) {
-        case actions.SHOW_FEEDBACK:
+        case actions.HANDLE_SAVE:
             return { success: action.success, message: action.message }
         default:
             return null
@@ -234,7 +234,7 @@ const interactor = (i, state = {}, action) => {
         ? { type: 'OUT_OF_SCOPE' }
         : action
 
-    return {
+    const newState = {
         protein: protein(state.protein, scoped),
         name: name(state.name, scoped),
         start: start(state.start, scoped),
@@ -242,6 +242,16 @@ const interactor = (i, state = {}, action) => {
         mapping: mapping(state.mapping, scoped),
         ui: interactorui(state.ui, scoped)
     }
+
+    if (action.type == actions.HANDLE_SAVE && action.success) {
+        newState.protein.matures = newState.protein.matures.concat([{
+            name: newState.name,
+            start: newState.start,
+            stop: newState.stop,
+        }])
+    }
+
+    return newState
 }
 
 export default (state = {}, action) => {

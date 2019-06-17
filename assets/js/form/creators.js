@@ -132,7 +132,7 @@ const save = (run_id, pmid) => {
             .catch(error => console.log(error))
             .then(response => response.json())
             .then(json => dispatch({
-                type: actions.SHOW_FEEDBACK,
+                type: actions.HANDLE_SAVE,
                 success: json.success,
                 message: json.reason,
             }))
