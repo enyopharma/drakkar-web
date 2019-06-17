@@ -15,22 +15,12 @@ window.form = {
         window.form.edit(id, type, run_id, pmid)
     },
 
-    edit: (id, type, run_id, pmid, data = {}) => {
-        const i1type = 'h'
-        const i2type = type == 'hh' ? 'h' : 'v'
-
-        const state = { data: data }
-
+    edit: (id, type, run_id, pmid, state = {}) => {
         let store = createStore(reducer, state, applyMiddleware(thunk))
 
         render(
             <Provider store={store}>
-                <App
-                    run_id={run_id}
-                    pmid={pmid}
-                    i1type={i1type}
-                    i2type={i2type}
-                />
+                <App type={type} run_id={run_id} pmid={pmid} />
             </Provider>,
             document.getElementById(id)
         )

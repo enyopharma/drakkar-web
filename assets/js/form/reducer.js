@@ -11,6 +11,34 @@ const qmethod = (state = '', action) => {
     }
 }
 
+const saving = (state = false, action) => {
+    switch (action.type) {
+        case actions.FIRE_SAVE:
+            return true
+        case actions.SHOW_FEEDBACK:
+            return false
+        default:
+            return state
+    }
+}
+
+const feedback = (state = null, action) => {
+    switch (action.type) {
+        case actions.SHOW_FEEDBACK:
+            return { success: action.success, message: action.message }
+        default:
+            return null
+    }
+}
+
+const formui = (state = {}, action) => {
+    return {
+        qmethod: qmethod(state.qmethod, action),
+        saving: saving(state.saving, action),
+        feedback: feedback(state.feedback, action),
+    }
+}
+
 const method = (state = null, action) => {
     switch (action.type) {
         case actions.SELECT_METHOD:
@@ -27,56 +55,7 @@ const method = (state = null, action) => {
     }
 }
 
-const editing = (i, state = false, action) => {
-    if (action.i != i) return state
-
-    switch (action.type) {
-        case actions.SELECT_PROTEIN:
-            return action.protein.type == 'v'
-        case actions.EDIT_MATURE:
-            return true
-        case actions.UPDATE_MATURE:
-            return false
-        case actions.RESET:
-            return false
-        default:
-            return state
-    }
-}
-
-const processing = (i, state = false, action) => {
-    if (action.i != i) return state
-
-    switch (action.type) {
-        case actions.FIRE_ALIGNMENT:
-            return true
-        case actions.ADD_ALIGNMENT:
-            return false
-        case actions.CANCEL_ALIGNMENT:
-            return false
-        case actions.RESET:
-            return false
-        default:
-            return state
-    }
-}
-
-const qprotein = (i, state = '', action) => {
-    if (action.i != i) return state
-
-    switch (action.type) {
-        case actions.UPDATE_PROTEIN_QUERY:
-            return action.query
-        case actions.RESET:
-            return ''
-        default:
-            return state
-    }
-}
-
-const protein = (i, state = null, action) => {
-    if (action.i != i) return state
-
+const protein = (state = null, action) => {
     switch (action.type) {
         case actions.SELECT_PROTEIN:
             return {
@@ -99,9 +78,7 @@ const protein = (i, state = null, action) => {
     }
 }
 
-const name = (i, state = '', action) => {
-    if (action.i != i) return state
-
+const name = (state = '', action) => {
     switch (action.type) {
         case actions.SELECT_PROTEIN:
             return action.protein.type == 'h' || action.protein.matures.length == 0
@@ -118,9 +95,7 @@ const name = (i, state = '', action) => {
     }
 }
 
-const start = (i, state = '', action) => {
-    if (action.i != i) return state
-
+const start = (state = '', action) => {
     switch (action.type) {
         case actions.SELECT_PROTEIN:
             return action.protein.type == 'h' || action.protein.matures.length == 0
@@ -137,9 +112,7 @@ const start = (i, state = '', action) => {
     }
 }
 
-const stop = (i, state = '', action) => {
-    if (action.i != i) return state
-
+const stop = (state = '', action) => {
     switch (action.type) {
         case actions.SELECT_PROTEIN:
             return action.protein.type == 'h' || action.protein.matures.length == 0
@@ -156,9 +129,7 @@ const stop = (i, state = '', action) => {
     }
 }
 
-const mapping = (i, state = [], action) => {
-    if (action.i != i) return state
-
+const mapping = (state = [], action) => {
     switch (action.type) {
         case actions.SELECT_PROTEIN:
             return []
@@ -180,9 +151,48 @@ const mapping = (i, state = [], action) => {
     }
 }
 
-const qalignment = (i, state = '', action) => {
-    if (action.i != i) return state
+const editing = (state = false, action) => {
+    switch (action.type) {
+        case actions.SELECT_PROTEIN:
+            return action.protein.type == 'v'
+        case actions.EDIT_MATURE:
+            return true
+        case actions.UPDATE_MATURE:
+            return false
+        case actions.RESET:
+            return false
+        default:
+            return state
+    }
+}
 
+const processing = (state = false, action) => {
+    switch (action.type) {
+        case actions.FIRE_ALIGNMENT:
+            return true
+        case actions.ADD_ALIGNMENT:
+            return false
+        case actions.CANCEL_ALIGNMENT:
+            return false
+        case actions.RESET:
+            return false
+        default:
+            return state
+    }
+}
+
+const qprotein = (state = '', action) => {
+    switch (action.type) {
+        case actions.UPDATE_PROTEIN_QUERY:
+            return action.query
+        case actions.RESET:
+            return ''
+        default:
+            return state
+    }
+}
+
+const qalignment = (state = '', action) => {
     switch (action.type) {
         case actions.UPDATE_ALIGNMENT_QUERY:
             return action.query
@@ -195,9 +205,7 @@ const qalignment = (i, state = '', action) => {
     }
 }
 
-const alignment = (i, state = null, action) => {
-    if (action.i != i) return state
-
+const alignment = (state = null, action) => {
     switch (action.type) {
         case actions.SHOW_ALIGNMENT:
             return action.alignment
@@ -212,48 +220,34 @@ const alignment = (i, state = null, action) => {
     }
 }
 
-const interactor = (i, state = {}, action) => {
+const interactorui = (state = {}, action) => {
     return {
-        editing: editing(i, state.editing, action),
-        processing: processing(i, state.processing, action),
-        qprotein: qprotein(i, state.qprotein, action),
-        protein: protein(i, state.protein, action),
-        name: name(i, state.name, action),
-        start: start(i, state.start, action),
-        stop: stop(i, state.stop, action),
-        mapping: mapping(i, state.mapping, action),
-        qalignment: qalignment(i, state.qalignment, action),
-        alignment: alignment(i, state.alignment, action),
+        editing: editing(state.editing, action),
+        processing: processing(state.processing, action),
+        qprotein: qprotein(state.qprotein, action),
+        qalignment: qalignment(state.qalignment, action),
+        alignment: alignment(state.alignment, action),
     }
 }
 
-const saving = (state = false, action) => {
-    switch (action.type) {
-        case actions.FIRE_SAVE:
-            return true
-        case actions.SHOW_FEEDBACK:
-            return false
-        default:
-            return state
-    }
-}
+const interactor = (i, state = {}, action) => {
+    const scoped = i == action.i ? action : { type: 'OUT_OF_SCOPE' }
 
-const feedback = (state = null, action) => {
-    switch (action.type) {
-        case actions.SHOW_FEEDBACK:
-            return { success: action.success, message: action.message }
-        default:
-            return null
+    return {
+        protein: protein(state.protein, scoped),
+        name: name(state.name, scoped),
+        start: start(state.start, scoped),
+        stop: stop(state.stop, scoped),
+        mapping: mapping(state.mapping, scoped),
+        ui: interactorui(state.ui, scoped)
     }
 }
 
 export default (state = {}, action) => {
     return {
-        qmethod: qmethod(state.qmethod, action),
         method: method(state.method, action),
         interactor1: interactor(1, state.interactor1, action),
         interactor2: interactor(2, state.interactor2, action),
-        saving: saving(state.saving, action),
-        feedback: feedback(state.feedback, action),
+        ui: formui(state.ui, action),
     }
 }

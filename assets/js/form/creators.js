@@ -85,7 +85,7 @@ const alignment = {
         return (dispatch, getState) => {
             const state = getState()
             const interactor = i == 1 ? state.interactor1 : state.interactor2
-            const query = interactor.qalignment
+            const query = interactor.ui.qalignment
             const sequences = state2sequences(interactor)
 
             dispatch({ i: i, type: actions.FIRE_ALIGNMENT})
