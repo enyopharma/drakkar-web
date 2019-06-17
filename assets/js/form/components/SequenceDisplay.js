@@ -1,17 +1,9 @@
 import React from 'react'
 
-const SequenceDisplay = ({ source, protein, valid }) => {
-    const before = protein.start != ''
-        ? source.sequence.slice(0, protein.start - 1)
-        : ''
-
-    const after = protein.stop != ''
-        ? source.sequence.slice(protein.stop, source.sequence.length)
-        : ''
-
-    const sequence = (protein.start != '' && protein.stop != '')
-        ? source.sequence.slice(protein.start - 1, protein.stop)
-        : source.sequence;
+const SequenceDisplay = ({ name, start, stop, sequence, valid }) => {
+    const before = start == '' ? '' : sequence.slice(0, start - 1)
+    const after = stop == '' ? '' : sequence.slice(stop, sequence.length)
+    const slice = start == '' && stop == '' ? sequence : sequence.slice(start - 1, stop)
 
     return (
         <React.Fragment>
@@ -21,7 +13,7 @@ const SequenceDisplay = ({ source, protein, valid }) => {
                         type="text"
                         className="form-control"
                         placeholder="Name"
-                        value={protein.name}
+                        value={name}
                         readOnly
                     />
                 </div>
@@ -30,7 +22,7 @@ const SequenceDisplay = ({ source, protein, valid }) => {
                         type="text"
                         className="form-control"
                         placeholder="Start"
-                        value={protein.start}
+                        value={start}
                         readOnly
                     />
                 </div>
@@ -39,7 +31,7 @@ const SequenceDisplay = ({ source, protein, valid }) => {
                         type="text"
                         className="form-control"
                         placeholder="Stop"
-                        value={protein.stop}
+                        value={stop}
                         readOnly
                     />
                 </div>
@@ -71,9 +63,9 @@ const SequenceDisplay = ({ source, protein, valid }) => {
                         border: '1px solid #ced4da',
                         backgroundColor: '#e9ecef',
                     }}>
-                        {before == '' && after == '' ? sequence : (
+                        {before == '' && after == '' ? slice : (
                             <React.Fragment>
-                                {before}<strong>{sequence}</strong>{after}
+                                {before}<strong>{slice}</strong>{after}
                             </React.Fragment>
                         )}
                     </div>

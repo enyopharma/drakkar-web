@@ -4,37 +4,37 @@ import ExtractFormGroup from './ExtractFormGroup'
 import DomainsFormGroup from './DomainsFormGroup'
 import CoordinatesFormGroup from './CoordinatesFormGroup'
 
-const MappingEditor = ({ query, processing, protein, update, fire }) => {
-    const isQueryValid = query.trim() != '' && protein.mapping.filter(mapping => {
-        return query.toUpperCase().trim() == mapping.sequence.toUpperCase().trim()
+const MappingEditor = ({ query, mapped, sequence, domains, processing, update, fire }) => {
+    const isQueryValid = query.trim() != '' && mapped.filter(sequence => {
+        return query.toUpperCase().trim() == sequence.toUpperCase().trim()
     }).length == 0
 
     const setCoordinates = (start, stop) => {
-        update(protein.sequence.slice(start - 1, stop))
+        update(sequence.slice(start - 1, stop))
     }
 
-    const selectFeature = feature => {
-        setCoordinates(feature.start, feature.stop)
+    const selectDomain = domain => {
+        setCoordinates(domain.start, domain.stop)
     }
 
     return (
         <React.Fragment>
             <DomainsFormGroup
-                domains={protein.domains}
+                domains={domains}
                 enabled={! processing}
-                select={selectFeature}
+                select={selectDomain}
             >
                 Extract feature sequence
             </DomainsFormGroup>
             <CoordinatesFormGroup
-                sequence={protein.sequence}
+                sequence={sequence}
                 enabled={! processing}
                 set={update}
             >
                 Extract sequence to map
             </CoordinatesFormGroup>
             <ExtractFormGroup
-                sequence={protein.sequence}
+                sequence={sequence}
                 enabled={! processing}
                 set={setCoordinates}
             >
@@ -56,7 +56,7 @@ const MappingEditor = ({ query, processing, protein, update, fire }) => {
                     <button
                         type="button"
                         className="btn btn-block btn-primary"
-                        onClick={e => fire(protein.sequences)}
+                        onClick={e => fire()}
                         disabled={processing || ! isQueryValid}
                     >
                         {processing
