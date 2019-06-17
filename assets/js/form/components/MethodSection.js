@@ -3,7 +3,7 @@ import React from 'react'
 import api from '../api'
 import SearchField from './SearchField'
 
-const MethodSection = ({ selected, select, unselect }) => {
+const MethodSection = ({ query, selected, update, select, unselect }) => {
     const search = q => api.method.search(q).then(methods => {
         return methods.map(method => ({
             value: method,
@@ -15,7 +15,7 @@ const MethodSection = ({ selected, select, unselect }) => {
         <div className="row">
             <div className="col">
                 <div style={{display: selected == null ? 'block' : 'none'}}>
-                    <SearchField search={search} select={select}>
+                    <SearchField query={query} update={update} search={search} select={select}>
                         Search a method...
                     </SearchField>
                 </div>

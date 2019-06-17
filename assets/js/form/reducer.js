@@ -1,5 +1,16 @@
 import actions from './actions'
 
+const qmethod = (state = '', action) => {
+    switch (action.type) {
+        case actions.UPDATE_METHOD_QUERY:
+            return action.query
+        case actions.RESET:
+            return ''
+        default:
+            return state
+    }
+}
+
 const method = (state = null, action) => {
     if (action.type == actions.RESET) return null
 
@@ -42,6 +53,19 @@ const processing = (i, state = false, action) => {
             return false
         case actions.CANCEL_ALIGNMENT:
             return false
+        default:
+            return state
+    }
+}
+
+const qprotein = (i, state = '', action) => {
+    if (action.type == actions.RESET) return ''
+
+    if (action.i != i) return state
+
+    switch (action.type) {
+        case actions.UPDATE_PROTEIN_QUERY:
+            return action.query
         default:
             return state
     }
@@ -179,6 +203,7 @@ const interactor = (i, state = {}, action) => {
     return {
         editing: editing(i, state.editing, action),
         processing: processing(i, state.processing, action),
+        qprotein: qprotein(i, state.qprotein, action),
         protein: protein(i, state.protein, action),
         name: name(i, state.name, action),
         start: start(i, state.start, action),
@@ -211,6 +236,7 @@ const feedback = (state = null, action) => {
 
 export default (state = {}, action) => {
     return {
+        qmethod: qmethod(state.qmethod, action),
         method: method(state.method, action),
         interactor1: interactor(1, state.interactor1, action),
         interactor2: interactor(2, state.interactor2, action),

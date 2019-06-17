@@ -2,6 +2,13 @@ import api from './api'
 import actions from './actions'
 
 const method = {
+    update: query => {
+        return {
+            type: actions.UPDATE_METHOD_QUERY,
+            query: query,
+        }
+    },
+
     select: method => {
         return {
             type: actions.SELECT_METHOD,
@@ -17,6 +24,14 @@ const method = {
 }
 
 const protein = {
+    update: (i, query) => {
+        return {
+            i: i,
+            type: actions.UPDATE_PROTEIN_QUERY,
+            query: query,
+        }
+    },
+
     select: (i, protein) => {
         return dispatch => {
             api.protein.select(protein.accession)

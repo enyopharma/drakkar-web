@@ -18,6 +18,7 @@ const mapStateToInteractorProps = (i, type, state) => {
         protein: {
             type: type,
             editable: ! state.processing,
+            query: state.qprotein,
             selected: state.protein,
         },
         sequence: {
@@ -43,8 +44,8 @@ const mapStateToInteractorProps = (i, type, state) => {
                 protein: protein,
             },
             editor: {
-                query: state.qalignment,
                 processing: state.processing,
+                query: state.qalignment,
                 protein: protein,
             },
             modal: {
@@ -59,6 +60,7 @@ const mapStateToInteractorProps = (i, type, state) => {
 const mapDispatchToInteractorProps = (i, type, dispatch) => {
     return {
         protein: {
+            update: query => dispatch(creators.protein.update(i, query)),
             select: protein => dispatch(creators.protein.select(i, protein)),
             unselect: () => dispatch(creators.protein.unselect(i)),
         },
@@ -109,7 +111,8 @@ const mergeInteractorProps = (i, type, props, actions) => {
 const mapStateToProps = (state, { run_id, pmid, i1type, i2type }) => {
     return {
         method: {
-            selected: state.method
+            query: state.qmethod,
+            selected: state.method,
         },
         interactor1: mapStateToInteractorProps(1, i1type, state.interactor1),
         interactor2: mapStateToInteractorProps(2, i2type, state.interactor2),
@@ -135,6 +138,7 @@ const mapStateToProps = (state, { run_id, pmid, i1type, i2type }) => {
 const mapDispatchToProps = (dispatch, { run_id, pmid, i1type, i2type }) => {
     return {
         method: {
+            update: query => dispatch(creators.method.update(query)),
             select: method => dispatch(creators.method.select(method)),
             unselect: () => dispatch(creators.method.unselect()),
         },
@@ -147,12 +151,12 @@ const mapDispatchToProps = (dispatch, { run_id, pmid, i1type, i2type }) => {
     }
 }
 
-const mergeProps = (props, actions, { run_id, pmid, i1type, i2type }) => {
+const mergeProps = (props1, props2, { run_id, pmid, i1type, i2type }) => {
     return {
-        method: Object.assign(props.method, actions.method),
-        interactor1: mergeInteractorProps(1, i1type, props.interactor1, actions.interactor1),
-        interactor2: mergeInteractorProps(2, i2type, props.interactor2, actions.interactor2),
-        actions: Object.assign(props.actions, actions.actions),
+        method: Object.assign(props1.method, props2.method),
+        interactor1: mergeInteractorProps(1, i1type, props1.interactor1, props2.interactor1),
+        interactor2: mergeInteractorProps(2, i2type, props1.interactor2, props2.interactor2),
+        actions: Object.assign(props1.actions, props2.actions),
     }
 }
 

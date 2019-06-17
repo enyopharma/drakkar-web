@@ -1,8 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react'
 
-const SearchField = ({ search, select, max=5, children }) => {
+const SearchField = ({ query, update, search, select, max=5, children }) => {
     const timeout = useRef(null)
-    const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [visible, setVisible] = useState(false)
     const [active, setActive] = useState(0)
@@ -77,7 +76,7 @@ const SearchField = ({ search, select, max=5, children }) => {
                     onClick={e => setVisible(true)}
                     onFocus={e => setVisible(true)}
                     onBlur={e => setVisible(false)}
-                    onChange={e => setQuery(e.target.value)}
+                    onChange={e => update(e.target.value)}
                     onKeyDown={handleKeyDown}
                 />
             </div>
