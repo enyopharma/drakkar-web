@@ -9,26 +9,26 @@ import reducer from './reducer'
 import creators from './creators'
 import formatters from './formatters'
 
-const mapStateToInteractorProps = (i, type, ui, data) => {
-    const source = formatters.source(data)
-    const protein = formatters.protein(data)
-    const alignment = formatters.alignment(ui.alignment, protein.sequences)
+const mapStateToInteractorProps = (i, type, state) => {
+    const source = formatters.source(state)
+    const protein = formatters.protein(state)
+    const alignment = formatters.alignment(state.alignment, protein.sequences)
 
     return {
         protein: {
             type: type,
-            editable: ! ui.processing,
-            selected: data.protein,
+            editable: ! state.processing,
+            selected: state.protein,
         },
         sequence: {
-            editing: ui.editing,
+            editing: state.editing,
             display: {
-                valid: ! ui.editing,
+                valid: ! state.editing,
                 source: source,
                 protein: protein,
             },
             toggle: {
-                editable: type == 'v' && ! ui.editing && ! ui.processing,
+                editable: type == 'v' && ! state.editing && ! state.processing,
                 source: source,
                 protein: protein,
             },
@@ -38,18 +38,18 @@ const mapStateToInteractorProps = (i, type, ui, data) => {
             }
         },
         mapping: {
-            selecting: ui.alignment != null,
+            selecting: state.alignment != null,
             display: {
                 protein: protein,
             },
             editor: {
-                processing: ui.processing,
+                processing: state.processing,
                 protein: protein,
             },
             modal: {
                 i: i,
                 type: type,
-                alignment: formatters.alignment(ui.alignment, protein.sequences),
+                alignment: formatters.alignment(state.alignment, protein.sequences),
             },
         }
     }
@@ -104,33 +104,33 @@ const mergeInteractorProps = (i, type, props, actions) => {
     }
 }
 
-const mapStateToProps = (state, { i1type, i2type }) => {
+const mapStateToProps = (state, { run_id, pmid, i1type, i2type }) => {
     return {
         method: {
-            selected: state.data.method
+            selected: state.method
         },
-        interactor1: mapStateToInteractorProps(1, i1type, state.ui.interactor1, state.data.interactor1),
-        interactor2: mapStateToInteractorProps(2, i2type, state.ui.interactor2, state.data.interactor2),
+        interactor1: mapStateToInteractorProps(1, i1type, state.interactor1),
+        interactor2: mapStateToInteractorProps(2, i2type, state.interactor2),
         actions: {
-            saving: state.ui.saving,
-            feedback: state.ui.feedback,
-            savable: ! state.ui.interactor1.editing && ! state.ui.interactor2.editing
-                    && ! state.ui.interactor1.processing && ! state.ui.interactor2.processing
-                    && state.data.method != null
-                    && state.data.interactor1.protein != null
-                    && state.data.interactor1.name != ''
-                    && state.data.interactor1.start != ''
-                    && state.data.interactor1.stop != ''
-                    && state.data.interactor2.protein != null
-                    && state.data.interactor2.name != ''
-                    && state.data.interactor2.start != ''
-                    && state.data.interactor2.stop != '',
-            resetable: ! state.ui.interactor1.processing && ! state.ui.interactor2.processing,
+            saving: state.saving,
+            feedback: state.feedback,
+            savable: ! state.interactor1.editing && ! state.interactor2.editing
+                    && ! state.interactor1.processing && ! state.interactor2.processing
+                    && state.method != null
+                    && state.interactor1.protein != null
+                    && state.interactor1.name != ''
+                    && state.interactor1.start != ''
+                    && state.interactor1.stop != ''
+                    && state.interactor2.protein != null
+                    && state.interactor2.name != ''
+                    && state.interactor2.start != ''
+                    && state.interactor2.stop != '',
+            resetable: ! state.interactor1.processing && ! state.interactor2.processing,
         },
     }
 }
 
-const mapDispatchToProps = (dispatch, { i1type, i2type }) => {
+const mapDispatchToProps = (dispatch, { run_id, pmid, i1type, i2type }) => {
     return {
         method: {
             select: method => dispatch(creators.method.select(method)),
@@ -139,13 +139,13 @@ const mapDispatchToProps = (dispatch, { i1type, i2type }) => {
         interactor1: mapDispatchToInteractorProps(1, i1type, dispatch),
         interactor2: mapDispatchToInteractorProps(2, i2type, dispatch),
         actions: {
-            save: () => dispatch(creators.save()),
+            save: () => dispatch(creators.save(run_id, pmid)),
             reset: () => dispatch(creators.reset()),
         },
     }
 }
 
-const mergeProps = (props, actions, { i1type, i2type }) => {
+const mergeProps = (props, actions, { run_id, pmid, i1type, i2type }) => {
     return {
         method: Object.assign(props.method, actions.method),
         interactor1: mergeInteractorProps(1, i1type, props.interactor1, actions.interactor1),
@@ -165,12 +165,19 @@ window.form = {
         const i1type = 'h'
         const i2type = type == 'hh' ? 'h' : 'v'
 
-        const state = { run_id: run_id, pmid: pmid, data: data }
+        const state = { data: data }
 
         let store = createStore(reducer, state, applyMiddleware(thunk))
 
         render(
-            <Provider store={store}><App i1type={i1type} i2type={i2type} /></Provider>,
+            <Provider store={store}>
+                <App
+                    run_id={run_id}
+                    pmid={pmid}
+                    i1type={i1type}
+                    i2type={i2type}
+                />
+            </Provider>,
             document.getElementById(id)
         )
     }
