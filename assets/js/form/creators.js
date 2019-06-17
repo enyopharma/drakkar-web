@@ -90,9 +90,13 @@ const alignment = {
 
             dispatch({ i: i, type: actions.FIRE_ALIGNMENT})
 
-            api.alignment(query, sequences, alignment => {
-                dispatch({ i: i, type: actions.SHOW_ALIGNMENT, alignment: alignment })
-            })
+            api.alignment(query, sequences)
+                .catch(error => console.log(error))
+                .then(alignment => dispatch({
+                    i: i,
+                    type: actions.SHOW_ALIGNMENT,
+                    alignment: alignment
+                }))
         }
     },
 
@@ -122,19 +126,16 @@ const alignment = {
 
 const save = (run_id, pmid) => {
     return (dispatch, getState) =>  {
-        dispatch({
-            type: actions.FIRE_SAVE,
-        })
+        dispatch({ type: actions.FIRE_SAVE })
 
-        const state = getState();
-
-        console.log(state);
-
-        api.save(run_id, pmid, state, response => dispatch({
-            type: actions.SHOW_FEEDBACK,
-            success: response.success,
-            message: response.reason,
-        }))
+        api.save(run_id, pmid, getState())
+            .catch(error => console.log(error))
+            .then(response => response.json())
+            .then(json => dispatch({
+                type: actions.SHOW_FEEDBACK,
+                success: json.success,
+                message: json.reason,
+            }))
     }
 }
 

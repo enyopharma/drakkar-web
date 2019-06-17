@@ -19,68 +19,58 @@ const protein = {
         .then(json => json.data.protein),
 }
 
-const alignment = (query, sequences, handler) => {
+const alignment = (query, sequences) => {
     const id = uuid()
 
-    const socket = new WebSocket(`ws://${window.location.host}:3000`, 'app')
+    return new Promise((resolve, reject) => {
+        const socket = new WebSocket(`ws://${window.location.host}:3000`, 'app')
 
-    socket.onopen = () => socket.send(JSON.stringify({
-        channel: 'echo',
-        payload: {
-            id: id,
-            message: `Listening for job with id '${id}'.`,
-        },
-    }))
+        socket.onopen = () => socket.send(JSON.stringify({
+            channel: 'echo',
+            payload: { id: id, message: `Listening for job with id '${id}'.` },
+        }))
 
-    socket.onmessage = event => {
-        const message = JSON.parse(event.data)
+        socket.onmessage = event => {
+            const message = JSON.parse(event.data)
 
-        const channel = message.channel;
-        const payload = message.payload;
+            const channel = message.channel;
+            const payload = message.payload;
 
-        if (channel == 'echo' && payload.id == id) {
-            console.log(payload.message)
-            return;
+            if (channel == 'echo' && payload.id == id) {
+                console.log(payload.message)
+                return;
+            }
+
+            if (channel == 'alignment' && payload.id == id) {
+                socket.close()
+                resolve(payload.alignment)
+            }
         }
 
-        if (channel == 'alignment' && payload.id == id) {
-            handler(payload.alignment)
-            socket.close()
-        }
-    }
-
-    const request = fetch('/jobs/alignments', {
-        method: 'POST',
-        headers: {
-            'accept': 'application/json',
-            'content-type': 'application/json',
-        },
-        body: JSON.stringify({
-            id: id,
-            query: query,
-            sequences: sequences,
-        })
+        fetch('/jobs/alignments', {
+            method: 'POST',
+            headers: {
+                'accept': 'application/json',
+                'content-type': 'application/json',
+            },
+            body: JSON.stringify({
+                id: id,
+                query: query,
+                sequences: sequences,
+            })
+        }).catch(error => reject(error))
     })
-
-    request.then(response => {}, error => console.log(error))
 }
 
-const save = (run_id, pmid, description, handler) => {
-    const url = `/runs/${run_id}/publications/${pmid}/descriptions`
-
-    const request = fetch(url, {
+const save = (run_id, pmid, body) => {
+    return fetch(`/runs/${run_id}/publications/${pmid}/descriptions`, {
         method: 'POST',
         headers: {
             'accept': 'application/json',
             'content-type': 'application/json',
         },
-        body: JSON.stringify(description)
+        body: JSON.stringify(body)
     })
-
-    request
-        .then(response => response.json(), response => response.json())
-        .then(json => handler(json))
-
 }
 
 export default { method, protein, alignment, save }
