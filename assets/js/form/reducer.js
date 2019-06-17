@@ -14,7 +14,10 @@ const qmethod = (state = '', action) => {
 const method = (state = null, action) => {
     switch (action.type) {
         case actions.SELECT_METHOD:
-            return action.method
+            return {
+                psimi_id: action.method.psimi_id,
+                name: action.method.name,
+            }
         case actions.UNSELECT_METHOD:
             return null
         case action.RESET:
@@ -76,7 +79,17 @@ const protein = (i, state = null, action) => {
 
     switch (action.type) {
         case actions.SELECT_PROTEIN:
-            return action.protein
+            return {
+                type: action.protein.type,
+                accession: action.protein.accession,
+                name: action.protein.name,
+                description: action.protein.description,
+                sequence: action.protein.sequence,
+                isoforms: action.protein.isoforms,
+                matures: action.protein.matures,
+                chains: action.protein.chains,
+                domains: action.protein.domains,
+            }
         case actions.UNSELECT_PROTEIN:
             return null
         case actions.RESET:
