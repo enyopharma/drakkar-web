@@ -48,7 +48,7 @@ const method = (state = null, action) => {
             }
         case actions.UNSELECT_METHOD:
             return null
-        case action.RESET:
+        case actions.RESET:
             return null
         default:
             return state
