@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import Alignment from './Alignment'
 
-const MappingDisplay = ({ type, mapping, remove }) => {
+const MappingDisplay = ({ type, width, mapping, remove }) => {
     return (
         <React.Fragment>
             {mapping.map((alignment, i) => (
@@ -11,6 +11,7 @@ const MappingDisplay = ({ type, mapping, remove }) => {
                         <Alignment
                             key={i}
                             type={type}
+                            width={width}
                             alignment={alignment}
                             remove={() => remove(i)}
                         />

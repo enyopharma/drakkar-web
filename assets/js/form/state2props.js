@@ -22,26 +22,6 @@ const state2protein = ({ protein }) => {
     }
 }
 
-const state2mature = ({ name, start, stop, protein }) => {
-    if (name == '' || start == '' || stop == '' || protein == null) {
-        return { name: '', start: '', stop: '', sequence: '', domains: []}
-    }
-
-    const sequence = protein.sequence.slice(start - 1, stop)
-
-    const domains = protein.domains.map(domain => {
-        return {
-            key: domain.key,
-            description: domain.description,
-            start: domain.start - start + 1,
-            stop: domain.stop - start + 1,
-            valid: domain.start >= start && domain.stop <= stop,
-        }
-    })
-
-    return { name, start, stop, sequence, domains }
-}
-
 const state2sequences = ({ start, stop, protein }) => {
     if (start == '' || stop == '' || protein == null) {
         return []
@@ -56,23 +36,44 @@ const state2sequences = ({ start, stop, protein }) => {
         : canonical
 }
 
+const state2mature = ({ name, start, stop, protein, mapping }) => {
+    if (name == '' || start == '' || stop == '' || protein == null) {
+        return { name: '', start: '', stop: '', sequence: '', domains: [], maxwidth: 0, mapping: []}
+    }
+
+    const sequence = protein.sequence.slice(start - 1, stop)
+
+    const sequences = state2sequences({ start, stop, protein })
+
+    const domains = protein.domains.map(domain => {
+        return {
+            key: domain.key,
+            description: domain.description,
+            start: domain.start - start + 1,
+            stop: domain.stop - start + 1,
+            valid: domain.start >= start && domain.stop <= stop,
+        }
+    })
+
+    const maxwidth = Math.max(...Object.values(sequences).map(sequence => {
+        return sequence.length
+    }))
+
+    return Object.assign({ name, start, stop, sequence, domains, maxwidth }, {
+        mapping: mapping.map(alignment => inject(alignment, sequences))
+    })
+}
+
 const state2alignment = state => {
     const sequences = state2sequences(state)
 
     return state.ui.alignment == null ? null : inject(Object.assign({}, state.ui.alignment), sequences)
 }
 
-const state2mapping = state => {
-    const sequences = state2sequences(state)
-
-    return state.mapping.map(alignment => inject(alignment, sequences))
-}
-
 const mapStateToInteractorProps = (i, type, state) => {
     const protein = state2protein(state)
     const mature = state2mature(state)
     const alignment = state2alignment(state)
-    const mapping = state2mapping(state)
 
     return {
         protein: {
@@ -108,7 +109,8 @@ const mapStateToInteractorProps = (i, type, state) => {
             selecting: state.ui.alignment != null,
             display: {
                 type: type,
-                mapping: mapping,
+                width: mature.maxwidth,
+                mapping: mature.mapping,
             },
             editor: {
                 query: state.ui.qalignment,
@@ -120,6 +122,7 @@ const mapStateToInteractorProps = (i, type, state) => {
             modal: {
                 i: i,
                 type: type,
+                width: mature.maxwidth,
                 alignment: alignment,
             },
         }
