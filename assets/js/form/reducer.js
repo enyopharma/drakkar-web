@@ -230,7 +230,9 @@ const interactorui = (state = {}, action) => {
 }
 
 const interactor = (i, state = {}, action) => {
-    const scoped = i == action.i ? action : { type: 'OUT_OF_SCOPE' }
+    const scoped = i != action.i && action.type != actions.RESET
+        ? { type: 'OUT_OF_SCOPE' }
+        : action
 
     return {
         protein: protein(state.protein, scoped),

@@ -140,10 +140,7 @@ const save = (run_id, pmid) => {
 }
 
 const reset = () => {
-    return dispatch => {
-        dispatch({i: 1, type: actions.RESET})
-        dispatch({i: 2, type: actions.RESET})
-    }
+    return { type: actions.RESET }
 }
 
 export default { method, protein, mature, alignment, save, reset }
