@@ -59,7 +59,6 @@ const protein = (state = null, action) => {
     switch (action.type) {
         case actions.SELECT_PROTEIN:
             return {
-                type: action.protein.type,
                 accession: action.protein.accession,
                 name: action.protein.name,
                 description: action.protein.description,
