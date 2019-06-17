@@ -244,11 +244,19 @@ const interactor = (i, state = {}, action) => {
     }
 
     if (action.type == actions.HANDLE_SAVE && action.success) {
-        newState.protein.matures = newState.protein.matures.concat([{
-            name: newState.name,
-            start: newState.start,
-            stop: newState.stop,
-        }])
+        const existing = newState.protein.matures.map(mature => {
+            return mature.name == name
+                && mature.start == start
+                && mature.stop == stop
+        })
+
+        if (existing.length == 0) {
+            newState.protein.matures = newState.protein.matures.concat([{
+                name: newState.name,
+                start: newState.start,
+                stop: newState.stop,
+            }])
+        }
     }
 
     return newState
