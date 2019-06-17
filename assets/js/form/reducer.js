@@ -12,12 +12,12 @@ const qmethod = (state = '', action) => {
 }
 
 const method = (state = null, action) => {
-    if (action.type == actions.RESET) return null
-
     switch (action.type) {
         case actions.SELECT_METHOD:
             return action.method
         case actions.UNSELECT_METHOD:
+            return null
+        case action.RESET:
             return null
         default:
             return state
@@ -25,8 +25,6 @@ const method = (state = null, action) => {
 }
 
 const editing = (i, state = false, action) => {
-    if (action.type == actions.RESET) return false
-
     if (action.i != i) return state
 
     switch (action.type) {
@@ -36,14 +34,14 @@ const editing = (i, state = false, action) => {
             return true
         case actions.UPDATE_MATURE:
             return false
+        case actions.RESET:
+            return false
         default:
             return state
     }
 }
 
 const processing = (i, state = false, action) => {
-    if (action.type == actions.RESET) return false
-
     if (action.i != i) return state
 
     switch (action.type) {
@@ -53,27 +51,27 @@ const processing = (i, state = false, action) => {
             return false
         case actions.CANCEL_ALIGNMENT:
             return false
+        case actions.RESET:
+            return false
         default:
             return state
     }
 }
 
 const qprotein = (i, state = '', action) => {
-    if (action.type == actions.RESET) return ''
-
     if (action.i != i) return state
 
     switch (action.type) {
         case actions.UPDATE_PROTEIN_QUERY:
             return action.query
+        case actions.RESET:
+            return ''
         default:
             return state
     }
 }
 
 const protein = (i, state = null, action) => {
-    if (action.type == actions.RESET) return null
-
     if (action.i != i) return state
 
     switch (action.type) {
@@ -81,14 +79,14 @@ const protein = (i, state = null, action) => {
             return action.protein
         case actions.UNSELECT_PROTEIN:
             return null
+        case actions.RESET:
+            return null
         default:
             return state
     }
 }
 
 const name = (i, state = '', action) => {
-    if (action.type == actions.RESET) return ''
-
     if (action.i != i) return state
 
     switch (action.type) {
@@ -100,14 +98,14 @@ const name = (i, state = '', action) => {
             return ''
         case actions.UPDATE_MATURE:
             return action.mature.name
+        case actions.RESET:
+            return ''
         default:
             return state
     }
 }
 
 const start = (i, state = '', action) => {
-    if (action.type == actions.RESET) return ''
-
     if (action.i != i) return state
 
     switch (action.type) {
@@ -119,14 +117,14 @@ const start = (i, state = '', action) => {
             return ''
         case actions.UPDATE_MATURE:
             return action.mature.start
+        case actions.RESET:
+            return ''
         default:
             return state
     }
 }
 
 const stop = (i, state = '', action) => {
-    if (action.type == actions.RESET) return ''
-
     if (action.i != i) return state
 
     switch (action.type) {
@@ -138,14 +136,14 @@ const stop = (i, state = '', action) => {
             return ''
         case actions.UPDATE_MATURE:
             return action.mature.stop
+        case actions.RESET:
+            return ''
         default:
             return state
     }
 }
 
 const mapping = (i, state = [], action) => {
-    if (action.type == actions.RESET) return []
-
     if (action.i != i) return state
 
     switch (action.type) {
@@ -162,14 +160,14 @@ const mapping = (i, state = [], action) => {
                 ...state.slice(0, action.index),
                 ...state.slice(action.index + 1, state.length),
             ]
+        case actions.RESET:
+            return []
         default:
             return state
     }
 }
 
 const qalignment = (i, state = '', action) => {
-    if (action.type == actions.RESET) return ''
-
     if (action.i != i) return state
 
     switch (action.type) {
@@ -177,14 +175,14 @@ const qalignment = (i, state = '', action) => {
             return action.query
         case actions.ADD_ALIGNMENT:
             return ''
+        case actions.RESET:
+            return ''
         default:
             return state
     }
 }
 
 const alignment = (i, state = null, action) => {
-    if (action.type == actions.RESET) return null
-
     if (action.i != i) return state
 
     switch (action.type) {
@@ -193,6 +191,8 @@ const alignment = (i, state = null, action) => {
         case actions.ADD_ALIGNMENT:
             return null
         case actions.CANCEL_ALIGNMENT:
+            return null
+        case actions.RESET:
             return null
         default:
             return state

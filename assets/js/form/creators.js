@@ -137,8 +137,9 @@ const save = (run_id, pmid) => {
 }
 
 const reset = () => {
-    return {
-        type: actions.RESET,
+    return dispatch => {
+        dispatch({i: 1, type: actions.RESET})
+        dispatch({i: 2, type: actions.RESET})
     }
 }
 
