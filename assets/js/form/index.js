@@ -43,6 +43,7 @@ const mapStateToInteractorProps = (i, type, state) => {
                 protein: protein,
             },
             editor: {
+                query: state.qalignment,
                 processing: state.processing,
                 protein: protein,
             },
@@ -71,10 +72,11 @@ const mapDispatchToInteractorProps = (i, type, dispatch) => {
         },
         mapping: {
             display: {
-                remove: index => dispatch(creators.alignment.remove(i, index))
+                remove: index => dispatch(creators.alignment.remove(i, index)),
             },
             editor: {
-                fire: (query, sequences) => dispatch(creators.alignment.fire(i, query, sequences))
+                update: query => dispatch(creators.alignment.update(i, query)),
+                fire: sequences => dispatch(creators.alignment.fire(i, sequences)),
             },
             modal: {
                 add: alignment => dispatch(creators.alignment.add(i, alignment)),

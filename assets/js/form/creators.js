@@ -57,8 +57,20 @@ const mature = {
 }
 
 const alignment = {
-    fire: (i, query, sequences) => {
-        return dispatch => {
+    update: (i, query) => {
+        return {
+            i: i,
+            type: actions.UPDATE_ALIGNMENT_QUERY,
+            query: query,
+        }
+    },
+
+    fire: (i, sequences) => {
+        return (dispatch, getState) => {
+            const state = getState()
+            const interactor = i == 1 ? state.interactor1 : state.interactor2
+            const query = interactor.qalignment
+
             dispatch({ i: i, type: actions.FIRE_ALIGNMENT})
 
             api.alignment(query, sequences, alignment => {

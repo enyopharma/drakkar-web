@@ -1,18 +1,16 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import ExtractFormGroup from './ExtractFormGroup'
 import DomainsFormGroup from './DomainsFormGroup'
 import CoordinatesFormGroup from './CoordinatesFormGroup'
 
-const MappingEditor = ({ processing, protein, fire }) => {
-    const [query, setQuery] = useState('')
-
+const MappingEditor = ({ query, processing, protein, update, fire }) => {
     const isQueryValid = query.trim() != '' && protein.mapping.filter(mapping => {
         return query.toUpperCase().trim() == mapping.sequence.toUpperCase().trim()
     }).length == 0
 
     const setCoordinates = (start, stop) => {
-        setQuery(protein.sequence.slice(start - 1, stop))
+        update(protein.sequence.slice(start - 1, stop))
     }
 
     const selectFeature = feature => {
@@ -31,7 +29,7 @@ const MappingEditor = ({ processing, protein, fire }) => {
             <CoordinatesFormGroup
                 sequence={protein.sequence}
                 enabled={! processing}
-                set={setQuery}
+                set={update}
             >
                 Extract sequence to map
             </CoordinatesFormGroup>
@@ -48,7 +46,7 @@ const MappingEditor = ({ processing, protein, fire }) => {
                         className="form-control"
                         placeholder="Sequence to map"
                         value={query}
-                        onChange={e => setQuery(e.target.value)}
+                        onChange={e => update(e.target.value)}
                         readOnly={processing}
                     />
                 </div>
@@ -58,7 +56,7 @@ const MappingEditor = ({ processing, protein, fire }) => {
                     <button
                         type="button"
                         className="btn btn-block btn-primary"
-                        onClick={e => fire(query, protein.sequences)}
+                        onClick={e => fire(protein.sequences)}
                         disabled={processing || ! isQueryValid}
                     >
                         {processing

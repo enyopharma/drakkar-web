@@ -143,6 +143,21 @@ const mapping = (i, state = [], action) => {
     }
 }
 
+const qalignment = (i, state = '', action) => {
+    if (action.type == actions.RESET) return ''
+
+    if (action.i != i) return state
+
+    switch (action.type) {
+        case actions.UPDATE_ALIGNMENT_QUERY:
+            return action.query
+        case actions.ADD_ALIGNMENT:
+            return ''
+        default:
+            return state
+    }
+}
+
 const alignment = (i, state = null, action) => {
     if (action.type == actions.RESET) return null
 
@@ -169,6 +184,7 @@ const interactor = (i, state = {}, action) => {
         start: start(i, state.start, action),
         stop: stop(i, state.stop, action),
         mapping: mapping(i, state.mapping, action),
+        qalignment: qalignment(i, state.qalignment, action),
         alignment: alignment(i, state.alignment, action),
     }
 }
