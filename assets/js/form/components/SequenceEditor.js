@@ -13,6 +13,8 @@ const SequenceEditor = ({ sequence, mature, matures, chains, update }) => {
 
     const isNameSet = name.trim() != ''
 
+    const isNameAlphaNum = name.trim().match(/^[a-zA-Z0-9]*$/)
+
     const areCoordinatesSet = start != '' && stop != ''
 
     const doesNameExist = matures.filter(m => {
@@ -27,7 +29,7 @@ const SequenceEditor = ({ sequence, mature, matures, chains, update }) => {
         return m.name == name.trim() && m.start == start && m.stop == stop
     }).length > 0
 
-    const isNameValid = ! isNameSet || ! doesNameExist || doesMatureExist
+    const isNameValid = ! isNameSet || (isNameAlphaNum && ! doesNameExist) || doesMatureExist
 
     const areCoordinatesValid = ! areCoordinatesSet || ! doCoordinatesExist || doesMatureExist
 
