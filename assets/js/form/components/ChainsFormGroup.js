@@ -20,14 +20,14 @@ const ChainsFormGroup = ({ chains, enabled = true, set, children }) => {
 
     const isValid = areContiguous(filtered)
 
-    const update = options => {
+    const select = options => {
         setSelected([...options]
             .filter(o => o.selected)
             .map(o => parseInt(o.value))
         )
     }
 
-    const handleClick = () => {
+    const submit = () => {
         set(filtered[0].start, filtered[filtered.length - 1].stop)
     }
 
@@ -37,7 +37,7 @@ const ChainsFormGroup = ({ chains, enabled = true, set, children }) => {
                 <select
                     value={selected}
                     className="form-control"
-                    onChange={e => update(e.target.options)}
+                    onChange={e => select(e.target.options)}
                     disabled={chains.length == 0}
                     multiple={true}
                 >
@@ -52,7 +52,7 @@ const ChainsFormGroup = ({ chains, enabled = true, set, children }) => {
                 <button
                     type="button"
                     className="btn btn-block btn-info"
-                    onClick={handleClick}
+                    onClick={e => submit()}
                     disabled={! enabled || ! isValid || filtered.length == 0}
                 >
                     {children}

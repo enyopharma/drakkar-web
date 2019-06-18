@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 const DomainsFormGroup = ({ domains, enabled = true, select, children }) => {
     const [domain, setDomain] = useState('')
 
-    const handleClick = () => {
+    const submit = () => {
         select(domains[domain])
     }
 
@@ -31,7 +31,7 @@ const DomainsFormGroup = ({ domains, enabled = true, select, children }) => {
                 <button
                     type="button"
                     className="btn btn-block btn-info"
-                    onClick={handleClick}
+                    onClick={e => submit()}
                     disabled={! enabled || domain == ''}
                 >
                     {children}

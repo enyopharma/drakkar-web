@@ -11,11 +11,6 @@ const SequenceEditor = ({ sequence, mature, matures, chains, update }) => {
     const [start, setStart] = useState(mature.start)
     const [stop, setStop] = useState(mature.stop)
 
-    const setCoordinates = (start, stop) => {
-        setStart(start)
-        setStop(stop)
-    }
-
     const isNameSet = name.trim() != ''
 
     const areCoordinatesSet = start != '' && stop != ''
@@ -39,11 +34,16 @@ const SequenceEditor = ({ sequence, mature, matures, chains, update }) => {
     const isMatureValid = isNameSet && areCoordinatesSet
         && (doesMatureExist || (! doesNameExist && ! doCoordinatesExist))
 
-    const handleValidate = () => {
+    const setCoordinates = (start, stop) => {
+        setStart(start)
+        setStop(stop)
+    }
+
+    const submit = () => {
         update({name: name.trim(), start: start, stop: stop})
     }
 
-    const handleReset = () => {
+    const reset = () => {
         setCoordinates(1, sequence.length)
     }
 
@@ -95,7 +95,7 @@ const SequenceEditor = ({ sequence, mature, matures, chains, update }) => {
                     <button
                         type="button"
                         className="btn btn-block btn-primary"
-                        onClick={handleValidate}
+                        onClick={e => submit()}
                         disabled={! isMatureValid}
                     >
                         Validate
@@ -118,7 +118,7 @@ const SequenceEditor = ({ sequence, mature, matures, chains, update }) => {
                     <button
                         type="button"
                         className="btn btn-block btn-info"
-                        onClick={handleReset}
+                        onClick={e => reset()}
                     >
                         Set to full length
                     </button>

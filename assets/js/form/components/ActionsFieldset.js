@@ -4,7 +4,7 @@ import Modal from 'react-bootstrap4-modal';
 const ActionsFieldset = ({ saving, savable, save, resetable, reset, feedback }) => {
     const [modal, setModal] = useState(false)
 
-    const confirmReset = () => {
+    const submitReset = () => {
         reset()
         setModal(false)
         window.scrollTo(0, 0)
@@ -60,7 +60,7 @@ const ActionsFieldset = ({ saving, savable, save, resetable, reset, feedback }) 
                     <button
                         type="button"
                         className="btn btn-block btn-primary"
-                        onClick={e => confirmReset()}
+                        onClick={e => submitReset()}
                     >
                         <i className="fas fa-eraser" /> Reset form data
                     </button>

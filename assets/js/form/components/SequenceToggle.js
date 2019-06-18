@@ -11,7 +11,7 @@ const SequenceToggle = ({ type, start, stop, width, editable, edit }) => {
             <div className="col-1">
                 <button
                     className="btn btn-block btn-warning"
-                    onClick={edit}
+                    onClick={e => edit()}
                     disabled={! editable}
                 >
                     <i className="fas fa-edit" />

@@ -9,7 +9,7 @@ const ExtractFormGroup = ({ sequence, enabled = true, set, children }) => {
 
     useEffect(() => setValid(true), [from, to])
 
-    const handleClick = () => {
+    const submit = () => {
         if (from.trim() == '' || to.trim() == '') return
 
         const [start1, stop1] = extract(sequence, from.trim())
@@ -44,7 +44,7 @@ const ExtractFormGroup = ({ sequence, enabled = true, set, children }) => {
                 <button
                     type="button"
                     className="btn btn-block btn-info"
-                    onClick={handleClick}
+                    onClick={e => submit()}
                     disabled={! enabled || from.trim() == '' || to.trim() == ''}
                 >
                     {children}

@@ -32,14 +32,6 @@ const MappingModal = ({ i, type, alignment, add, cancel }) => {
 
     const isValid = filtered.isoforms.length > 0
 
-    const select = (i, j) => {
-        setSelected(Array.concat([], selected, [[i, j]]))
-    }
-
-    const unselect = (i, j) => {
-        setSelected(selected.filter(s => s[0] != i || s[1] != j))
-    }
-
     const isIsoformSelected = i => {
         return selected.filter(s => s[0] == i).length > 0
     }
@@ -48,8 +40,16 @@ const MappingModal = ({ i, type, alignment, add, cancel }) => {
         return selected.filter(s => s[0] == i && s[1] == j).length > 0
     }
 
-    const handleToggle = (e, i, j) => {
-        e.target.checked ? select(i, j) : unselect(i, j)
+    const select = (i, j) => {
+        setSelected(Array.concat([], selected, [[i, j]]))
+    }
+
+    const unselect = (i, j) => {
+        setSelected(selected.filter(s => s[0] != i || s[1] != j))
+    }
+
+    const toggle = (checked, i, j) => {
+        checked ? select(i, j) : unselect(i, j)
     }
 
     return (
@@ -109,7 +109,7 @@ const MappingModal = ({ i, type, alignment, add, cancel }) => {
                                                     <input
                                                         type="checkbox"
                                                         checked={isOccurenceSelected(i, j)}
-                                                        onChange={e => handleToggle(e, i, j)}
+                                                        onChange={e => toggle(e.target.checked, i, j)}
                                                     />
                                                 </div>
                                             </div>

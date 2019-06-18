@@ -8,7 +8,7 @@ const SubsequenceFormGroup = ({ sequence, enabled = true, set, children }) => {
 
     useEffect(() => setValid(true), [subsequence])
 
-    const handleClick = () => {
+    const submit = () => {
         if (subsequence.trim() == '') return
 
         const [start, stop] = extract(sequence, subsequence.trim())
@@ -31,7 +31,7 @@ const SubsequenceFormGroup = ({ sequence, enabled = true, set, children }) => {
                 <button
                     type="button"
                     className="btn btn-block btn-info"
-                    onClick={handleClick}
+                    onClick={e => submit()}
                     disabled={! enabled || subsequence.trim() == ''}
                 >
                     {children}

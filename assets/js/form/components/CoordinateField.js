@@ -1,13 +1,13 @@
 import React from 'react'
 
-const CoordinateField = ({ value, set, max, valid = true, children }) => {
-    const handleChange = (e) => {
-        if (e.target.value == '') { set(''); return }
+const CoordinateField = ({ value, max, valid = true, set, children }) => {
+    const setCoordinate = (value) => {
+        if (value == '') { set(''); return }
 
-        let value = parseInt(e.target.value)
-        if (value < 1) value = 1
-        if (value > max) value = max
-        set(value)
+        let v = parseInt(value)
+        if (v < 1) v = 1
+        if (v > max) v = max
+        set(v)
     }
 
     return (
@@ -18,7 +18,7 @@ const CoordinateField = ({ value, set, max, valid = true, children }) => {
             className={'form-control' + (valid ? '' : ' is-invalid')}
             placeholder={children}
             value={value}
-            onChange={handleChange}
+            onChange={e => setCoordinate(e.target.value)}
         />
     )
 }

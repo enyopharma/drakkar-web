@@ -29,7 +29,7 @@ const UniprotSection = ({ type, query, selected, editable, update, select, unsel
                         <button
                             type="button"
                             className="close"
-                            onClick={unselect}
+                            onClick={e => unselect()}
                             disabled={! editable}
                         >
                             <span>&times;</span>

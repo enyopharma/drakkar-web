@@ -25,7 +25,7 @@ const MethodSection = ({ query, selected, update, select, unselect }) => {
                         <button
                             type="button"
                             className="close"
-                            onClick={unselect}
+                            onClick={e => unselect()}
                         >
                             <span>&times;</span>
                         </button>

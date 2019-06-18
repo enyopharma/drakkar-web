@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import MappingImg from './MappingImg'
 
@@ -18,7 +18,7 @@ const Alignment = ({ type, alignment, remove }) => {
                     <div className="col-1">
                         <button
                             className="btn btn-block btn-warning"
-                            onClick={(e) => remove()}
+                            onClick={e => remove()}
                         >
                             <i className="fas fa-trash" />
                         </button>
