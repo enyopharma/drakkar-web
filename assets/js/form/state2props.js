@@ -2,11 +2,14 @@ import creators from './creators'
 
 const inject = (alignment, sequences) => {
     return Object.assign(alignment, {
+        maxwidth: Math.max(...Object.values(sequences).map(sequence => {
+            return sequence.length
+        })),
         isoforms: alignment.isoforms.map(isoform => {
             return Object.assign(isoform, {
                 sequence: sequences[isoform.accession]
             })
-        })
+        }),
     })
 }
 
@@ -22,28 +25,27 @@ const state2protein = ({ protein }) => {
     }
 }
 
-const state2sequences = ({ start, stop, protein }) => {
-    if (start == '' || stop == '' || protein == null) {
-        return []
+const state2mature = ({ name, start, stop, protein, mapping, alignment }) => {
+    if (name == '' || start == '' || stop == '' || protein == null) {
+        return {
+            name: '',
+            start: '',
+            stop: '',
+            sequence: '',
+            sequences: [],
+            domains: [],
+            mapping: [],
+            alignment: null,
+        }
     }
 
     const sequence = protein.sequence.slice(start - 1, stop)
 
     const canonical = { [protein.accession]: sequence }
 
-    return start == 1 && stop == protein.sequence.length
+    const sequences = start == 1 && stop == protein.sequence.length
         ? Object.assign(canonical, protein.isoforms)
         : canonical
-}
-
-const state2mature = ({ name, start, stop, protein, mapping }) => {
-    if (name == '' || start == '' || stop == '' || protein == null) {
-        return { name: '', start: '', stop: '', sequence: '', domains: [], maxwidth: 0, mapping: []}
-    }
-
-    const sequence = protein.sequence.slice(start - 1, stop)
-
-    const sequences = state2sequences({ start, stop, protein })
 
     const domains = protein.domains.map(domain => {
         return {
@@ -55,48 +57,39 @@ const state2mature = ({ name, start, stop, protein, mapping }) => {
         }
     })
 
-    const maxwidth = Math.max(...Object.values(sequences).map(sequence => {
-        return sequence.length
-    }))
-
-    return Object.assign({ name, start, stop, sequence, domains, maxwidth }, {
-        mapping: mapping.map(alignment => inject(alignment, sequences))
+    return Object.assign({ name, start, stop, sequence, sequences, domains }, {
+        mapping: mapping.map(alignment => inject(alignment, sequences)),
+        alignment: alignment == null ? null : inject(alignment, sequences),
     })
-}
-
-const state2alignment = state => {
-    const sequences = state2sequences(state)
-
-    return state.ui.alignment == null ? null : inject(Object.assign({}, state.ui.alignment), sequences)
 }
 
 const mapStateToInteractorProps = (i, type, state) => {
     const protein = state2protein(state)
     const mature = state2mature(state)
-    const alignment = state2alignment(state)
 
     return {
         protein: {
             type: type,
-            editable: ! state.ui.processing,
-            query: state.ui.qprotein,
+            selecting: state.protein == null,
+            editable: ! state.processing,
+            query: state.qprotein,
             selected: state.protein,
         },
         sequence: {
-            editing: state.ui.editing,
+            editing: state.editing,
             display: {
                 name: mature.name,
                 start: mature.start,
                 stop: mature.stop,
                 sequence: protein.sequence,
-                valid: ! state.ui.editing,
+                valid: ! state.editing,
             },
             toggle: {
                 type: type,
                 start: mature.start,
                 stop: mature.stop,
                 width: protein.sequence.length,
-                editable: type == 'v' && ! state.ui.editing && ! state.ui.processing,
+                editable: type == 'v' && ! state.editing && ! state.processing,
             },
             editor: {
                 sequence: protein.sequence,
@@ -106,24 +99,22 @@ const mapStateToInteractorProps = (i, type, state) => {
             }
         },
         mapping: {
-            selecting: state.ui.alignment != null,
+            selecting: state.alignment != null,
             display: {
                 type: type,
-                width: mature.maxwidth,
                 mapping: mature.mapping,
             },
             editor: {
-                query: state.ui.qalignment,
+                query: state.qalignment,
                 mapped: state.mapping.map(alignment => alignment.sequence),
                 sequence: mature.sequence,
                 domains: mature.domains,
-                processing: state.ui.processing,
+                processing: state.processing,
             },
             modal: {
                 i: i,
                 type: type,
-                width: mature.maxwidth,
-                alignment: alignment,
+                alignment: mature.alignment,
             },
         }
     }
@@ -185,17 +176,17 @@ const mapStateToProps = (state, { run_id, pmid, type }) => {
 
     return {
         method: {
-            query: state.ui.qmethod,
+            query: state.qmethod,
             selected: state.method,
         },
         interactor1: mapStateToInteractorProps(1, type1, state.interactor1),
         interactor2: mapStateToInteractorProps(2, type2, state.interactor2),
         actions: {
-            saving: state.ui.saving,
-            feedback: state.ui.feedback,
-            resetable: ! state.interactor1.ui.processing && ! state.interactor2.ui.processing,
-            savable: ! state.interactor1.ui.editing && ! state.interactor2.ui.editing
-                    && ! state.interactor1.ui.processing && ! state.interactor2.ui.processing
+            saving: state.saving,
+            feedback: state.feedback,
+            resetable: ! state.interactor1.processing && ! state.interactor2.processing,
+            savable: ! state.interactor1.editing && ! state.interactor2.editing
+                    && ! state.interactor1.processing && ! state.interactor2.processing
                     && state.method != null
                     && state.interactor1.protein != null
                     && state.interactor1.name != ''
@@ -238,4 +229,4 @@ const mergeProps = (props1, props2, { run_id, pmid, type }) => {
     }
 }
 
-export { state2sequences, mapStateToProps, mapDispatchToProps, mergeProps }
+export { state2mature, mapStateToProps, mapDispatchToProps, mergeProps }

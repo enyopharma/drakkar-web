@@ -15,7 +15,7 @@ const InteractorFieldset = ({ i, type, protein, sequence, mapping }) => {
             <h3>Uniprot</h3>
             <UniprotSection {...protein} />
             <h3>Sequence</h3>
-            {protein.selected == null ? (
+            {protein.selecting ? (
                 <p>
                     Please select an uniprot entry first.
                 </p>
@@ -23,7 +23,7 @@ const InteractorFieldset = ({ i, type, protein, sequence, mapping }) => {
                 <SequenceSection {...sequence} />
             )}
             <h3>Mapping</h3>
-            {protein.selected == null || sequence.editing ? (
+            {protein.selecting || sequence.editing ? (
                 <p>
                     Please select a sequence first.
                 </p>

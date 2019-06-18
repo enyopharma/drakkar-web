@@ -1,44 +1,5 @@
 import actions from './actions'
 
-const qmethod = (state = '', action) => {
-    switch (action.type) {
-        case actions.UPDATE_METHOD_QUERY:
-            return action.query
-        case actions.RESET:
-            return ''
-        default:
-            return state
-    }
-}
-
-const saving = (state = false, action) => {
-    switch (action.type) {
-        case actions.FIRE_SAVE:
-            return true
-        case actions.HANDLE_SAVE:
-            return false
-        default:
-            return state
-    }
-}
-
-const feedback = (state = null, action) => {
-    switch (action.type) {
-        case actions.HANDLE_SAVE:
-            return { success: action.success, message: action.message }
-        default:
-            return null
-    }
-}
-
-const formui = (state = {}, action) => {
-    return {
-        qmethod: qmethod(state.qmethod, action),
-        saving: saving(state.saving, action),
-        feedback: feedback(state.feedback, action),
-    }
-}
-
 const method = (state = null, action) => {
     switch (action.type) {
         case actions.SELECT_METHOD:
@@ -219,47 +180,74 @@ const alignment = (state = null, action) => {
     }
 }
 
-const interactorui = (state = {}, action) => {
-    return {
-        editing: editing(state.editing, action),
-        processing: processing(state.processing, action),
-        qprotein: qprotein(state.qprotein, action),
-        qalignment: qalignment(state.qalignment, action),
-        alignment: alignment(state.alignment, action),
-    }
-}
-
 const interactor = (i, state = {}, action) => {
     const scoped = i != action.i && action.type != actions.RESET
         ? { type: 'OUT_OF_SCOPE' }
         : action
 
-    const newState = {
+    const interactor = {
         protein: protein(state.protein, scoped),
         name: name(state.name, scoped),
         start: start(state.start, scoped),
         stop: stop(state.stop, scoped),
         mapping: mapping(state.mapping, scoped),
-        ui: interactorui(state.ui, scoped)
+
+        // UI state: meant to start with default values
+        editing: editing(state.editing, scoped),
+        processing: processing(state.processing, scoped),
+        qprotein: qprotein(state.qprotein, scoped),
+        qalignment: qalignment(state.qalignment, scoped),
+        alignment: alignment(state.alignment, scoped),
     }
 
     if (action.type == actions.HANDLE_SAVE && action.success) {
-        const existing = newState.protein.matures.map(mature => {
+        const existing = interactor.protein.matures.map(mature => {
             return mature.name == name
                 && mature.start == start
                 && mature.stop == stop
         })
 
         if (existing.length == 0) {
-            newState.protein.matures = newState.protein.matures.concat([{
-                name: newState.name,
-                start: newState.start,
-                stop: newState.stop,
+            interactor.protein.matures = interactor.protein.matures.concat([{
+                name: interactor.name,
+                start: interactor.start,
+                stop: interactor.stop,
             }])
         }
     }
 
-    return newState
+    return interactor
+}
+
+const qmethod = (state = '', action) => {
+    switch (action.type) {
+        case actions.UPDATE_METHOD_QUERY:
+            return action.query
+        case actions.RESET:
+            return ''
+        default:
+            return state
+    }
+}
+
+const saving = (state = false, action) => {
+    switch (action.type) {
+        case actions.FIRE_SAVE:
+            return true
+        case actions.HANDLE_SAVE:
+            return false
+        default:
+            return state
+    }
+}
+
+const feedback = (state = null, action) => {
+    switch (action.type) {
+        case actions.HANDLE_SAVE:
+            return { success: action.success, message: action.message }
+        default:
+            return null
+    }
 }
 
 export default (state = {}, action) => {
@@ -267,6 +255,10 @@ export default (state = {}, action) => {
         method: method(state.method, action),
         interactor1: interactor(1, state.interactor1, action),
         interactor2: interactor(2, state.interactor2, action),
-        ui: formui(state.ui, action),
+
+        // UI state: meant to start with default values
+        qmethod: qmethod(state.qmethod, action),
+        saving: saving(state.saving, action),
+        feedback: feedback(state.feedback, action),
     }
 }

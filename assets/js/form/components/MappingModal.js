@@ -25,7 +25,7 @@ const filteredAlignment = (alignment, selected) => {
     })
 }
 
-const MappingModal = ({ i, type, width, alignment, add, cancel }) => {
+const MappingModal = ({ i, type, alignment, add, cancel }) => {
     const [selected, setSelected] = useState(indexes(alignment))
 
     const filtered = filteredAlignment(alignment, selected)
@@ -82,7 +82,7 @@ const MappingModal = ({ i, type, width, alignment, add, cancel }) => {
                                         type={type}
                                         start={1}
                                         stop={isoform.sequence.length}
-                                        width={width}
+                                        width={alignment.maxwidth}
                                         active={isIsoformSelected(i)}
                                     />
                                 </div>
@@ -101,7 +101,7 @@ const MappingModal = ({ i, type, width, alignment, add, cancel }) => {
                                                         type={type}
                                                         start={occurence.start}
                                                         stop={occurence.stop}
-                                                        width={width}
+                                                        width={alignment.maxwidth}
                                                         active={isOccurenceSelected(i, j)}
                                                     />
                                                 </div>

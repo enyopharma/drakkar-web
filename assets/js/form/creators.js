@@ -1,6 +1,6 @@
 import api from './api'
 import actions from './actions'
-import { state2sequences } from './state2props'
+import { state2mature } from './state2props'
 
 const method = {
     update: query => {
@@ -85,8 +85,8 @@ const alignment = {
         return (dispatch, getState) => {
             const state = getState()
             const interactor = i == 1 ? state.interactor1 : state.interactor2
-            const query = interactor.ui.qalignment
-            const sequences = state2sequences(interactor)
+            const query = interactor.qalignment
+            const sequences = state2mature(interactor).sequences
 
             dispatch({ i: i, type: actions.FIRE_ALIGNMENT})
 

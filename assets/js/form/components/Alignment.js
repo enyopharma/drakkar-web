@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import MappingImg from './MappingImg'
 
-const Alignment = ({ type, width, alignment, remove }) => {
+const Alignment = ({ type, alignment, remove }) => {
     return (
         <div className="card">
             <div className="card-header">
@@ -36,7 +36,7 @@ const Alignment = ({ type, width, alignment, remove }) => {
                                 type={type}
                                 start={1}
                                 stop={isoform.sequence.length}
-                                width={width}
+                                width={alignment.maxwidth}
                             />
                         </p>
                         <ul className="list-unstyled">
@@ -46,7 +46,7 @@ const Alignment = ({ type, width, alignment, remove }) => {
                                         type={type}
                                         start={occurence.start}
                                         stop={occurence.stop}
-                                        width={width}
+                                        width={alignment.maxwidth}
                                     />
                                 </li>
                             ))}
