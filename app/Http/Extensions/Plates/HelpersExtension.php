@@ -16,6 +16,7 @@ final class HelpersExtension implements ExtensionInterface
             'empty' => 'There is no pending publication.',
             'classes' => [
                 'text' => 'text-warning',
+                'badge' => 'badge-warning',
             ],
         ],
         Publication::SELECTED => [
@@ -23,6 +24,7 @@ final class HelpersExtension implements ExtensionInterface
             'empty' => 'There is no selected publication.',
             'classes' => [
                 'text' => 'text-primary',
+                'badge' => 'badge-primary',
             ],
         ],
         Publication::DISCARDED => [
@@ -30,6 +32,7 @@ final class HelpersExtension implements ExtensionInterface
             'empty' => 'There is no discarded publication.',
             'classes' => [
                 'text' => 'text-danger',
+                'badge' => 'badge-danger',
             ],
         ],
         Publication::CURATED => [
@@ -37,6 +40,7 @@ final class HelpersExtension implements ExtensionInterface
             'empty' => 'There is no curated publication.',
             'classes' => [
                 'text' => 'text-success',
+                'badge' => 'badge-success',
             ],
         ],
     ];
@@ -53,6 +57,10 @@ final class HelpersExtension implements ExtensionInterface
 
         $engine->registerFunction('textclass', function (string $state) {
             return $this->map[$state]['classes']['text'] ?? '';
+        });
+
+        $engine->registerFunction('badgeclass', function (string $state) {
+            return $this->map[$state]['classes']['badge'] ?? '';
         });
 
         $engine->registerFunction('highlighted', function (string $str, string $type, array $patterns) {

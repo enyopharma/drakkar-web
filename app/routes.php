@@ -28,7 +28,7 @@ return function (RouteCollector $collector) {
         'runs.publications.descriptions.create',
     ]);
 
-    $collector->get('/runs/{run_id}/publications/{pmid}/descriptions/{id}', ...[
+    $collector->get('/runs/{run_id}/publications/{pmid}/descriptions/{id}/edit', ...[
         App\Http\Handlers\Descriptions\EditHandler::class,
         'runs.publications.descriptions.edit',
     ]);

@@ -62,7 +62,7 @@ SQL;
         }
 
         throw new NotFoundException(
-            sprintf('%s has no entry with run_id %s and pmid %s', self::class, $pmid)
+            sprintf('%s has no entry with run_id %s and pmid %s', self::class, $run_id, $pmid)
         );
     }
 

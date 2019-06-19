@@ -6,6 +6,7 @@
         </title>
         <link rel="stylesheet" href="<?= $this->asset('build/app.css') ?>" />
         <?= $this->section('styles') ?>
+        <script type="text/javascript" src="<?= $this->asset('build/runtime.js') ?>"></script>
         <script type="text/javascript" src="<?= $this->asset('build/app.js') ?>"></script>
         <?= $this->section('scripts') ?>
     </head>

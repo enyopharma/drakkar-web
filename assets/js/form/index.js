@@ -8,21 +8,17 @@ import Form from './components/Form'
 import reducer from './reducer'
 import { mapStateToProps, mapDispatchToProps, mergeProps } from './state2props'
 
-const App = connect(mapStateToProps, mapDispatchToProps, mergeProps)(Form);
+const init = (wrapper, container, type, run_id, pmid, state = {}) => {
+    let store = createStore(reducer, state, applyMiddleware(thunk))
 
-window.form = {
-    create: (id, type, run_id, pmid) => {
-        window.form.edit(id, type, run_id, pmid)
-    },
+    const App = connect(mapStateToProps, mapDispatchToProps, mergeProps)(Form);
 
-    edit: (id, type, run_id, pmid, state = {}) => {
-        let store = createStore(reducer, state, applyMiddleware(thunk))
-
-        render(
-            <Provider store={store}>
-                <App type={type} run_id={run_id} pmid={pmid} />
-            </Provider>,
-            document.getElementById(id)
-        )
-    }
+    render(
+        <Provider store={store}>
+            <App type={type} run_id={run_id} pmid={pmid} wrapper={wrapper} />
+        </Provider>,
+        document.getElementById(container)
+    )
 }
+
+window.description = { form: init }

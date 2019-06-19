@@ -171,7 +171,7 @@ const mergeInteractorProps = (i, type, props1, props2) => {
     }
 }
 
-const mapStateToProps = (state, { run_id, pmid, type }) => {
+const mapStateToProps = (state, { wrapper, run_id, pmid, type }) => {
     const [type1, type2] = ['h', type == 'hh' ? 'h' : 'v']
 
     return {
@@ -182,6 +182,7 @@ const mapStateToProps = (state, { run_id, pmid, type }) => {
         interactor1: mapStateToInteractorProps(1, type1, state.interactor1),
         interactor2: mapStateToInteractorProps(2, type2, state.interactor2),
         actions: {
+            top: wrapper,
             saving: state.saving,
             feedback: state.feedback,
             resetable: ! state.interactor1.processing && ! state.interactor2.processing,

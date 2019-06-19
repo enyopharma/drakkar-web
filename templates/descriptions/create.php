@@ -1,13 +1,22 @@
 <?php $this->layout('layout'); ?>
 
+<?php if ($publication['state'] == $selected): ?>
 <?php $this->push('scripts'); ?>
 <script type="text/javascript" src="<?= $this->asset('build/form.js') ?>"></script>
 <script type="text/javascript">
     $(document).ready(function () {
-        form.create('description', '<?= $publication['run']['type'] ?>', <?= $publication['run']['id'] ?>, <?= $publication['pmid'] ?>);
+        description.form(
+            'description-wrap',
+            'description-form',
+            '<?= $publication['run']['type'] ?>',
+            <?= $publication['run']['id'] ?>,
+            <?= $publication['pmid'] ?>,
+            <?= count($description) == 0 ? '{}' : json_encode($description) ?>
+        );
     })
 </script>
 <?php $this->end(); ?>
+<?php endif ?>
 
 <div class="page-header">
     <h1>
@@ -24,4 +33,29 @@
     </h1>
 </div>
 
-<div id="description"></div>
+<div class="row">
+    <div class="col">
+        <?= $this->insert('publications/card', ['publication' => $publication, 'collapsed' => false]) ?>
+    </div>
+</div>
+
+<hr class="mt-4 mb-4">
+
+<?php if ($publication['state'] == $selected): ?>
+<div id="description-wrap" class="row">
+    <div class="col">
+        <div class="card">
+            <h4 class="card-header">
+                Add a new description
+            </h4>
+            <div class="card-body">
+                <div id="description-form"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php else: ?>
+<div class="alert alert-danger">
+    Publication state must be 'selected' in order to add new descriptions.
+</div>
+<?php endif ?>

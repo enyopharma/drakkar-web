@@ -35,6 +35,21 @@ return [
             );
         },
 
+        InteractorProjection::class => function ($container) {
+            return new InteractorProjection(
+                $container->get(PDO::class),
+                $container->get(ProteinProjection::class)
+            );
+        },
+
+        DescriptionProjection::class => function ($container) {
+            return new DescriptionProjection(
+                $container->get(PDO::class),
+                $container->get(MethodProjection::class),
+                $container->get(InteractorProjection::class)
+            );
+        },
+
         RunSumupProjection::class => function ($container) {
             return new RunSumupProjection(
                 $container->get(PDO::class),
@@ -46,14 +61,6 @@ return [
             return new PrecurationProjection(
                 $container->get(RunProjection::class),
                 $container->get(PublicationProjection::class)
-            );
-        },
-
-        DescriptionProjection::class => function ($container) {
-            return new DescriptionProjection(
-                $container->get(PDO::class),
-                $container->get(MethodProjection::class),
-                $container->get(InteractorProjection::class)
             );
         },
     ],

@@ -1,19 +1,19 @@
 import React, { useState } from 'react'
 import Modal from 'react-bootstrap4-modal';
 
-const ActionsFieldset = ({ saving, savable, save, resetable, reset, feedback }) => {
+const ActionsFieldset = ({ top, saving, savable, save, resetable, reset, feedback }) => {
     const [modal, setModal] = useState(false)
 
     const submitReset = () => {
         reset()
         setModal(false)
-        window.scrollTo(0, 0)
+        document.getElementById(top).scrollIntoView()
     }
 
     return (
         <fieldset>
             <legend>
-                <i className={'fas fa-circle small text-warning'} />
+                <i className={'fas fa-circle small text-success'} />
                 &nbsp;
                 Actions
             </legend>
@@ -67,12 +67,12 @@ const ActionsFieldset = ({ saving, savable, save, resetable, reset, feedback }) 
                 </div>
             </Modal>
             {feedback == null ? null : (
-                <p className={feedback.success ? 'text-success' : 'text-danger'}>
+                <div className={feedback.success ? 'text-success' : 'text-danger'}>
                     {feedback.success
                         ? 'Description successfully saved!'
                         : feedback.message
                     }
-                </p>
+                </div>
             )}
         </fieldset>
     )

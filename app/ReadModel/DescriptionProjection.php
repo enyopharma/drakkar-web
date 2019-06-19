@@ -10,7 +10,7 @@ final class DescriptionProjection
         SELECT d.*
         FROM associations AS a, descriptions AS d
         WHERE a.id = d.association_id
-        AND a.id = ?
+        AND a.run_id = ?
         AND a.pmid = ?
         AND d.id = ?
 SQL;
@@ -36,8 +36,6 @@ SQL;
 
         if ($description = $select_description_sth->fetch()) {
             return [
-                'run_id' => $run_id,
-                'pmid' => $pmid,
                 'method' => $this->methods->id($description['method_id']),
                 'interactor1' => $this->interactors->id($description['interactor1_id']),
                 'interactor2' => $this->interactors->id($description['interactor2_id']),
