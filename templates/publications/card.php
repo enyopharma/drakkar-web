@@ -17,7 +17,7 @@
         <p class="card-text text-muted">
             &mdash;&nbsp;<?= implode(', ', $publication['authors']) ?> in <?= $publication['journal'] ?>
         </p>
-        <div class="row mt-0 mb-0">
+        <div class="row my-0">
             <div class="col-2 offset-8">
                 <a
                     class="btn btn-sm btn-block btn-link"

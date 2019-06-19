@@ -79,10 +79,6 @@
                 <span class="text-danger">
                     <?= $this->e($run['nbs'][$discarded]) ?>
                 </span>
-                -
-                <span class="text-success">
-                    <?= $this->e($run['nbs'][$curated]) ?>
-                </span>
             </td>
             <td class="text-center">
                 <a href="<?= $this->url('runs.show', $run) ?>">

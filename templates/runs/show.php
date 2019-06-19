@@ -33,14 +33,6 @@
             Discarded (<?= $run['nbs'][$discarded] ?>)
         </a>
     </li>
-    <li class="nav-item">
-        <a
-            class="nav-link text-success <?= $state == $curated ? 'active' : '' ?>"
-            href="<?= $this->url('runs.show', $run, ['state' => $curated]) ?>"
-        >
-            Curated (<?= $run['nbs'][$curated] ?>)
-        </a>
-    </li>
 </ul>
 
 <h2 class="my-4">
