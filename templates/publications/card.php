@@ -61,7 +61,6 @@
                         name="state"
                         value="<?= $selected ?>"
                         class="btn btn-sm btn-block btn-primary"
-                        <?= $publication['selected'] ? 'disabled' : '' ?>
                     >
                         Select
                     </button>
@@ -72,7 +71,6 @@
                         name="state"
                         value="<?= $discarded ?>"
                         class="btn btn-sm btn-block btn-danger"
-                        <?= $publication['discarded'] ? 'disabled' : '' ?>
                     >
                         Discard
                     </button>
