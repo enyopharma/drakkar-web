@@ -12,6 +12,9 @@ Encore
     .addEntry('app', './assets/js/app.js')
     .addEntry('form', './assets/js/form/index.js')
 
+    // enable runtime chunks
+    .enableSingleRuntimeChunk()
+
     // allow sass/scss files to be processed
     .enableSassLoader()
 
