@@ -5,7 +5,7 @@ use Enyo\Http\Routing\RouteCollector;
 return function (RouteCollector $collector) {
     $collector->get('/', ...[
         App\Http\Handlers\Runs\IndexHandler::class,
-        'index',
+        'runs.index',
     ]);
 
     $collector->get('/runs/{id}', ...[
@@ -15,12 +15,12 @@ return function (RouteCollector $collector) {
 
     $collector->put('/runs/{run_id}/publications/{pmid}', ...[
         App\Http\Handlers\Publications\UpdateHandler::class,
-        'runs.publications',
+        'runs.publications.update',
     ]);
 
     $collector->post('/runs/{run_id}/publications/{pmid}/descriptions', ...[
         App\Http\Handlers\Descriptions\InsertHandler::class,
-        'runs.publications.descriptions',
+        'runs.publications.descriptions.store',
     ]);
 
     $collector->get('/runs/{run_id}/publications/{pmid}/descriptions/create', ...[

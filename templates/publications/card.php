@@ -41,7 +41,7 @@
     <div class="card-footer">
         <form
             method="POST"
-            action="<?= $this->url('runs.publications', $publication) ?>"
+            action="<?= $this->url('runs.publications.update', $publication) ?>"
         >
             <input type="hidden" name="_method" value="PUT" />
             <input type="hidden" name="redirect" value="<?= isset($redirect) ? $redirect : '' ?>" />

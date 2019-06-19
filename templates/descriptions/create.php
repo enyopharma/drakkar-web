@@ -20,7 +20,7 @@
 
 <div class="page-header">
     <h1>
-        <a href="<?= $this->url('index') ?>">
+        <a href="<?= $this->url('runs.index') ?>">
             Drakkar</a>
         &gt;
         <a href="<?= $this->url('runs.show', $publication['run']) ?>">

@@ -2,7 +2,7 @@
 
 <div class="page-header">
     <h1>
-        <a href="<?= $this->url('index') ?>">Drakkar</a>
+        <a href="<?= $this->url('runs.index') ?>">Drakkar</a>
         &gt;
         Run <?= $run['name'] ?>
     </h1>
