@@ -39,25 +39,25 @@
     <?= $this->header($state) ?>
 </h2>
 
-<?php if ($run['publications']->count() == 0): ?>
+<?php if ($publications->count() == 0): ?>
 <p>
     <?= $this->empty($state) ?>
 </p>
 <?php else: ?>
 <?php $this->insert('pagination/nav', [
-    'pagination' => $run['publications'],
+    'pagination' => $publications,
     'url' => $this->partialUrl('runs.show', $run, ['state' => $state]),
 ]) ?>
 <div class="row my-4">
     <div class="col">
         <?php $this->insert('publications/deck', [
             'type' => $run['type'],
-            'publications' => $run['publications'],
+            'publications' => $publications,
         ]) ?>
     </div>
 </div>
 <?php $this->insert('pagination/nav', [
-    'pagination' => $run['publications'],
+    'pagination' => $publications,
     'url' => $this->partialUrl('runs.show', $run, ['state' => $state]),
 ]) ?>
 <?php endif ?>

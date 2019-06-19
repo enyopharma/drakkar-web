@@ -6,7 +6,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\ReadModel\RunSumupProjection;
+use App\ReadModel\RunProjection;
 
 use Enyo\Http\Responders\HtmlResponder;
 
@@ -16,7 +16,7 @@ final class IndexHandler implements RequestHandlerInterface
 
     private $responder;
 
-    public function __construct(RunSumupProjection $runs, HtmlResponder $responder)
+    public function __construct(RunProjection $runs, HtmlResponder $responder)
     {
         $this->runs = $runs;
         $this->responder = $responder;

@@ -32,7 +32,10 @@ SQL;
 SQL;
 
     const COUNT_PUBLCIATIONS_SQL = <<<SQL
-        SELECT COUNT(*) FROM associations WHERE run_id = ? AND state = ?
+        SELECT run_id, state, COUNT(*) AS nb
+        FROM associations
+        WHERE run_id = ? AND state = ?
+        GROUP BY run_id, state
 SQL;
 
     const SELECT_KEYWORDS_SQL = <<<SQL
@@ -81,11 +84,12 @@ SQL;
 
         $select_publications_sth = $this->pdo->prepare(self::PAGINATE_PUBLICATIONS_SQL);
 
+        $publications = [];
+
         $select_publications_sth->execute([$run_id, $state, $limit, $offset]);
 
+        $total = $this->count($run_id, $state);
         $patterns = $this->patterns($run_id);
-
-        $publications = [];
 
         while ($publication = $select_publications_sth->fetch()) {
             $publications[] = $this->formatted($publication, $patterns);
@@ -94,13 +98,20 @@ SQL;
         return new Pagination(new ResultSet($publications), $total, $page, $limit);
     }
 
-    public function count(int $run_id, string $state): int
+    public function maxPage(int $run_id, string $state, int $limit = 20): int
+    {
+        $total = $this->count($run_id, $state);
+
+        return (int) $total/$limit;
+    }
+
+    private function count(int $run_id, string $state): int
     {
         $count_publications_sth = $this->pdo->prepare(self::COUNT_PUBLCIATIONS_SQL);
 
         $count_publications_sth->execute([$run_id, $state]);
 
-        return ($nb = $count_publications_sth->fetchColumn()) ? $nb : 0;
+        return ($nb = $count_publications_sth->fetchColumn(2)) ? $nb : 0;
     }
 
     private function patterns(int $run_id): array

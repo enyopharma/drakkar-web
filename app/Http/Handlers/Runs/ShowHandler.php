@@ -6,7 +6,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\ReadModel\PrecurationProjection;
+use App\ReadModel\RunProjection;
+use App\ReadModel\PublicationProjection;
 
 use Enyo\ReadModel\NotFoundException;
 use Enyo\ReadModel\OverflowException;
@@ -21,9 +22,13 @@ final class ShowHandler implements RequestHandlerInterface
 
     private $responder;
 
-    public function __construct(PrecurationProjection $runs, HtmlResponder $responder)
-    {
+    public function __construct(
+        RunProjection $runs,
+        PublicationProjection $publications,
+        HtmlResponder $responder
+    ) {
         $this->runs = $runs;
+        $this->publications = $publications;
         $this->responder = $responder;
     }
 
@@ -41,7 +46,8 @@ final class ShowHandler implements RequestHandlerInterface
             return $this->responder->template('runs/show', [
                 'state' => $state,
                 'page' => $page,
-                'run' => $this->runs->id($id, $state, $page, $limit),
+                'run' => $this->runs->id($id),
+                'publications' => $this->publications->pagination($id, $state, $page, $limit),
             ]);
         }
 
@@ -59,7 +65,7 @@ final class ShowHandler implements RequestHandlerInterface
         catch (OverflowException $e) {
             return $this->responder->route('runs.show', ['id' => $id], [
                 'state' => $state,
-                'page' => $page - 1,
+                'page' => $this->publications->maxPage($id, $state, $limit),
             ]);
         }
     }
