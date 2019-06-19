@@ -35,7 +35,12 @@
 
 <div class="row">
     <div class="col">
-        <?= $this->insert('publications/card', ['publication' => $publication, 'collapsed' => false]) ?>
+        <?= $this->insert('publications/card', [
+            'publication' => $publication,
+            'redirect' => count($description) == 0
+                ? $this->url('runs.publications.descriptions.create', $publication)
+                : $this->url('runs.publications.descriptions.edit', $description)
+        ]) ?>
     </div>
 </div>
 

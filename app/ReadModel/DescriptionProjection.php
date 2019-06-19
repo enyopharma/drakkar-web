@@ -7,7 +7,7 @@ use Enyo\ReadModel\NotFoundException;
 final class DescriptionProjection
 {
     const SELECT_FROM_ID_SQL = <<<SQL
-        SELECT d.*
+        SELECT a.run_id, a.pmid, d.*
         FROM associations AS a, descriptions AS d
         WHERE a.id = d.association_id
         AND a.run_id = ?
@@ -36,6 +36,9 @@ SQL;
 
         if ($description = $select_description_sth->fetch()) {
             return [
+                'id' => $description['id'],
+                'run_id' => $description['run_id'],
+                'pmid' => $description['pmid'],
                 'method' => $this->methods->id($description['method_id']),
                 'interactor1' => $this->interactors->id($description['interactor1_id']),
                 'interactor2' => $this->interactors->id($description['interactor2_id']),

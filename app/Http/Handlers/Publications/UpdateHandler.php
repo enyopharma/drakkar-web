@@ -31,11 +31,21 @@ final class UpdateHandler implements RequestHandlerInterface
         $pmid = (int) $attributes['pmid'];
         $state = $body['state'];
         $annotation = $body['annotation'];
+        $redirect = $body['redirect'] ?? '';
 
         $payload = ($this->domain)($run_id, $pmid, $state, $annotation);
 
-        return $payload->parsed([$this->responder, 'back'], [
+        return $payload->parsed($this->success($redirect), [
             UpdatePublicationState::NOT_FOUND => [$this->responder, 'notfound'],
         ]);
+    }
+
+    private function success(string $url): callable
+    {
+        return function () use ($url) {
+            return $url == ''
+                ? $this->responder->back()
+                : $this->responder->redirect($url);
+        };
     }
 }
