@@ -63,14 +63,8 @@ final class HelpersExtension implements ExtensionInterface
             return $this->map[$state]['classes']['badge'] ?? '';
         });
 
-        $engine->registerFunction('highlighted', function (string $str, string $type, array $patterns) {
-            $map = [
-                Run::HH => 'text-primary',
-                Run::VH => 'text-danger',
-            ];
-
-            $replacement = sprintf('<span class="%s">$1</span>', $map[$type] ?? '');
-            $replacements = array_pad([], count($patterns), $replacement);
+        $engine->registerFunction('highlighted', function (string $str, array $patterns) {
+            $replacements = array_pad([], count($patterns), '<strong>$1</strong>');
 
             return preg_replace($patterns, $replacements, $str);
         });
