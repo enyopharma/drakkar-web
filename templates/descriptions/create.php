@@ -26,7 +26,7 @@
         <a href="<?= $this->url('runs.show', $publication['run']) ?>">
             <?= $publication['run']['type'] ?> - <?= $publication['run']['name'] ?></a>
         &gt;
-        <a href="#">
+        <a href="<?= $this->url('runs.publications.show', $publication) ?>">
             <?= $publication['pmid'] ?></a>
         &gt;
         new description
@@ -44,23 +44,21 @@
     </div>
 </div>
 
-<hr class="mt-4 mb-4">
-
-<?php if ($publication['state'] == $selected): ?>
 <div id="description-wrap" class="row">
     <div class="col">
         <div class="card">
-            <h4 class="card-header">
+            <h3 class="card-header">
                 Add a new description
-            </h4>
+            </h3>
             <div class="card-body">
+                <?php if ($publication['state'] == $selected): ?>
                 <div id="description-form"></div>
+                <?php else: ?>
+                <div class="text-danger">
+                    Publication state must be 'selected' in order to add new descriptions.
+                </div>
+                <?php endif ?>
             </div>
         </div>
     </div>
 </div>
-<?php else: ?>
-<div class="alert alert-danger">
-    Publication state must be 'selected' in order to add new descriptions.
-</div>
-<?php endif ?>

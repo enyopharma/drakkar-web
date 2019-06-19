@@ -7,5 +7,4 @@
         ]) ?>
     </div>
 </div>
-<hr>
 <?php endforeach; ?>

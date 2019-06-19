@@ -13,6 +13,11 @@ return function (RouteCollector $collector) {
         'runs.show',
     ]);
 
+    $collector->get('/runs/{run_id}/publications/{pmid}', ...[
+        App\Http\Handlers\Publications\ShowHandler::class,
+        'runs.publications.show',
+    ]);
+
     $collector->put('/runs/{run_id}/publications/{pmid}', ...[
         App\Http\Handlers\Publications\UpdateHandler::class,
         'runs.publications.update',

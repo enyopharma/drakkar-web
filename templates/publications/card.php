@@ -7,7 +7,8 @@
     </h3>
     <div class="card-body">
         <h4 class="card-title">
-            <a href="#"><?= $publication['title'] ?></a>
+            <a href="<?= $this->url('runs.publications.show', $publication) ?>">
+                <?= $publication['title'] ?></a>
         </h4>
         <?php foreach ($publication['abstract'] as $abstract): ?>
         <p class="card-text">
