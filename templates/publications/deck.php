@@ -3,7 +3,7 @@
     <div class="col">
         <?php $this->insert('publications/card', [
             'publication' => $publication,
-            'redirect' => $this->url('runs.show', $publication['run'], ['state' => $publication['state']])
+            'redirect' => isset($redirect) ? $redirect : '',
         ]) ?>
     </div>
 </div>

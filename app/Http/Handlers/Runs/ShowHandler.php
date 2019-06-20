@@ -6,6 +6,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+use App\Domain\Publication;
 use App\ReadModel\RunProjection;
 use App\ReadModel\PublicationProjection;
 
@@ -41,6 +42,10 @@ final class ShowHandler implements RequestHandlerInterface
         $state = $query['state'] ?? \App\Domain\Publication::PENDING;
         $page = (int) ($query['page'] ?? 1);
         $limit = (int) ($query['limit'] ?? 20);
+
+        if (! in_array($state, Publication::STATES)) {
+            return $this->responder->notfound();
+        }
 
         try {
             return $this->responder->template('runs/show', [

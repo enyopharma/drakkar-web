@@ -35,7 +35,7 @@
     </li>
 </ul>
 
-<h2 class="my-4">
+<h2 id="publications" class="my-4">
     <?= $this->header($state) ?>
 </h2>
 
@@ -53,6 +53,7 @@
         <?php $this->insert('publications/deck', [
             'type' => $run['type'],
             'publications' => $publications,
+            'redirect' => $this->url('runs.show', $run, ['state' => $state], 'publications'),
         ]) ?>
     </div>
 </div>
