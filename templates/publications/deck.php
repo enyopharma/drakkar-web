@@ -1,5 +1,5 @@
 <?php foreach($publications as $publication): ?>
-<div class="row">
+<div id="publication-<?= $publication['pmid'] ?>" class="row">
     <div class="col">
         <?php $this->insert('publications/card', [
             'publication' => $publication,

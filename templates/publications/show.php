@@ -46,13 +46,7 @@
     'pagination' => $descriptions,
     'url' => $this->partialUrl('runs.publications.show', $publication, [], 'descriptions'),
 ]) ?>
-<?php foreach ($descriptions as $description): ?>
-<div class="row">
-    <div class="col">
-        <?= $this->insert('descriptions/card', ['description' => $description]) ?>
-    </div>
-</div>
-<?php endforeach ?>
+<?= $this->insert('descriptions/deck', ['descriptions' => $descriptions]) ?>
 <?php $this->insert('pagination/nav', [
     'pagination' => $descriptions,
     'url' => $this->partialUrl('runs.publications.show', $publication, [], 'descriptions'),
