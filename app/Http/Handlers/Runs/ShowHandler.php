@@ -50,7 +50,6 @@ final class ShowHandler implements RequestHandlerInterface
         try {
             return $this->responder->template('runs/show', [
                 'state' => $state,
-                'page' => $page,
                 'run' => $this->runs->id($id),
                 'publications' => $this->publications->pagination($id, $state, $page, $limit),
             ]);
