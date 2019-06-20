@@ -38,6 +38,11 @@ return function (RouteCollector $collector) {
         'runs.publications.descriptions.edit',
     ]);
 
+    $collector->delete('/runs/{run_id}/publications/{pmid}/descriptions/{id}', ...[
+        App\Http\Handlers\Descriptions\DeleteHandler::class,
+        'runs.publications.descriptions.delete',
+    ]);
+
     $collector->get('/methods', ...[
         App\Http\Handlers\Methods\IndexHandler::class,
         'methods.index',

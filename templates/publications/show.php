@@ -16,7 +16,7 @@
     <div class="col">
         <?= $this->insert('publications/card', [
             'publication' => $publication,
-            'redirect' => $this->url('runs.publications.show', $publication)
+            'redirect' => $this->partialUrl('runs.publications.show', $publication)
         ]) ?>
     </div>
 </div>
@@ -46,7 +46,12 @@
     'pagination' => $descriptions,
     'url' => $this->partialUrl('runs.publications.show', $publication, [], 'descriptions'),
 ]) ?>
-<?= $this->insert('descriptions/deck', ['descriptions' => $descriptions]) ?>
+<?= $this->insert('descriptions/deck', [
+    'descriptions' => $descriptions,
+    'redirect' => $this->partialUrl('runs.publications.show', $publication, [
+        'page' => $descriptions->page()
+    ])
+]) ?>
 <?php $this->insert('pagination/nav', [
     'pagination' => $descriptions,
     'url' => $this->partialUrl('runs.publications.show', $publication, [], 'descriptions'),

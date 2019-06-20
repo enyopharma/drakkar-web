@@ -45,7 +45,7 @@
             action="<?= $this->url('runs.publications.update', $publication) ?>"
         >
             <input type="hidden" name="_method" value="PUT" />
-            <input type="hidden" name="redirect" value="<?= isset($redirect) ? $redirect : '' ?>" />
+            <input type="hidden" name="redirect" value="<?= $redirect() ?>" />
             <div class="row mt-0">
                 <div class="col">
                     <textarea

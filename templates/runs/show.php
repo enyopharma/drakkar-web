@@ -53,7 +53,7 @@
         <?php $this->insert('publications/deck', [
             'type' => $run['type'],
             'publications' => $publications,
-            'redirect' => $this->url('runs.show', $run, ['state' => $state], 'publications'),
+            'redirect' => $this->partialUrl('runs.show', $run, ['state' => $state], 'publications'),
         ]) ?>
     </div>
 </div>

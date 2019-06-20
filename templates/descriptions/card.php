@@ -1,4 +1,7 @@
 <div class="card description">
+    <h4 class="card-header">
+        <?= $description['type'] ?> description from <?= $description['pmid'] ?>
+    </h4>
     <div class="card-body">
         <div class="row mt-0">
             <div class="col">
@@ -48,12 +51,16 @@
                 </a>
             </div>
             <div class="col">
-                <a
-                    class="btn btn-sm btn-block btn-danger <?= $description['deleted'] ? 'disabled' : '' ?>"
-                    href="#"
-                >
-                    <i class="fas fa-trash"></i> Delete
-                </a>
+                <form method="POST" action="<?= $this->url('runs.publications.descriptions.delete', $description) ?>">
+                    <input type="hidden" name="_method" value="DELETE" />
+                    <input type="hidden" name="redirect" value="<?= $redirect([], 'description-' . $description['id']) ?>" />
+                    <button
+                        type="submit"
+                        class="btn btn-sm btn-block btn-danger <?= $description['deleted'] ? 'disabled' : '' ?>"
+                    >
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                </form>
             </div>
         </div>
     </div>

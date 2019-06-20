@@ -4,6 +4,7 @@ use App\Domain\InsertRun;
 use App\Domain\PopulateRun;
 use App\Domain\StartAlignment;
 use App\Domain\InsertDescription;
+use App\Domain\DeleteDescription;
 use App\Domain\PopulatePublication;
 use App\Domain\UpdatePublicationState;
 
@@ -43,6 +44,12 @@ return [
 
         InsertDescription::class => function ($container) {
             return new InsertDescription(
+                $container->get(PDO::class)
+            );
+        },
+
+        DeleteDescription::class => function ($container) {
+            return new DeleteDescription(
                 $container->get(PDO::class)
             );
         },
