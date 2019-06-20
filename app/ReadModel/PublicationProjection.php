@@ -102,7 +102,7 @@ SQL;
     {
         $total = $this->count($run_id, $state);
 
-        return (int) $total/$limit;
+        return (int) ceil($total/$limit);
     }
 
     private function count(int $run_id, string $state): int
