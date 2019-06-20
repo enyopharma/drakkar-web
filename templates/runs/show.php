@@ -46,7 +46,7 @@
 <?php else: ?>
 <?php $this->insert('pagination/nav', [
     'pagination' => $publications,
-    'url' => $this->partialUrl('runs.show', $run, ['state' => $state]),
+    'url' => $this->partialUrl('runs.show', $run, ['state' => $state], 'publications'),
 ]) ?>
 <div class="row my-4">
     <div class="col">
@@ -59,6 +59,6 @@
 </div>
 <?php $this->insert('pagination/nav', [
     'pagination' => $publications,
-    'url' => $this->partialUrl('runs.show', $run, ['state' => $state]),
+    'url' => $this->partialUrl('runs.show', $run, ['state' => $state], 'publications'),
 ]) ?>
 <?php endif ?>

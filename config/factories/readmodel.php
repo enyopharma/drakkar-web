@@ -4,8 +4,9 @@ use App\ReadModel\RunProjection;
 use App\ReadModel\MethodProjection;
 use App\ReadModel\ProteinProjection;
 use App\ReadModel\InteractorProjection;
-use App\ReadModel\DescriptionProjection;
 use App\ReadModel\PublicationProjection;
+use App\ReadModel\DescriptionProjection;
+use App\ReadModel\DescriptionSumupProjection;
 
 return [
     'factories' => [
@@ -45,6 +46,12 @@ return [
                 $container->get(PDO::class),
                 $container->get(MethodProjection::class),
                 $container->get(InteractorProjection::class)
+            );
+        },
+
+        DescriptionSumupProjection::class => function ($container) {
+            return new DescriptionSumupProjection(
+                $container->get(PDO::class)
             );
         },
     ],

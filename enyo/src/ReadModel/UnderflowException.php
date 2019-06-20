@@ -2,7 +2,7 @@
 
 namespace Enyo\ReadModel;
 
-final class OverflowException extends \Exception
+final class UnderflowException extends \Exception
 {
     //
 }

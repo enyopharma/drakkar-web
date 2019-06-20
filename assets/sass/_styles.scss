@@ -24,14 +24,19 @@ body {
         display: block;
         text-decoration: none;
     }
-    .card-body {
-        ul {
+
+    &.description {
+        .col.mapping > .row:first-child {
+            margin-top: 0;
+        }
+
+        .col.mapping > .row:last-child {
             margin-bottom: 0;
         }
     }
 }
 
-.mapping {
+.alignment {
     rect {
         fill: $gray-400;
         &.h {

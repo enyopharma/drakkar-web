@@ -54,9 +54,9 @@
                 <?php if ($publication['state'] == $selected): ?>
                 <div id="description-form"></div>
                 <?php else: ?>
-                <div class="text-danger">
+                <p class="card-text text-danger">
                     Publication state must be 'selected' in order to add new descriptions.
-                </div>
+                </p>
                 <?php endif ?>
             </div>
         </div>

@@ -6,7 +6,7 @@ const MappingImg = ({ type, start, stop, width, active = true }) => {
     const widthp = (start, stop, length) => ((stop - start + 1) * 100/length) + '%'
 
     return (
-        <svg className="mapping" width="100%" height="30">
+        <svg className="alignment" width="100%" height="30">
             <text x="0" y="30" fontSize="10">
                 1
             </text>

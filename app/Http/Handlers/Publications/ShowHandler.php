@@ -7,37 +7,62 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use App\ReadModel\PublicationProjection;
+use App\ReadModel\DescriptionSumupProjection;
 
+use Enyo\ReadModel\NotFoundException;
+use Enyo\ReadModel\OverflowException;
+use Enyo\ReadModel\UnderflowException;
 use Enyo\Http\Responders\HtmlResponder;
 
 final class ShowHandler implements RequestHandlerInterface
 {
     private $publications;
 
+    private $descriptions;
+
     private $responder;
 
-    public function __construct(PublicationProjection $publications, HtmlResponder $responder)
-    {
+    public function __construct(
+        PublicationProjection $publications,
+        DescriptionSumupProjection $descriptions,
+        HtmlResponder $responder
+    ) {
         $this->publications = $publications;
+        $this->descriptions = $descriptions;
         $this->responder = $responder;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $attributes = (array) $request->getAttributes();
-        $body = (array) $request->getParsedBody();
+        $query = (array) $request->getQueryParams();
 
         $run_id = (int) $attributes['run_id'];
         $pmid = (int) $attributes['pmid'];
+        $page = (int) ($query['page'] ?? 1);
+        $limit = (int) ($query['limit'] ?? 20);
 
         try {
             return $this->responder->template('publications/show', [
                 'publication' => $this->publications->pmid($run_id, $pmid),
+                'descriptions' => $this->descriptions->pagination($run_id, $pmid, $page, $limit),
             ]);
         }
 
         catch (NotFoundException $e) {
             return $this->responder->notfound();
+        }
+
+        catch (UnderflowException $e) {
+            return $this->responder->route('runs.publications.show', ['run_id' => $run_id, 'pmid' => $pmid], [
+                'page' => 1,
+            ]);
+        }
+
+        catch (OverflowException $e) {
+            return $this->responder->route('runs.publications.show', ['run_id' => $run_id, 'pmid' => $pmid], [
+                'page' => $this->descriptions->maxPage($run_id, $pmid, $limit),
+            ]);
         }
     }
 }
