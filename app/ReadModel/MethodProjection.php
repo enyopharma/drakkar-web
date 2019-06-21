@@ -46,7 +46,7 @@ SQL;
     {
         $select_method_sth = $this->pdo->prepare(self::SELECT_FROM_PSIMI_ID_SQL);
 
-        $select_method_sth->execute([$id]);
+        $select_method_sth->execute([$psimi_id]);
 
         if ($method = $select_method_sth->fetch()) {
             return $method;

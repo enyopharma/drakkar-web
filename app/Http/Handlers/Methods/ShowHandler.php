@@ -1,25 +1,25 @@
 <?php declare(strict_types=1);
 
-namespace App\Http\Handlers\Proteins;
+namespace App\Http\Handlers\Methods;
 
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\ReadModel\ProteinProjection;
+use App\ReadModel\MethodProjection;
 
 use Enyo\ReadModel\NotFoundException;
 use Enyo\Http\Responders\JsonResponder;
 
 final class ShowHandler implements RequestHandlerInterface
 {
-    private $proteins;
+    private $methods;
 
     private $responder;
 
-    public function __construct(ProteinProjection $proteins, JsonResponder $responder)
+    public function __construct(MethodProjection $methods, JsonResponder $responder)
     {
-        $this->proteins = $proteins;
+        $this->methods = $methods;
         $this->responder = $responder;
     }
 
@@ -27,11 +27,11 @@ final class ShowHandler implements RequestHandlerInterface
     {
         $attributes = (array) $request->getAttributes();
 
-        $accession = $attributes['accession'] ?? '';
+        $psimi_id = $attributes['psimi_id'] ?? '';
 
         try {
             return $this->responder->response([
-                'protein' => $this->proteins->accession($accession),
+                'method' => $this->methods->psimi_id($psimi_id),
             ]);
         }
 

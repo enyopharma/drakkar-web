@@ -48,6 +48,11 @@ return function (RouteCollector $collector) {
         'methods.index',
     ]);
 
+    $collector->get('/methods/{psimi_id}', ...[
+        App\Http\Handlers\Methods\ShowHandler::class,
+        'methods.show',
+    ]);
+
     $collector->get('/proteins', ...[
         App\Http\Handlers\Proteins\IndexHandler::class,
         'proteins.index',
