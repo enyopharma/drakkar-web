@@ -58,6 +58,26 @@ return function (RouteCollector $collector) {
         'proteins.show',
     ]);
 
+    $collector->get('/proteins/{accession}/isoforms', ...[
+        App\Http\Handlers\Proteins\Isoforms\IndexHandler::class,
+        'proteins.isoforms.index',
+    ]);
+
+    $collector->get('/proteins/{accession}/matures', ...[
+        App\Http\Handlers\Proteins\Matures\IndexHandler::class,
+        'proteins.matures.index',
+    ]);
+
+    $collector->get('/proteins/{accession}/domains', ...[
+        App\Http\Handlers\Proteins\Domains\IndexHandler::class,
+        'proteins.domains.index',
+    ]);
+
+    $collector->get('/proteins/{accession}/chains', ...[
+        App\Http\Handlers\Proteins\Chains\IndexHandler::class,
+        'proteins.chains.index',
+    ]);
+
     $collector->post('/jobs/alignments', ...[
         App\Http\Handlers\Jobs\AlignmentHandler::class,
         'jobs.alignment',
