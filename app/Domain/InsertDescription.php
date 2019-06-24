@@ -57,6 +57,7 @@ SQL;
         AND i2.protein_id = ?
         AND i2.start = ?
         AND i2.stop = ?
+        AND deleted_at IS NULL
 SQL;
 
     const INSERT_INTERACTOR_STH = <<<SQL

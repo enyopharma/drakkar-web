@@ -7,7 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use App\ReadModel\PublicationProjection;
-use App\ReadModel\DescriptionSumupProjection;
+use App\ReadModel\DescriptionProjection;
 
 use Enyo\ReadModel\NotFoundException;
 use Enyo\ReadModel\OverflowException;
@@ -24,7 +24,7 @@ final class ShowHandler implements RequestHandlerInterface
 
     public function __construct(
         PublicationProjection $publications,
-        DescriptionSumupProjection $descriptions,
+        DescriptionProjection $descriptions,
         HtmlResponder $responder
     ) {
         $this->publications = $publications;

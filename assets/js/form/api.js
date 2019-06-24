@@ -3,20 +3,24 @@ import fetch from 'cross-fetch'
 
 const uuid = require('uuid/v4')
 
-const method = {
+const methods = {
     search: q => fetch('/methods?' + qs.stringify({q: q}))
         .then(response => response.json())
-        .then(json => json.data.methods)
+        .then(json => json.data.methods, error => console.log(error)),
+
+    select: psimi_id => fetch(`/methods/${psimi_id}`)
+        .then(response => response.json(), error => console.log(error))
+        .then(json => json.data.method, error => console.log(error)),
 }
 
-const protein = {
+const proteins = {
     search: (type, q) => fetch('/proteins?' + qs.stringify({type: type, q: q}))
         .then(response => response.json(), error => console.log(error))
-        .then(json => json.data.proteins),
+        .then(json => json.data.proteins, error => console.log(error)),
 
-    select: accession => fetch('/proteins/' + accession)
+    select: accession => fetch(`/proteins/${accession}`)
         .then(response => response.json(), error => console.log(error))
-        .then(json => json.data.protein),
+        .then(json => json.data.protein, error => console.log(error)),
 }
 
 const alignment = (query, sequences) => {
@@ -73,4 +77,4 @@ const save = (run_id, pmid, body) => {
     })
 }
 
-export default { method, protein, alignment, save }
+export default { methods, proteins, alignment, save }

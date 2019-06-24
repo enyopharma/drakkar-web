@@ -8,14 +8,7 @@ use Enyo\ReadModel\ResultSetInterface;
 
 final class ProteinProjection
 {
-    const SELECT_FROM_ID_SQL = <<<SQL
-        SELECT p.id, p.type, p.accession, p.name, p.description, s.sequence
-        FROM proteins AS p, sequences AS s
-        WHERE p.id = s.protein_id AND s.is_canonical IS TRUE
-        AND p.id = ?
-SQL;
-
-    const SELECT_FROM_ACCESSION_SQL = <<<SQL
+    const SELECT_PROTEIN_SQL = <<<SQL
         SELECT p.id, p.type, p.accession, p.name, p.description, s.sequence
         FROM proteins AS p, sequences AS s
         WHERE p.id = s.protein_id AND s.is_canonical IS TRUE
@@ -23,17 +16,9 @@ SQL;
 SQL;
 
     const SELECT_ISOFORMS_SQL = <<<SQL
-        SELECT accession, sequence
+        SELECT accession, sequence, is_canonical
         FROM sequences
         WHERE protein_id = ?
-        AND is_canonical IS FALSE
-SQL;
-
-    const SELECT_MATURES_SQL = <<<SQL
-        SELECT name, start, stop
-        FROM interactors
-        WHERE protein_id = ?
-        GROUP BY name, start, stop
 SQL;
 
     const SELECT_CHAINS_SQL = <<<SQL
@@ -56,6 +41,15 @@ SQL;
         ORDER BY start ASC, stop ASC
 SQL;
 
+    const SELECT_MATURES_SQL = <<<SQL
+        SELECT i.name, i.start, i.stop
+        FROM descriptions AS d, interactors AS i
+        WHERE (i.id = d.interactor1_id OR i.id = d.interactor2_id)
+        AND d.deleted_at IS NULL
+        AND i.protein_id = ?
+        GROUP BY i.name, i.start, i.stop
+SQL;
+
     const SEARCH_PROTEINS_SQL = <<<SQL
         SELECT accession, name, description
         FROM proteins
@@ -70,24 +64,9 @@ SQL;
         $this->pdo = $pdo;
     }
 
-    public function id(int $id): array
-    {
-        $select_protein_sth = $this->pdo->prepare(self::SELECT_FROM_ID_SQL);
-
-        $select_protein_sth->execute([$id]);
-
-        if ($protein = $select_protein_sth->fetch()) {
-            return $this->formatted($protein);
-        }
-
-        throw new NotFoundException(
-            sprintf('%s has no entry with id %s', self::class, $id)
-        );
-    }
-
     public function accession(string $accession): array
     {
-        $select_protein_sth = $this->pdo->prepare(self::SELECT_FROM_ACCESSION_SQL);
+        $select_protein_sth = $this->pdo->prepare(self::SELECT_PROTEIN_SQL);
 
         $select_protein_sth->execute([$accession]);
 
@@ -118,20 +97,20 @@ SQL;
     private function formatted(array $protein): array
     {
         $select_isoforms_sth = $this->pdo->prepare(self::SELECT_ISOFORMS_SQL);
-        $select_matures_sth = $this->pdo->prepare(self::SELECT_MATURES_SQL);
         $select_chains_sth = $this->pdo->prepare(self::SELECT_CHAINS_SQL);
         $select_domains_sth = $this->pdo->prepare(self::SELECT_DOMAINS_SQL);
+        $select_matures_sth = $this->pdo->prepare(self::SELECT_MATURES_SQL);
 
         $select_isoforms_sth->execute([$protein['id']]);
-        $select_matures_sth->execute([$protein['id']]);
         $select_chains_sth->execute([$protein['id']]);
         $select_domains_sth->execute([$protein['id']]);
+        $select_matures_sth->execute([$protein['id']]);
 
         return array_merge($protein, [
-            'isoforms' => $select_isoforms_sth->fetchall(\PDO::FETCH_KEY_PAIR),
-            'matures' => $select_matures_sth->fetchall(),
+            'isoforms' => $select_isoforms_sth->fetchall(),
             'chains' => $select_chains_sth->fetchall(),
-            'domains' => $select_domains_sth->fetchall()
+            'domains' => $select_domains_sth->fetchall(),
+            'matures' => $select_matures_sth->fetchall(),
         ]);
     }
 }

@@ -5,7 +5,7 @@ import { Provider, connect } from 'react-redux'
 import thunk from 'redux-thunk';
 
 import Form from './components/Form'
-import reducer from './reducer'
+import reducer from './reducers/form'
 import { mapStateToProps, mapDispatchToProps, mergeProps } from './state2props'
 
 const init = (wrapper, container, type, run_id, pmid, state = {}) => {

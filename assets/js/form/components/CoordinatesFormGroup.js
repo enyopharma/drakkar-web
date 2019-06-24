@@ -9,9 +9,11 @@ const CoordinatesFormGroup = ({ sequence, enabled = true, set, children }) => {
 
     useEffect(() => setValid(true), [start, stop])
 
-    const submit = () => start <= stop
-        ? set(sequence.slice(start - 1, stop))
-        : setValid(false)
+    const submit = () => {
+        start <= stop
+            ? set(sequence.slice(start - 1, stop))
+            : setValid(false)
+    }
 
     return (
         <div className="row">

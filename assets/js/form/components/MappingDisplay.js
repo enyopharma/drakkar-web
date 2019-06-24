@@ -1,19 +1,66 @@
 import React from 'react'
 
-import Alignment from './Alignment'
+import MappingImg from './MappingImg'
 
-const MappingDisplay = ({ type, mapping, remove }) => {
+const MappingDisplay = ({ type, sequences, mapping, remove }) => {
+    const maxwidth = Math.max(...Object.values(sequences).map(sequence => sequence.length))
+
     return (
         <React.Fragment>
             {mapping.map((alignment, i) => (
                 <div key={i} className="row">
                     <div className="col">
-                        <Alignment
-                            key={i}
-                            type={type}
-                            alignment={alignment}
-                            remove={() => remove(i)}
-                        />
+                        <div className="card">
+                            <div className="card-header">
+                                <div className="row">
+                                    <div className="col">
+                                        <input
+                                            type="text"
+                                            className="form-control"
+                                            value={alignment.sequence}
+                                            readOnly
+                                        />
+                                    </div>
+                                    <div className="col-1">
+                                        <button
+                                            className="btn btn-block btn-warning"
+                                            onClick={e => remove(i)}
+                                        >
+                                            <i className="fas fa-trash" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <ul className="list-group list-group-flush">
+                                {alignment.isoforms.map((isoform, j) => (
+                                    <li key={j} className="list-group-item">
+                                        <h4>
+                                            {isoform.accession}
+                                        </h4>
+                                        <p>
+                                            <MappingImg
+                                                type={type}
+                                                start={1}
+                                                stop={sequences[isoform.accession].length}
+                                                width={maxwidth}
+                                            />
+                                        </p>
+                                        <ul className="list-unstyled">
+                                            {isoform.occurences.map((occurence, k) => (
+                                                <li key={k}>
+                                                    <MappingImg
+                                                        type={type}
+                                                        start={occurence.start}
+                                                        stop={occurence.stop}
+                                                        width={maxwidth}
+                                                    />
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
                     </div>
                 </div>
             ))}

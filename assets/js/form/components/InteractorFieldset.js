@@ -1,10 +1,18 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
+import api from '../api'
 import UniprotSection from './UniprotSection'
 import MappingSection from './MappingSection'
 import SequenceSection from './SequenceSection'
 
-const InteractorFieldset = ({ i, type, protein, sequence, mapping }) => {
+const InteractorFieldset = ( { i, type, accession, editing, uniprot, sequence, mapping } ) => {
+    const [protein, setProtein] = useState(null)
+
+    useEffect(() => { accession == null
+        ? setProtein(null)
+        : api.proteins.select(accession).then(protein => setProtein(protein))
+    }, [accession, editing])
+
     return (
         <fieldset>
             <legend>
@@ -13,22 +21,22 @@ const InteractorFieldset = ({ i, type, protein, sequence, mapping }) => {
                 Interactor {i}
             </legend>
             <h3>Uniprot</h3>
-            <UniprotSection {...protein} />
+            <UniprotSection {...uniprot} protein={protein} />
             <h3>Sequence</h3>
-            {protein.selecting ? (
+            {protein == null ? (
                 <p>
                     Please select an uniprot entry first.
                 </p>
             ) : (
-                <SequenceSection {...sequence} />
+                <SequenceSection {...sequence} protein={protein} />
             )}
             <h3>Mapping</h3>
-            {protein.selecting || sequence.editing ? (
+            {protein == null || editing ? (
                 <p>
                     Please select a sequence first.
                 </p>
             ) : (
-                <MappingSection {...mapping} />
+                <MappingSection {...mapping} protein={protein} />
             )}
         </fieldset>
     )

@@ -13,7 +13,7 @@ const indexes = alignment => {
     return indexes
 }
 
-const filteredAlignment = (alignment, selected) => {
+const filter = (alignment, selected) => {
     return Object.assign({}, alignment, {
         isoforms: alignment.isoforms.map((isoform, i) => {
             return Object.assign({}, isoform, {
@@ -25,12 +25,14 @@ const filteredAlignment = (alignment, selected) => {
     })
 }
 
-const MappingModal = ({ i, type, alignment, add, cancel }) => {
+const MappingModal = ({ i, type, sequences, alignment, add, cancel }) => {
     const [selected, setSelected] = useState(indexes(alignment))
 
-    const filtered = filteredAlignment(alignment, selected)
+    const filtered = filter(alignment, selected)
 
     const isValid = filtered.isoforms.length > 0
+
+    const maxwidth = Math.max(...Object.values(sequences).map(sequence => sequence.length))
 
     const isIsoformSelected = i => {
         return selected.filter(s => s[0] == i).length > 0
@@ -41,7 +43,7 @@ const MappingModal = ({ i, type, alignment, add, cancel }) => {
     }
 
     const select = (i, j) => {
-        setSelected(Array.concat([], selected, [[i, j]]))
+        setSelected(Array.concat(selected, [[i, j]]))
     }
 
     const unselect = (i, j) => {
@@ -81,8 +83,8 @@ const MappingModal = ({ i, type, alignment, add, cancel }) => {
                                     <MappingImg
                                         type={type}
                                         start={1}
-                                        stop={isoform.sequence.length}
-                                        width={alignment.maxwidth}
+                                        stop={sequences[isoform.accession].length}
+                                        width={maxwidth}
                                         active={isIsoformSelected(i)}
                                     />
                                 </div>
@@ -101,7 +103,7 @@ const MappingModal = ({ i, type, alignment, add, cancel }) => {
                                                         type={type}
                                                         start={occurence.start}
                                                         stop={occurence.stop}
-                                                        width={alignment.maxwidth}
+                                                        width={maxwidth}
                                                         active={isOccurenceSelected(i, j)}
                                                     />
                                                 </div>

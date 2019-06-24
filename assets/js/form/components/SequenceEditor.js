@@ -6,10 +6,10 @@ import ExtractFormGroup from './ExtractFormGroup'
 import MatureProteinList from './MatureProteinList'
 import SubsequenceFormGroup from './SubsequenceFormGroup'
 
-const SequenceEditor = ({ sequence, mature, matures, chains, update }) => {
-    const [name, setName] = useState(mature.name)
-    const [start, setStart] = useState(mature.start)
-    const [stop, setStop] = useState(mature.stop)
+const SequenceEditor = ({ current, sequence, matures, chains, update }) => {
+    const [name, setName] = useState(current.name)
+    const [start, setStart] = useState(current.start)
+    const [stop, setStop] = useState(current.stop)
 
     const isNameSet = name.trim() != ''
 
@@ -33,7 +33,7 @@ const SequenceEditor = ({ sequence, mature, matures, chains, update }) => {
 
     const areCoordinatesValid = ! areCoordinatesSet || ! doCoordinatesExist || doesMatureExist
 
-    const isMatureValid = isNameSet && areCoordinatesSet
+    const isMatureValid = isNameSet && isNameAlphaNum && areCoordinatesSet
         && (doesMatureExist || (! doesNameExist && ! doCoordinatesExist))
 
     const setCoordinates = (start, stop) => {

@@ -1,9 +1,12 @@
 import React from 'react'
 
-const SequenceDisplay = ({ name, start, stop, sequence, valid }) => {
-    const before = start == '' ? '' : sequence.slice(0, start - 1)
-    const after = stop == '' ? '' : sequence.slice(stop, sequence.length)
-    const slice = start == '' && stop == '' ? sequence : sequence.slice(start - 1, stop)
+const SequenceDisplay = ({ current, sequence, valid }) => {
+    const before = current.start == '' ? '' : sequence.slice(0, current.start - 1)
+    const after = current.stop == '' ? '' : sequence.slice(current.stop, sequence.length)
+    const slice = current.start == '' && current.stop == '' ? sequence : sequence.slice(
+        current.start - 1,
+        current.stop
+    )
 
     return (
         <React.Fragment>
@@ -13,7 +16,7 @@ const SequenceDisplay = ({ name, start, stop, sequence, valid }) => {
                         type="text"
                         className="form-control"
                         placeholder="Name"
-                        value={name}
+                        value={current.name}
                         readOnly
                     />
                 </div>
@@ -22,7 +25,7 @@ const SequenceDisplay = ({ name, start, stop, sequence, valid }) => {
                         type="text"
                         className="form-control"
                         placeholder="Start"
-                        value={start}
+                        value={current.start}
                         readOnly
                     />
                 </div>
@@ -31,7 +34,7 @@ const SequenceDisplay = ({ name, start, stop, sequence, valid }) => {
                         type="text"
                         className="form-control"
                         placeholder="Stop"
-                        value={stop}
+                        value={current.stop}
                         readOnly
                     />
                 </div>

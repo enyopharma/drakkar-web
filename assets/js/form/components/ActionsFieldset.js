@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Modal from 'react-bootstrap4-modal';
 
-const ActionsFieldset = ({ top, saving, savable, save, resetable, reset, feedback }) => {
+const ActionsFieldset = ({ top, feedback, saving, savable, resetable, save, reset }) => {
     const [modal, setModal] = useState(false)
 
     const submitReset = () => {
@@ -13,7 +13,7 @@ const ActionsFieldset = ({ top, saving, savable, save, resetable, reset, feedbac
     return (
         <fieldset>
             <legend>
-                <i className={'fas fa-circle small text-success'} />
+                <i className={'fas fa-circle small text-primary'} />
                 &nbsp;
                 Actions
             </legend>

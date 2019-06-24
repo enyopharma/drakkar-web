@@ -4,9 +4,9 @@ import ExtractFormGroup from './ExtractFormGroup'
 import DomainsFormGroup from './DomainsFormGroup'
 import CoordinatesFormGroup from './CoordinatesFormGroup'
 
-const MappingEditor = ({ query, mapped, sequence, domains, processing, update, fire }) => {
-    const isQueryValid = query.trim() != '' && mapped.filter(sequence => {
-        return query.toUpperCase().trim() == sequence.toUpperCase().trim()
+const MappingEditor = ({ query, sequence, domains, processing, mapping, update, fire }) => {
+    const isQueryValid = query.trim() != '' && mapping.filter(alignment => {
+        return query.toUpperCase().trim() == alignment.sequence.toUpperCase().trim()
     }).length == 0
 
     const setCoordinates = (start, stop) => {

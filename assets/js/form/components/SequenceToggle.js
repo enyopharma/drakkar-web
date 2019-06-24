@@ -2,11 +2,11 @@ import React from 'react'
 
 import MappingImg from './MappingImg'
 
-const SequenceToggle = ({ type, start, stop, width, editable, edit }) => {
+const SequenceToggle = ({ type, current, width, editable, edit }) => {
     return (
         <div className="row">
             <div className="col">
-                <MappingImg type={type} start={start} stop={stop} width={width} />
+                <MappingImg type={type} start={current.start} stop={current.stop} width={width} />
             </div>
             <div className="col-1">
                 <button

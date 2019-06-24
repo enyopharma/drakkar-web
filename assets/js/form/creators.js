@@ -1,6 +1,5 @@
 import api from './api'
 import actions from './actions'
-import { state2mature } from './state2props'
 
 const method = {
     update: query => {
@@ -10,10 +9,14 @@ const method = {
         }
     },
 
-    select: method => {
-        return {
-            type: actions.SELECT_METHOD,
-            method: method,
+    select: psimi_id => {
+        return (dispatch) => {
+            api.methods.select(psimi_id).then(method => {
+                dispatch({
+                    type: actions.SELECT_METHOD,
+                    method: method,
+                })
+            })
         }
     },
 
@@ -33,17 +36,15 @@ const protein = {
         }
     },
 
-    select: (i, protein) => {
-        return dispatch => {
-            api.protein.select(protein.accession)
-                .then(protein => {
-                    dispatch({
-                        i: i,
-                        type: actions.SELECT_PROTEIN,
-                        protein: protein,
-                    })
+    select: (i, accession) => {
+        return (dispatch) => {
+            api.proteins.select(accession).then(protein => {
+                dispatch({
+                    i: i,
+                    type: actions.SELECT_PROTEIN,
+                    protein: protein,
                 })
-                .catch(error => console.log(error))
+            })
         }
     },
 
@@ -81,14 +82,12 @@ const alignment = {
         }
     },
 
-    fire: i => {
-        return (dispatch, getState) => {
-            const state = getState()
-            const interactor = i == 1 ? state.interactor1 : state.interactor2
-            const query = interactor.qalignment
-            const sequences = state2mature(interactor).sequences
-
-            dispatch({ i: i, type: actions.FIRE_ALIGNMENT})
+    fire: (i, query, sequences) => {
+        return (dispatch) => {
+            dispatch({
+                i: i,
+                type: actions.FIRE_ALIGNMENT,
+            })
 
             api.alignment(query, sequences)
                 .catch(error => console.log(error))
@@ -132,7 +131,7 @@ const save = (run_id, pmid) => {
             .catch(error => console.log(error))
             .then(response => response.json())
             .then(json => dispatch({
-                type: actions.HANDLE_SAVE,
+                type: actions.SHOW_FEEDBACK,
                 success: json.success,
                 message: json.reason,
             }))
