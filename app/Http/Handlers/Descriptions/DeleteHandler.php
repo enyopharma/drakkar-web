@@ -8,7 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 use App\Domain\DeleteDescription;
 
-use Enyo\Http\Responders\HtmlResponder;
+use Enyo\Http\Responders\JsonResponder;
 
 final class DeleteHandler implements RequestHandlerInterface
 {
@@ -16,7 +16,7 @@ final class DeleteHandler implements RequestHandlerInterface
 
     private $responder;
 
-    public function __construct(DeleteDescription $domain, HtmlResponder $responder)
+    public function __construct(DeleteDescription $domain, JsonResponder $responder)
     {
         $this->domain = $domain;
         $this->responder = $responder;
@@ -34,17 +34,8 @@ final class DeleteHandler implements RequestHandlerInterface
 
         $payload = ($this->domain)($run_id, $pmid, $id);
 
-        return $payload->parsed($this->success($redirect), [
+        return $payload->parsed([$this->responder, 'response'], [
             DeleteDescription::NOT_FOUND => [$this->responder, 'notfound'],
         ]);
-    }
-
-    private function success(string $url): callable
-    {
-        return function () use ($url) {
-            return $url == ''
-                ? $this->responder->back()
-                : $this->responder->redirect($url);
-        };
     }
 }
