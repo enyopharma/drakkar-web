@@ -75,6 +75,8 @@ const save = (run_id, pmid, body) => {
         },
         body: JSON.stringify(body)
     })
+    .then(response => response.json(), error => console.log(error))
+    .then(json => json, error => console.log(error))
 }
 
 export default { methods, proteins, alignment, save }

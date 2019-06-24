@@ -127,14 +127,11 @@ const save = (run_id, pmid) => {
     return (dispatch, getState) =>  {
         dispatch({ type: actions.FIRE_SAVE })
 
-        api.save(run_id, pmid, getState())
-            .catch(error => console.log(error))
-            .then(response => response.json())
-            .then(json => dispatch({
-                type: actions.SHOW_FEEDBACK,
-                success: json.success,
-                message: json.reason,
-            }))
+        api.save(run_id, pmid, getState()).then(json => dispatch({
+            type: actions.SHOW_FEEDBACK,
+            success: json.success,
+            message: json.reason,
+        }))
     }
 }
 
