@@ -16,14 +16,7 @@ const query = (state = '', action) => {
 const current = (state = null, action) => {
     switch (action.type) {
         case actions.SHOW_ALIGNMENT:
-            return Object.assign(action.alignment, {
-                isoforms: action.alignment.isoforms
-                    .sort((a, b) => a.accession.localeCompare(b.accession))
-                    .map(isoform => Object.assign(isoform, {
-                        occurences: isoform.occurences.sort((a, b) => a.start - b.start)
-                    })
-                )
-            })
+            return action.alignment
         case actions.ADD_ALIGNMENT:
             return null
         case actions.CANCEL_ALIGNMENT:

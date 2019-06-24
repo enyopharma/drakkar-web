@@ -19,6 +19,7 @@ SQL;
         SELECT accession, sequence, is_canonical
         FROM sequences
         WHERE protein_id = ?
+        ORDER BY is_canonical DESC, accession ASC
 SQL;
 
     const SELECT_CHAINS_SQL = <<<SQL
