@@ -67,20 +67,6 @@ return function (string $root): array {
         ],
 
         /**
-         * The instances autowiring.
-         *
-         * @var array
-         */
-        'autowiring' => [
-            'options' => [
-                //
-            ],
-            'namespaces' => [
-                //
-            ],
-        ],
-
-        /**
          * The service providers to import.
          *
          * @var \Interop\Container\ServiceProviderInterface[]
@@ -101,24 +87,5 @@ return function (string $root): array {
         ], $debug ? [
             sprintf('%s/config/factories/debug/*.php', $root)
         ] : []),
-
-        /**
-         * The processing passes to add.
-         *
-         * @var Quanta\Container\Configuration\Passes\ProcessingPassInterface[]
-         */
-        'passes' => [
-            //
-        ],
-
-        /**
-         * The compilation options.
-         *
-         * @var array
-         */
-        'compilation' => [
-            'cache' => $env == 'production',
-            'path' => $root . '/storage/app/factories.php',
-        ],
     ];
 };

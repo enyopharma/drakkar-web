@@ -8,12 +8,10 @@ use Quanta\Collections\ClassCollection;
 use Quanta\Collections\VendorDirectory;
 use Quanta\Collections\FilteredCollection;
 
-use Quanta\Container\CompiledFactoryMap;
 use Quanta\Container\ConfiguredFactoryMap;
 use Quanta\Container\Values\ValueFactory;
 use Quanta\Container\Configuration\ParameterArray;
 use Quanta\Container\Configuration\ServiceProviderDiscovery;
-use Quanta\Container\Configuration\ProcessingPassCollection;
 use Quanta\Container\Configuration\MergedConfigurationSource;
 use Quanta\Container\Configuration\ServiceProviderCollection;
 use Quanta\Container\Configuration\PhpFileConfigurationSource;
@@ -38,18 +36,13 @@ return function (array $app): array {
     );
 
     // build a factory map.
-    $map = new CompiledFactoryMap(
-        new ConfiguredFactoryMap(
-            new MergedConfigurationSource(
-                new ParameterArray($factory, $app['parameters']),
-                new ServiceProviderDiscovery($vendor),
-                new ServiceProviderCollection(...$app['providers']),
-                new PhpFileConfigurationSource($factory, ...$app['files']),
-                new ProcessingPassCollection(...$app['passes'])
-            )
-        ),
-        $app['compilation']['cache'],
-        $app['compilation']['path']
+    $map = new ConfiguredFactoryMap(
+        new MergedConfigurationSource(
+            new ParameterArray($factory, $app['parameters']),
+            new ServiceProviderDiscovery($vendor),
+            new ServiceProviderCollection(...$app['providers']),
+            new PhpFileConfigurationSource($factory, ...$app['files'])
+        )
     );
 
     // create the factory map.
