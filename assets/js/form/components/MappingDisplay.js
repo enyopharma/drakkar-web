@@ -46,12 +46,12 @@ const MappingDisplay = ({ type, sequences, mapping, remove }) => {
                                             />
                                         </p>
                                         <ul className="list-unstyled">
-                                            {isoform.occurences.map((occurence, k) => (
+                                            {isoform.occurrences.map((occurrence, k) => (
                                                 <li key={k}>
                                                     <MappingImg
                                                         type={type}
-                                                        start={occurence.start}
-                                                        stop={occurence.stop}
+                                                        start={occurrence.start}
+                                                        stop={occurrence.stop}
                                                         width={maxwidth}
                                                     />
                                                 </li>

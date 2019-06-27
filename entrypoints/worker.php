@@ -65,7 +65,7 @@ while (true) {
 
         $isoforms[] = [
             'accession' => $accession,
-            'occurences' => array_map(function ($line) {
+            'occurrences' => array_map(function ($line) {
                 list($start, $stop, $identity) = explode(';', $line);
 
                  return [

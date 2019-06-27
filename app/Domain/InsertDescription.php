@@ -219,8 +219,8 @@ SQL;
                     return $this->unprocessable('Interactor 1 mapping is not valid');
                 }
 
-                foreach ($isoform['occurences'] as $occurence) {
-                    if ($occurence['stop'] > strlen($sequence['sequence'])) {
+                foreach ($isoform['occurrences'] as $occurrence) {
+                    if ($occurrence['stop'] > strlen($sequence['sequence'])) {
                         return $this->unprocessable('Interactor 1 mapping is not valid');
                     }
                 }
@@ -236,8 +236,8 @@ SQL;
                     return $this->unprocessable('Interactor 2 mapping is not valid');
                 }
 
-                foreach ($isoform['occurences'] as $occurence) {
-                    if ($occurence['stop'] > strlen($sequence['sequence'])) {
+                foreach ($isoform['occurrences'] as $occurrence) {
+                    if ($occurrence['stop'] > strlen($sequence['sequence'])) {
                         return $this->unprocessable('Interactor 2 mapping is not valid');
                     }
                 }

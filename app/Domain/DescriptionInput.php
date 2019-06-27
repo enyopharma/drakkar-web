@@ -273,13 +273,13 @@ final class DescriptionInput
             $this->error('Key interactor%s.mapping[%s].isoforms[%s].accession is required', $i, $j, $k);
         }
 
-        if (! key_exists('occurences', $isoform)) {
-            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurences is required', $i, $j, $k);
+        if (! key_exists('occurrences', $isoform)) {
+            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurrences is required', $i, $j, $k);
         }
 
         return [
             'accession' => $this->isoacc($i, $j, $k, $isoform['accession']),
-            'occurences' => $this->occurences($i, $j, $k, $isoform['occurences']),
+            'occurrences' => $this->occurrences($i, $j, $k, $isoform['occurrences']),
         ];
     }
 
@@ -296,51 +296,51 @@ final class DescriptionInput
         return $accession;
     }
 
-    private function occurences(int $i, int $j, int $k, $occurences): array
+    private function occurrences(int $i, int $j, int $k, $occurrences): array
     {
-        if (! is_array($occurences)) {
-            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurences must be an array', $i, $j, $k);
+        if (! is_array($occurrences)) {
+            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurrences must be an array', $i, $j, $k);
         }
 
-        if (count($occurences) == 0) {
-            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurences must not be empty', $i, $j, $k);
+        if (count($occurrences) == 0) {
+            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurrences must not be empty', $i, $j, $k);
         }
 
-        if (count($occurences) > count(array_filter(array_keys($occurences), 'is_int'))) {
-            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurences must be a non associative array', $i, $j, $k);
+        if (count($occurrences) > count(array_filter(array_keys($occurrences), 'is_int'))) {
+            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurrences must be a non associative array', $i, $j, $k);
         }
 
-        return array_map(function ($l, $occurence) use ($i, $j, $k) {
-            return $this->occurence($i, $j, $k, $l, $occurence);
-        }, array_keys($occurences), array_values($occurences));
+        return array_map(function ($l, $occurrence) use ($i, $j, $k) {
+            return $this->occurrence($i, $j, $k, $l, $occurrence);
+        }, array_keys($occurrences), array_values($occurrences));
     }
 
-    private function occurence(int $i, int $j, int $k, int $l, $occurence): array
+    private function occurrence(int $i, int $j, int $k, int $l, $occurrence): array
     {
-        if (! is_array($occurence)) {
-            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurences[%s] must be an array', $i, $j, $k, $l);
+        if (! is_array($occurrence)) {
+            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurrences[%s] must be an array', $i, $j, $k, $l);
         }
 
-        if (! key_exists('start', $occurence)) {
-            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurences[%s].start is required', $i, $j, $k, $l);
+        if (! key_exists('start', $occurrence)) {
+            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurrences[%s].start is required', $i, $j, $k, $l);
         }
 
-        if (! key_exists('stop', $occurence)) {
-            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurences[%s].stop is required', $i, $j, $k, $l);
+        if (! key_exists('stop', $occurrence)) {
+            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurrences[%s].stop is required', $i, $j, $k, $l);
         }
 
-        if (! key_exists('identity', $occurence)) {
-            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurences[%s].identity is required', $i, $j, $k, $l);
+        if (! key_exists('identity', $occurrence)) {
+            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurrences[%s].identity is required', $i, $j, $k, $l);
         }
 
-        $start = $this->occstart($i, $j, $k, $l, $occurence['start']);
-        $stop = $this->occstop($i, $j, $k, $l, $occurence['stop']);
+        $start = $this->occstart($i, $j, $k, $l, $occurrence['start']);
+        $stop = $this->occstop($i, $j, $k, $l, $occurrence['stop']);
 
         if ($start > $stop) {
-            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurences[%s]: start is greater than stop', $i, $j, $k, $l);
+            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurrences[%s]: start is greater than stop', $i, $j, $k, $l);
         }
 
-        $identity = $this->identity($i, $j, $k, $l, $occurence['identity']);
+        $identity = $this->identity($i, $j, $k, $l, $occurrence['identity']);
 
         return [
             'start' => $start,
@@ -352,11 +352,11 @@ final class DescriptionInput
     private function occstart(int $i, int $j, int $k, int $l, $start): int
     {
         if (! is_int($start)) {
-            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurences[%s].start must be an integer', $i, $j, $k, $l);
+            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurrences[%s].start must be an integer', $i, $j, $k, $l);
         }
 
         if ($start < 1) {
-            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurences[%s].start must be greater than 0', $i, $j, $k, $l);
+            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurrences[%s].start must be greater than 0', $i, $j, $k, $l);
         }
 
         return $start;
@@ -365,11 +365,11 @@ final class DescriptionInput
     private function occstop(int $i, int $j, int $k, int $l, $stop): int
     {
         if (! is_int($stop)) {
-            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurences[%s].stop must be an integer', $i, $j, $k, $l);
+            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurrences[%s].stop must be an integer', $i, $j, $k, $l);
         }
 
         if ($stop < 1) {
-            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurences[%s].stop must be greater than 0', $i, $j, $k, $l);
+            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurrences[%s].stop must be greater than 0', $i, $j, $k, $l);
         }
 
         return $stop;
@@ -378,15 +378,15 @@ final class DescriptionInput
     private function identity(int $i, int $j, int $k, int $l, $identity)
     {
         if (! is_int($identity) && ! is_float($identity)) {
-            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurences[%s].identity must be a number', $i, $j, $k, $l);
+            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurrences[%s].identity must be a number', $i, $j, $k, $l);
         }
 
         if ($identity < 1) {
-            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurences[%s].identity must be greater than 0', $i, $j, $k, $l);
+            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurrences[%s].identity must be greater than 0', $i, $j, $k, $l);
         }
 
         if ($identity > 100) {
-            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurences[%s].identity must be smaller than 100', $i, $j, $k, $l);
+            $this->error('Key interactor%s.mapping[%s].isoforms[%s].occurrences[%s].identity must be smaller than 100', $i, $j, $k, $l);
         }
 
         return $identity;

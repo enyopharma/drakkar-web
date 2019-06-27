@@ -7,7 +7,7 @@ const indexes = alignment => {
     const indexes = []
 
     alignment.isoforms.map((r, i) => {
-        r.occurences.map((o, j) => indexes.push([i, j]))
+        r.occurrences.map((o, j) => indexes.push([i, j]))
     })
 
     return indexes
@@ -17,11 +17,11 @@ const filter = (alignment, selected) => {
     return Object.assign({}, alignment, {
         isoforms: alignment.isoforms.map((isoform, i) => {
             return Object.assign({}, isoform, {
-                occurences: isoform.occurences.filter((o, j) => {
+                occurrences: isoform.occurrences.filter((o, j) => {
                     return selected.filter(s => s[0] == i && s[1] == j).length == 1
                 })
             })
-        }).filter(isoform => isoform.occurences.length > 0)
+        }).filter(isoform => isoform.occurrences.length > 0)
     })
 }
 
@@ -38,7 +38,7 @@ const MappingModal = ({ i, type, sequences, alignment, add, cancel }) => {
         return selected.filter(s => s[0] == i).length > 0
     }
 
-    const isOccurenceSelected = (i, j) => {
+    const isOccurrenceSelected = (i, j) => {
         return selected.filter(s => s[0] == i && s[1] == j).length > 0
     }
 
@@ -89,28 +89,28 @@ const MappingModal = ({ i, type, sequences, alignment, add, cancel }) => {
                                     />
                                 </div>
                             </div>
-                            {isoform.occurences.length == 0 ? (
+                            {isoform.occurrences.length == 0 ? (
                                 <p>
                                     No alignment of the sequence on this isoform.
                                 </p>
                             ) : (
                                 <ul className="list-unstyled">
-                                    {isoform.occurences.map((occurence, j) => (
+                                    {isoform.occurrences.map((occurrence, j) => (
                                         <li key={j}>
                                             <div className="row">
                                                 <div className="col-11">
                                                     <MappingImg
                                                         type={type}
-                                                        start={occurence.start}
-                                                        stop={occurence.stop}
+                                                        start={occurrence.start}
+                                                        stop={occurrence.stop}
                                                         width={maxwidth}
-                                                        active={isOccurenceSelected(i, j)}
+                                                        active={isOccurrenceSelected(i, j)}
                                                     />
                                                 </div>
                                                 <div className="col">
                                                     <input
                                                         type="checkbox"
-                                                        checked={isOccurenceSelected(i, j)}
+                                                        checked={isOccurrenceSelected(i, j)}
                                                         onChange={e => toggle(e.target.checked, i, j)}
                                                     />
                                                 </div>

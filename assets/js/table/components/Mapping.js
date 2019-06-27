@@ -14,16 +14,16 @@ const Mapping = ({ type, start, stop, isoforms, mapping }) => {
 
     const reduced = mapping.reduce((reduced, alignment) => {
         alignment.isoforms.map(isoform => {
-            isoform.occurences.map(occurence => {
+            isoform.occurrences.map(occurrence => {
                 if (! reduced[isoform.accession]) reduced[isoform.accession] = {
                     accession: isoform.accession,
                     start: 1,
                     stop: widths[isoform.accession],
                     width: widths[isoform.accession],
-                    occurences: [],
+                    occurrences: [],
                 }
 
-                reduced[isoform.accession].occurences.push(occurence)
+                reduced[isoform.accession].occurrences.push(occurrence)
             })
         })
         return reduced
@@ -43,12 +43,12 @@ const Mapping = ({ type, start, stop, isoforms, mapping }) => {
                             stop={isoform.stop}
                             width={maxwidth}
                         />
-                        {isoform.occurences.map((occurence, j) => (
+                        {isoform.occurrences.map((occurrence, j) => (
                             <MappingImg
                                 key={j}
                                 type={type}
-                                start={occurence.start}
-                                stop={occurence.stop}
+                                start={occurrence.start}
+                                stop={occurrence.stop}
                                 width={maxwidth}
                             />
                         ))}
