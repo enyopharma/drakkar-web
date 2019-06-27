@@ -36,7 +36,10 @@
 
 <?php if ($publication['state'] == $selected): ?>
 <p>
-    <a href="<?= $this->url('runs.publications.descriptions.create', $publication) ?>">
+    <a
+        href="<?= $this->url('runs.publications.descriptions.create', $publication) ?>"
+        target="_blank"
+    >
         Add new descriptions.
     </a>
 </p>
