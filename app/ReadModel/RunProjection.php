@@ -5,6 +5,7 @@ namespace App\ReadModel;
 use App\Domain\Publication;
 
 use Enyo\ReadModel\ResultSet;
+use Enyo\ReadModel\NotFoundException;
 use Enyo\ReadModel\ResultSetInterface;
 
 final class RunProjection

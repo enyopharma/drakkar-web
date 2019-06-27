@@ -145,7 +145,15 @@ SQL;
 
     private function date(?string $date): string
     {
-        return is_null($date) ? '-' : date('Y - m - d', strtotime($date));
+        if (is_null($date)) return '-';
+
+        if (($time = strtotime($date)) !== false) {
+            return date('Y - m - d', $time);
+        }
+
+        throw new \LogicException(
+            sprintf('%s can\'t be converted to a time', $date)
+        );
     }
 
     private function formatted(array $description): array
