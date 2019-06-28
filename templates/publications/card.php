@@ -7,16 +7,17 @@
     </h3>
     <div class="card-body">
         <h4 class="card-title">
+            <strong>[<?= $publication['journal'] ?>]</strong>
             <a href="<?= $this->url('runs.publications.show', $publication) ?>">
-                <?= $publication['title'] ?></a>
+                <?= $this->highlighted($publication['title'], $publication['keywords']) ?></a>
         </h4>
         <?php foreach ($publication['abstract'] as $abstract): ?>
         <p class="card-text">
-            <?= nl2br($this->highlighted($abstract, $publication['patterns'])) ?>
+            <?= nl2br($this->highlighted($abstract, $publication['keywords'])) ?>
         </p>
         <?php endforeach; ?>
         <p class="card-text text-muted">
-            &mdash;&nbsp;<?= implode(', ', $publication['authors']) ?> in <?= $publication['journal'] ?>
+            &mdash;&nbsp;<?= implode(', ', $publication['authors']) ?>
         </p>
         <div class="row my-0">
             <div class="col-2 offset-8">

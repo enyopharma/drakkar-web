@@ -39,10 +39,7 @@ SQL;
 SQL;
 
     const SELECT_KEYWORDS_SQL = <<<SQL
-        SELECT k.pattern
-        FROM runs AS r, keywords AS k
-        WHERE r.type = k.type
-        AND r.id = ?
+        SELECT type, pattern FROM keywords
 SQL;
 
     private $pdo;
@@ -58,10 +55,10 @@ SQL;
 
         $select_publication_sth->execute([$run_id, $pmid]);
 
-        $patterns = $this->patterns($run_id);
+        $keywords = $this->keywords();
 
         if ($publication = $select_publication_sth->fetch()) {
-            return $this->formatted($publication, $patterns);
+            return $this->formatted($publication, $keywords);
         }
 
         throw new NotFoundException(
@@ -89,10 +86,10 @@ SQL;
         $select_publications_sth->execute([$run_id, $state, $limit, $offset]);
 
         $total = $this->count($run_id, $state);
-        $patterns = $this->patterns($run_id);
+        $keywords = $this->keywords();
 
         while ($publication = $select_publications_sth->fetch()) {
-            $publications[] = $this->formatted($publication, $patterns);
+            $publications[] = $this->formatted($publication, $keywords);
         }
 
         return new Pagination(new ResultSet($publications), $total, $page, $limit);
@@ -114,24 +111,20 @@ SQL;
         return ($nb = $count_publications_sth->fetchColumn(2)) ? $nb : 0;
     }
 
-    private function patterns(int $run_id): array
+    private function keywords(): array
     {
         $select_keywords_sth = $this->pdo->prepare(self::SELECT_KEYWORDS_SQL);
 
-        $select_keywords_sth->execute([$run_id]);
+        $select_keywords_sth->execute();
 
-        $patterns = [];
-
-        while ($keyword = $select_keywords_sth->fetch()) {
-            $patterns[] = '/(' . str_replace('*', '[^\s(),]*', $keyword['pattern']) . ')/i';
-        }
-
-        return $patterns;
+        return $select_keywords_sth->fetchAll();
     }
 
-    private function formatted(array $publication, array $patterns = []): array
+    private function formatted(array $publication, array $keywords = []): array
     {
-        $metadata = json_decode($publication['metadata'] ?? [], true);
+        $metadata = ! is_null($publication['metadata'])
+            ? json_decode($publication['metadata'], true)
+            : [];
 
         $article = $metadata['PubmedArticle']['MedlineCitation']['Article'] ?? [];
 
@@ -149,7 +142,7 @@ SQL;
             'journal' => $article['Journal']['Title'] ?? '',
             'abstract' => $this->abstract($article),
             'authors' => $this->authors($article),
-            'patterns' => $patterns,
+            'keywords' => $keywords,
             'pending' => $publication['state'] == Publication::PENDING,
             'selected' => $publication['state'] == Publication::SELECTED,
             'discarded' => $publication['state'] == Publication::DISCARDED,

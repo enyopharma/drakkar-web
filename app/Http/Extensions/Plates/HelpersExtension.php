@@ -63,10 +63,32 @@ final class HelpersExtension implements ExtensionInterface
             return $this->map[$state]['classes']['badge'] ?? '';
         });
 
-        $engine->registerFunction('highlighted', function (string $str, array $patterns) {
-            $replacements = array_pad([], count($patterns), '<strong>$1</strong>');
+        $engine->registerFunction('highlighted', function (string $str, array $keywords) {
+            $patterns = [
+                $this->pattern('g', $keywords),
+                $this->pattern('v', $keywords),
+            ];
+
+            $replacements = [
+                '<strong class="kv g">$0</strong>',
+                '<strong class="kv v">$0</strong>',
+            ];
 
             return preg_replace($patterns, $replacements, $str);
         });
+    }
+
+    private function pattern(string $type, array $keywords): string
+    {
+        $patterns = array_map(function ($k) use ($type) {
+                return '[A-Z0-9-]*' . $k['pattern'] . '[A-Z0-9-]*';
+            }, array_filter($keywords, function ($k) use ($type) {
+                return $k['type'] == $type;
+            })
+        );
+
+        usort($patterns, function ($a, $b) { return strlen($b) - strlen($a); });
+
+        return '/' . implode('|', $patterns) . '/i';
     }
 }
