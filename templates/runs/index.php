@@ -14,21 +14,21 @@
 </div>
 <div class="row">
     <div class="col-4 d-none d-md-block">
-        <img src="<?= 'img/viking.png' ?>" class="img-fluid" style="width: 200px; opacity: 0.8;">
+        <img src="<?= 'img/viking.png' ?>" class="img-fluid" style="width: 180px; opacity: 0.8;">
     </div>
     <div class="col offset-md-1">
         <div class="card">
             <h3 class="card-header">Ahoy mate, here is how to sail</h3>
             <div class="card-body">
-                <ul>
+                <ul class="my-0">
                     <li>
-                        Login to <strong>Drakkar</strong> with you ENYOpharma account
+                        Logged as <strong><?= $user['name'] ?></strong>
                     </li>
                     <li>
-                        Review publications from each curation run and discard the unrelevant ones
+                        Select/discard publications for each curation run listed below
                     </li>
                     <li>
-                        Add descriptions for each relevant publication through the curation assistant form
+                        Add descriptions for each selected publication through the curation assistant form
                     </li>
                     <li>
                         Any time you can download the current vinland dataset

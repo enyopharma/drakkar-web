@@ -25,6 +25,7 @@ final class IndexHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         return $this->responder->template('runs/index', [
+            'user' => $request->getAttribute('user'),
             'runs' => $this->runs->all(),
         ]);
     }
