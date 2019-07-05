@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 10.8 (Ubuntu 10.8-0ubuntu0.18.04.1)
--- Dumped by pg_dump version 10.8 (Ubuntu 10.8-0ubuntu0.18.04.1)
+-- Dumped from database version 10.9 (Ubuntu 10.9-0ubuntu0.18.04.1)
+-- Dumped by pg_dump version 10.9 (Ubuntu 10.9-0ubuntu0.18.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -192,7 +192,7 @@ ALTER SEQUENCE public.interactors_id_seq OWNED BY public.interactors.id;
 
 CREATE TABLE public.keywords (
     id integer NOT NULL,
-    type character(2) NOT NULL,
+    type character(1) NOT NULL,
     pattern character varying(255) NOT NULL
 );
 
@@ -441,6 +441,14 @@ ALTER TABLE ONLY public.associations
 
 ALTER TABLE ONLY public.associations
     ADD CONSTRAINT associations_run_id_pmid_key UNIQUE (run_id, pmid);
+
+
+--
+-- Name: descriptions descriptions_interactor1_id_interactor2_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.descriptions
+    ADD CONSTRAINT descriptions_interactor1_id_interactor2_id_key UNIQUE (interactor1_id, interactor2_id);
 
 
 --
