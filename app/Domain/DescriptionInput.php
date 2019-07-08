@@ -135,8 +135,8 @@ final class DescriptionInput
             $this->error('Key interactor%s.name must be a string', $i);
         }
 
-        if (preg_match('/^[a-zA-Z0-9]+$/', $name) === 0) {
-            $this->error('Key interactor%s.name must be formatted as [a-zA-Z0-9]+', $i);
+        if (preg_match('/^[^\s]+$/', $name) === 0) {
+            $this->error('Key interactor%s.name must be formatted as [^\s]+', $i);
         }
 
         return $name;
