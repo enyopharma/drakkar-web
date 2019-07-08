@@ -9,18 +9,11 @@
  * @return void
  */
 return function (string $root, string $env, bool $debug) {
-    $handler = new SlashTrace\EventHandler\DebugHandler;
+    $slashtrace = new SlashTrace\SlashTrace;
 
-    if (! $debug) {
-        $handler->setRenderer(new class implements SlashTrace\DebugRenderer\DebugRenderer {
-            public function render(SlashTrace\Event $event)
-            {
-                http_response_code(500);
-            }
-        });
+    if ($debug) {
+        $slashtrace->addHandler(new SlashTrace\EventHandler\DebugHandler);
     }
 
-    $slashtrace = new SlashTrace\SlashTrace;
-    $slashtrace->addHandler($handler);
     $slashtrace->register();
 };

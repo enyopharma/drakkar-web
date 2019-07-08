@@ -16,6 +16,11 @@ require $root . '/vendor/autoload.php';
 [$env, $debug] = (require $root . '/config/envvars.php')($root);
 
 /**
+ * Register an error handler.
+ */
+(require $root . '/config/error.handler.php')($root, $env, $debug);
+
+/**
  * Build the app container.
  */
 $container = (require $root . '/config/container.php')($root, $env, $debug);
