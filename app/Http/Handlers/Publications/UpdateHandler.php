@@ -7,8 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use App\Domain\UpdatePublicationState;
-
-use Enyo\Http\Responders\HtmlResponder;
+use App\Http\Responders\HtmlResponder;
 
 final class UpdateHandler implements RequestHandlerInterface
 {

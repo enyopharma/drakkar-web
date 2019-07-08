@@ -7,8 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use App\Domain\DeleteDescription;
-
-use Enyo\Http\Responders\JsonResponder;
+use App\Http\Responders\JsonResponder;
 
 final class DeleteHandler implements RequestHandlerInterface
 {

@@ -5,13 +5,6 @@ namespace App\ReadModel;
 use App\Domain\Run;
 use App\Domain\Protein;
 
-use Enyo\ReadModel\ResultSet;
-use Enyo\ReadModel\Pagination;
-use Enyo\ReadModel\NotFoundException;
-use Enyo\ReadModel\OverflowException;
-use Enyo\ReadModel\UnderflowException;
-use Enyo\ReadModel\ResultSetInterface;
-
 final class DescriptionProjection
 {
     const SELECT_DESCRIPTION_SQL = <<<SQL

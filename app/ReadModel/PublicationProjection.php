@@ -4,13 +4,6 @@ namespace App\ReadModel;
 
 use App\Domain\Publication;
 
-use Enyo\ReadModel\ResultSet;
-use Enyo\ReadModel\Pagination;
-use Enyo\ReadModel\NotFoundException;
-use Enyo\ReadModel\OverflowException;
-use Enyo\ReadModel\UnderflowException;
-use Enyo\ReadModel\ResultSetInterface;
-
 final class PublicationProjection
 {
     const SELECT_FROM_PMID_SQL = <<<SQL

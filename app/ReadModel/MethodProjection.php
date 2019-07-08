@@ -2,10 +2,6 @@
 
 namespace App\ReadModel;
 
-use Enyo\ReadModel\ResultSet;
-use Enyo\ReadModel\NotFoundException;
-use Enyo\ReadModel\ResultSetInterface;
-
 final class MethodProjection
 {
     const SELECT_FROM_ID_SQL = <<<SQL

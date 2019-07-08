@@ -2,10 +2,6 @@
 
 namespace App\ReadModel;
 
-use Enyo\ReadModel\ResultSet;
-use Enyo\ReadModel\NotFoundException;
-use Enyo\ReadModel\ResultSetInterface;
-
 final class ProteinProjection
 {
     const SELECT_PROTEIN_SQL = <<<SQL

@@ -7,9 +7,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use App\ReadModel\MethodProjection;
+use App\ReadModel\NotFoundException;
+use App\Http\Responders\JsonResponder;
 
-use Enyo\ReadModel\NotFoundException;
-use Enyo\Http\Responders\JsonResponder;
 
 final class ShowHandler implements RequestHandlerInterface
 {

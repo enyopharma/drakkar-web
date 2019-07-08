@@ -6,13 +6,12 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+use App\ReadModel\NotFoundException;
+use App\ReadModel\OverflowException;
+use App\ReadModel\UnderflowException;
 use App\ReadModel\PublicationProjection;
 use App\ReadModel\DescriptionProjection;
-
-use Enyo\ReadModel\NotFoundException;
-use Enyo\ReadModel\OverflowException;
-use Enyo\ReadModel\UnderflowException;
-use Enyo\Http\Responders\HtmlResponder;
+use App\Http\Responders\HtmlResponder;
 
 final class ShowHandler implements RequestHandlerInterface
 {

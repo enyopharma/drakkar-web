@@ -3,9 +3,9 @@
 namespace Enyo\Http\Middleware;
 
 use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface as Handler;
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 use Enyo\Http\Session;
 
@@ -58,7 +58,7 @@ class SessionMiddleware implements MiddlewareInterface
     /**
      * @inheritdoc
      */
-    public function process(Request $request, Handler $handler): Response
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         // Fail when session is disabled.
         if (session_status() === PHP_SESSION_DISABLED) {
@@ -127,7 +127,7 @@ class SessionMiddleware implements MiddlewareInterface
      *
      * @see https://github.com/relayphp/Relay.Middleware/blob/1.x/src/SessionHeadersHandler.php
      */
-    private function attachSessionHeaders(Response $response): Response
+    private function attachSessionHeaders(ResponseInterface $response): ResponseInterface
     {
         $time = time();
 
@@ -144,7 +144,7 @@ class SessionMiddleware implements MiddlewareInterface
      * @param int                                   $time
      * @return \Psr\Http\Message\ResponseInterface
      */
-    private function attachCacheLimiterHeader(Response $response, int $time): Response
+    private function attachCacheLimiterHeader(ResponseInterface $response, int $time): ResponseInterface
     {
         $cache_limiter = session_cache_limiter();
 
@@ -171,7 +171,7 @@ class SessionMiddleware implements MiddlewareInterface
      *
      * @see https://github.com/php/php-src/blob/PHP-7.0/ext/session/session.c#L1267-L1284
      */
-    private function attachPublicCacheLimiterHeader(Response $response, int $time): Response
+    private function attachPublicCacheLimiterHeader(ResponseInterface $response, int $time): ResponseInterface
     {
         $cache_expire = session_cache_expire();
 
@@ -195,7 +195,7 @@ class SessionMiddleware implements MiddlewareInterface
      *
      * @see https://github.com/php/php-src/blob/PHP-7.0/ext/session/session.c#L1297-L1302
      */
-    private function attachPrivateCacheLimiterHeader(Response $response, int $time): Response
+    private function attachPrivateCacheLimiterHeader(ResponseInterface $response, int $time): ResponseInterface
     {
         $response = $response->withAddedHeader('Expires', self::EXPIRED);
 
@@ -211,7 +211,7 @@ class SessionMiddleware implements MiddlewareInterface
      *
      * @see https://github.com/php/php-src/blob/PHP-7.0/ext/session/session.c#L1286-L1295
      */
-    private function attachPrivateNoExpireCacheLimiterHeader(Response $response, int $time): Response
+    private function attachPrivateNoExpireCacheLimiterHeader(ResponseInterface $response, int $time): ResponseInterface
     {
         $cache_expire = session_cache_expire();
 
@@ -232,7 +232,7 @@ class SessionMiddleware implements MiddlewareInterface
      *
      * @see https://github.com/php/php-src/blob/PHP-7.0/ext/session/session.c#L1304-L1314
      */
-    private function attachNocacheCacheLimiterHeader(ResponseInterface $response): Response
+    private function attachNocacheCacheLimiterHeader(ResponseInterface $response): ResponseInterface
     {
         return $response
             ->withAddedHeader('Expires', self::EXPIRED)
@@ -249,7 +249,7 @@ class SessionMiddleware implements MiddlewareInterface
      *
      * @see https://github.com/php/php-src/blob/PHP-7.0/ext/session/session.c#L1402-L1476
      */
-    private function attachSessionCookie(Response $response, int $time): Response
+    private function attachSessionCookie(ResponseInterface $response, int $time): ResponseInterface
     {
         // Get the session id, name and the cookie options.
         $id = session_id();

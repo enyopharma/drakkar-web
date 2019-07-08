@@ -25,7 +25,7 @@ final class LazyRequestHandler implements RequestHandlerInterface
 
         throw new \UnexpectedValueException(
             vsprintf('%s expects an instance of %s to be returned by the factory, %s returned', [
-                LazyMiddleware::class,
+                LazyRequestHandler::class,
                 RequestHandlerInterface::class,
                 gettype($middleware),
             ])

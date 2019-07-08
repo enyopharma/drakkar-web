@@ -25,7 +25,7 @@ final class CallableRequestHandler implements RequestHandlerInterface
         catch (\TypeError $e) {
             throw new \UnexpectedValueException(
                 vsprintf('Return value of callable request handler must implement %s, %s returned', [
-                    ResponseInterface::class,
+                    Response::class,
                     gettype($response),
                 ])
             );

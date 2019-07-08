@@ -80,7 +80,7 @@ final class HelpersExtension implements ExtensionInterface
 
     private function pattern(string $type, array $keywords): string
     {
-        $patterns = array_map(function ($k) use ($type) {
+        $patterns = array_map(function ($k) {
                 return '[A-Z0-9-]*' . $k['pattern'] . '[A-Z0-9-]*';
             }, array_filter($keywords, function ($k) use ($type) {
                 return $k['type'] == $type;

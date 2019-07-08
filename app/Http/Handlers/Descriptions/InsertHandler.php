@@ -8,8 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 use App\Domain\DescriptionInput;
 use App\Domain\InsertDescription;
-
-use Enyo\Http\Responders\JsonResponder;
+use App\Http\Responders\JsonResponder;
 
 final class InsertHandler implements RequestHandlerInterface
 {

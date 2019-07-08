@@ -13,14 +13,12 @@ require $root . '/vendor/autoload.php';
 /**
  * Load the env.
  */
-(new Dotenv\Dotenv($root))->load();
+[$env, $debug] = (require $root . '/config/envvars.php')($root);
 
 /**
  * Build the app container.
  */
- $app = (require $root . '/config/app.php')($root);
- $factories = (require $root . '/config/factories.php')($app);
- $container = (require $root . '/config/container.php')($factories);
+$container = (require $root . '/config/container.php')($root, $env, $debug);
 
 /**
  * Read the redis queue.

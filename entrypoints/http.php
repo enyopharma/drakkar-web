@@ -13,28 +13,22 @@ require $root . '/vendor/autoload.php';
 /**
  * Load the env.
  */
-(new Dotenv\Dotenv($root))->load();
+[$env, $debug] = (require $root . '/config/envvars.php')($root);
 
 /**
- * Register slashtrace as error handler.
+ * Register an error handler.
  */
- $slashtrace = new SlashTrace\SlashTrace;
-
- $slashtrace->addHandler(new SlashTrace\EventHandler\DebugHandler);
-
- $slashtrace->register();
+(require $root . '/config/error.handler.php')($root, $env, $debug);
 
 /**
  * Build the app container.
  */
- $app = (require $root . '/config/app.php')($root);
- $factories = (require $root . '/config/factories.php')($app);
- $container = (require $root . '/config/container.php')($factories);
+$container = (require $root . '/config/container.php')($root, $env, $debug);
 
 /**
  * Call boot scripts with the container.
  */
-(require $root . '/config/session.php')($container);
+(require $root . '/config/boot/session.php')($container);
 
 /**
  * Run the http application.

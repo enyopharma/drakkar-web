@@ -7,8 +7,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use App\ReadModel\RunProjection;
-
-use Enyo\Http\Responders\HtmlResponder;
+use App\Http\Responders\HtmlResponder;
 
 final class IndexHandler implements RequestHandlerInterface
 {

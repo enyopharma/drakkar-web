@@ -26,7 +26,7 @@ final class CallableMiddleware implements MiddlewareInterface
         catch (\TypeError $e) {
             throw new \UnexpectedValueException(
                 vsprintf('Return value of callable middleware must implement %s, %s returned', [
-                    ResponseInterface::class,
+                    Response::class,
                     gettype($response),
                 ])
             );

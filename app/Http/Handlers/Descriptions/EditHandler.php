@@ -7,11 +7,10 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use App\Domain\Publication;
+use App\ReadModel\NotFoundException;
 use App\ReadModel\PublicationProjection;
 use App\ReadModel\DescriptionProjection;
-
-use Enyo\ReadModel\NotFoundException;
-use Enyo\Http\Responders\HtmlResponder;
+use App\Http\Responders\HtmlResponder;
 
 final class EditHandler implements RequestHandlerInterface
 {
