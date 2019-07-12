@@ -18,7 +18,9 @@ require $root . '/vendor/autoload.php';
 /**
  * Register an error handler.
  */
-(require $root . '/config/error.handler.php')($root, $env, $debug);
+$handler = Quanta\ErrorHandler\register()->setRenderer(
+    new Quanta\ErrorHandler\WebRenderer($debug, $_SERVER['HTTP_ACCEPT'] ?? '')
+);
 
 /**
  * Build the app container.
