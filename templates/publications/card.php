@@ -1,4 +1,4 @@
-<div class="card">
+<div id="publication-<?= $publication['pmid'] ?>" class="card">
     <h3 class="card-header">
         PMID: <?= $publication['pmid'] ?>
         <span class="float-right badge <?= $this->badgeclass($publication['state']) ?>">
@@ -19,7 +19,7 @@
         <p class="card-text text-muted">
             &mdash;&nbsp;<?= implode(', ', $publication['authors']) ?>
         </p>
-        <div class="row my-0">
+        <div class="row">
             <div class="col-2 offset-8">
                 <a
                     class="btn btn-sm btn-block btn-link"
@@ -45,10 +45,10 @@
             method="POST"
             action="<?= $this->url('runs.publications.update', $publication) ?>"
         >
-            <input type="hidden" name="_method" value="PUT" />
-            <input type="hidden" name="redirect" value="<?= $redirect() ?>" />
-            <div class="row mt-0">
+            <div class="row">
                 <div class="col">
+                    <input type="hidden" name="_method" value="PUT" />
+                    <input type="hidden" name="redirect" value="<?= $redirect() ?>" />
                     <textarea
                         class="form-control form-control-sm"
                         name="annotation"
@@ -56,7 +56,7 @@
                     ><?= $publication['annotation'] ?></textarea>
                 </div>
             </div>
-            <div class="row mb-0">
+            <div class="row">
                 <div class="col">
                     <button
                         type="submit"

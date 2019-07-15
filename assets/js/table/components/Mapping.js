@@ -10,8 +10,6 @@ const Mapping = ({ type, start, stop, isoforms, mapping }) => {
         return widths
     }, {})
 
-    const maxwidth = Math.max(...Object.values(widths))
-
     const reduced = mapping.reduce((reduced, alignment) => {
         alignment.isoforms.map(isoform => {
             isoform.occurrences.map(occurrence => {
@@ -34,23 +32,19 @@ const Mapping = ({ type, start, stop, isoforms, mapping }) => {
             {Object.values(reduced).map((isoform, i) => (
                 <div key={i} className="card">
                     <h5 className="card-header">
-                        {isoform.accession}
+                        {isoform.accession} (length: {widths[isoform.accession]})
                     </h5>
                     <div className="card-body">
-                        <MappingImg
-                            type={type}
-                            start={isoform.start}
-                            stop={isoform.stop}
-                            width={maxwidth}
-                        />
                         {isoform.occurrences.map((occurrence, j) => (
-                            <MappingImg
-                                key={j}
-                                type={type}
-                                start={occurrence.start}
-                                stop={occurrence.stop}
-                                width={maxwidth}
-                            />
+                            <p>
+                                <MappingImg
+                                    key={j}
+                                    type={type}
+                                    start={occurrence.start}
+                                    stop={occurrence.stop}
+                                    width={widths[isoform.accession]}
+                                />
+                            </p>
                         ))}
                     </div>
                 </div>

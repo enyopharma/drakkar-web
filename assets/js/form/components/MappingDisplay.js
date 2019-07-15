@@ -3,8 +3,6 @@ import React from 'react'
 import MappingImg from './MappingImg'
 
 const MappingDisplay = ({ type, sequences, mapping, remove }) => {
-    const maxwidth = Math.max(...Object.values(sequences).map(sequence => sequence.length))
-
     return (
         <React.Fragment>
             {mapping.map((alignment, i) => (
@@ -31,20 +29,12 @@ const MappingDisplay = ({ type, sequences, mapping, remove }) => {
                                     </div>
                                 </div>
                             </div>
-                            <ul className="list-group list-group-flush">
+                            <ul className="list-group list-group-flush mt-0">
                                 {alignment.isoforms.map((isoform, j) => (
                                     <li key={j} className="list-group-item">
                                         <h4>
-                                            {isoform.accession}
+                                            {isoform.accession} (length: {sequences[isoform.accession].length})
                                         </h4>
-                                        <p>
-                                            <MappingImg
-                                                type={type}
-                                                start={1}
-                                                stop={sequences[isoform.accession].length}
-                                                width={maxwidth}
-                                            />
-                                        </p>
                                         <ul className="list-unstyled">
                                             {isoform.occurrences.map((occurrence, k) => (
                                                 <li key={k}>
@@ -52,7 +42,7 @@ const MappingDisplay = ({ type, sequences, mapping, remove }) => {
                                                         type={type}
                                                         start={occurrence.start}
                                                         stop={occurrence.stop}
-                                                        width={maxwidth}
+                                                        width={sequences[isoform.accession].length}
                                                     />
                                                 </li>
                                             ))}

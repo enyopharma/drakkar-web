@@ -32,12 +32,6 @@ const MappingModal = ({ i, type, sequences, alignment, add, cancel }) => {
 
     const isValid = filtered.isoforms.length > 0
 
-    const maxwidth = Math.max(...Object.values(sequences).map(sequence => sequence.length))
-
-    const isIsoformSelected = i => {
-        return selected.filter(s => s[0] == i).length > 0
-    }
-
     const isOccurrenceSelected = (i, j) => {
         return selected.filter(s => s[0] == i && s[1] == j).length > 0
     }
@@ -77,18 +71,7 @@ const MappingModal = ({ i, type, sequences, alignment, add, cancel }) => {
                 <ul className="list-unstyled">
                     {alignment.isoforms.map((isoform, i) => (
                         <li key={i}>
-                            <h4>{isoform.accession}</h4>
-                            <div className="row">
-                                <div className="col-11">
-                                    <MappingImg
-                                        type={type}
-                                        start={1}
-                                        stop={sequences[isoform.accession].length}
-                                        width={maxwidth}
-                                        active={isIsoformSelected(i)}
-                                    />
-                                </div>
-                            </div>
+                            <h4>{isoform.accession} (length: {sequences[isoform.accession].length})</h4>
                             {isoform.occurrences.length == 0 ? (
                                 <p>
                                     No alignment of the sequence on this isoform.
@@ -103,7 +86,7 @@ const MappingModal = ({ i, type, sequences, alignment, add, cancel }) => {
                                                         type={type}
                                                         start={occurrence.start}
                                                         stop={occurrence.stop}
-                                                        width={maxwidth}
+                                                        width={sequences[isoform.accession].length}
                                                         active={isOccurrenceSelected(i, j)}
                                                     />
                                                 </div>

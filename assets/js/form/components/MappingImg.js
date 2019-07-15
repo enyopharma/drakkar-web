@@ -7,12 +7,6 @@ const MappingImg = ({ type, start, stop, width, active = true }) => {
 
     return (
         <svg className="alignment" width="100%" height="30">
-            <text x="0" y="30" fontSize="10">
-                1
-            </text>
-            <text x="100%" y="10" fontSize="10" textAnchor="end">
-                {width}
-            </text>
             <text x={startp(start, width)} y="10" fontSize="10">
                 {start}
             </text>

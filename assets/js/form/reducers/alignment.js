@@ -4,6 +4,10 @@ const query = (state = '', action) => {
     switch (action.type) {
         case actions.UPDATE_ALIGNMENT_QUERY:
             return action.query
+        case actions.SELECT_PROTEIN:
+            return ''
+        case actions.UNSELECT_PROTEIN:
+            return ''
         case actions.ADD_ALIGNMENT:
             return ''
         case actions.RESET:

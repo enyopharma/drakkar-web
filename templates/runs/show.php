@@ -48,15 +48,11 @@
     'pagination' => $publications,
     'url' => $this->partialUrl('runs.show', $run, ['state' => $state], 'publications'),
 ]) ?>
-<div class="row my-4">
-    <div class="col">
-        <?php $this->insert('publications/deck', [
-            'type' => $run['type'],
-            'publications' => $publications,
-            'redirect' => $this->partialUrl('runs.show', $run, ['state' => $state], 'publications'),
-        ]) ?>
-    </div>
-</div>
+<?php $this->insert('publications/deck', [
+    'type' => $run['type'],
+    'publications' => $publications,
+    'redirect' => $this->partialUrl('runs.show', $run, ['state' => $state], 'publications'),
+]) ?>
 <?php $this->insert('pagination/nav', [
     'pagination' => $publications,
     'url' => $this->partialUrl('runs.show', $run, ['state' => $state], 'publications'),

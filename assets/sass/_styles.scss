@@ -14,9 +14,22 @@ body {
     }
 }
 
-.row {
+.row, .card, p, ul, table, fieldset {
     margin-top: $spacer;
     margin-bottom: $spacer;
+    &:first-child {
+        margin-top: 0;
+    }
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.wrapper {
+    &>.row, &>.card, &>p, &>ul, &>table, &>fieldset {
+        margin-top: $spacer;
+        margin-bottom: $spacer;
+    }
 }
 
 .card {
@@ -24,15 +37,14 @@ body {
         display: block;
         text-decoration: none;
     }
+    .card-title strong {
+        font-weight: 400;
+    }
+}
 
-    &.description {
-        .col.mapping > .row:first-child {
-            margin-top: 0;
-        }
-
-        .col.mapping > .row:last-child {
-            margin-bottom: 0;
-        }
+p {
+    strong.kv.v {
+        color: $danger;
     }
 }
 
@@ -45,15 +57,5 @@ body {
         &.v {
             fill: $danger;
         }
-    }
-}
-
-.card-title strong {
-    font-weight: 400;
-}
-
-p {
-    strong.kv.v {
-        color: $danger;
     }
 }

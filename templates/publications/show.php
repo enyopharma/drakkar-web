@@ -21,14 +21,10 @@
     </h1>
 </div>
 
-<div class="row">
-    <div class="col">
-        <?= $this->insert('publications/card', [
-            'publication' => $publication,
-            'redirect' => $this->partialUrl('runs.publications.show', $publication)
-        ]) ?>
-    </div>
-</div>
+<?= $this->insert('publications/card', [
+    'publication' => $publication,
+    'redirect' => $this->partialUrl('runs.publications.show', $publication)
+]) ?>
 
 <h2 id="descriptions">
     Descriptions associated with this publication
@@ -58,7 +54,7 @@
     'pagination' => $descriptions,
     'url' => $this->partialUrl('runs.publications.show', $publication, [], 'descriptions'),
 ]) ?>
-<div id="descriptions-table"></div>
+<div id="descriptions-table" class="wrapper"></div>
 <?php $this->insert('pagination/nav', [
     'pagination' => $descriptions,
     'url' => $this->partialUrl('runs.publications.show', $publication, [], 'descriptions'),
