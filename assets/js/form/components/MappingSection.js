@@ -7,10 +7,12 @@ import MappingDisplay from './MappingDisplay'
 const MappingSection = ({ protein, fire, ...props }) => {
     const sequence = protein.sequence.slice(props.start - 1, props.stop)
 
-    const sequences = protein.isoforms.reduce((sequences, isoform) => {
-        sequences[isoform.accession] = isoform.is_canonical ? sequence : isoform.sequence
-        return sequences
-    }, {})
+    const sequences = props.start == 1 && props.stop == protein.sequence.length
+        ? protein.isoforms.reduce((sequences, isoform) => {
+            sequences[isoform.accession] = isoform.sequence
+            return sequences
+        }, {})
+        : {[protein.accession]: sequence}
 
     const domains = protein.domains.map(domain => {
         return {
