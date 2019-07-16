@@ -1550,16 +1550,16 @@
         },
         {
             "name": "quanta/array-type-check",
-            "version": "0.2.0",
+            "version": "0.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quantaphp/array-type-check.git",
-                "reference": "b86693d2a59ea42edb8e61dc70032d0aa9efab7d"
+                "reference": "17a233857d6d77c4143677a5a523eaa4ea7c89cc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/array-type-check/zipball/b86693d2a59ea42edb8e61dc70032d0aa9efab7d",
-                "reference": "b86693d2a59ea42edb8e61dc70032d0aa9efab7d",
+                "url": "https://api.github.com/repos/quantaphp/array-type-check/zipball/17a233857d6d77c4143677a5a523eaa4ea7c89cc",
+                "reference": "17a233857d6d77c4143677a5a523eaa4ea7c89cc",
                 "shasum": ""
             },
             "require": {
@@ -1588,26 +1588,26 @@
             ],
             "description": "PHP associative array type check",
             "homepage": "https://github.com/quantaphp/array-type-check",
-            "time": "2019-07-10T13:12:41+00:00"
+            "time": "2019-07-16T10:56:56+00:00"
         },
         {
             "name": "quanta/container",
-            "version": "0.3.1",
+            "version": "0.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quantaphp/container.git",
-                "reference": "554669624791b70d518f42d08d24283641ede301"
+                "reference": "6b4158bc57e20e41860875908211507cfa113cd5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/container/zipball/554669624791b70d518f42d08d24283641ede301",
-                "reference": "554669624791b70d518f42d08d24283641ede301",
+                "url": "https://api.github.com/repos/quantaphp/container/zipball/6b4158bc57e20e41860875908211507cfa113cd5",
+                "reference": "6b4158bc57e20e41860875908211507cfa113cd5",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.0",
                 "psr/container": "^1.0",
-                "quanta/array-type-check": "0.2.0"
+                "quanta/array-type-check": "^0.3"
             },
             "require-dev": {
                 "eloquent/phony-kahlan": "^2.0",
@@ -1637,7 +1637,7 @@
                 "container",
                 "dependency-injection"
             ],
-            "time": "2019-07-10T13:23:41+00:00"
+            "time": "2019-07-16T11:22:30+00:00"
         },
         {
             "name": "quanta/error-handler",
