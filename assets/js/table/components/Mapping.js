@@ -2,7 +2,7 @@ import React from 'react'
 
 import MappingImg from './MappingImg'
 
-const Mapping = ({ type, start, stop, protein, mapping }) => {
+const Mapping = ({ type, name, start, stop, protein, mapping }) => {
     const reduced = mapping.reduce((reduced, alignment) => {
         alignment.isoforms.map(isoform => {
             isoform.occurrences.map(occurrence => {
@@ -37,7 +37,12 @@ const Mapping = ({ type, start, stop, protein, mapping }) => {
             {Object.values(reduced).map((isoform, i) => (
                 <div key={i} className="card">
                     <h5 className="card-header">
-                        {isoform.accession} ({coordinates[isoform.accession].start} - {coordinates[isoform.accession].stop})
+                        {coordinates[isoform.accession].start == 1
+                            ? isoform.accession
+                            : [isoform.accession, '/', name].join('')} (
+                            {coordinates[isoform.accession].start},&nbsp;
+                            {coordinates[isoform.accession].stop}
+                        )
                     </h5>
                     <div className="card-body">
                         {isoform.occurrences.sort((a, b) => a.start - b.start).map((occurrence, j) => (

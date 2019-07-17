@@ -25,7 +25,7 @@ const filter = (alignment, selected) => {
     })
 }
 
-const MappingModal = ({ i, type, coordinates, alignment, add, cancel }) => {
+const MappingModal = ({ i, type, name, coordinates, alignment, add, cancel }) => {
     const [selected, setSelected] = useState(indexes(alignment))
 
     const filtered = filter(alignment, selected)
@@ -72,7 +72,12 @@ const MappingModal = ({ i, type, coordinates, alignment, add, cancel }) => {
                     {alignment.isoforms.map((isoform, i) => (
                         <li key={i}>
                             <h4>
-                                {isoform.accession} ({coordinates[isoform.accession].start} - {coordinates[isoform.accession].stop})
+                                {coordinates[isoform.accession].start == 1
+                                    ? isoform.accession
+                                    : [isoform.accession, '/', name].join('')} (
+                                    {coordinates[isoform.accession].start},&nbsp;
+                                    {coordinates[isoform.accession].stop}
+                                )
                             </h4>
                             {isoform.occurrences.length == 0 ? (
                                 <p>

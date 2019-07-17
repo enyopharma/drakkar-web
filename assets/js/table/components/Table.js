@@ -81,7 +81,7 @@ const Table = ({ descriptions }) => {
                                     ].join('')
                                     : [
                                         description.interactor2.protein.accession, '/',
-                                        description.interactor2.name, '(',
+                                        description.interactor2.name, ' (',
                                         description.interactor2.start, ', ',
                                         description.interactor2.stop, ')',
                                     ].join('')}

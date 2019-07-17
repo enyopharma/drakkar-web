@@ -38,6 +38,7 @@ const MappingModal = ({ description, close }) => {
                             ) : (
                                 <Mapping
                                     type="h"
+                                    name={description.interactor1.name}
                                     start={description.interactor1.start}
                                     stop={description.interactor1.stop}
                                     protein={protein1}
@@ -53,6 +54,7 @@ const MappingModal = ({ description, close }) => {
                             ) : (
                                 <Mapping
                                     type={description.type == 'hh' ? 'h' : 'v'}
+                                    name={description.interactor2.name}
                                     start={description.interactor2.start}
                                     stop={description.interactor2.stop}
                                     protein={protein2}

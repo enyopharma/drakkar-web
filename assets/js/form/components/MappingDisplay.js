@@ -2,7 +2,7 @@ import React from 'react'
 
 import MappingImg from './MappingImg'
 
-const MappingDisplay = ({ type, coordinates, mapping, remove }) => {
+const MappingDisplay = ({ type, name, coordinates, mapping, remove }) => {
     return (
         <React.Fragment>
             {mapping.map((alignment, i) => (
@@ -33,7 +33,12 @@ const MappingDisplay = ({ type, coordinates, mapping, remove }) => {
                                 {alignment.isoforms.map((isoform, j) => (
                                     <li key={j} className="list-group-item">
                                         <h4>
-                                            {isoform.accession} ({coordinates[isoform.accession].start} - {coordinates[isoform.accession].stop})
+                                            {coordinates[isoform.accession].start == 1
+                                                ? isoform.accession
+                                                : [isoform.accession, '/', name].join('')} (
+                                                {coordinates[isoform.accession].start},&nbsp;
+                                                {coordinates[isoform.accession].stop}
+                                            )
                                         </h4>
                                         <ul className="list-unstyled">
                                             {isoform.occurrences.sort((a, b) => a.start - b.start).map((occurrence, k) => (
