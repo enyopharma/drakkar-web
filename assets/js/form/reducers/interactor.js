@@ -6,9 +6,7 @@ import alignment from './alignment'
 const name = (state = '', action) => {
     switch (action.type) {
         case actions.SELECT_PROTEIN:
-            return action.protein.type == 'h' || action.protein.matures.length == 0
-                ? action.protein.name
-                : ''
+            return action.protein.type == 'h' ? action.protein.name : ''
         case actions.UNSELECT_PROTEIN:
             return ''
         case actions.UPDATE_MATURE:
