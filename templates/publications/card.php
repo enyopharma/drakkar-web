@@ -77,6 +77,16 @@
                         Discard
                     </button>
                 </div>
+                <div class="col">
+                    <button
+                        type="submit"
+                        name="state"
+                        value="<?= $curated ?>"
+                        class="btn btn-sm btn-block btn-success"
+                    >
+                        Curated
+                    </button>
+                </div>
             </div>
         </form>
     </div>

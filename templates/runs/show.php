@@ -11,7 +11,7 @@
 <ul class="nav nav-tabs nav-fill my-4">
     <li class="nav-item">
         <a
-            class="nav-link text-warning <?= $state == $pending ? 'active' : '' ?>"
+            class="nav-link <?= $this->textclass($pending) ?> <?= $state == $pending ? 'active' : '' ?>"
             href="<?= $this->url('runs.show', $run, ['state' => $pending]) ?>"
         >
             Pending (<?= $run['nbs'][$pending] ?>)
@@ -19,7 +19,7 @@
     </li>
     <li class="nav-item">
         <a
-            class="nav-link text-primary <?= $state == $selected ? 'active' : '' ?>"
+            class="nav-link <?= $this->textclass($selected) ?> <?= $state == $selected ? 'active' : '' ?>"
             href="<?= $this->url('runs.show', $run, ['state' => $selected]) ?>"
         >
             Selected (<?= $run['nbs'][$selected] ?>)
@@ -27,10 +27,18 @@
     </li>
     <li class="nav-item">
         <a
-            class="nav-link text-danger <?= $state == $discarded ? 'active' : '' ?>"
+            class="nav-link <?= $this->textclass($discarded) ?> <?= $state == $discarded ? 'active' : '' ?>"
             href="<?= $this->url('runs.show', $run, ['state' => $discarded]) ?>"
         >
             Discarded (<?= $run['nbs'][$discarded] ?>)
+        </a>
+    </li>
+    <li class="nav-item">
+        <a
+            class="nav-link <?= $this->textclass($curated) ?> <?= $state == $curated ? 'active' : '' ?>"
+            href="<?= $this->url('runs.show', $run, ['state' => $curated]) ?>"
+        >
+            Curated (<?= $run['nbs'][$curated] ?>)
         </a>
     </li>
 </ul>
