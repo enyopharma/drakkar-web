@@ -7,17 +7,18 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use App\ReadModel\ProteinProjection;
+use App\ReadModel\RepositoryInterface;
 use App\Http\Responders\JsonResponder;
 
 final class IndexHandler implements RequestHandlerInterface
 {
-    private $proteins;
+    private $repo;
 
     private $responder;
 
-    public function __construct(ProteinProjection $proteins, JsonResponder $responder)
+    public function __construct(RepositoryInterface $repo, JsonResponder $responder)
     {
-        $this->proteins = $proteins;
+        $this->repo = $repo;
         $this->responder = $responder;
     }
 
@@ -25,11 +26,10 @@ final class IndexHandler implements RequestHandlerInterface
     {
         $query = (array) $request->getQueryParams();
 
-        $type = $query['type'] ?? '';
-        $q = $query['q'] ?? '';
+        $proteins = $this->repo->projection(ProteinProjection::class);
 
         return $this->responder->response([
-            'proteins' => $this->proteins->search($type, $q),
+            'proteins' => $proteins->rset($query),
         ]);
     }
 }

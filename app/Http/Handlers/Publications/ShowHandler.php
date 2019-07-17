@@ -7,27 +7,20 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use App\ReadModel\NotFoundException;
-use App\ReadModel\OverflowException;
-use App\ReadModel\UnderflowException;
+use App\ReadModel\RepositoryInterface;
 use App\ReadModel\PublicationProjection;
 use App\ReadModel\DescriptionProjection;
 use App\Http\Responders\HtmlResponder;
 
 final class ShowHandler implements RequestHandlerInterface
 {
-    private $publications;
-
-    private $descriptions;
+    private $repo;
 
     private $responder;
 
-    public function __construct(
-        PublicationProjection $publications,
-        DescriptionProjection $descriptions,
-        HtmlResponder $responder
-    ) {
-        $this->publications = $publications;
-        $this->descriptions = $descriptions;
+    public function __construct(RepositoryInterface $repo, HtmlResponder $responder)
+    {
+        $this->repo = $repo;
         $this->responder = $responder;
     }
 
@@ -38,13 +31,14 @@ final class ShowHandler implements RequestHandlerInterface
 
         $run_id = (int) $attributes['run_id'];
         $pmid = (int) $attributes['pmid'];
-        $page = (int) ($query['page'] ?? 1);
-        $limit = (int) ($query['limit'] ?? 20);
+
+        $publications = $this->repo->projection(PublicationProjection::class, $run_id);
+        $descriptions = $this->repo->projection(DescriptionProjection::class, $run_id, $pmid);
 
         try {
             return $this->responder->template('publications/show', [
-                'publication' => $this->publications->pmid($run_id, $pmid),
-                'descriptions' => $this->descriptions->pagination($run_id, $pmid, $page, $limit),
+                'publication' => $publications->rset($attributes)->first(),
+                'descriptions' => $descriptions->rset($query),
             ]);
         }
 
@@ -52,15 +46,9 @@ final class ShowHandler implements RequestHandlerInterface
             return $this->responder->notfound();
         }
 
-        catch (UnderflowException $e) {
+        catch (\OutOfRangeException $e) {
             return $this->responder->route('runs.publications.show', ['run_id' => $run_id, 'pmid' => $pmid], [
                 'page' => 1,
-            ]);
-        }
-
-        catch (OverflowException $e) {
-            return $this->responder->route('runs.publications.show', ['run_id' => $run_id, 'pmid' => $pmid], [
-                'page' => $this->descriptions->maxPage($run_id, $pmid, $limit),
             ]);
         }
     }

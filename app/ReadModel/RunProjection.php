@@ -4,20 +4,20 @@ namespace App\ReadModel;
 
 use App\Domain\Publication;
 
-final class RunProjection
+final class RunProjection implements ProjectionInterface
 {
-    const SELECT_RUNS_SQL = <<<SQL
-        SELECT * FROM runs
-        WHERE populated = true
-        AND deleted_at IS NULL
-        ORDER BY created_at DESC, id DESC
-SQL;
-
     const SELECT_RUN_SQL = <<<SQL
         SELECT * FROM runs
         WHERE populated = true
         AND deleted_at IS NULL
         AND id = ?
+SQL;
+
+    const SELECT_RUNS_SQL = <<<SQL
+        SELECT * FROM runs
+        WHERE populated = true
+        AND deleted_at IS NULL
+        ORDER BY created_at DESC, id DESC
 SQL;
 
     const COUNT_PUBLICATIONS_SQL = <<<SQL
@@ -40,7 +40,19 @@ SQL;
         $this->pdo = $pdo;
     }
 
-    public function id(int $id): array
+    public function publications(int $id, string $state = Publication::PENDING): PublicationProjection
+    {
+        return new PublicationProjection($this->pdo, $id, $state);
+    }
+
+    public function rset(array $criteria = []): ResultSetInterface
+    {
+        return key_exists('id', $criteria)
+            ? $this->id((int) $criteria['id'])
+            : $this->all();
+    }
+
+    private function id(int $id): ResultSetInterface
     {
         $select_run_sth = $this->pdo->prepare(self::SELECT_RUN_SQL);
         $count_publications_sth = $this->pdo->prepare(self::COUNT_PUBLICATIONS_SQL);
@@ -56,15 +68,13 @@ SQL;
                 $nbs[$state] = ($nb = $count_publications_sth->fetchColumn(2)) ? $nb : 0;
             }
 
-            return $this->formatted($run, $nbs);
+            return new ArrayResultSet($this->formatted($run, $nbs));
         }
 
-        throw new NotFoundException(
-            sprintf('%s has no entry with id %s', self::class, $id)
-        );
+        return new EmptyResultSet(self::class, ['id' => $id]);
     }
 
-    public function all(): ResultSetInterface
+    private function all(): ResultSetInterface
     {
         $select_runs_sth = $this->pdo->prepare(self::SELECT_RUNS_SQL);
         $count_publications_sth = $this->pdo->prepare(self::EAGER_LOAD_COUNT_PUBLICATIONS_SQL);
@@ -85,7 +95,7 @@ SQL;
             $runs[] = $this->formatted($run, $nbs[$run['id']]);
         }
 
-        return new ResultSet($runs);
+        return new ArrayResultSet(...$runs);
     }
 
     private function formatted(array $run, array $nbs): array

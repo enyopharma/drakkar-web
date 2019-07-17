@@ -5,7 +5,7 @@ namespace App\ReadModel;
 use App\Domain\Run;
 use App\Domain\Protein;
 
-final class DescriptionProjection
+final class DescriptionProjection implements ProjectionInterface
 {
     const SELECT_DESCRIPTION_SQL = <<<SQL
         SELECT r.id AS run_id, r.type, a.pmid,
@@ -70,69 +70,70 @@ SQL;
 
     private $pdo;
 
-    public function __construct(\PDO $pdo)
+    private $run_id;
+
+    private $pmid;
+
+    public function __construct(\PDO $pdo, int $run_id, int $pmid)
     {
         $this->pdo = $pdo;
+        $this->run_id = $run_id;
+        $this->pmid = $pmid;
     }
 
-    public function id(int $run_id, int $pmid, int $id): array
+    public function rset(array $criteria = []): ResultSetInterface
+    {
+        return key_exists('id', $criteria)
+            ? $this->id((int) $criteria['id'])
+            : $this->pagination(
+                (int) ($criteria['page'] ?? 1),
+                (int) ($criteria['limit'] ?? 20)
+            );
+    }
+
+    private function id(int $id): ResultSetInterface
     {
         $select_description_sth = $this->pdo->prepare(self::SELECT_DESCRIPTION_SQL);
 
-        $select_description_sth->execute([$run_id, $pmid, $id]);
+        $select_description_sth->execute([$this->run_id, $this->pmid, $id]);
 
-        if ($description = $select_description_sth->fetch()) {
-            return $this->formatted($description);
-        }
-
-        throw new NotFoundException(
-            vsprintf('%s has no entry with run_id %s, pmid %s, id %s', [
-                self::class,
-                $run_id,
-                $pmid,
-                $id,
-            ])
-        );
+        return ($description = $select_description_sth->fetch())
+            ? new ArrayResultSet($this->formatted($description))
+            : new EmptyResultSet(self::class, ['id' => $id]);
     }
 
-    public function pagination(int $run_id, int $pmid, int $page = 1, int $limit = 20): ResultSetInterface
+    private function pagination(int $page, int $limit): ResultSetInterface
     {
         $offset = ($page - 1) * $limit;
-        $total = $this->count($run_id, $pmid);
+        $total = $this->count();
 
-        if ($page < 1) {
-            throw new UnderflowException;
-        }
-
-        if ($offset > 0 && $total <= $offset) {
-            throw new OverflowException;
+        if ($page < 1 || ($offset > 0 && $total <= $offset)) {
+            throw new \OutOfRangeException;
         }
 
         $select_descriptions_sth = $this->pdo->prepare(self::SELECT_DESCRIPTIONS_SQL);
 
         $descriptions = [];
 
-        $select_descriptions_sth->execute([$run_id, $pmid, $limit, $offset]);
+        $select_descriptions_sth->execute([$this->run_id, $this->pmid, $limit, $offset]);
 
         while ($description = $select_descriptions_sth->fetch()) {
             $descriptions[] = $this->formatted($description);
         }
 
-        return new Pagination(new ResultSet($descriptions), $total, $page, $limit);
+        return new Pagination(
+            new ArrayResultSet(...$descriptions),
+            $total,
+            $page,
+            $limit
+        );
     }
 
-    public function maxPage(int $run_id, int $pmid, int $limit = 20): int
-    {
-        $total = $this->count($run_id, $pmid);
-
-        return (int) ceil($total/$limit);
-    }
-
-    private function count(int $run_id, int $pmid): int
+    private function count(): int
     {
         $count_descriptions_sth = $this->pdo->prepare(self::COUNT_DESCRIPTIONS_SQL);
 
-        $count_descriptions_sth->execute([$run_id, $pmid]);
+        $count_descriptions_sth->execute([$this->run_id, $this->pmid]);
 
         return ($nb = $count_descriptions_sth->fetchColumn()) ? $nb : 0;
     }

@@ -2,13 +2,9 @@
 
 namespace App\ReadModel;
 
-final class MethodProjection
+final class MethodProjection implements ProjectionInterface
 {
-    const SELECT_FROM_ID_SQL = <<<SQL
-        SELECT * FROM methods WHERE id = ?
-SQL;
-
-    const SELECT_FROM_PSIMI_ID_SQL = <<<SQL
+    const SELECT_METHOD_SQL = <<<SQL
         SELECT * FROM methods WHERE psimi_id = ?
 SQL;
 
@@ -23,37 +19,28 @@ SQL;
         $this->pdo = $pdo;
     }
 
-    public function id(int $id): array
+    public function rset(array $criteria = []): ResultSetInterface
     {
-        $select_method_sth = $this->pdo->prepare(self::SELECT_FROM_ID_SQL);
-
-        $select_method_sth->execute([$id]);
-
-        if ($method = $select_method_sth->fetch()) {
-            return $method;
-        }
-
-        throw new NotFoundException(
-            sprintf('%s has no entry with id %s', self::class, $id)
-        );
+        return key_exists('psimi_id', $criteria)
+            ? $this->psimi_id((string) ($criteria['psimi_id'] ?? ''))
+            : $this->search(
+                (string) ($criteria['q'] ?? ''),
+                (int) ($criteria['limit'] ?? 20)
+            );
     }
 
-    public function psimi_id(string $psimi_id): array
+    private function psimi_id(string $psimi_id): ResultSetInterface
     {
-        $select_method_sth = $this->pdo->prepare(self::SELECT_FROM_PSIMI_ID_SQL);
+        $select_method_sth = $this->pdo->prepare(self::SELECT_METHOD_SQL);
 
         $select_method_sth->execute([$psimi_id]);
 
-        if ($method = $select_method_sth->fetch()) {
-            return $method;
-        }
-
-        throw new NotFoundException(
-            sprintf('%s has no entry with psimi_id \'%s\'', self::class, $psimi_id)
-        );
+        return ($method = $select_method_sth->fetch())
+            ? new ArrayResultSet($method)
+            : new EmptyResultSet(self::class, ['psimi_id' => $psimi_id]);
     }
 
-    public function search(string $q, int $limit = 20): ResultSetInterface
+    private function search(string $q, int $limit): ResultSetInterface
     {
         $parts = (array) preg_split('/\s+/', $q);
 
@@ -65,6 +52,6 @@ SQL;
             return '%' . $part . '%';
         }, $parts), [$limit]));
 
-        return new ResultSet($select_methods_sth->fetchAll());
+        return new ArrayResultSet(...$select_methods_sth->fetchAll());
     }
 }

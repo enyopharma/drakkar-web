@@ -1,38 +1,15 @@
 <?php declare(strict_types=1);
 
-use App\ReadModel\RunProjection;
-use App\ReadModel\MethodProjection;
-use App\ReadModel\ProteinProjection;
-use App\ReadModel\PublicationProjection;
-use App\ReadModel\DescriptionProjection;
+use App\ReadModel\Repository;
+use App\ReadModel\RepositoryInterface;
 
 return [
-    RunProjection::class => function ($container) {
-        return new RunProjection(
-            $container->get(PDO::class)
-        );
+    RepositoryInterface::class => function ($container) {
+        return $container->get(Repository::class);
     },
 
-    PublicationProjection::class => function ($container) {
-        return new PublicationProjection(
-            $container->get(PDO::class)
-        );
-    },
-
-    MethodProjection::class => function ($container) {
-        return new MethodProjection(
-            $container->get(PDO::class)
-        );
-    },
-
-    ProteinProjection::class => function ($container) {
-        return new ProteinProjection(
-            $container->get(PDO::class)
-        );
-    },
-
-    DescriptionProjection::class => function ($container) {
-        return new DescriptionProjection(
+    Repository::class => function ($container) {
+        return new Repository(
             $container->get(PDO::class)
         );
     },

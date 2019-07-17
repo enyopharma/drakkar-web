@@ -8,18 +8,18 @@ use Psr\Http\Message\ServerRequestInterface;
 
 use App\ReadModel\NotFoundException;
 use App\ReadModel\ProteinProjection;
+use App\ReadModel\RepositoryInterface;
 use App\Http\Responders\JsonResponder;
-
 
 final class ShowHandler implements RequestHandlerInterface
 {
-    private $proteins;
+    private $repo;
 
     private $responder;
 
-    public function __construct(ProteinProjection $proteins, JsonResponder $responder)
+    public function __construct(RepositoryInterface $repo, JsonResponder $responder)
     {
-        $this->proteins = $proteins;
+        $this->repo = $repo;
         $this->responder = $responder;
     }
 
@@ -27,11 +27,11 @@ final class ShowHandler implements RequestHandlerInterface
     {
         $attributes = (array) $request->getAttributes();
 
-        $accession = $attributes['accession'] ?? '';
+        $proteins = $this->repo->projection(ProteinProjection::class);
 
         try {
             return $this->responder->response([
-                'protein' => $this->proteins->accession($accession),
+                'protein' => $proteins->rset($attributes)->first(),
             ]);
         }
 

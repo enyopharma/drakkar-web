@@ -6,27 +6,21 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\Domain\Publication;
 use App\ReadModel\NotFoundException;
+use App\ReadModel\RepositoryInterface;
 use App\ReadModel\PublicationProjection;
 use App\ReadModel\DescriptionProjection;
 use App\Http\Responders\HtmlResponder;
 
 final class EditHandler implements RequestHandlerInterface
 {
-    private $publications;
-
-    private $descriptions;
+    private $repo;
 
     private $responder;
 
-    public function __construct(
-        PublicationProjection $publications,
-        DescriptionProjection $descriptions,
-        HtmlResponder $responder
-    ) {
-        $this->publications = $publications;
-        $this->descriptions = $descriptions;
+    public function __construct(RepositoryInterface $repo, HtmlResponder $responder)
+    {
+        $this->repo = $repo;
         $this->responder = $responder;
     }
 
@@ -36,12 +30,14 @@ final class EditHandler implements RequestHandlerInterface
 
         $run_id = (int) $attributes['run_id'];
         $pmid = (int) $attributes['pmid'];
-        $id = (int) $attributes['id'];
+
+        $publications = $this->repo->projection(PublicationProjection::class, $run_id);
+        $descriptions = $this->repo->projection(DescriptionProjection::class, $run_id, $pmid);
 
         try {
             return $this->responder->template('descriptions/create', [
-                'publication' => $this->publications->pmid($run_id, $pmid),
-                'description' => $this->descriptions->id($run_id, $pmid, $id),
+                'publication' => $publications->rset($attributes)->first(),
+                'description' => $descriptions->rset($attributes)->first(),
             ]);
         }
 

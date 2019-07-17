@@ -6,20 +6,21 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\Domain\Publication;
 use App\ReadModel\NotFoundException;
+use App\ReadModel\RepositoryInterface;
 use App\ReadModel\PublicationProjection;
+use App\ReadModel\DescriptionProjection;
 use App\Http\Responders\HtmlResponder;
 
 final class CreateHandler implements RequestHandlerInterface
 {
-    private $publications;
+    private $repo;
 
     private $responder;
 
-    public function __construct(PublicationProjection $publications, HtmlResponder $responder)
+    public function __construct(RepositoryInterface $repo, HtmlResponder $responder)
     {
-        $this->publications = $publications;
+        $this->repo = $repo;
         $this->responder = $responder;
     }
 
@@ -28,11 +29,12 @@ final class CreateHandler implements RequestHandlerInterface
         $attributes = (array) $request->getAttributes();
 
         $run_id = (int) $attributes['run_id'];
-        $pmid = (int) $attributes['pmid'];
+
+        $publications = $this->repo->projection(PublicationProjection::class, $run_id);
 
         try {
             return $this->responder->template('descriptions/create', [
-                'publication' => $this->publications->pmid($run_id, $pmid),
+                'publication' => $publications->rset($attributes)->first(),
                 'description' => [],
             ]);
         }

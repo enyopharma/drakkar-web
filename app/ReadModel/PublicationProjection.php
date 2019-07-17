@@ -4,7 +4,7 @@ namespace App\ReadModel;
 
 use App\Domain\Publication;
 
-final class PublicationProjection
+final class PublicationProjection implements ProjectionInterface
 {
     const SELECT_FROM_PMID_SQL = <<<SQL
         SELECT r.id AS run_id, r.type AS run_type, r.name AS run_name, a.annotation, a.state, p.*
@@ -20,7 +20,7 @@ SQL;
         WHERE r.id = a.run_id AND p.pmid = a.pmid
         AND a.run_id = ?
         AND a.state = ?
-        ORDER BY a.updated_at DESC, a.id ASC
+        ORDER BY a.updated_at ASC, a.id ASC
         LIMIT ? OFFSET ?
 SQL;
 
@@ -37,69 +37,79 @@ SQL;
 
     private $pdo;
 
-    public function __construct(\PDO $pdo)
+    private $run_id;
+
+    private $state;
+
+    public function __construct(\PDO $pdo, int $run_id, string $state = Publication::PENDING)
     {
         $this->pdo = $pdo;
+        $this->run_id = $run_id;
+        $this->state = $state;
     }
 
-    public function pmid(int $run_id, int $pmid): array
+    public function descriptions(int $pmid): DescriptionProjection
+    {
+        return new DescriptionProjection($this->pdo, $this->run_id, $pmid);
+    }
+
+    public function rset(array $criteria = []): ResultSetInterface
+    {
+        return key_exists('pmid', $criteria)
+            ? $this->pmid((int) $criteria['pmid'])
+            : $this->pagination(
+                (int) ($criteria['page'] ?? 1),
+                (int) ($criteria['limit'] ?? 20)
+            );
+    }
+
+    private function pmid(int $pmid): ResultSetInterface
     {
         $select_publication_sth = $this->pdo->prepare(self::SELECT_FROM_PMID_SQL);
 
-        $select_publication_sth->execute([$run_id, $pmid]);
+        $select_publication_sth->execute([$this->run_id, $pmid]);
 
         $keywords = $this->keywords();
 
-        if ($publication = $select_publication_sth->fetch()) {
-            return $this->formatted($publication, $keywords);
-        }
-
-        throw new NotFoundException(
-            sprintf('%s has no entry with run_id %s and pmid %s', self::class, $run_id, $pmid)
-        );
+        return ($publication = $select_publication_sth->fetch())
+            ? new ArrayResultSet($this->formatted($publication, $keywords))
+            : new EmptyResultSet(self::class, ['pmid' => $pmid]);
     }
 
-    public function pagination(int $run_id, string $state, int $page = 1, int $limit = 20): ResultSetInterface
+    private function pagination(int $page, int $limit): ResultSetInterface
     {
         $offset = ($page - 1) * $limit;
-        $total = $this->count($run_id, $state);
+        $total = $this->count();
 
-        if ($page < 1) {
-            throw new UnderflowException;
-        }
-
-        if ($offset > 0 && $total <= $offset) {
-            throw new OverflowException;
+        if ($page < 1 || ($offset > 0 && $total <= $offset)) {
+            throw new \OutOfRangeException;
         }
 
         $select_publications_sth = $this->pdo->prepare(self::PAGINATE_PUBLICATIONS_SQL);
 
         $publications = [];
 
-        $select_publications_sth->execute([$run_id, $state, $limit, $offset]);
+        $select_publications_sth->execute([$this->run_id, $this->state, $limit, $offset]);
 
-        $total = $this->count($run_id, $state);
         $keywords = $this->keywords();
 
         while ($publication = $select_publications_sth->fetch()) {
             $publications[] = $this->formatted($publication, $keywords);
         }
 
-        return new Pagination(new ResultSet($publications), $total, $page, $limit);
+        return new Pagination(
+            new ArrayResultSet(...$publications),
+            $total,
+            $page,
+            $limit
+        );
     }
 
-    public function maxPage(int $run_id, string $state, int $limit = 20): int
-    {
-        $total = $this->count($run_id, $state);
-
-        return (int) ceil($total/$limit);
-    }
-
-    private function count(int $run_id, string $state): int
+    private function count(): int
     {
         $count_publications_sth = $this->pdo->prepare(self::COUNT_PUBLCIATIONS_SQL);
 
-        $count_publications_sth->execute([$run_id, $state]);
+        $count_publications_sth->execute([$this->run_id, $this->state]);
 
         return ($nb = $count_publications_sth->fetchColumn(2)) ? $nb : 0;
     }

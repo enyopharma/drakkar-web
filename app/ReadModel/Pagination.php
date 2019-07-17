@@ -20,6 +20,11 @@ final class Pagination implements ResultSetInterface
         $this->limit = $limit;
     }
 
+    public function first(): array
+    {
+        return $this->rset->first();
+    }
+
     public function count(): int
     {
         return $this->rset->count();
@@ -33,16 +38,6 @@ final class Pagination implements ResultSetInterface
     public function jsonSerialize()
     {
         return $this->rset->jsonSerialize();
-    }
-
-    public function map(callable $cb): ResultSetInterface
-    {
-        return new Pagination(
-            $this->rset->map($cb),
-            $this->total,
-            $this->page,
-            $this->limit
-        );
     }
 
     public function page(): int

@@ -4,5 +4,5 @@ namespace App\ReadModel;
 
 interface ResultSetInterface extends \Countable, \IteratorAggregate, \JsonSerializable
 {
-    public function map(callable $cb): ResultSetInterface;
+    public function first(): array;
 }

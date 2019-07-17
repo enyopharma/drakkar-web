@@ -2,7 +2,7 @@
 
 namespace App\ReadModel;
 
-final class ProteinProjection
+final class ProteinProjection implements ProjectionInterface
 {
     const SELECT_PROTEIN_SQL = <<<SQL
         SELECT p.id, p.type, p.accession, p.name, p.description, s.sequence
@@ -61,22 +61,29 @@ SQL;
         $this->pdo = $pdo;
     }
 
-    public function accession(string $accession): array
+    public function rset(array $criteria = []): ResultSetInterface
+    {
+        return key_exists('accession', $criteria)
+            ? $this->accession((string) $criteria['accession'])
+            : $this->search(
+                (string) ($criteria['type'] ?? ''),
+                (string) ($criteria['q'] ?? ''),
+                (int) ($criteria['limit'] ?? 20)
+            );
+    }
+
+    private function accession(string $accession): ResultSetInterface
     {
         $select_protein_sth = $this->pdo->prepare(self::SELECT_PROTEIN_SQL);
 
         $select_protein_sth->execute([$accession]);
 
-        if ($protein = $select_protein_sth->fetch()) {
-            return $this->formatted($protein);
-        }
-
-        throw new NotFoundException(
-            sprintf('%s has no entry with accession \'%s\'', self::class, $accession)
-        );
+        return ($protein = $select_protein_sth->fetch())
+            ? new ArrayResultSet($this->formatted($protein))
+            : new EmptyResultSet(self::class, ['accession' => $accession]);
     }
 
-    public function search(string $type, string $q, int $limit = 20): ResultSetInterface
+    private function search(string $type, string $q, int $limit): ResultSetInterface
     {
         $parts = (array) preg_split('/\s+/', $q);
 
@@ -88,7 +95,7 @@ SQL;
             return '%' . $part . '%';
         }, $parts), [$limit]));
 
-        return new ResultSet($select_proteins_sth->fetchAll());
+        return new ArrayResultSet(...$select_proteins_sth->fetchAll());
     }
 
     private function formatted(array $protein): array
