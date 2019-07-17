@@ -2,9 +2,6 @@
 
 namespace App\ReadModel;
 
-use App\Domain\Run;
-use App\Domain\Protein;
-
 final class DescriptionProjection implements ProjectionInterface
 {
     const SELECT_DESCRIPTION_SQL = <<<SQL
@@ -98,7 +95,10 @@ SQL;
         $select_description_sth->execute([$this->run_id, $this->pmid, $id]);
 
         return ($description = $select_description_sth->fetch())
-            ? new ArrayResultSet($this->formatted($description))
+            ? new MappedResultSet(
+                new ArrayResultSet($description),
+                new DescriptionMapper
+            )
             : new EmptyResultSet(self::class, ['id' => $id]);
     }
 
@@ -113,16 +113,13 @@ SQL;
 
         $select_descriptions_sth = $this->pdo->prepare(self::SELECT_DESCRIPTIONS_SQL);
 
-        $descriptions = [];
-
         $select_descriptions_sth->execute([$this->run_id, $this->pmid, $limit, $offset]);
 
-        while ($description = $select_descriptions_sth->fetch()) {
-            $descriptions[] = $this->formatted($description);
-        }
-
         return new Pagination(
-            new ArrayResultSet(...$descriptions),
+            new MappedResultSet(
+                new ArrayResultSet(...$select_descriptions_sth->fetchAll()),
+                new DescriptionMapper
+            ),
             $total,
             $page,
             $limit
@@ -136,65 +133,5 @@ SQL;
         $count_descriptions_sth->execute([$this->run_id, $this->pmid]);
 
         return ($nb = $count_descriptions_sth->fetchColumn()) ? $nb : 0;
-    }
-
-    private function date(?string $date): string
-    {
-        if (is_null($date)) return '-';
-
-        if (($time = strtotime($date)) !== false) {
-            return date('Y - m - d', $time);
-        }
-
-        throw new \LogicException(
-            sprintf('%s can\'t be converted to a time', $date)
-        );
-    }
-
-    private function formatted(array $description): array
-    {
-        return [
-            'run' => [
-                'id' => $description['run_id'],
-                'type' => $description['type'],
-            ],
-            'publication' => [
-                'run_id' => $description['run_id'],
-                'pmid' => $description['pmid'],
-            ],
-            'id' => $description['id'],
-            'type' => $description['type'],
-            'run_id' => $description['run_id'],
-            'pmid' => $description['pmid'],
-            'method' => [
-                'psimi_id' => $description['psimi_id'],
-                'name' => $description['method_name'],
-            ],
-            'interactor1' => [
-                'type' => Protein::H,
-                'name' => $description['name1'],
-                'start' => $description['start1'],
-                'stop' => $description['stop1'],
-                'protein' => [
-                    'accession' => $description['accession1'],
-                ],
-                'mapping' => json_decode($description['mapping1'], true),
-            ],
-            'interactor2' => [
-                'type' => $description['type'] == Run::HH
-                    ? Protein::H
-                    : Protein::V,
-                'name' => $description['name2'],
-                'start' => $description['start2'],
-                'stop' => $description['stop2'],
-                'protein' => [
-                    'accession' => $description['accession2'],
-                ],
-                'mapping' => json_decode($description['mapping2'], true),
-            ],
-            'created_at' => $this->date($description['created_at']),
-            'deleted_at' => $this->date($description['deleted_at']),
-            'deleted' => ! is_null($description['deleted_at']),
-        ];
     }
 }

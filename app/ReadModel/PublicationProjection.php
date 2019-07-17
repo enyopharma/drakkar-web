@@ -48,11 +48,6 @@ SQL;
         $this->state = $state;
     }
 
-    public function descriptions(int $pmid): DescriptionProjection
-    {
-        return new DescriptionProjection($this->pdo, $this->run_id, $pmid);
-    }
-
     public function rset(array $criteria = []): ResultSetInterface
     {
         return key_exists('pmid', $criteria)
@@ -69,10 +64,11 @@ SQL;
 
         $select_publication_sth->execute([$this->run_id, $pmid]);
 
-        $keywords = $this->keywords();
-
         return ($publication = $select_publication_sth->fetch())
-            ? new ArrayResultSet($this->formatted($publication, $keywords))
+            ? new MappedResultSet(
+                new ArrayResultSet($publication),
+                new PublicationMapper($this->keywords())
+            )
             : new EmptyResultSet(self::class, ['pmid' => $pmid]);
     }
 
@@ -87,18 +83,13 @@ SQL;
 
         $select_publications_sth = $this->pdo->prepare(self::PAGINATE_PUBLICATIONS_SQL);
 
-        $publications = [];
-
         $select_publications_sth->execute([$this->run_id, $this->state, $limit, $offset]);
 
-        $keywords = $this->keywords();
-
-        while ($publication = $select_publications_sth->fetch()) {
-            $publications[] = $this->formatted($publication, $keywords);
-        }
-
         return new Pagination(
-            new ArrayResultSet(...$publications),
+            new MappedResultSet(
+                new ArrayResultSet(...$select_publications_sth->fetchAll()),
+                new PublicationMapper($this->keywords())
+            ),
             $total,
             $page,
             $limit
@@ -121,62 +112,5 @@ SQL;
         $select_keywords_sth->execute();
 
         return $select_keywords_sth->fetchAll();
-    }
-
-    private function formatted(array $publication, array $keywords = []): array
-    {
-        $metadata = ! is_null($publication['metadata'])
-            ? json_decode($publication['metadata'], true)
-            : [];
-
-        $article = $metadata['PubmedArticle']['MedlineCitation']['Article'] ?? [];
-
-        return [
-            'run' => [
-                'id' => $publication['run_id'],
-                'type' => $publication['run_type'],
-                'name' => $publication['run_name'],
-            ],
-            'run_id' => $publication['run_id'],
-            'pmid' => $publication['pmid'],
-            'state' => $publication['state'],
-            'annotation' => $publication['annotation'],
-            'title' => $article['ArticleTitle'] ?? $publication['pmid'],
-            'journal' => $article['Journal']['Title'] ?? '',
-            'abstract' => $this->abstract($article),
-            'authors' => $this->authors($article),
-            'keywords' => $keywords,
-            'pending' => $publication['state'] == Publication::PENDING,
-            'selected' => $publication['state'] == Publication::SELECTED,
-            'discarded' => $publication['state'] == Publication::DISCARDED,
-            'curated' => $publication['state'] == Publication::CURATED,
-        ];
-    }
-
-    private function abstract(array $article): array
-    {
-        return is_array($article['Abstract']['AbstractText'] ?? [])
-            ? $article['Abstract']['AbstractText'] ?? ['No abstract']
-            : [$article['Abstract']['AbstractText'] ?? 'No abstract'];
-    }
-
-    private function author(array $author): string
-    {
-        return sprintf('%s %s', $author['LastName'], $author['Initials']);
-    }
-
-    private function authors(array $article): array
-    {
-        $authors = $article['AuthorList']['Author'] ?? [];
-
-        try {
-            return array_map(function (array $author) {
-                return $this->author($author);
-            }, $authors);
-        }
-
-        catch (\TypeError $e) {
-            return [$this->author($authors)];
-        }
     }
 }

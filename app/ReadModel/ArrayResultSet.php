@@ -27,7 +27,7 @@ final class ArrayResultSet implements ResultSetInterface
 
     public function getIterator()
     {
-        return new \ArrayIterator($this->rows);
+        yield from $this->rows;
     }
 
     public function jsonSerialize()

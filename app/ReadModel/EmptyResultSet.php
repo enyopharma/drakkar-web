@@ -30,7 +30,7 @@ final class EmptyResultSet implements ResultSetInterface
 
     public function getIterator()
     {
-        return new \ArrayIterator([]);
+        yield from [];
     }
 
     public function jsonSerialize()

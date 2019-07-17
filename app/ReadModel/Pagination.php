@@ -50,13 +50,6 @@ final class Pagination implements ResultSetInterface
         return (int) ceil($this->total/$this->limit);
     }
 
-    public function overflow(): bool
-    {
-        $total = $this->total();
-
-        return $total > 0 && $this->page > $total;
-    }
-
     public function links(int $n = 10): array
     {
         // compute the total number of pages
@@ -69,12 +62,12 @@ final class Pagination implements ResultSetInterface
 
         // show two blocks when current page is close to the begining
         if ($this->page < $n - 2) {
-            return [$this->range(1, 8), $this->range($total - 1, $total)];
+            return [$this->range(1, $n - 2), $this->range($total - 1, $total)];
         }
 
         // show two blocks when current page is close to the end
         if ($this->page > $total - $n + 3) {
-            return [$this->range(1, 2), $this->range($total - 7, $total)];
+            return [$this->range(1, 2), $this->range($total - $n + 3, $total)];
         }
 
         // show three blocks when current page is not close to an edge

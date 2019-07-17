@@ -7,14 +7,16 @@ use App\Domain\Publication;
 final class RunProjection implements ProjectionInterface
 {
     const SELECT_RUN_SQL = <<<SQL
-        SELECT * FROM runs
+        SELECT *
+        FROM runs
         WHERE populated = true
         AND deleted_at IS NULL
         AND id = ?
 SQL;
 
     const SELECT_RUNS_SQL = <<<SQL
-        SELECT * FROM runs
+        SELECT *
+        FROM runs
         WHERE populated = true
         AND deleted_at IS NULL
         ORDER BY created_at DESC, id DESC
@@ -40,11 +42,6 @@ SQL;
         $this->pdo = $pdo;
     }
 
-    public function publications(int $id, string $state = Publication::PENDING): PublicationProjection
-    {
-        return new PublicationProjection($this->pdo, $id, $state);
-    }
-
     public function rset(array $criteria = []): ResultSetInterface
     {
         return key_exists('id', $criteria)
@@ -68,7 +65,10 @@ SQL;
                 $nbs[$state] = ($nb = $count_publications_sth->fetchColumn(2)) ? $nb : 0;
             }
 
-            return new ArrayResultSet($this->formatted($run, $nbs));
+            return new MappedResultSet(
+                new ArrayResultSet($run),
+                new RunMapper([$run['id'] => $nbs])
+            );
         }
 
         return new EmptyResultSet(self::class, ['id' => $id]);
@@ -79,6 +79,8 @@ SQL;
         $select_runs_sth = $this->pdo->prepare(self::SELECT_RUNS_SQL);
         $count_publications_sth = $this->pdo->prepare(self::EAGER_LOAD_COUNT_PUBLICATIONS_SQL);
 
+        $select_runs_sth->execute();
+
         $nbs = [];
 
         $count_publications_sth->execute();
@@ -87,24 +89,9 @@ SQL;
             $nbs[$row['run_id']][$row['state']] = $row['nb'];
         }
 
-        $runs = [];
-
-        $select_runs_sth->execute();
-
-        while ($run = $select_runs_sth->fetch()) {
-            $runs[] = $this->formatted($run, $nbs[$run['id']]);
-        }
-
-        return new ArrayResultSet(...$runs);
-    }
-
-    private function formatted(array $run, array $nbs): array
-    {
-        return $run+= ['nbs' => [
-            Publication::PENDING => $nbs[Publication::PENDING] ?? 0,
-            Publication::SELECTED => $nbs[Publication::SELECTED] ?? 0,
-            Publication::DISCARDED => $nbs[Publication::DISCARDED] ?? 0,
-            Publication::CURATED => $nbs[Publication::CURATED] ?? 0,
-        ]];
+        return new MappedResultSet(
+            new ArrayResultSet(...$select_runs_sth->fetchAll()),
+            new RunMapper($nbs)
+        );
     }
 }
