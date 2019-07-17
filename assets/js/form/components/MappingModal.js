@@ -25,7 +25,7 @@ const filter = (alignment, selected) => {
     })
 }
 
-const MappingModal = ({ i, type, sequences, alignment, add, cancel }) => {
+const MappingModal = ({ i, type, coordinates, alignment, add, cancel }) => {
     const [selected, setSelected] = useState(indexes(alignment))
 
     const filtered = filter(alignment, selected)
@@ -71,14 +71,16 @@ const MappingModal = ({ i, type, sequences, alignment, add, cancel }) => {
                 <ul className="list-unstyled">
                     {alignment.isoforms.map((isoform, i) => (
                         <li key={i}>
-                            <h4>{isoform.accession} (length: {sequences[isoform.accession].length})</h4>
+                            <h4>
+                                {isoform.accession} ({coordinates[isoform.accession].start} - {coordinates[isoform.accession].stop})
+                            </h4>
                             {isoform.occurrences.length == 0 ? (
                                 <p>
                                     No alignment of the sequence on this isoform.
                                 </p>
                             ) : (
                                 <ul className="list-unstyled">
-                                    {isoform.occurrences.map((occurrence, j) => (
+                                    {isoform.occurrences.sort((a, b) => a.start - b.start).map((occurrence, j) => (
                                         <li key={j}>
                                             <div className="row">
                                                 <div className="col-11">
@@ -86,7 +88,7 @@ const MappingModal = ({ i, type, sequences, alignment, add, cancel }) => {
                                                         type={type}
                                                         start={occurrence.start}
                                                         stop={occurrence.stop}
-                                                        width={sequences[isoform.accession].length}
+                                                        width={coordinates[isoform.accession].width}
                                                         active={isOccurrenceSelected(i, j)}
                                                     />
                                                 </div>

@@ -2,22 +2,12 @@ import React from 'react'
 
 import MappingImg from './MappingImg'
 
-const Mapping = ({ type, start, stop, isoforms, mapping }) => {
-    const widths = isoforms.reduce((widths, isoform) => {
-        widths[isoform.accession] = isoform.is_canonical
-            ? stop - start + 1
-            : isoform.sequence.length
-        return widths
-    }, {})
-
+const Mapping = ({ type, start, stop, protein, mapping }) => {
     const reduced = mapping.reduce((reduced, alignment) => {
         alignment.isoforms.map(isoform => {
             isoform.occurrences.map(occurrence => {
                 if (! reduced[isoform.accession]) reduced[isoform.accession] = {
                     accession: isoform.accession,
-                    start: 1,
-                    stop: widths[isoform.accession],
-                    width: widths[isoform.accession],
                     occurrences: [],
                 }
 
@@ -27,22 +17,37 @@ const Mapping = ({ type, start, stop, isoforms, mapping }) => {
         return reduced
     }, {})
 
+    const coordinates = start == 1 && stop == protein.sequence.length
+        ? protein.isoforms.reduce((reduced, isoform) => {
+            reduced[isoform.accession] = {
+                start: 1,
+                stop: isoform.sequence.length,
+                width: isoform.sequence.length,
+            }
+            return reduced
+        }, {})
+        : {[protein.accession]: {
+            start: start,
+            stop: stop,
+            width: stop - start + 1
+        }}
+
     return (
         <React.Fragment>
             {Object.values(reduced).map((isoform, i) => (
                 <div key={i} className="card">
                     <h5 className="card-header">
-                        {isoform.accession} (length: {widths[isoform.accession]})
+                        {isoform.accession} ({coordinates[isoform.accession].start} - {coordinates[isoform.accession].stop})
                     </h5>
                     <div className="card-body">
-                        {isoform.occurrences.map((occurrence, j) => (
+                        {isoform.occurrences.sort((a, b) => a.start - b.start).map((occurrence, j) => (
                             <p>
                                 <MappingImg
                                     key={j}
                                     type={type}
                                     start={occurrence.start}
                                     stop={occurrence.stop}
-                                    width={widths[isoform.accession]}
+                                    width={coordinates[isoform.accession].width}
                                 />
                             </p>
                         ))}

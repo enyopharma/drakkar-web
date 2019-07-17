@@ -27,6 +27,7 @@ const mapStateToMappingProps = (i, type, state) => {
         i: i,
         type: type,
         query: state.ui.alignment.query,
+        name: state.name,
         start: state.start,
         stop: state.stop,
         mapping: state.mapping,

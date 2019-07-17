@@ -5,22 +5,22 @@ import api from '../api'
 import Mapping from './Mapping'
 
 const MappingModal = ({ description, close }) => {
-    const [isoforms1, setIsoforms1] = useState(null)
-    const [isoforms2, setIsoforms2] = useState(null)
+    const [protein1, setProtein1] = useState(null)
+    const [protein2, setProtein2] = useState(null)
 
     useEffect(() => {
-        setIsoforms1(null)
-        setIsoforms2(null)
+        setProtein1(null)
+        setProtein2(null)
 
         api.proteins.select(description.interactor1.protein.accession)
-            .then(protein => setIsoforms1(protein.isoforms))
+            .then(protein => setProtein1(protein))
 
         api.proteins.select(description.interactor2.protein.accession)
-            .then(protein => setIsoforms2(protein.isoforms))
+            .then(protein => setProtein2(protein))
     }, [description])
 
     return (
-        <Modal visible={isoforms1 != null && isoforms2 != null} dialogClassName="modal-lg">
+        <Modal visible={protein1 != null && protein2 != null} dialogClassName="modal-lg">
             <div className="modal-header">
                 <h5 className="modal-title">
                     Mapping of description from {description.pmid}
@@ -30,9 +30,9 @@ const MappingModal = ({ description, close }) => {
                 </button>
             </div>
             <div className="modal-body">
-                <div className="row my-0">
+                <div className="row">
                     <div className="col">
-                        {isoforms1 == null ? null : (
+                        {protein1 == null ? null : (
                             description.interactor1.mapping.length == 0 ? (
                                 <p>No mapping on interactor 1</p>
                             ) : (
@@ -40,14 +40,14 @@ const MappingModal = ({ description, close }) => {
                                     type="h"
                                     start={description.interactor1.start}
                                     stop={description.interactor1.stop}
-                                    isoforms={isoforms1}
+                                    protein={protein1}
                                     mapping={description.interactor1.mapping}
                                 />
                             )
                         )}
                     </div>
                     <div className="col">
-                        {isoforms2 == null ? null : (
+                        {protein2 == null ? null : (
                             description.interactor2.mapping.length == 0 ? (
                                 <p>No mapping on interactor 2</p>
                             ) : (
@@ -55,7 +55,7 @@ const MappingModal = ({ description, close }) => {
                                     type={description.type == 'hh' ? 'h' : 'v'}
                                     start={description.interactor2.start}
                                     stop={description.interactor2.stop}
-                                    isoforms={isoforms2}
+                                    protein={protein2}
                                     mapping={description.interactor2.mapping}
                                 />
                             )

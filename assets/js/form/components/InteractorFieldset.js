@@ -5,7 +5,7 @@ import UniprotSection from './UniprotSection'
 import MappingSection from './MappingSection'
 import SequenceSection from './SequenceSection'
 
-const InteractorFieldset = ( { i, type, accession, editing, uniprot, sequence, mapping } ) => {
+const InteractorFieldset = ({ i, type, accession, editing, uniprot, sequence, mapping }) => {
     const [protein, setProtein] = useState(null)
 
     useEffect(() => { accession == null
