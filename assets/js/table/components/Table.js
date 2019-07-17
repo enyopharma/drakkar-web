@@ -74,17 +74,10 @@ const Table = ({ descriptions }) => {
                                 ].join('')}
                             </td>
                             <td className="text-center">
-                                {description.type == 'hh'
-                                    ? [
-                                        description.interactor2.protein.accession, '/',
-                                        description.interactor2.name,
-                                    ].join('')
-                                    : [
-                                        description.interactor2.protein.accession, '/',
-                                        description.interactor2.name, ' (',
-                                        description.interactor2.start, ', ',
-                                        description.interactor2.stop, ')',
-                                    ].join('')}
+                                {[
+                                    description.interactor2.protein.accession, '/',
+                                    description.interactor2.name,
+                                ].join('')}
                             </td>
                             <td className="text-center">
                                 {description.interactor1.mapping.length == 0
