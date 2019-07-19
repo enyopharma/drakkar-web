@@ -50,7 +50,6 @@ final class ShowHandler implements RequestHandlerInterface
         }
 
         catch (NotFoundException $e) {
-            throw $e;
             return $this->responder->notfound();
         }
 
