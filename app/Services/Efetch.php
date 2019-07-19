@@ -32,10 +32,13 @@ final class Efetch
             ];
         }
 
+        // PUT CDATA AROUND ABSTRACTS TO PARSE HTML
+        $contents = (string) preg_replace('/<AbstractText(.*?)>(.+?)<\/AbstractText>/s', '<AbstractText$1><![CDATA[$2]]></AbstractText>', $contents);
+
         // parse xml.
         libxml_use_internal_errors(true);
 
-        $xml = simplexml_load_string($contents);
+        $xml = simplexml_load_string($contents, 'SimpleXMLElement', LIBXML_NOCDATA);
 
         if ($xml === false) {
             return [

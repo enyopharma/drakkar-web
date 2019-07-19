@@ -13,7 +13,7 @@
         </h4>
         <?php foreach ($publication['abstract'] as $abstract): ?>
         <p class="card-text">
-            <?= nl2br($this->highlighted($abstract, $publication['keywords'])) ?>
+            <?= $this->highlighted($abstract, $publication['keywords']) ?>
         </p>
         <?php endforeach; ?>
         <p class="card-text text-muted">

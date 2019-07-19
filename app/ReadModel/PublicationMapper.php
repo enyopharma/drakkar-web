@@ -15,13 +15,7 @@ final class PublicationMapper
 
     public function __invoke(array $publication): array
     {
-        $metadata = ! is_null($publication['metadata'])
-            ? json_decode($publication['metadata'], true)
-            : [];
-
-        $article = $metadata['PubmedArticle']['MedlineCitation']['Article'] ?? [];
-
-        return [
+        $raw = [
             'run' => [
                 'id' => $publication['run_id'],
                 'type' => $publication['run_type'],
@@ -31,33 +25,79 @@ final class PublicationMapper
             'pmid' => $publication['pmid'],
             'state' => $publication['state'],
             'annotation' => $publication['annotation'],
-            'title' => $article['ArticleTitle'] ?? $publication['pmid'],
-            'journal' => $article['Journal']['Title'] ?? '',
-            'abstract' => $this->abstract($article),
-            'authors' => $this->authors($article),
             'keywords' => $this->keywords,
             'pending' => $publication['state'] == Publication::PENDING,
             'selected' => $publication['state'] == Publication::SELECTED,
             'discarded' => $publication['state'] == Publication::DISCARDED,
             'curated' => $publication['state'] == Publication::CURATED,
         ];
+
+        $metadata = ! is_null($publication['metadata'])
+            ? json_decode($publication['metadata'], true)
+            : [];
+
+        if (key_exists('PubmedArticle', $metadata)) {
+            return array_merge($raw, $this->article($metadata['PubmedArticle']['MedlineCitation']));
+        }
+
+        if (key_exists('PubmedBookArticle', $metadata)) {
+            return array_merge($raw, $this->book($metadata['PubmedBookArticle']['BookDocument']));
+        }
+
+        return array_merge($raw, [
+            'title' => '',
+            'journal' => '',
+            'abstract' => ['Unknown format'],
+            'authors' => [],
+        ]);
     }
 
-    private function abstract(array $article): array
+    private function article(array $metadata): array
     {
-        return is_array($article['Abstract']['AbstractText'] ?? [])
-            ? $article['Abstract']['AbstractText'] ?? ['No abstract']
-            : [$article['Abstract']['AbstractText'] ?? 'No abstract'];
+        return [
+            'title' => $metadata['Article']['ArticleTitle'] ?? '',
+            'journal' => $metadata['Article']['Journal']['Title'] ?? '',
+            'abstract' => $this->abstract($metadata['Article']['Abstract'] ?? $metadata['OtherAbstract'] ?? []),
+            'authors' => $this->authors($metadata['Article']['AuthorList'] ?? []),
+        ];
     }
 
-    private function author(array $author): string
+    private function book(array $metadata): array
     {
-        return sprintf('%s %s', $author['LastName'], $author['Initials']);
+        return [
+            'title' => $metadata['ArticleTitle'] ?? '',
+            'journal' => $metadata['Book']['BookTitle'] ?? '',
+            'abstract' => $this->abstract($metadata['Abstract']),
+            'authors' => $this->authors($metadata['AuthorList']),
+        ];
     }
 
-    private function authors(array $article): array
+    private function abstract(array $abstract): array
     {
-        $authors = $article['AuthorList']['Author'] ?? [];
+        $text = $abstract['AbstractText'] ?? null;
+
+        if (is_string($text)) {
+            return [$text];
+        }
+
+        if (is_array($text)) {
+            return array_filter($text, 'is_string');
+        }
+
+        return ['No abstract'];
+    }
+
+    private function authors(array $list): array
+    {
+        $authors = $list['Author'] ?? [];
+
+        if (count($authors) == 0) {
+            return ['No author'];
+        }
+
+        if (key_exists('CollectiveName', $authors)) {
+            return [$authors['CollectiveName']];
+        }
 
         try {
             return array_map(function (array $author) {
@@ -68,5 +108,10 @@ final class PublicationMapper
         catch (\TypeError $e) {
             return [$this->author($authors)];
         }
+    }
+
+    private function author(array $author): string
+    {
+        return sprintf('%s %s', $author['LastName'], $author['Initials']);
     }
 }
