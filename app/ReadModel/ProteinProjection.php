@@ -85,7 +85,7 @@ SQL;
 
     private function search(string $type, string $q, int $limit): ResultSetInterface
     {
-        $parts = (array) preg_split('/\s+/', $q);
+        $parts = array_filter(explode(' ', $q));
 
         $select_proteins_sth = $this->pdo->prepare(vsprintf(self::SEARCH_PROTEINS_SQL, [
             implode(' AND ', array_pad([], count($parts), 'search ILIKE ?')),
