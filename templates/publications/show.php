@@ -40,7 +40,7 @@
     </a>
 </p>
 <?php else: ?>
-<p class="text-danger">
+<p class="text-warning">
     Publication state must be 'selected' in order to add new descriptions.
 </p>
 <?php endif ?>
