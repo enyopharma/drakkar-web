@@ -7,7 +7,7 @@ final class DescriptionProjection implements ProjectionInterface
     const SELECT_DESCRIPTION_SQL = <<<SQL
         SELECT r.id AS run_id, r.type, a.pmid,
             d.id, d.created_at, d.deleted_at,
-            m.psimi_id, m.name AS method_name,
+            m.psimi_id,
             i1.name AS name1, i1.start AS start1, i1.stop AS stop1, i1.mapping AS mapping1,
             i2.name AS name2, i2.start AS start2, i2.stop AS stop2, i2.mapping AS mapping2,
             p1.id AS protein1_id, p1.accession AS accession1,
@@ -33,7 +33,7 @@ SQL;
     const SELECT_DESCRIPTIONS_SQL = <<<SQL
         SELECT r.id AS run_id, r.type, a.pmid,
             d.id, d.created_at, d.deleted_at,
-            m.psimi_id, m.name AS method_name,
+            m.psimi_id,
             i1.name AS name1, i1.start AS start1, i1.stop AS stop1, i1.mapping AS mapping1,
             i2.name AS name2, i2.start AS start2, i2.stop AS stop2, i2.mapping AS mapping2,
             p1.id AS protein1_id, p1.accession AS accession1,

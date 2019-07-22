@@ -24,7 +24,6 @@ final class DescriptionMapper
             'pmid' => $description['pmid'],
             'method' => [
                 'psimi_id' => $description['psimi_id'],
-                'name' => $description['method_name'],
             ],
             'interactor1' => [
                 'type' => Protein::H,
