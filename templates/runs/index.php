@@ -7,7 +7,7 @@
 </div>
 <div class="row my-4">
     <div class="col">
-        <a href="#" class="btn btn-primary btn-lg btn-block">
+        <a href="<?= $this->url('dataset') ?>" class="btn btn-primary btn-lg btn-block">
             Download current vinland dataset
         </a>
     </div>

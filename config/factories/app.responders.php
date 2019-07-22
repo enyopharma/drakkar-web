@@ -4,6 +4,7 @@ use App\Cli\Responders\Responder;
 use App\Cli\Responders\PopulateResponder;
 use App\Http\Responders\HtmlResponder;
 use App\Http\Responders\JsonResponder;
+use App\Http\Responders\DatasetResponder;
 
 return [
     Responder::class => function () {
@@ -27,6 +28,12 @@ return [
 
     JsonResponder::class => function ($container) {
         return new JsonResponder(
+            $container->get(Psr\Http\Message\ResponseFactoryInterface::class)
+        );
+    },
+
+    DatasetResponder::class => function ($container) {
+        return new DatasetResponder(
             $container->get(Psr\Http\Message\ResponseFactoryInterface::class)
         );
     },

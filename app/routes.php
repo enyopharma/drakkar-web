@@ -63,6 +63,11 @@ return function (RouteCollector $collector) {
         'proteins.show',
     ]);
 
+    $collector->get('/dataset', ...[
+        App\Http\Handlers\Dataset\IndexHandler::class,
+        'dataset',
+    ]);
+
     $collector->post('/jobs/alignments', ...[
         App\Http\Handlers\Jobs\AlignmentHandler::class,
         'jobs.alignment',

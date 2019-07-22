@@ -13,10 +13,11 @@ return [
         $password = getenv('DB_PASSWORD');
 
         $options = [
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         ];
 
-        $pdo = new PDO(
+        return new PDO(
             vsprintf('pgsql:host=%s;port=%s;dbname=%s', [
                 $hostname === false ? 'localhost' : $hostname,
                 $port === false ? 5432 : $port,
@@ -26,9 +27,5 @@ return [
             $password === false ? 'password' : $password,
             $options
         );
-
-        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        return $pdo;
     },
 ];

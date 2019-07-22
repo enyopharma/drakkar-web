@@ -12,6 +12,7 @@ return [
         $stack = new EmitterStack;
 
         $stack->push(new Zend\HttpHandlerRunner\Emitter\SapiEmitter);
+        $stack->push(new Zend\HttpHandlerRunner\Emitter\SapiStreamEmitter);
 
         return $stack;
     },
