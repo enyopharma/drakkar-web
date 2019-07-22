@@ -32,24 +32,28 @@ final class PublicationMapper
             'curated' => $publication['state'] == Publication::CURATED,
         ];
 
-        $metadata = ! is_null($publication['metadata'])
-            ? json_decode($publication['metadata'], true)
-            : [];
+        try {
+            $metadata = ! is_null($publication['metadata'])
+                ? json_decode($publication['metadata'], true)
+                : [];
 
-        if (key_exists('PubmedArticle', $metadata)) {
-            return array_merge($raw, $this->article($metadata['PubmedArticle']['MedlineCitation']));
+            if (key_exists('PubmedArticle', $metadata)) {
+                return array_merge($raw, $this->article($metadata['PubmedArticle']['MedlineCitation']));
+            }
+
+            if (key_exists('PubmedBookArticle', $metadata)) {
+                return array_merge($raw, $this->book($metadata['PubmedBookArticle']['BookDocument']));
+            }
         }
 
-        if (key_exists('PubmedBookArticle', $metadata)) {
-            return array_merge($raw, $this->book($metadata['PubmedBookArticle']['BookDocument']));
+        catch (\Throwable $e) {
+            return array_merge($raw, [
+                'title' => '',
+                'journal' => '',
+                'abstract' => ['Unknown format'],
+                'authors' => [],
+            ]);
         }
-
-        return array_merge($raw, [
-            'title' => '',
-            'journal' => '',
-            'abstract' => ['Unknown format'],
-            'authors' => [],
-        ]);
     }
 
     private function article(array $metadata): array

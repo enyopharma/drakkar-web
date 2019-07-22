@@ -7,9 +7,13 @@
     </h3>
     <div class="card-body">
         <h4 class="card-title">
+            <?php if ($publication['journal'] != ''): ?>
             <strong>[<?= $publication['journal'] ?>]</strong>
+            <?php endif; ?>
+            <?php if ($publication['title'] != ''): ?>
             <a href="<?= $this->url('runs.publications.show', $publication) ?>">
                 <?= $this->highlighted($publication['title'], $publication['keywords']) ?></a>
+            <?php endif; ?>
         </h4>
         <?php foreach ($publication['abstract'] as $abstract): ?>
         <p class="card-text">
