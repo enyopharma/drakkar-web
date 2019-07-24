@@ -1,8 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\ReadModel;
 
-interface ResultSetInterface extends \Countable, \IteratorAggregate, \JsonSerializable
+interface ResultSetInterface extends \Countable, \JsonSerializable, \IteratorAggregate
 {
-    public function first(): array;
+    //
 }

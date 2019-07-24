@@ -6,20 +6,18 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\ReadModel\MethodProjection;
-use App\ReadModel\NotFoundException;
-use App\ReadModel\RepositoryInterface;
+use App\ReadModel\PsimiInterface;
 use App\Http\Responders\JsonResponder;
 
 final class ShowHandler implements RequestHandlerInterface
 {
-    private $repo;
+    private $psimi;
 
     private $responder;
 
-    public function __construct(RepositoryInterface $repo, JsonResponder $responder)
+    public function __construct(PsimiInterface $psimi, JsonResponder $responder)
     {
-        $this->repo = $repo;
+        $this->psimi = $psimi;
         $this->responder = $responder;
     }
 
@@ -27,11 +25,11 @@ final class ShowHandler implements RequestHandlerInterface
     {
         $attributes = (array) $request->getAttributes();
 
-        $methods = $this->repo->projection(MethodProjection::class);
+        $psimi_id = $attributes['psimi_id'];
 
         try {
             return $this->responder->response([
-                'method' => $methods->rset($attributes)->first(),
+                'method' => $this->psimi->method($psimi_id)->data(),
             ]);
         }
 

@@ -6,19 +6,18 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\ReadModel\MethodProjection;
-use App\ReadModel\RepositoryInterface;
+use App\ReadModel\PsimiInterface;
 use App\Http\Responders\JsonResponder;
 
 final class IndexHandler implements RequestHandlerInterface
 {
-    private $repo;
+    private $psimi;
 
     private $responder;
 
-    public function __construct(RepositoryInterface $repo, JsonResponder $responder)
+    public function __construct(PsimiInterface $psimi, JsonResponder $responder)
     {
-        $this->repo = $repo;
+        $this->psimi = $psimi;
         $this->responder = $responder;
     }
 
@@ -26,10 +25,10 @@ final class IndexHandler implements RequestHandlerInterface
     {
         $query = (array) $request->getQueryParams();
 
-        $methods = $this->repo->projection(MethodProjection::class);
+        $q = $query['q'] ?? '';
 
         return $this->responder->response([
-            'methods' => $methods->rset($query),
+            'methods' => $this->psimi->methods($q, 5),
         ]);
     }
 }

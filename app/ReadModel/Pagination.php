@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\ReadModel;
 
@@ -20,11 +22,6 @@ final class Pagination implements ResultSetInterface
         $this->limit = $limit;
     }
 
-    public function first(): array
-    {
-        return $this->rset->first();
-    }
-
     public function count(): int
     {
         return $this->rset->count();
@@ -37,7 +34,7 @@ final class Pagination implements ResultSetInterface
 
     public function jsonSerialize()
     {
-        return $this->rset->jsonSerialize();
+        return $this->rset;
     }
 
     public function page(): int

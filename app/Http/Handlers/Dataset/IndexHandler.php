@@ -6,31 +6,27 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\ReadModel\DatasetProjection;
-use App\ReadModel\NotFoundException;
-use App\ReadModel\RepositoryInterface;
+use App\ReadModel\DrakkarInterface;
 use App\Http\Responders\DatasetResponder;
 
 final class IndexHandler implements RequestHandlerInterface
 {
-    private $repo;
+    private $drakkar;
 
     private $responder;
 
-    public function __construct(RepositoryInterface $repo, DatasetResponder $responder)
+    public function __construct(DrakkarInterface $drakkar, DatasetResponder $responder)
     {
-        $this->repo = $repo;
+        $this->drakkar = $drakkar;
         $this->responder = $responder;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $dataset = $this->repo->projection(DatasetProjection::class);
-
-        $rset = $dataset->rset();
+        $dataset = $this->drakkar->dataset();
 
         $filename = 'vinland-' . date('Y-m-d');
 
-        return $this->responder->response($rset, $filename);
+        return $this->responder->response($dataset, $filename);
     }
 }

@@ -16,10 +16,10 @@ final class DatasetResponder
         $this->factory = $factory;
     }
 
-    public function response(ResultSetInterface $rset, string $filename = 'vinland'): ResponseInterface
+    public function response(iterable $dataset, string $filename = 'vinland'): ResponseInterface
     {
         return $this->factory->createResponse(200)
-            ->withBody(new IterableJsonStream($rset))
+            ->withBody(new IterableJsonStream($dataset))
             ->withHeader('content-type', 'application/json')
             ->withHeader('content-disposition', sprintf('attachment; filename="%s.json"', $filename));
     }

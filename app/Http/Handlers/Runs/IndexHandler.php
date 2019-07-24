@@ -6,29 +6,26 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\ReadModel\RunProjection;
-use App\ReadModel\RepositoryInterface;
+use App\ReadModel\DrakkarInterface;
 use App\Http\Responders\HtmlResponder;
 
 final class IndexHandler implements RequestHandlerInterface
 {
-    private $repo;
+    private $drakkar;
 
     private $responder;
 
-    public function __construct(RepositoryInterface $repo, HtmlResponder $responder)
+    public function __construct(DrakkarInterface $drakkar, HtmlResponder $responder)
     {
-        $this->repo = $repo;
+        $this->drakkar = $drakkar;
         $this->responder = $responder;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $runs = $this->repo->projection(RunProjection::class);
-
         return $this->responder->template('runs/index', [
             'user' => $request->getAttribute('user'),
-            'runs' => $runs->rset(),
+            'runs' => $this->drakkar->runs(),
         ]);
     }
 }

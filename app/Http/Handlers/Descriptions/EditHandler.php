@@ -6,21 +6,19 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+use App\ReadModel\DrakkarInterface;
 use App\ReadModel\NotFoundException;
-use App\ReadModel\RepositoryInterface;
-use App\ReadModel\PublicationProjection;
-use App\ReadModel\DescriptionProjection;
 use App\Http\Responders\HtmlResponder;
 
 final class EditHandler implements RequestHandlerInterface
 {
-    private $repo;
+    private $drakkar;
 
     private $responder;
 
-    public function __construct(RepositoryInterface $repo, HtmlResponder $responder)
+    public function __construct(DrakkarInterface $drakkar, HtmlResponder $responder)
     {
-        $this->repo = $repo;
+        $this->drakkar = $drakkar;
         $this->responder = $responder;
     }
 
@@ -30,14 +28,17 @@ final class EditHandler implements RequestHandlerInterface
 
         $run_id = (int) $attributes['run_id'];
         $pmid = (int) $attributes['pmid'];
-
-        $publications = $this->repo->projection(PublicationProjection::class, $run_id);
-        $descriptions = $this->repo->projection(DescriptionProjection::class, $run_id, $pmid);
+        $id = (int) $attributes['id'];
 
         try {
+            $run = $this->drakkar->run($run_id);
+            $publication = $run->publication($pmid);
+            $description = $publication->description($id);
+
             return $this->responder->template('descriptions/create', [
-                'publication' => $publications->rset($attributes)->first(),
-                'description' => $descriptions->rset($attributes)->first(),
+                'run' => $run->data(),
+                'publication' => $publication->data(),
+                'description' => $description->data(),
             ]);
         }
 

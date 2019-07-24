@@ -8,8 +8,8 @@
         description.form(
             'description-wrap',
             'description-form',
-            '<?= $publication['run']['type'] ?>',
-            <?= $publication['run']['id'] ?>,
+            '<?= $run['type'] ?>',
+            <?= $run['id'] ?>,
             <?= $publication['pmid'] ?>,
             <?= count($description) == 0 ? '{}' : json_encode($description) ?>
         );
@@ -23,8 +23,8 @@
         <a href="<?= $this->url('runs.index') ?>">
             Drakkar</a>
         &gt;
-        <a href="<?= $this->url('runs.show', $publication['run']) ?>">
-            <?= $publication['run']['type'] ?> - <?= $publication['run']['name'] ?></a>
+        <a href="<?= $this->url('runs.show', $run) ?>">
+            <?= $run['type'] ?> - <?= $run['name'] ?></a>
         &gt;
         <a href="<?= $this->url('runs.publications.show', $publication) ?>">
             <?= $publication['pmid'] ?></a>
