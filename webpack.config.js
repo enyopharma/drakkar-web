@@ -11,6 +11,7 @@ Encore
     // will create web/build/app.js and web/build/app.css
     .addEntry('app', './assets/js/app.js')
     .addEntry('form', './assets/js/form/index.js')
+    .addEntry('search', './assets/js/search/index.js')
     .addEntry('table', './assets/js/table/index.js')
 
     // enable runtime chunks
