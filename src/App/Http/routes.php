@@ -10,37 +10,37 @@ return function (RouteCollector $collector) {
         'runs.index',
     ]);
 
-    $collector->get('/runs/{run_id}/publications', ...[
+    $collector->get('/runs/{run_id:\d+}/publications', ...[
         App\Http\Handlers\Publications\IndexHandler::class,
         'runs.publications.index',
     ]);
 
-    $collector->put('/runs/{run_id}/publications/{pmid}', ...[
+    $collector->put('/runs/{run_id:\d+}/publications/{pmid:\d+}', ...[
         App\Http\Handlers\Publications\UpdateHandler::class,
         'runs.publications.update',
     ]);
 
-    $collector->get('/runs/{run_id}/publications/{pmid}/descriptions', ...[
+    $collector->get('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions', ...[
         App\Http\Handlers\Descriptions\IndexHandler::class,
         'runs.publications.descriptions.index',
     ]);
 
-    $collector->post('/runs/{run_id}/publications/{pmid}/descriptions', ...[
+    $collector->post('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions', ...[
         App\Http\Handlers\Descriptions\InsertHandler::class,
         'runs.publications.descriptions.store',
     ]);
 
-    $collector->get('/runs/{run_id}/publications/{pmid}/descriptions/create', ...[
+    $collector->get('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/create', ...[
         App\Http\Handlers\Descriptions\CreateHandler::class,
         'runs.publications.descriptions.create',
     ]);
 
-    $collector->get('/runs/{run_id}/publications/{pmid}/descriptions/{id}/edit', ...[
+    $collector->get('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/edit', ...[
         App\Http\Handlers\Descriptions\EditHandler::class,
         'runs.publications.descriptions.edit',
     ]);
 
-    $collector->delete('/runs/{run_id}/publications/{pmid}/descriptions/{id}', ...[
+    $collector->delete('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}', ...[
         App\Http\Handlers\Descriptions\DeleteHandler::class,
         'runs.publications.descriptions.delete',
     ]);
