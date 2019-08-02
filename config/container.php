@@ -12,7 +12,7 @@ return function (string $root, string $env, bool $debug): Psr\Container\Containe
     $app = [
         'app.root' => function () use ($root) { return $root; },
         'app.env' => function () use ($env) { return $env; },
-        'app.bool' => function () use ($debug) { return $debug; },
+        'app.debug' => function () use ($debug) { return $debug; },
     ];
 
     $configurations = (array) glob($root . '/config/factories/*.php');

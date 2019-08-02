@@ -14,22 +14,32 @@ final class AssetsExtension implements ExtensionInterface
     public function __construct(string $manifest)
     {
         $this->manifest = $manifest;
+        $this->map = null;
     }
 
     public function register(Engine $engine)
     {
-        $engine->registerFunction('asset', [$this, 'asset']);
+        /** @var \League\Plates\callback */
+        $asset = function (string $path) {
+            $map = $this->cachedMap();
+
+            if (array_key_exists($path, $map)) {
+                return $map[$path];
+            }
+
+            throw new \LogicException(sprintf("Asset not found: '%s'.", $path));
+        };
+
+        $engine->registerFunction('asset', $asset);
     }
 
-    public function asset($path): string
+    private function cachedMap()
     {
-        $map = $this->cachedMap();
-
-        if (array_key_exists($path, $map)) {
-            return $map[$path];
+        if (is_null($this->map)) {
+            $this->map = $this->map();
         }
 
-        throw new \LogicException(sprintf("Asset not found: '%s'.", $path));
+        return $this->map;
     }
 
     private function map()
@@ -41,14 +51,5 @@ final class AssetsExtension implements ExtensionInterface
         }
 
         throw new \LogicException(sprintf("Asset manifest file not found: '%s'.", $this->manifest));
-    }
-
-    private function cachedMap()
-    {
-        if (! $this->map) {
-            $this->map = $this->map();
-        }
-
-        return $this->map;
     }
 }

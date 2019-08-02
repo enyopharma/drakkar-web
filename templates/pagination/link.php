@@ -1,5 +1,5 @@
-<li class="page-item <?= $link['active'] ? 'active' : '' ?>">
-    <a class="page-link" href="<?= $url(['page' => $link['page']]) ?>">
-        <?= (string) $link['page'] ?>
+<li class="page-item <?= $active ? 'active' : '' ?> <?= $enabled ? '' : 'disabled' ?>">
+    <a class="page-link" href="<?= $url ?>">
+        <?= $label ?>
     </a>
 </li>

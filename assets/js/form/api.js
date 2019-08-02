@@ -6,21 +6,21 @@ const uuid = require('uuid/v4')
 const methods = {
     search: q => fetch('/methods?' + qs.stringify({q: q}))
         .then(response => response.json())
-        .then(json => json.data.methods, error => console.log(error)),
+        .then(json => json.data, error => console.log(error)),
 
     select: psimi_id => fetch(`/methods/${psimi_id}`)
         .then(response => response.json(), error => console.log(error))
-        .then(json => json.data.method, error => console.log(error)),
+        .then(json => json.data, error => console.log(error)),
 }
 
 const proteins = {
     search: (type, q) => fetch('/proteins?' + qs.stringify({type: type, q: q}))
         .then(response => response.json(), error => console.log(error))
-        .then(json => json.data.proteins, error => console.log(error)),
+        .then(json => json.data, error => console.log(error)),
 
     select: accession => fetch(`/proteins/${accession}`)
         .then(response => response.json(), error => console.log(error))
-        .then(json => json.data.protein, error => console.log(error)),
+        .then(json => json.data, error => console.log(error)),
 }
 
 const alignment = (query, sequences) => {

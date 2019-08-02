@@ -15,10 +15,6 @@ const Table = ({ descriptions }) => {
         return `/runs/${run_id}/publications/${pmid}/descriptions/${id}/edit`
     }
 
-    const openCopy = (index) => {
-        window.open(editUrl(index))
-    }
-
     const showMapping = (index) => {
         setSelected(descriptions[index])
     }
@@ -96,7 +92,7 @@ const Table = ({ descriptions }) => {
                                 {description.deleted_at}
                             </td>
                             <td className="text-center">
-                                <a href={editUrl(i)} onClick={(e) => { e.preventDefault(); openCopy(i) }}>
+                                <a href={editUrl(i)}>
                                     <i className="fas fa-copy"></i> Copy
                                 </a>
                             </td>

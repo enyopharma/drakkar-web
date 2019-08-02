@@ -85,8 +85,8 @@
                 </span>
             </td>
             <td class="text-center">
-                <a href="<?= $this->url('runs.show', $run) ?>">
-                    Resume curation
+                <a href="<?= $this->url('runs.publications.index', ['run_id' => $run['id']]) ?>">
+                    Publications
                 </a>
             </td>
         </tr>
