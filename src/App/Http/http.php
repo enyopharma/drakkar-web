@@ -8,11 +8,7 @@ return function (MiddlewareFactory $factory) {
     $middleware = [];
 
     // conditional shutdown middleware.
-    $shutdown = getenv('APP_SHUTDOWN');
-
-    $shutdown = $shutdown && (strtolower((string) $shutdown) === 'true' || $shutdown === '1');
-
-    if ($shutdown) {
+    if (file_exists(__DIR__ . '/shutdown')) {
         $middleware[] = new Middlewares\Shutdown;
     }
 
