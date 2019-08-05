@@ -11,7 +11,7 @@ use Domain\ReadModel\RunViewInterface;
 use Domain\ReadModel\PublicationViewInterface;
 use Domain\ReadModel\DescriptionViewInterface;
 
-final class SelectDescription
+final class SelectDescription implements DomainActionInterface
 {
     private $runs;
 
@@ -29,8 +29,12 @@ final class SelectDescription
         $this->descriptions = $descriptions;
     }
 
-    public function __invoke(int $run_id, int $pmid, int $id): DomainPayloadInterface
+    public function __invoke(array $input): DomainPayloadInterface
     {
+        $run_id = (int) $input['run_id'];
+        $pmid = (int) $input['pmid'];
+        $id = (int) $input['id'];
+
         $select_run_sth = $this->runs->id($run_id);
 
         if (! $run = $select_run_sth->fetch()) {

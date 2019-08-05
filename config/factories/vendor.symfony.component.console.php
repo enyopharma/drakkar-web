@@ -10,7 +10,7 @@ return [
 
         $factory = require sprintf('%s/src/App/Cli/cli.php', $container->get('app.root'));
 
-        $commands = $factory(new Enyo\InstanceFactory($container));
+        $commands = $factory($container);
 
         array_map([$application, 'add'], $commands);
 

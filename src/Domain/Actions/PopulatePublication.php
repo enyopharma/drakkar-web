@@ -13,7 +13,7 @@ use Domain\Payloads\ResourceUpdated;
 use Domain\Payloads\ResourceNotFound;
 use Domain\Payloads\DomainPayloadInterface;
 
-final class PopulatePublication
+final class PopulatePublication implements DomainActionInterface
 {
     const SELECT_RUNS_SQL = <<<SQL
         SELECT r.*
@@ -54,8 +54,10 @@ SQL;
         $this->efetch = $efetch;
     }
 
-    public function __invoke(int $pmid): DomainPayloadInterface
+    public function __invoke(array $input): DomainPayloadInterface
     {
+        $pmid = (int) $input['pmid'];
+
         // prepare the queries.
         $select_runs_sth = $this->pdo->prepare(self::SELECT_RUNS_SQL);
         $select_publication_sth = $this->pdo->prepare(self::SELECT_PUBLICATION_SQL);

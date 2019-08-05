@@ -8,7 +8,7 @@ use Domain\Payloads\ProteinCollectionData;
 use Domain\Payloads\DomainPayloadInterface;
 use Domain\ReadModel\ProteinViewInterface;
 
-final class SearchProteins
+final class SearchProteins implements DomainActionInterface
 {
     private $proteins;
 
@@ -17,8 +17,12 @@ final class SearchProteins
         $this->proteins = $proteins;
     }
 
-    public function __invoke(string $type, string $q, int $limit): DomainPayloadInterface
+    public function __invoke(array $input): DomainPayloadInterface
     {
+        $type = (string) ($input['type'] ?? '');
+        $q = (string) ($input['q'] ?? '');
+        $limit = (int) ($input['limit'] ?? 5);
+
         $proteins = $this->proteins->search($type, $q, $limit)->fetchAll();
 
         return new ProteinCollectionData($proteins);

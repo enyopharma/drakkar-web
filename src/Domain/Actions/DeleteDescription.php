@@ -5,11 +5,12 @@ declare(strict_types=1);
 namespace Domain\Actions;
 
 use Domain\Description;
+use Domain\Payloads\InputNotValid;
 use Domain\Payloads\ResourceDeleted;
 use Domain\Payloads\ResourceNotFound;
 use Domain\Payloads\DomainPayloadInterface;
 
-final class DeleteDescription
+final class DeleteDescription implements DomainActionInterface
 {
     const DELETE_DESCRIPTION_SQL = <<<SQL
         UPDATE descriptions SET deleted_at = NOW() WHERE id = ?
@@ -22,8 +23,12 @@ SQL;
         $this->pdo = $pdo;
     }
 
-    public function __invoke(int $run_id, int $pmid, int $id): DomainPayloadInterface
+    public function __invoke(array $input): DomainPayloadInterface
     {
+        $run_id = (int) $input['run_id'];
+        $pmid = (int) $input['pmid'];
+        $id = (int) $input['id'];
+
         $delete_description_sth = $this->pdo->prepare(self::DELETE_DESCRIPTION_SQL);
 
         $delete_description_sth->execute([$id]);

@@ -10,7 +10,7 @@ use Domain\Payloads\DomainConflict;
 use Domain\Payloads\ResourceCreated;
 use Domain\Payloads\DomainPayloadInterface;
 
-final class CreateRun
+final class CreateRun implements DomainActionInterface
 {
     const INSERT_RUN_SQL = <<<SQL
         INSERT INTO runs (type, name) VALUES (?, ?)
@@ -43,14 +43,23 @@ SQL;
         $this->pdo = $pdo;
     }
 
-    public function __invoke(string $type, string $name, int ...$pmids): DomainPayloadInterface
+    public function __invoke(array $input): DomainPayloadInterface
     {
+        $type = (string) $input['type'];
+        $name = (string) $input['name'];
+        $pmids = array_filter((array) ($input['pmids'] ?? []), 'is_int');
+
         if (! in_array($type, Run::TYPES)) {
             return new InputNotValid([
                 sprintf('Value \'%s\' is not a valid curation run type.', $type)
             ]);
         }
 
+        if (count($pmids) == 0) {
+            return new InputNotValid(['At least one pmid is required.']);
+        }
+
+        // prepare the queries.
         $insert_run_sth = $this->pdo->prepare(self::INSERT_RUN_SQL);
         $insert_publication_sth = $this->pdo->prepare(self::INSERT_PUBLICATION_SQL);
         $insert_association_sth = $this->pdo->prepare(self::INSERT_ASSOCIATION_SQL);

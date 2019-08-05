@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Responders;
 
-use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseFactoryInterface;
+
+use League\Plates\Engine;
+use Zend\Expressive\Helper\UrlHelper;
 
 use Domain\Payloads\DomainPayloadInterface as Payload;
 
@@ -13,12 +16,18 @@ final class PublicationResponder implements HttpResponderInterface
 {
     private $factory;
 
-    public function __construct(HtmlResponseFactory $factory)
+    private $engine;
+
+    private $url;
+
+    public function __construct(ResponseFactoryInterface $factory, Engine $engine, UrlHelper $url)
     {
         $this->factory = $factory;
+        $this->engine = $engine;
+        $this->url = $url;
     }
 
-    public function __invoke(Request $request, Payload $payload): Response
+    public function __invoke(Request $request, Payload $payload): MaybeResponse
     {
         if ($payload instanceof \Domain\Payloads\PublicationCollectionData) {
             return $this->publicationCollectionData($request, $payload);
@@ -32,50 +41,55 @@ final class PublicationResponder implements HttpResponderInterface
             return $this->resourceUpdated($request, $payload);
         }
 
-        if ($payload instanceof \Domain\Payloads\ResourceNotFound) {
-            return $this->resourceNotFound($request, $payload);
-        }
-
-        throw new \LogicException(
-            sprintf('Unhandled payload %s', get_class($payload))
-        );
+        return MaybeResponse::none();
     }
 
-    private function publicationCollectionData($request, $payload): Response
+    private function publicationCollectionData($request, $payload): MaybeResponse
     {
         $query = (array) $request->getQueryParams();
 
         $data = ['publications' => $payload->data()] + $payload->meta();
 
-        return $this->factory->template(200, 'publications/index', $data);
+        $body = $this->engine->render('publications/index', $data);
+
+        $response = $this->factory
+            ->createResponse(200)
+            ->withHeader('content-type', 'text/html');
+
+        $response->getBody()->write($body);
+
+        return MaybeResponse::just($response);
     }
 
-    private function pageOutOfRange($request, $payload): Response
+    private function pageOutOfRange($request, $payload): MaybeResponse
     {
         $query = (array) $request->getQueryParams();
 
-        return $this->factory->route(302, 'runs.publications.index', [
+        $url = $this->url->generate('runs.publications.index', [
             'run_id' => (int) $request->getAttribute('run_id'),
         ], [
             'state' => $query['state'] ?? '',
             'page' => $payload->page(),
             'limit' => $payload->limit(),
         ], 'publications');
+
+        $response = $this->factory
+            ->createResponse(302)
+            ->withHeader('location', $url);
+
+        return MaybeResponse::just($response);
     }
 
-    private function resourceUpdated($request, $payload): Response
+    private function resourceUpdated($request, $payload): MaybeResponse
     {
         $body = $request->getParsedBody();
 
         $url = (string) ($body['_source'] ?? '');
 
-        return $this->factory->redirect(302, $url);
-    }
+        $response = $this->factory
+            ->createResponse(302)
+            ->withHeader('location', $url);
 
-    private function resourceNotFound($request, $payload): Response
-    {
-        return $this->factory->notfound(
-            $payload->message()
-        );
+        return MaybeResponse::just($response);
     }
 }

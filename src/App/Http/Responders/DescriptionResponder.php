@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace App\Http\Responders;
 
-use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseFactoryInterface;
+
+use League\Plates\Engine;
+use Zend\Expressive\Helper\UrlHelper;
 
 use Domain\Payloads\DomainPayloadInterface as Payload;
 
@@ -13,12 +16,18 @@ final class DescriptionResponder implements HttpResponderInterface
 {
     private $factory;
 
-    public function __construct(HtmlResponseFactory $factory)
+    private $engine;
+
+    private $url;
+
+    public function __construct(ResponseFactoryInterface $factory, Engine $engine, UrlHelper $url)
     {
         $this->factory = $factory;
+        $this->engine = $engine;
+        $this->url = $url;
     }
 
-    public function __invoke(Request $request, Payload $payload): Response
+    public function __invoke(Request $request, Payload $payload): MaybeResponse
     {
         if ($payload instanceof \Domain\Payloads\DescriptionCollectionData) {
             return $this->descriptionCollectionData($request, $payload);
@@ -36,57 +45,74 @@ final class DescriptionResponder implements HttpResponderInterface
             return $this->descriptionData($request, $payload);
         }
 
-        if ($payload instanceof \Domain\Payloads\ResourceNotFound) {
-            return $this->resourceNotFound($request, $payload);
-        }
-
-        throw new \LogicException(
-            sprintf('Unhandled payload %s', get_class($payload))
-        );
+        return MaybeResponse::none();
     }
 
-    private function descriptionCollectionData($request, $payload): Response
+    private function descriptionCollectionData($request, $payload): MaybeResponse
     {
         $data = ['descriptions' => $payload->data()] + $payload->meta();
 
-        return $this->factory->template(200, 'descriptions/index', $data);
+        $body = $this->engine->render('descriptions/index', $data);
+
+        $response = $this->factory
+            ->createResponse(200)
+            ->withHeader('content-type', 'text/html');
+
+        $response->getBody()->write($body);
+
+        return MaybeResponse::just($response);
     }
 
-    private function pageOutOfRange($request, $payload): Response
+    private function pageOutOfRange($request, $payload): MaybeResponse
     {
         $run_id = (int) $request->getAttribute('run_id');
         $pmid = (int) $request->getAttribute('pmid');
 
-        return $this->factory->route(302, 'runs.publications.descriptions.index', [
+        $url = $this->url->generate('runs.publications.descriptions.index', [
             'run_id' => $run_id,
             'pmid' => $pmid,
         ], [
             'page' => $payload->page(),
             'limit' => $payload->limit(),
         ], 'descriptions');
+
+        $response = $this->factory
+            ->createResponse(302)
+            ->withHeader('location', $url);
+
+        return MaybeResponse::just($response);
     }
 
-    private function publicationData($request, $payload): Response
+    private function publicationData($request, $payload): MaybeResponse
     {
         $data = [
             'publication' => $payload->data(),
             'description' => [],
         ] + $payload->meta();
 
-        return $this->factory->template(200, 'descriptions/form', $data);
+        $body = $this->engine->render('descriptions/form', $data);
+
+        $response = $this->factory
+            ->createResponse(200)
+            ->withHeader('content-type', 'text/html');
+
+        $response->getBody()->write($body);
+
+        return MaybeResponse::just($response);
     }
 
-    private function descriptionData($request, $payload): Response
+    private function descriptionData($request, $payload): MaybeResponse
     {
         $data = ['description' => $payload->data()] + $payload->meta();
 
-        return $this->factory->template(200, 'descriptions/form', $data);
-    }
+        $body = $this->engine->render('descriptions/form', $data);
 
-    private function resourceNotFound($request, $payload): Response
-    {
-        return $this->factory->notfound(
-            $payload->message()
-        );
+        $response = $this->factory
+            ->createResponse(200)
+            ->withHeader('content-type', 'text/html');
+
+        $response->getBody()->write($body);
+
+        return MaybeResponse::just($response);
     }
 }

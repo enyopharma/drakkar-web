@@ -9,7 +9,7 @@ use Domain\Payloads\ResourceUpdated;
 use Domain\Payloads\ResourceNotFound;
 use Domain\Payloads\DomainPayloadInterface;
 
-final class UpdatePublicationState
+final class UpdatePublicationState implements DomainActionInterface
 {
     const UPDATE_PUBLICATION_SQL = <<<SQL
         UPDATE associations
@@ -24,8 +24,13 @@ SQL;
         $this->pdo = $pdo;
     }
 
-    public function __invoke(int $run_id, int $pmid, string $state, string $annotation): DomainPayloadInterface
+    public function __invoke(array $input): DomainPayloadInterface
     {
+        $run_id = (int) $input['run_id'];
+        $pmid = (int) $input['pmid'];
+        $state = (string) $input['state'];
+        $annotation = (string) $input['annotation'];
+
         $update_publication_sth = $this->pdo->prepare(self::UPDATE_PUBLICATION_SQL);
 
         $update_publication_sth->execute([$state, $annotation, $run_id, $pmid]);

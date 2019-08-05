@@ -14,10 +14,10 @@ return [
     FIFODispatcher::class => function ($container) {
         $factory = require sprintf('%s/src/App/Http/http.php', $container->get('app.root'));
 
-        $middleware = $factory(new Enyo\Http\Middleware\MiddlewareFactory($container));
+        $middleware = $factory($container);
 
         return new FIFODispatcher(
-            new Enyo\Http\Handlers\InnerMostRequestHandler,
+            new App\Http\Handlers\InnerMostRequestHandler,
             ...$middleware
         );
     },

@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Http\Responders;
 
-use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Message\ResponseFactoryInterface;
 
@@ -19,7 +18,7 @@ final class JsonResponder implements HttpResponderInterface
         $this->factory = $factory;
     }
 
-    public function __invoke(Request $request, Payload $payload): Response
+    public function __invoke(Request $request, Payload $payload): MaybeResponse
     {
         if ($payload instanceof \Domain\Payloads\ResourceNotFound) {
             return $this->response(404, $payload);
@@ -40,7 +39,7 @@ final class JsonResponder implements HttpResponderInterface
         return $this->response(200, $payload);
     }
 
-    private function response(int $code, Payload $payload): Response
+    private function response(int $code, Payload $payload): MaybeResponse
     {
         $data = [
             'code' => $code,
@@ -48,10 +47,12 @@ final class JsonResponder implements HttpResponderInterface
             'data' => $payload->data(),
         ] + $payload->meta();
 
-        $response = $this->factory->createResponse($code);
+        $response = $this->factory
+            ->createResponse($code)
+            ->withHeader('content-type', 'application/json');
 
         $response->getBody()->write(json_encode($data));
 
-        return $response->withHeader('content-type', 'application/json');
+        return MaybeResponse::just($response);
     }
 }

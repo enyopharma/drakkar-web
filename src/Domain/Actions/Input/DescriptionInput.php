@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Actions;
+namespace Domain\Actions\Input;
 
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -13,20 +13,6 @@ final class DescriptionInput
     private $method;
     private $interactor1;
     private $interactor2;
-
-    public static function fromRequest(ServerRequestInterface $request): self
-    {
-        $attributes = (array) $request->getAttributes();
-        $body = (array) $request->getParsedBody();
-
-        return new self(
-            (int) $attributes['run_id'],
-            (int) $attributes['pmid'],
-            $body['method'] ?? [],
-            $body['interactor1'] ?? [],
-            $body['interactor2'] ?? []
-        );
-    }
 
     public function __construct(int $run_id, int $pmid, array $method, array $interactor1, array $interactor2)
     {

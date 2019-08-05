@@ -11,7 +11,7 @@ use Domain\Payloads\PublicationCollectionData;
 use Domain\ReadModel\RunViewInterface;
 use Domain\ReadModel\PublicationViewInterface;
 
-final class CollectPublications
+final class CollectPublications implements DomainActionInterface
 {
     private $runs;
 
@@ -25,9 +25,12 @@ final class CollectPublications
         $this->publications = $publications;
     }
 
-    public function __invoke(int $run_id, string $state, int $page, int $limit): DomainPayloadInterface
+    public function __invoke(array $input): DomainPayloadInterface
     {
-        if (empty($state)) $state = \Domain\Association::PENDING;
+        $run_id = (int) $input['run_id'];
+        $state = (string) ($input['state'] ?? \Domain\Association::PENDING);
+        $page = (int) ($input['page'] ?? 1);
+        $limit = (int) ($input['limit'] ?? 20);
 
         $select_run_sth = $this->runs->id($run_id);
 

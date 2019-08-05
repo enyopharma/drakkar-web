@@ -46,8 +46,7 @@
         "psr-4": {
             "App\\": "src/App/",
             "Domain\\": "src/Domain/",
-            "Services\\": "src/Services/",
-            "Enyo\\": "enyo/src"
+            "Services\\": "src/Services/"
         }
     },
     "require-dev": {

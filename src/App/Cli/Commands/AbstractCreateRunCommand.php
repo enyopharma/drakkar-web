@@ -40,17 +40,20 @@ abstract class AbstractCreateRunCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $name = $input->getArgument('name');
+        $input = [
+            'type' => $this->type,
+            'name' => $input->getArgument('name'),
+        ];
 
         try {
-            $pmids = $this->pmidsFromStdin();
+            $input['pmids'] = $this->pmidsFromStdin();
         }
 
         catch (\UnexpectedValueException $e) {
             return $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
         }
 
-        $payload = ($this->domain)($this->type, $name, ...$pmids);
+        $payload = ($this->domain)($input);
 
         return ($this->responder)($output, $payload);
     }

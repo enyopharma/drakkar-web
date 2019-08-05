@@ -12,7 +12,7 @@ use Domain\ReadModel\RunViewInterface;
 use Domain\ReadModel\PublicationViewInterface;
 use Domain\ReadModel\DescriptionViewInterface;
 
-final class CollectDescriptions
+final class CollectDescriptions implements DomainActionInterface
 {
     private $runs;
 
@@ -30,8 +30,13 @@ final class CollectDescriptions
         $this->descriptions = $descriptions;
     }
 
-    public function __invoke(int $run_id, int $pmid, int $page, int $limit): DomainPayloadInterface
+    public function __invoke(array $input): DomainPayloadInterface
     {
+        $run_id = (int) $input['run_id'];
+        $pmid = (int) $input['pmid'];
+        $page = (int) ($input['page'] ?? 1);
+        $limit = (int) ($input['limit'] ?? 20);
+
         $select_run_sth = $this->runs->id($run_id);
 
         if (! $run = $select_run_sth->fetch()) {

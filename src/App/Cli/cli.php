@@ -2,13 +2,23 @@
 
 declare(strict_types=1);
 
-use Enyo\InstanceFactory;
-
-return function (InstanceFactory $factory) {
+return function (Psr\Container\ContainerInterface $container) {
     return [
-        $factory(App\Cli\Commands\CreateHHRunCommand::class),
-        $factory(App\Cli\Commands\CreateVHRunCommand::class),
-        $factory(App\Cli\Commands\PopulateRunCommand::class),
-        $factory(App\Cli\Commands\PopulatePublicationCommand::class),
+        new App\Cli\Commands\CreateHHRunCommand(
+            $container->get(Domain\Actions\CreateRun::class),
+            $container->get(App\Cli\Responders\CliResponder::class)
+        ),
+        new App\Cli\Commands\CreateVHRunCommand(
+            $container->get(Domain\Actions\CreateRun::class),
+            $container->get(App\Cli\Responders\CliResponder::class)
+        ),
+        new App\Cli\Commands\PopulateRunCommand(
+            $container->get(Domain\Actions\PopulateRun::class),
+            $container->get(App\Cli\Responders\CliResponder::class)
+        ),
+        new App\Cli\Commands\PopulatePublicationCommand(
+            $container->get(Domain\Actions\PopulatePublication::class),
+            $container->get(App\Cli\Responders\CliResponder::class)
+        ),
     ];
 };

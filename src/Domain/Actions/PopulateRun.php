@@ -14,7 +14,7 @@ use Domain\Payloads\ResourceUpdated;
 use Domain\Payloads\ResourceNotFound;
 use Domain\Payloads\DomainPayloadInterface;
 
-final class PopulateRun
+final class PopulateRun implements DomainActionInterface
 {
     const SELECT_RUN_SQL = <<<SQL
         SELECT * FROM runs WHERE id = ?
@@ -47,8 +47,10 @@ SQL;
         $this->efetch = $efetch;
     }
 
-    public function __invoke(int $id, callable $listen = null): DomainPayloadInterface
+    public function __invoke(array $input, callable $listen = null): DomainPayloadInterface
     {
+        $id = (int) $input['id'];
+
         // prepare the queries.
         $select_run_sth = $this->pdo->prepare(self::SELECT_RUN_SQL);
         $select_publications_sth = $this->pdo->prepare(self::SELECT_PUBLICATIONS_SQL);

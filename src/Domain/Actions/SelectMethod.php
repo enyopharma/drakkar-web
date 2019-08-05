@@ -9,7 +9,7 @@ use Domain\Payloads\ResourceNotFound;
 use Domain\Payloads\DomainPayloadInterface;
 use Domain\ReadModel\MethodViewInterface;
 
-final class SelectMethod
+final class SelectMethod implements DomainActionInterface
 {
     private $methods;
 
@@ -18,8 +18,10 @@ final class SelectMethod
         $this->methods = $methods;
     }
 
-    public function __invoke(string $psimi_id): DomainPayloadInterface
+    public function __invoke(array $input): DomainPayloadInterface
     {
+        $psimi_id = (string) $input['psimi_id'];
+
         if ($method = $this->methods->psimiId($psimi_id)->fetch()) {
             return new MethodData($method);
         }

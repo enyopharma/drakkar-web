@@ -8,7 +8,7 @@ use Domain\Payloads\MethodCollectionData;
 use Domain\Payloads\DomainPayloadInterface;
 use Domain\ReadModel\MethodViewInterface;
 
-final class SearchMethods
+final class SearchMethods implements DomainActionInterface
 {
     private $methods;
 
@@ -17,8 +17,11 @@ final class SearchMethods
         $this->methods = $methods;
     }
 
-    public function __invoke(string $q, int $limit): DomainPayloadInterface
+    public function __invoke(array $input): DomainPayloadInterface
     {
+        $q = (string) ($input['q'] ?? '');
+        $limit = (int) ($input['limit'] ?? 5);
+
         $methods = $this->methods->search($q, $limit)->fetchAll();
 
         return new MethodCollectionData($methods);

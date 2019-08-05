@@ -39,9 +39,11 @@ final class PopulateRunCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $id = (int) ((array) $input->getArgument('id'))[0];
+        $input = [
+            'id' => (int) ((array) $input->getArgument('id'))[0],
+        ];
 
-        $payload = ($this->domain)($id, function ($payload) use ($output) {
+        $payload = ($this->domain)($input, function ($payload) use ($output) {
             return ($this->responder)($output, $payload);
         });
 

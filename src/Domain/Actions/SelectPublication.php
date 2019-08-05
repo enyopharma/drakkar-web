@@ -10,7 +10,7 @@ use Domain\Payloads\DomainPayloadInterface;
 use Domain\ReadModel\RunViewInterface;
 use Domain\ReadModel\PublicationViewInterface;
 
-final class SelectPublication
+final class SelectPublication implements DomainActionInterface
 {
     private $runs;
 
@@ -24,8 +24,11 @@ final class SelectPublication
         $this->publications = $publications;
     }
 
-    public function __invoke(int $run_id, int $pmid): DomainPayloadInterface
+    public function __invoke(array $input): DomainPayloadInterface
     {
+        $run_id = (int) $input['run_id'];
+        $pmid = (int) $input['pmid'];
+
         $select_run_sth = $this->runs->id($run_id);
 
         if (! $run = $select_run_sth->fetch()) {

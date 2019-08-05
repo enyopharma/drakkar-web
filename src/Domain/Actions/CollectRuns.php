@@ -8,7 +8,7 @@ use Domain\Payloads\RunCollectionData;
 use Domain\Payloads\DomainPayloadInterface;
 use Domain\ReadModel\RunViewInterface;
 
-final class CollectRuns
+final class CollectRuns implements DomainActionInterface
 {
     private $runs;
 
@@ -17,7 +17,7 @@ final class CollectRuns
         $this->runs = $runs;
     }
 
-    public function __invoke(): DomainPayloadInterface
+    public function __invoke(array $input): DomainPayloadInterface
     {
         $runs = $this->runs->all()->fetchAll();
 

@@ -7,7 +7,7 @@ namespace Domain\Actions;
 use Domain\Payloads\AlignmentStarted;
 use Domain\Payloads\DomainPayloadInterface;
 
-final class StartAlignment
+final class StartAlignment implements DomainActionInterface
 {
     private $client;
 
@@ -16,8 +16,12 @@ final class StartAlignment
         $this->client = $client;
     }
 
-    public function __invoke(string $id, string $query, array $sequences): DomainPayloadInterface
+    public function __invoke(array $input): DomainPayloadInterface
     {
+        $id = (string) $input['id'];
+        $query = (string) $input['query'];
+        $sequences = array_filter((array) ($input['sequences'] ?? []), 'is_string');
+
         $this->client->rpush('default', json_encode([
             'id' => $id,
             'query' => $query,

@@ -39,9 +39,11 @@ final class PopulatePublicationCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $pmid = (int) ((array) $input->getArgument('pmid'))[0];
+        $input = [
+            'pmid' => (int) ((array) $input->getArgument('pmid'))[0],
+        ];
 
-        $payload = ($this->domain)($pmid);
+        $payload = ($this->domain)($input);
 
         return ($this->responder)($output, $payload);
     }

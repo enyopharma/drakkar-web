@@ -13,7 +13,7 @@ use Domain\Payloads\ResourceCreated;
 use Domain\Payloads\ResourceNotFound;
 use Domain\Payloads\DomainPayloadInterface;
 
-final class CreateDescription
+final class CreateDescription implements DomainActionInterface
 {
     const SELECT_ASSOCIATION_STH = <<<SQL
         SELECT r.type, a.*
@@ -87,8 +87,16 @@ SQL;
         $this->pdo = $pdo;
     }
 
-    public function __invoke(DescriptionInput $input): DomainPayloadInterface
+    public function __invoke(array $input): DomainPayloadInterface
     {
+        $input = new Input\DescriptionInput(
+            (int) $input['run_id'],
+            (int) $input['pmid'],
+            $input['method'] ?? [],
+            $input['interactor1'] ?? [],
+            $input['interactor2'] ?? []
+        );
+
         try {
             $run = $input->run();
             $publication = $input->publication();
