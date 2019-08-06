@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 /**
  * Get the root path.
@@ -38,16 +40,14 @@ while (true) {
 
         $sequence = strtoupper($sequence);
 
-        $cmd = implode(' ', ['/bin/alignment', $sequence, $query]);
-
-        $process = new Symfony\Component\Process\Process($cmd);
+        $process = new Symfony\Component\Process\Process(['/bin/alignment', $sequence, $query]);
 
         try {
             $process->mustRun();
 
             $output = $process->getOutput();
 
-            $output = preg_replace('/[\r\n]+$/', '', trim($output));
+            $output = (string) preg_replace('/[\r\n]+$/', '', trim($output));
 
             $lines = explode("\n", $output);
         }
@@ -64,7 +64,7 @@ while (true) {
                  return [
                      'start' => (int) $start,
                      'stop' => (int) $stop,
-                     'identity' => (float) round($identity, 2),
+                     'identity' => round((float) $identity, 2),
                  ];
             }, $lines),
         ];
