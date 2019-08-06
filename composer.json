@@ -19,7 +19,6 @@
         "league/plates": "^3.3",
         "middlewares/payload": "^2.1",
         "middlewares/shutdown": "^1.1",
-        "monolog/monolog": "^1.24",
         "nyholm/psr7": "^1.1",
         "nyholm/psr7-server": "^0.3.0",
         "predis/predis": "^1.1",
