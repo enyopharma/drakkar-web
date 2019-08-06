@@ -10,14 +10,10 @@ return [
     },
 
     'predis.clients.default' => function ($container) {
-        $scheme = getenv('REDIS_SCHEME');
-        $host = getenv('REDIS_HOST');
-        $port = getenv('REDIS_PORT');
-
         return new Client([
-            'scheme' => $scheme === false ? 'tcp' : $scheme,
-            'host' => $host === false ? 'localhost' : $host,
-            'port' => $port === false ? 6379 : (int) $port,
+            'scheme' => $container->get('redis.scheme'),
+            'host' => $container->get('redis.host'),
+            'port' => $container->get('redis.port'),
         ]);
     },
 ];

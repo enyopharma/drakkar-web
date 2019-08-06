@@ -26,6 +26,7 @@ return [
 
     SsoAuthentificationMiddleware::class => function ($container) {
         return new SsoAuthentificationMiddleware(
+            $container->get('sso.host'),
             $container->get(ResponseFactoryInterface::class)
         );
     },

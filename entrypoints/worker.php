@@ -11,14 +11,9 @@ $root = (string) realpath(__DIR__ . '/../');
 require $root . '/vendor/autoload.php';
 
 /**
- * Load the env.
- */
-[$env, $debug] = (require $root . '/config/envvars.php')($root);
-
-/**
  * Build the app container.
  */
-$container = (require $root . '/config/container.php')($root, $env, $debug);
+$container = require $root . '/container.php';
 
 /**
  * Read the redis queue.

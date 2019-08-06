@@ -13,10 +13,13 @@ use Dflydev\FigCookies\FigResponseCookies;
 
 class SsoAuthentificationMiddleware implements MiddlewareInterface
 {
+    private $host;
+
     private $factory;
 
-    public function __construct(ResponseFactoryInterface $factory)
+    public function __construct(string $host, ResponseFactoryInterface $factory)
     {
+        $this->host = $host;
         $this->factory = $factory;
     }
 
@@ -26,7 +29,7 @@ class SsoAuthentificationMiddleware implements MiddlewareInterface
 
         $session_id = $cookies['sso'] ?? '';
 
-        $client = new \GuzzleHttp\Client(['base_uri' => 'http://' . getenv('SSO_HOST')]);
+        $client = new \GuzzleHttp\Client(['base_uri' => 'http://' . $this->host]);
 
         $response = $client->request('GET', '/', ['allow_redirects' => false, 'headers' => [
             'Accept' => 'application/json',
