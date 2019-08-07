@@ -11,6 +11,10 @@ use Psr\Http\Message\ServerRequestFactoryInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 
 return [
+    Psr17Factory::class => function ($container) {
+        return new Psr17Factory;
+    },
+
     UriFactoryInterface::class => function ($container) {
         return $container->get(Psr17Factory::class);
     },
@@ -29,9 +33,5 @@ return [
 
     ServerRequestFactoryInterface::class => function ($container) {
         return $container->get(Psr17Factory::class);
-    },
-
-    Psr17Factory::class => function () {
-        return new Psr17Factory;
     },
 ];

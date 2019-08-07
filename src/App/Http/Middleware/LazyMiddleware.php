@@ -3,9 +3,9 @@
 namespace App\Http\Middleware;
 
 use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface as Handler;
-use Psr\Http\Message\ResponseInterface as Response;
-use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 final class LazyMiddleware implements MiddlewareInterface
 {
@@ -16,7 +16,7 @@ final class LazyMiddleware implements MiddlewareInterface
         $this->factory = $factory;
     }
 
-    public function process(Request $request, Handler $handler): Response
+    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $middleware = ($this->factory)();
 

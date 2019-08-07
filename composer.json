@@ -29,15 +29,14 @@
         "psr/http-server-middleware": "^1.0",
         "psr/log": "^1.1",
         "quanta/container": "^0.3.0",
-        "quanta/error-handler": "^0.1.0",
-        "quanta/http-entrypoint": "^0.2.0",
+        "quanta/http-exception-handler": "dev-master",
         "quanta/http-middleware": "^0.2.0",
+        "quanta/http-server": "dev-master",
         "symfony/console": "^4.2",
         "symfony/dotenv": "^4.3",
         "symfony/process": "^4.3",
         "zendframework/zend-expressive-fastroute": "^3.0",
-        "zendframework/zend-expressive-helpers": "^5.1",
-        "zendframework/zend-httphandlerrunner": "^1.1"
+        "zendframework/zend-expressive-helpers": "^5.1"
     },
     "autoload": {
         "psr-4": {

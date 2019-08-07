@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "925061cab044511dec5c2d2cedf9dd09",
+    "content-hash": "5270a8567964827013c7a8e207d03b38",
     "packages": [
         {
             "name": "dflydev/fig-cookies",
@@ -1159,17 +1159,17 @@
             "time": "2019-07-16T11:22:30+00:00"
         },
         {
-            "name": "quanta/error-handler",
-            "version": "0.1.1",
+            "name": "quanta/http-exception-handler",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/quantaphp/error-handler.git",
-                "reference": "505002fcd7816998bb9731df844a18a47f468eb5"
+                "url": "https://github.com/quantaphp/http-exception-handler.git",
+                "reference": "7c19d380b6bad194c7c8ebaa4c9cc9257c60a3da"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/error-handler/zipball/505002fcd7816998bb9731df844a18a47f468eb5",
-                "reference": "505002fcd7816998bb9731df844a18a47f468eb5",
+                "url": "https://api.github.com/repos/quantaphp/http-exception-handler/zipball/7c19d380b6bad194c7c8ebaa4c9cc9257c60a3da",
+                "reference": "7c19d380b6bad194c7c8ebaa4c9cc9257c60a3da",
                 "shasum": ""
             },
             "require": {
@@ -1179,59 +1179,6 @@
                 "eloquent/phony-kahlan": "^2.0",
                 "kahlan/kahlan": "^4.0",
                 "phpstan/phpstan": "^0.11.2"
-            },
-            "type": "library",
-            "autoload": {
-                "files": [
-                    "src/functions.php"
-                ],
-                "psr-4": {
-                    "Quanta\\ErrorHandler\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "pmall",
-                    "email": "pierre.mallinjoud@gmail.com"
-                }
-            ],
-            "description": "Minimalist error handler library",
-            "homepage": "https://github.com/quantaphp/error-handler",
-            "keywords": [
-                "error",
-                "error-handler",
-                "exception",
-                "exception-handler"
-            ],
-            "time": "2019-07-25T09:13:05+00:00"
-        },
-        {
-            "name": "quanta/http-entrypoint",
-            "version": "0.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/quantaphp/http-entrypoint.git",
-                "reference": "d9c36f03351666df5164528f390bab63c0701837"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/http-entrypoint/zipball/d9c36f03351666df5164528f390bab63c0701837",
-                "reference": "d9c36f03351666df5164528f390bab63c0701837",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.0",
-                "psr/http-message": "^1.0",
-                "psr/http-server-handler": "^1.0"
-            },
-            "require-dev": {
-                "eloquent/phony-kahlan": "^2.0",
-                "kahlan/kahlan": "^4.0",
-                "phpstan/phpstan": "^0.11.8"
             },
             "type": "library",
             "autoload": {
@@ -1249,15 +1196,15 @@
                     "email": "pierre.mallinjoud@gmail.com"
                 }
             ],
-            "description": "Http entrypoint for Psr-15 applications",
-            "homepage": "https://github.com/quanta/http-entrypoint",
+            "description": "Minimalist exception handler library",
+            "homepage": "https://github.com/quantaphp/http-exception-handler",
             "keywords": [
-                "entrypoint",
-                "http",
-                "psr-15",
-                "request-handler"
+                "error",
+                "error-handler",
+                "exception",
+                "exception-handler"
             ],
-            "time": "2019-06-13T11:30:32+00:00"
+            "time": "2019-08-07T13:28:16+00:00"
         },
         {
             "name": "quanta/http-middleware",
@@ -1309,6 +1256,53 @@
                 "request-handler"
             ],
             "time": "2019-06-13T11:42:05+00:00"
+        },
+        {
+            "name": "quanta/http-server",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/quantaphp/http-server.git",
+                "reference": "9bb7133ad09c7833d2562b45dd17ada4a943fe10"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/quantaphp/http-server/zipball/9bb7133ad09c7833d2562b45dd17ada4a943fe10",
+                "reference": "9bb7133ad09c7833d2562b45dd17ada4a943fe10",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0",
+                "psr/http-message": "^1.0"
+            },
+            "require-dev": {
+                "eloquent/phony-kahlan": "^2.0",
+                "kahlan/kahlan": "^4.0",
+                "phpstan/phpstan": "^0.11.2"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Quanta\\Http\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "pmall",
+                    "email": "pierre.mallinjoud@gmail.com"
+                }
+            ],
+            "description": "Http server for running psr-7 applications",
+            "homepage": "https://github.com/quantaphp/http-server",
+            "keywords": [
+                "psr-7",
+                "server"
+            ],
+            "time": "2019-08-07T15:20:47+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -1897,61 +1891,6 @@
             "time": "2018-06-05T15:28:00+00:00"
         },
         {
-            "name": "zendframework/zend-httphandlerrunner",
-            "version": "1.1.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/zendframework/zend-httphandlerrunner.git",
-                "reference": "75fb12751fe9d6e392cce1ee0d687dacae2db787"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/zendframework/zend-httphandlerrunner/zipball/75fb12751fe9d6e392cce1ee0d687dacae2db787",
-                "reference": "75fb12751fe9d6e392cce1ee0d687dacae2db787",
-                "shasum": ""
-            },
-            "require": {
-                "php": "^7.1",
-                "psr/http-message": "^1.0",
-                "psr/http-message-implementation": "^1.0",
-                "psr/http-server-handler": "^1.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^7.0.2",
-                "zendframework/zend-coding-standard": "~1.0.0",
-                "zendframework/zend-diactoros": "^1.7 || ^2.1.1"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.1.x-dev",
-                    "dev-develop": "1.2.x-dev"
-                },
-                "zf": {
-                    "config-provider": "Zend\\HttpHandlerRunner\\ConfigProvider"
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Zend\\HttpHandlerRunner\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "description": "Execute PSR-15 RequestHandlerInterface instances and emit responses they generate.",
-            "keywords": [
-                "ZendFramework",
-                "components",
-                "expressive",
-                "psr-15",
-                "psr-7",
-                "zf"
-            ],
-            "time": "2019-02-19T18:20:34+00:00"
-        },
-        {
             "name": "zendframework/zend-stdlib",
             "version": "3.2.1",
             "source": {
@@ -2169,16 +2108,16 @@
         },
         {
             "name": "nette/di",
-            "version": "v3.0.0",
+            "version": "v3.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/di.git",
-                "reference": "19d83539245aaacb59470828919182411061841f"
+                "reference": "4aff517a1c6bb5c36fa09733d4cea089f529de6d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/di/zipball/19d83539245aaacb59470828919182411061841f",
-                "reference": "19d83539245aaacb59470828919182411061841f",
+                "url": "https://api.github.com/repos/nette/di/zipball/4aff517a1c6bb5c36fa09733d4cea089f529de6d",
+                "reference": "4aff517a1c6bb5c36fa09733d4cea089f529de6d",
                 "shasum": ""
             },
             "require": {
@@ -2238,7 +2177,7 @@
                 "nette",
                 "static"
             ],
-            "time": "2019-04-03T19:35:46+00:00"
+            "time": "2019-08-07T12:11:33+00:00"
         },
         {
             "name": "nette/finder",
@@ -2892,7 +2831,10 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "quanta/http-exception-handler": 20,
+        "quanta/http-server": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

@@ -1,1 +1,1 @@
-../entrypoints/http.php
+../entrypoints/http.dev.php

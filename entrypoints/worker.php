@@ -13,9 +13,14 @@ $root = (string) realpath(__DIR__ . '/../');
 require $root . '/vendor/autoload.php';
 
 /**
- * Build the app container.
+ * Get the app config.
  */
-$container = require $root . '/container.php';
+$config = (require $root . '/config/app.php')($root, 'worker', true);
+
+/**
+ * Get the app container.
+ */
+$container = (require $root . '/container.php')($config);
 
 /**
  * Read the redis queue.
