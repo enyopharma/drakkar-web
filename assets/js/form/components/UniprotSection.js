@@ -8,6 +8,7 @@ const UniprotSection = ({ type, query, protein, editable, update, select, unsele
         return proteins.map(protein => ({
             value: protein.accession, label: [
                 protein.accession,
+                protein.taxon,
                 protein.name,
                 protein.description,
             ].join(' - '),
@@ -24,7 +25,11 @@ const UniprotSection = ({ type, query, protein, editable, update, select, unsele
                 </div>
                 {protein == null ? null : (
                     <div className={'mb-0 alert alert-' + (type == 'h' ? 'primary' : 'danger')}>
-                        <strong>{protein.accession}</strong> - {protein.name} - {protein.description}
+                        <strong>{protein.accession}</strong> - {[
+                            protein.taxon,
+                            protein.name,
+                            protein.description,
+                        ].join(' - ')}
                         <button
                             type="button"
                             className="close"

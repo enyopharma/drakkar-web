@@ -16,9 +16,12 @@ final class ProteinViewSql implements ProteinViewInterface
     public function accession(string $accession): Statement
     {
         $select_protein_sth = Query::instance($this->pdo)
-            ->select('p.id, p.type, p.accession, p.name, p.description, s.sequence')
-            ->from('proteins AS p, sequences AS s')
+            ->select('p.id, p.type, p.accession, tn.name AS taxon, p.name, p.description, s.sequence')
+            ->from('proteins AS p, sequences AS s, taxon AS t, taxon_name AS tn')
             ->where('p.id = s.protein_id AND s.is_canonical IS TRUE')
+            ->where('p.taxon_id = t.ncbi_taxon_id')
+            ->where('t.taxon_id = tn.taxon_id')
+            ->where('tn.name_class = \'scientific name\'')
             ->where('p.accession = ?')
             ->prepare();
 
@@ -31,12 +34,17 @@ final class ProteinViewSql implements ProteinViewInterface
 
     public function search(string $type, string $q, int $limit): Statement
     {
-        $qs = array_map(function ($q) { return '%' . $q . '%'; }, array_filter(explode(' ', $q)));
+        $qs = array_map(function ($q) {
+            return '%' . trim($q) . '%';
+        }, array_filter(explode('+', $q)));
 
         $select_proteins_sth = Query::instance($this->pdo)
-            ->select('type, accession, name, description')
-            ->from('proteins')
-            ->where('type = ?', ...array_pad([], count($qs), 'search ILIKE ?'))
+            ->select('p.type, p.accession, tn.name AS taxon, p.name, p.description')
+            ->from('proteins AS p, taxon AS t, taxon_name AS tn')
+            ->where('p.type = ?', ...array_pad([], count($qs), 'p.search ILIKE ?'))
+            ->where('p.taxon_id = t.ncbi_taxon_id')
+            ->where('t.taxon_id = tn.taxon_id')
+            ->where('tn.name_class = \'scientific name\'')
             ->sliced()
             ->prepare();
 
@@ -50,14 +58,16 @@ final class ProteinViewSql implements ProteinViewInterface
     private function first(\PDOStatement $sth): \Generator
     {
         if ($protein = $sth->fetch()) {
-            $extra = [
-                'isoforms' => $this->isoforms($protein['id']),
-                'chains' => $this->chains($protein['id']),
-                'domains' => $this->domains($protein['id']),
-                'matures' => $this->matures($protein['id']),
-            ];
+            $protein_id = $protein['id'];
 
-            yield array_merge($protein, $extra);
+            unset($protein['id']);
+
+            yield array_merge($protein, [
+                'isoforms' => $this->isoforms($protein_id),
+                'chains' => $this->chains($protein_id),
+                'domains' => $this->domains($protein_id),
+                'matures' => $this->matures($protein_id),
+            ]);
         }
     }
 

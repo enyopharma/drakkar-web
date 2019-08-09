@@ -26,6 +26,16 @@ const SearchField = ({ query, update, search, select, max=5, children }) => {
     useEffect(() => setActive(0), [results])
     useEffect(() => setVisible(! searching), [searching])
 
+    const regex = query.trim()
+        .replace(/\s*\+$/, '')
+        .replace(/\s*\+\s*/g, '|');
+
+    const highlight = value => {
+        return regex.length > 0
+            ? value.replace(new RegExp('(' + regex + ')', 'gi'), '<strong>$1</strong>')
+            : value
+    }
+
     const selectValue = value => {
         setVisible(false)
         select(value)
@@ -89,8 +99,8 @@ const SearchField = ({ query, update, search, select, max=5, children }) => {
                             className={'list-group-item' + (active == index ? ' active' : '')}
                             onMouseOver={e => setActive(index)}
                             onMouseDown={e => selectValue(result.value)}
+                            dangerouslySetInnerHTML={{ __html: highlight(result.label) }}
                         >
-                            {result.label}
                         </li>
                     ))}
                     </ul>

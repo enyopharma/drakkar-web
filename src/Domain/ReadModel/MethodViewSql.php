@@ -35,7 +35,9 @@ final class MethodViewSql implements MethodViewInterface
 
     public function search(string $q, int $limit): Statement
     {
-        $qs = array_map(function ($q) { return '%' . $q . '%'; }, array_filter(explode(' ', $q)));
+        $qs = array_map(function ($q) {
+            return '%' . trim($q) . '%';
+        }, array_filter(explode('+', $q)));
 
         $select_methods_sth = $this->selectMethodsQuery()
             ->where(...array_pad([], count($qs), 'search ILIKE ?'))
