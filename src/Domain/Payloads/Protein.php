@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Payloads;
 
-final class ProteinData extends DomainData
+final class Protein extends DomainData
 {
     public function __construct(array $protein)
     {

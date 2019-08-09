@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Payloads;
 
-final class DescriptionCollectionData extends DomainData
+final class DescriptionCollection extends DomainData
 {
     public function __construct(array $run, array $publication, array $descriptions, array $pagination)
     {

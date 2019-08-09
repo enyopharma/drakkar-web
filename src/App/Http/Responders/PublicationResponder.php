@@ -29,7 +29,7 @@ final class PublicationResponder implements HttpResponderInterface
 
     public function __invoke(Request $request, Payload $payload): MaybeResponse
     {
-        if ($payload instanceof \Domain\Payloads\PublicationCollectionData) {
+        if ($payload instanceof \Domain\Payloads\PublicationCollection) {
             return $this->publicationCollectionData($request, $payload);
         }
 

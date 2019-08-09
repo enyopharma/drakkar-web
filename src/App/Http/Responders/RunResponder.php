@@ -25,7 +25,7 @@ final class RunResponder implements HttpResponderInterface
 
     public function __invoke(Request $request, Payload $payload): MaybeResponse
     {
-        if ($payload instanceof \Domain\Payloads\RunCollectionData) {
+        if ($payload instanceof \Domain\Payloads\RunCollection) {
             return $this->runCollectionData($request, $payload);
         }
 

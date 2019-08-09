@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Payloads;
 
-final class MethodCollectionData extends DomainData
+final class MethodCollection extends DomainData
 {
     public function __construct(array $methods)
     {

@@ -29,7 +29,7 @@ final class DescriptionResponder implements HttpResponderInterface
 
     public function __invoke(Request $request, Payload $payload): MaybeResponse
     {
-        if ($payload instanceof \Domain\Payloads\DescriptionCollectionData) {
+        if ($payload instanceof \Domain\Payloads\DescriptionCollection) {
             return $this->descriptionCollectionData($request, $payload);
         }
 
@@ -37,11 +37,11 @@ final class DescriptionResponder implements HttpResponderInterface
             return $this->pageOutOfRange($request, $payload);
         }
 
-        if ($payload instanceof \Domain\Payloads\PublicationData) {
+        if ($payload instanceof \Domain\Payloads\Publication) {
             return $this->publicationData($request, $payload);
         }
 
-        if ($payload instanceof \Domain\Payloads\DescriptionData) {
+        if ($payload instanceof \Domain\Payloads\Description) {
             return $this->descriptionData($request, $payload);
         }
 

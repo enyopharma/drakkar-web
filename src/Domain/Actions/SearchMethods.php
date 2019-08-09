@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Actions;
 
-use Domain\Payloads\MethodCollectionData;
+use Domain\Payloads\MethodCollection;
 use Domain\Payloads\DomainPayloadInterface;
 use Domain\ReadModel\MethodViewInterface;
 
@@ -24,6 +24,6 @@ final class SearchMethods implements DomainActionInterface
 
         $methods = $this->methods->search($q, $limit)->fetchAll();
 
-        return new MethodCollectionData($methods);
+        return new MethodCollection($methods);
     }
 }

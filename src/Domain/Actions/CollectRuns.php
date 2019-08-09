@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Actions;
 
-use Domain\Payloads\RunCollectionData;
+use Domain\Payloads\RunCollection;
 use Domain\Payloads\DomainPayloadInterface;
 use Domain\ReadModel\RunViewInterface;
 
@@ -21,6 +21,6 @@ final class CollectRuns implements DomainActionInterface
     {
         $runs = $this->runs->all()->fetchAll();
 
-        return new RunCollectionData($runs);
+        return new RunCollection($runs);
     }
 }

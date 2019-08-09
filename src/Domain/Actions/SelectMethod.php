@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Actions;
 
-use Domain\Payloads\MethodData;
+use Domain\Payloads\Method;
 use Domain\Payloads\ResourceNotFound;
 use Domain\Payloads\DomainPayloadInterface;
 use Domain\ReadModel\MethodViewInterface;
@@ -23,7 +23,7 @@ final class SelectMethod implements DomainActionInterface
         $psimi_id = (string) $input['psimi_id'];
 
         if ($method = $this->methods->psimiId($psimi_id)->fetch()) {
-            return new MethodData($method);
+            return new Method($method);
         }
 
         return new ResourceNotFound('method', ['psimi_id' => $psimi_id]);

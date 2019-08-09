@@ -6,8 +6,8 @@ namespace Domain\Actions;
 
 use Domain\Payloads\PageOutOfRange;
 use Domain\Payloads\ResourceNotFound;
+use Domain\Payloads\PublicationCollection;
 use Domain\Payloads\DomainPayloadInterface;
-use Domain\Payloads\PublicationCollectionData;
 use Domain\ReadModel\RunViewInterface;
 use Domain\ReadModel\PublicationViewInterface;
 
@@ -53,7 +53,7 @@ final class CollectPublications implements DomainActionInterface
             ->all($run_id, $state, $limit, $offset)
             ->fetchAll();
 
-        return new PublicationCollectionData($run, $publications, $state, [
+        return new PublicationCollection($run, $publications, $state, [
             'page' => $page,
             'total' => $total,
             'limit' => $limit,
