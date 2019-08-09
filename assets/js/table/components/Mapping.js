@@ -46,9 +46,8 @@ const Mapping = ({ type, name, start, stop, protein, mapping }) => {
                     </h5>
                     <div className="card-body">
                         {isoform.occurrences.sort((a, b) => a.start - b.start).map((occurrence, j) => (
-                            <p>
+                            <p key={j}>
                                 <MappingImg
-                                    key={j}
                                     type={type}
                                     start={occurrence.start}
                                     stop={occurrence.stop}

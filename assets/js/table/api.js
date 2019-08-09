@@ -3,7 +3,7 @@ import fetch from 'cross-fetch'
 const proteins = {
     select: accession => fetch(`/proteins/${accession}`)
         .then(response => response.json(), error => console.log(error))
-        .then(json => json.data.protein, error => console.log(error)),
+        .then(json => json.data, error => console.log(error)),
 }
 
 const descriptions = {
