@@ -67,7 +67,7 @@ return function (Psr\Container\ContainerInterface $container, $collector) {
     ]);
 
     $collector->get('/dataset', ...[
-        $dataset(Domain\Actions\CollectDataset::class),
+        $dataset(Domain\Actions\DownloadDataset::class),
         'dataset',
     ]);
 

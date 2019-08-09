@@ -9,6 +9,7 @@ use Zend\Expressive\Helper\UrlHelper;
 
 use App\Http\Responders\RunResponder;
 use App\Http\Responders\JsonResponder;
+use App\Http\Responders\DatasetResponder;
 use App\Http\Responders\PublicationResponder;
 use App\Http\Responders\DescriptionResponder;
 
@@ -33,6 +34,12 @@ return [
             $container->get(ResponseFactoryInterface::class),
             $container->get(Engine::class),
             $container->get(UrlHelper::class)
+        );
+    },
+
+    DatasetResponder::class => function ($container) {
+        return new DatasetResponder(
+            $container->get(ResponseFactoryInterface::class)
         );
     },
 

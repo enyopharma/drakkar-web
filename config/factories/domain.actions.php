@@ -10,6 +10,7 @@ use Domain\Actions\SearchMethods;
 use Domain\Actions\SelectProtein;
 use Domain\Actions\SearchProteins;
 use Domain\Actions\StartAlignment;
+use Domain\Actions\DownloadDataset;
 use Domain\Actions\SelectPublication;
 use Domain\Actions\SelectDescription;
 use Domain\Actions\CreateDescription;
@@ -121,6 +122,12 @@ return [
             $container->get(Domain\ReadModel\RunViewInterface::class),
             $container->get(Domain\ReadModel\PublicationViewInterface::class),
             $container->get(Domain\ReadModel\DescriptionViewInterface::class)
+        );
+    },
+
+    DownloadDataset::class => function ($container) {
+        return new DownloadDataset(
+            $container->get(Domain\ReadModel\DatasetViewInterface::class)
         );
     },
 ];
