@@ -1164,12 +1164,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/quantaphp/http-exception-handler.git",
-                "reference": "7c19d380b6bad194c7c8ebaa4c9cc9257c60a3da"
+                "reference": "a476938a67bcad7340fbff8977ebba7a0fd296b6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/http-exception-handler/zipball/7c19d380b6bad194c7c8ebaa4c9cc9257c60a3da",
-                "reference": "7c19d380b6bad194c7c8ebaa4c9cc9257c60a3da",
+                "url": "https://api.github.com/repos/quantaphp/http-exception-handler/zipball/a476938a67bcad7340fbff8977ebba7a0fd296b6",
+                "reference": "a476938a67bcad7340fbff8977ebba7a0fd296b6",
                 "shasum": ""
             },
             "require": {
@@ -1204,7 +1204,7 @@
                 "exception",
                 "exception-handler"
             ],
-            "time": "2019-08-07T13:28:16+00:00"
+            "time": "2019-08-09T10:54:04+00:00"
         },
         {
             "name": "quanta/http-middleware",
@@ -1263,12 +1263,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/quantaphp/http-server.git",
-                "reference": "9bb7133ad09c7833d2562b45dd17ada4a943fe10"
+                "reference": "2ce528af2b3a379336daa94e4f1de3f23c501d03"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/http-server/zipball/9bb7133ad09c7833d2562b45dd17ada4a943fe10",
-                "reference": "9bb7133ad09c7833d2562b45dd17ada4a943fe10",
+                "url": "https://api.github.com/repos/quantaphp/http-server/zipball/2ce528af2b3a379336daa94e4f1de3f23c501d03",
+                "reference": "2ce528af2b3a379336daa94e4f1de3f23c501d03",
                 "shasum": ""
             },
             "require": {
@@ -1302,7 +1302,7 @@
                 "psr-7",
                 "server"
             ],
-            "time": "2019-08-07T15:20:47+00:00"
+            "time": "2019-08-08T10:48:09+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
