@@ -31,12 +31,14 @@ final class DatasetResponder implements HttpResponderInterface
 
     private function dataset($request, $payload): MaybeResponse
     {
+        $filename = sprintf('vinland-%s', date('Y-m-d'));
+
         ['statement' => $statement] = $payload->data();
 
         $response = $this->factory
             ->createResponse(200)
             ->withHeader('content-type', 'application/json')
-            ->withHeader('content-disposition', 'attachment; filename="vinland.json"')
+            ->withHeader('content-disposition', 'attachment; filename="' . $filename . '"')
             ->withBody(new StatementJsonStream($statement));
 
         return MaybeResponse::just($response);

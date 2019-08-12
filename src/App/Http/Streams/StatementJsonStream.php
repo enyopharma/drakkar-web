@@ -85,21 +85,15 @@ final class StatementJsonStream implements StreamInterface
 
     public function read($length)
     {
-        $str = '';
-
-        if ($this->i == 0) $str = '[';
-
         if ($current = $this->statement->fetch()) {
-            if ($this->i > 0) $str.= ',';
-
             $this->i++;
 
-            return $str . "\n" . $this->formatted($current);
+            return (string) json_encode($current) . "\n";
         }
 
         $this->eof = true;
 
-        return $str == '[' ? '[]' : $str . "\n" . ']';
+        return '';
     }
 
     public function getContents()
@@ -116,12 +110,5 @@ final class StatementJsonStream implements StreamInterface
     public function getMetadata($key = null)
     {
         return is_null($key) ? [] : null;
-    }
-
-    private function formatted(array $current): string
-    {
-        $json = (string) json_encode($current, JSON_PRETTY_PRINT);
-
-        return (string) preg_replace('/^.+?$/m', '    $0', $json);
     }
 }

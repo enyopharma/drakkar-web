@@ -15,9 +15,15 @@ final class Statement
 
     public function fetch()
     {
-        return $this->generator->valid()
-            ? $this->generator->current()
-            : false;
+        if ($this->generator->valid()) {
+            $current = $this->generator->current();
+
+            $this->generator->next();
+
+            return $current;
+        }
+
+        return false;
     }
 
     public function fetchAll(): array
