@@ -37,7 +37,7 @@ final class DatasetResponder implements HttpResponderInterface
 
         $response = $this->factory
             ->createResponse(200)
-            ->withHeader('content-type', 'application/json')
+            ->withHeader('content-type', 'text/plain')
             ->withHeader('content-disposition', 'attachment; filename="' . $filename . '"')
             ->withBody(new StatementJsonStream($statement));
 
