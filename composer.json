@@ -29,7 +29,6 @@
         "psr/http-message": "^1.0",
         "psr/http-server-handler": "^1.0",
         "psr/http-server-middleware": "^1.0",
-        "psr/log": "^1.1",
         "quanta/container": "^0.3.0",
         "symfony/console": "^4.2",
         "symfony/dotenv": "^4.3",
