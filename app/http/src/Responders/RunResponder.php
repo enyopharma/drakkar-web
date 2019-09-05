@@ -33,7 +33,7 @@ final class RunResponder implements HttpResponderInterface
         if ($payload instanceof \Domain\Payloads\ResourceNotFound) {
             return $this->resourceNotFound($request, $payload);
         }
-die('kikou');
+
         throw new UnexpectedPayload($this, $payload);
     }
 
