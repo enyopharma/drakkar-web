@@ -3,16 +3,16 @@ var Encore = require('@symfony/webpack-encore');
 
 Encore
     // the project directory where all compiled assets will be stored
-    .setOutputPath('public/build/')
+    .setOutputPath('./app/http/public/build/')
 
     // the public path used by the web server to access the previous directory
     .setPublicPath('/build')
 
     // will create web/build/app.js and web/build/app.css
-    .addEntry('app', './assets/js/app.js')
-    .addEntry('form', './assets/js/form/index.js')
-    .addEntry('search', './assets/js/search/index.js')
-    .addEntry('table', './assets/js/table/index.js')
+    .addEntry('app', './app/http/assets/js/app.js')
+    .addEntry('form', './app/http/assets/js/form/index.js')
+    .addEntry('search', './app/http/assets/js/search/index.js')
+    .addEntry('table', './app/http/assets/js/table/index.js')
 
     // enable runtime chunks
     .enableSingleRuntimeChunk()
@@ -36,6 +36,6 @@ Encore
 
     // enable reactjs
     .enableReactPreset()
-;
+    ;
 
 module.exports = Encore.getWebpackConfig();

@@ -4,7 +4,7 @@ services:
         image: nginx
         volumes:
             - ./default.conf:/etc/nginx/conf.d/default.conf:ro
-            - .:/app:ro
+            - .:/opt:ro
         networks:
             - default
             - proxy
@@ -15,9 +15,9 @@ services:
             - app
     socket:
         image: node:12.2.0
-        command: ["node", "/app/entrypoints/socket.js"]
+        command: ["node", "/opt/socket/server.js"]
         volumes:
-            - .:/app:ro
+            - .:/opt:ro
         networks:
             - default
             - proxy
@@ -33,7 +33,7 @@ services:
         build: .
         user: ${UID}:${GID}
         volumes:
-            - .:/app:rw
+            - .:/opt:rw
         networks:
             - default
             - sso
@@ -41,8 +41,8 @@ services:
         image: enyopharma/alignment:7.2
         user: ${UID}:${GID}
         volumes:
-            - .:/app:rw
             - ./process/worker.conf:/etc/process.conf:ro
+            - .:/opt:rw
         depends_on:
             - redis
     redis:

@@ -1,1 +1,0 @@
-../entrypoints/http.dev.php

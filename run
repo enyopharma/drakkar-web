@@ -1,1 +1,1 @@
-entrypoints/cli.php
+app/cli/entrypoint.php
