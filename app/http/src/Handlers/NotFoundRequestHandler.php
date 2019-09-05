@@ -2,15 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Http\Middleware;
+namespace App\Http\Handlers;
 
-use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
-final class NotFoundMiddleware implements MiddlewareInterface
+final class NotFoundRequestHandler implements RequestHandlerInterface
 {
     private $factory;
 
@@ -19,7 +18,7 @@ final class NotFoundMiddleware implements MiddlewareInterface
         $this->factory = $factory;
     }
 
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $accept = $request->getHeaderLine('Accept');
 

@@ -5,77 +5,51 @@ declare(strict_types=1);
 use Psr\Container\ContainerInterface;
 
 /**
- * Return an array of middleware factories.
+ * Return an array of middleware.
  *
  * @param Psr\Container\ContainerInterface $container
- * @return callable[]
+ * @return Psr\Http\Server\MiddlewareInterface[]
  */
 return function (ContainerInterface $container): array {
+    if (file_exists(__DIR__ . '/../shutdown')) {
+        return [
+            new Middlewares\Shutdown,
+        ];
+    }
+
+    $factory = $container->get(Psr\Http\Message\ResponseFactoryInterface::class);
+
     return [
         /**
          * Whoops error handler.
          */
-        function () {
-            return new Middlewares\Whoops;
-        },
-
-        /**
-         * Shutdown middleware.
-         */
-        function () use ($container) {
-             return new App\Http\Middleware\ShutdownMiddleware(
-                $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-                function () { return file_exists(__DIR__ . '/../shutdown'); }
-            );
-        },
+        new Middlewares\Whoops,
 
         /**
          * SSO auth.
          */
-        function () use ($container) {
-            return new App\Http\Middleware\SsoAuthentificationMiddleware(
-                $_ENV['SSO_HOST'],
-                $container->get(Psr\Http\Message\ResponseFactoryInterface::class)
-            );
-        },
+        new App\Http\Middleware\SsoAuthentificationMiddleware($_ENV['SSO_HOST'], $factory),
 
         /**
          * Override the post method
          */
-        function () {
-            return (new Middlewares\MethodOverride)->parsedBodyParameter('_method');
-        },
+        (new Middlewares\MethodOverride)->parsedBodyParameter('_method'),
 
         /**
          * Json body parser.
          */
-        function () {
-            return new Middlewares\JsonPayload;
-        },
+        new Middlewares\JsonPayload,
 
         /**
          * Router.
          */
-        function () use ($container) {
-            return new Zend\Expressive\Router\Middleware\RouteMiddleware(
-                $container->get(Zend\Expressive\Router\RouterInterface::class)
-            );
-        },
+        new Zend\Expressive\Router\Middleware\RouteMiddleware(
+            $container->get(Zend\Expressive\Router\RouterInterface::class)
+        ),
 
         /**
          * Route dispatcher.
          */
-        function () {
-            return new Zend\Expressive\Router\Middleware\DispatchMiddleware;
-        },
-
-        /**
-         * Not found.
-         */
-        function () use ($container) {
-            return new App\Http\Middleware\NotFoundMiddleware(
-                $container->get(Psr\Http\Message\ResponseFactoryInterface::class)
-            );
-        },
+        new Zend\Expressive\Router\Middleware\DispatchMiddleware,
     ];
 };

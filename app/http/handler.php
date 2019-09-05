@@ -5,9 +5,10 @@ declare(strict_types=1);
 use Psr\Container\ContainerInterface;
 
 use Psr\Http\Server\RequestHandlerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
 
 use App\Http\Handlers\Dispatcher;
-use App\Http\Handlers\InnerMostRequestHandler;
+use App\Http\Handlers\NotFoundRequestHandler;
 
 /**
  * A factory producing the application request handler.
@@ -38,12 +39,19 @@ return function (string $env, bool $debug): RequestHandlerInterface {
     /**
      * Get the middleware factories.
      */
-    $factories = (require __DIR__ . '/config/middleware.php')($container);
+    $middleware = (require __DIR__ . '/config/middleware.php')($container);
+
+    /**
+     * Get the inner most request handler.
+     */
+    $handler = new NotFoundRequestHandler(
+        $container->get(ResponseFactoryInterface::class)
+    );
 
     /**
      * Return the application.
      */
-    return array_reduce(array_reverse($factories), function ($app, $factory) {
-        return new Dispatcher($app, new App\Http\Middleware\LazyMiddleware($factory));
-    }, new InnerMostRequestHandler);
+    return array_reduce(array_reverse($middleware), function ($app, $middleware) {
+        return new Dispatcher($app, $middleware);
+    }, $handler);
 };

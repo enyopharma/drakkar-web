@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace App\Http\Responders;
 
-use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
-use League\Plates\Engine;
+use Domain\Payloads\DomainPayloadInterface;
 
-use Domain\Payloads\DomainPayloadInterface as Payload;
+use League\Plates\Engine;
 
 final class RunResponder implements HttpResponderInterface
 {
@@ -23,16 +24,20 @@ final class RunResponder implements HttpResponderInterface
         $this->engine = $engine;
     }
 
-    public function __invoke(Request $request, Payload $payload): MaybeResponse
+    public function __invoke(ServerRequestInterface $request, DomainPayloadInterface $payload): ResponseInterface
     {
         if ($payload instanceof \Domain\Payloads\RunCollection) {
             return $this->runCollectionData($request, $payload);
         }
 
-        return MaybeResponse::none();
+        if ($payload instanceof \Domain\Payloads\ResourceNotFound) {
+            return $this->resourceNotFound($request, $payload);
+        }
+die('kikou');
+        throw new UnexpectedPayload($this, $payload);
     }
 
-    private function runCollectionData($request, $payload): MaybeResponse
+    private function runCollectionData($request, $payload): ResponseInterface
     {
         $body = $this->engine->render('runs/index', [
             'user' => (array) $request->getAttribute('user', [
@@ -47,6 +52,34 @@ final class RunResponder implements HttpResponderInterface
 
         $response->getBody()->write($body);
 
-        return MaybeResponse::just($response);
+        return $response;
+    }
+
+    private function resourceNotFound($request, $payload): ResponseInterface
+    {
+        $tpl = <<<EOT
+<!doctype html>
+<html>
+    <head>
+        <title>Not found</title>
+    </head>
+    <body>
+        <h1>Not found</h1>
+        <p>%s.</p>
+    </body>
+</html>
+EOT;
+
+        ['message' => $message] = $payload->meta();
+
+        $body = sprintf($tpl, $message);
+
+        $response = $this->factory
+            ->createResponse(200)
+            ->withHeader('content-type', 'text/html');
+
+        $response->getBody()->write($body);
+
+        return $response;
     }
 }

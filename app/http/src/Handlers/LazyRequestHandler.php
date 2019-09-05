@@ -1,13 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace App\Http\Middleware;
+namespace App\Http\Handlers;
 
-use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-final class LazyMiddleware implements MiddlewareInterface
+final class LazyRequestHandler implements RequestHandlerInterface
 {
     private $factory;
 
@@ -16,19 +15,19 @@ final class LazyMiddleware implements MiddlewareInterface
         $this->factory = $factory;
     }
 
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
+    public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $middleware = ($this->factory)();
+        $handler = ($this->factory)();
 
-        if ($middleware instanceof MiddlewareInterface) {
-            return $middleware->process($request, $handler);
+        if ($handler instanceof RequestHandlerInterface) {
+            return $handler->handle($request);
         }
 
         throw new \UnexpectedValueException(
             vsprintf('%s expects an instance of %s to be returned by the factory, %s returned', [
                 self::class,
-                MiddlewareInterface::class,
-                gettype($middleware),
+                RequestHandlerInterface::class,
+                gettype($handler),
             ])
         );
     }

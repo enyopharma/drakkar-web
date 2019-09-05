@@ -4,13 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Responders;
 
-use Psr\Http\Message\ServerRequestInterface as Request;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
+
+use Domain\Payloads\DomainPayloadInterface;
 
 use League\Plates\Engine;
 use Zend\Expressive\Helper\UrlHelper;
-
-use Domain\Payloads\DomainPayloadInterface as Payload;
 
 final class DescriptionResponder implements HttpResponderInterface
 {
@@ -27,7 +28,7 @@ final class DescriptionResponder implements HttpResponderInterface
         $this->url = $url;
     }
 
-    public function __invoke(Request $request, Payload $payload): MaybeResponse
+    public function __invoke(ServerRequestInterface $request, DomainPayloadInterface $payload): ResponseInterface
     {
         if ($payload instanceof \Domain\Payloads\DescriptionCollection) {
             return $this->descriptionCollectionData($request, $payload);
@@ -45,10 +46,14 @@ final class DescriptionResponder implements HttpResponderInterface
             return $this->descriptionData($request, $payload);
         }
 
-        return MaybeResponse::none();
+        if ($payload instanceof \Domain\Payloads\ResourceNotFound) {
+            return $this->resourceNotFound($request, $payload);
+        }
+
+        throw new UnexpectedPayload($this, $payload);
     }
 
-    private function descriptionCollectionData($request, $payload): MaybeResponse
+    private function descriptionCollectionData($request, $payload): ResponseInterface
     {
         $data = ['descriptions' => $payload->data()] + $payload->meta();
 
@@ -60,10 +65,10 @@ final class DescriptionResponder implements HttpResponderInterface
 
         $response->getBody()->write($body);
 
-        return MaybeResponse::just($response);
+        return $response;
     }
 
-    private function pageOutOfRange($request, $payload): MaybeResponse
+    private function pageOutOfRange($request, $payload): ResponseInterface
     {
         $run_id = (int) $request->getAttribute('run_id');
         $pmid = (int) $request->getAttribute('pmid');
@@ -76,14 +81,12 @@ final class DescriptionResponder implements HttpResponderInterface
             'limit' => $payload->limit(),
         ], 'descriptions');
 
-        $response = $this->factory
+        return $this->factory
             ->createResponse(302)
             ->withHeader('location', $url);
-
-        return MaybeResponse::just($response);
     }
 
-    private function publicationData($request, $payload): MaybeResponse
+    private function publicationData($request, $payload): ResponseInterface
     {
         $data = [
             'publication' => $payload->data(),
@@ -98,10 +101,10 @@ final class DescriptionResponder implements HttpResponderInterface
 
         $response->getBody()->write($body);
 
-        return MaybeResponse::just($response);
+        return $response;
     }
 
-    private function descriptionData($request, $payload): MaybeResponse
+    private function descriptionData($request, $payload): ResponseInterface
     {
         $data = ['description' => $payload->data()] + $payload->meta();
 
@@ -113,6 +116,34 @@ final class DescriptionResponder implements HttpResponderInterface
 
         $response->getBody()->write($body);
 
-        return MaybeResponse::just($response);
+        return $response;
+    }
+
+    private function resourceNotFound($request, $payload): ResponseInterface
+    {
+        $tpl = <<<EOT
+<!doctype html>
+<html>
+    <head>
+        <title>Not found</title>
+    </head>
+    <body>
+        <h1>Not found</h1>
+        <p>%s.</p>
+    </body>
+</html>
+EOT;
+
+        ['message' => $message] = $payload->meta();
+
+        $body = sprintf($tpl, $message);
+
+        $response = $this->factory
+            ->createResponse(200)
+            ->withHeader('content-type', 'text/html');
+
+        $response->getBody()->write($body);
+
+        return $response;
     }
 }

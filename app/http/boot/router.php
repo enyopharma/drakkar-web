@@ -15,20 +15,7 @@ return function (ContainerInterface $container) {
         $container->get(Zend\Expressive\Router\RouterInterface::class)
     );
 
-    $factory = function (string $action, string ...$responders) use ($container) {
-        return new App\Http\Middleware\LazyMiddleware(function () use ($container, $action, $responders) {
-            return new App\Http\Middleware\HandlerMiddleware(
-                new App\Http\Input\HttpInput,
-                $container->get($action),
-                $container->get(App\Http\Responders\JsonResponder::class),
-                ...array_map(function ($responder) use ($container) {
-                    return $container->get($responder);
-                }, $responders)
-            );
-        });
-    };
-
-    $routes = (require __DIR__ . '/../config/routes.php')($factory);
+    $routes = (require __DIR__ . '/../config/routes.php')();
 
     foreach ($routes as $endpoint => $route) {
         $parts = (array) preg_split('/\s+/', $endpoint);
@@ -37,15 +24,26 @@ return function (ContainerInterface $container) {
             throw new LogicException(sprintf('invalid endpoint \'%s\'', $endpoint));
         }
 
-        if (! key_exists('handler', $route)) {
-            throw new LogicException(sprintf('missing handler for endpoint \'%s\'', $endpoint));
+        if (! key_exists('action', $route)) {
+            throw new LogicException(sprintf('missing action for endpoint \'%s\'', $endpoint));
         }
 
         $method = (string) array_shift($parts);
         $path = (string) array_shift($parts);
         $name = $route['name'] ?? null;
-        $handler = $route['handler'];
+        $action = $route['action'];
+        $responder = $route['responder'] ?? App\Http\Responders\JsonResponder::class;
 
-        $collector->route($path, $handler, [$method], $name);
+        $middleware = new App\Http\Middleware\RequestHandlerMiddleware(
+            new App\Http\Handlers\LazyRequestHandler(function () use ($container, $action, $responder) {
+                return new App\Http\Handlers\Endpoint(
+                    new App\Http\Input\HttpInput,
+                    $container->get($action),
+                    $container->get($responder)
+                );
+            })
+        );
+
+        $collector->route($path, $middleware, [$method], $name);
     }
 };

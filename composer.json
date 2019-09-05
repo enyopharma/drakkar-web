@@ -20,6 +20,7 @@
         "league/plates": "^3.3",
         "middlewares/method-override": "^1.1",
         "middlewares/payload": "^2.1",
+        "middlewares/shutdown": "^1.1",
         "middlewares/whoops": "^1.2",
         "nyholm/psr7": "^1.1",
         "nyholm/psr7-server": "^0.3.0",
