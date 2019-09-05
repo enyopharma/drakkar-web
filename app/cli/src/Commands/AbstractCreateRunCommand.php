@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Cli\Commands;
 
+use Domain\Actions\CreateRun;
+
+use App\Cli\Responders\RunResponder;
+
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Domain\Actions\CreateRun;
-
-use App\Cli\Responders\CliResponder;
 
 abstract class AbstractCreateRunCommand extends Command
 {
@@ -21,7 +21,7 @@ abstract class AbstractCreateRunCommand extends Command
 
     private $responder;
 
-    public function __construct(string $type, CreateRun $domain, CliResponder $responder)
+    public function __construct(string $type, CreateRun $domain, RunResponder $responder)
     {
         $this->type = $type;
         $this->domain = $domain;

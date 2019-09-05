@@ -2,10 +2,15 @@
 
 declare(strict_types=1);
 
-use App\Cli\Responders\CliResponder;
+use App\Cli\Responders\RunResponder;
+use App\Cli\Responders\PublicationResponder;
 
 return [
-    CliResponder::class => function () {
-        return new CliResponder;
+    RunResponder::class => function () {
+        return new RunResponder;
+    },
+
+    PublicationResponder::class => function () {
+        return new PublicationResponder;
     },
 ];

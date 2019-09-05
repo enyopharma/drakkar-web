@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Cli\Commands;
 
+use Domain\Actions\PopulatePublication;
+
+use App\Cli\Responders\PublicationResponder;
+
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Domain\Actions\PopulatePublication;
-
-use App\Cli\Responders\CliResponder;
 
 final class PopulatePublicationCommand extends Command
 {
@@ -21,7 +21,7 @@ final class PopulatePublicationCommand extends Command
 
     private $responder;
 
-    public function __construct(PopulatePublication $domain, CliResponder $responder)
+    public function __construct(PopulatePublication $domain, PublicationResponder $responder)
     {
         $this->domain = $domain;
         $this->responder = $responder;

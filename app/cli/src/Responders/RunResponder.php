@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace App\Cli\Responders;
 
-use Symfony\Component\Console\Output\OutputInterface;
-
 use Domain\Payloads\DomainPayloadInterface;
 
-final class CliResponder implements CliResponderInterface
+use Symfony\Component\Console\Output\OutputInterface;
+
+final class RunResponder implements CliResponderInterface
 {
     public function __invoke(OutputInterface $output, DomainPayloadInterface $payload)
     {
@@ -29,11 +29,11 @@ final class CliResponder implements CliResponderInterface
         }
 
         if ($payload instanceof \Domain\Payloads\DomainConflict) {
-            return $this->domainFailure($output, $payload);
+            return $this->domainConflict($output, $payload);
         }
 
         if ($payload instanceof \Domain\Payloads\RuntimeFailure) {
-            return $this->domainFailure($output, $payload);
+            return $this->runtimeFailure($output, $payload);
         }
 
         throw new \LogicException(
@@ -50,17 +50,9 @@ final class CliResponder implements CliResponderInterface
 
     private function resourceUpdated($output, $payload)
     {
-        if ($payload->isAbout(\Domain\Run::class)) {
-            $tpl = '<info>Metadata of curation run with %s publications successfully updated.</info>';
+        $tpl = '<info>Metadata of curation run with %s publications successfully updated.</info>';
 
-            $output->writeln(sprintf($tpl, $payload->idstr()));
-        }
-
-        if ($payload->isAbout(\Domain\Publication::class)) {
-            $tpl = '<info>Metadata of publication with %s successfully updated.</info>';
-
-            $output->writeln(sprintf($tpl, $payload->idstr()));
-        }
+        $output->writeln(sprintf($tpl, $payload->idstr()));
     }
 
     private function resourceNotFound($output, $payload)
@@ -77,7 +69,12 @@ final class CliResponder implements CliResponderInterface
         return 1;
     }
 
-    private function domainFailure($output, $payload)
+    private function domainConflict($output, $payload)
+    {
+        $output->writeln(sprintf('<error>%s</error>', $payload->reason()));
+    }
+
+    private function runtimeFailure($output, $payload)
     {
         $output->writeln(sprintf('<error>%s</error>', $payload->reason()));
     }

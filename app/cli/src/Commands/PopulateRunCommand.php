@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Cli\Commands;
 
+use Domain\Actions\PopulateRun;
+
+use App\Cli\Responders\RunResponder;
+use App\Cli\Responders\PublicationResponder;
+
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-
-use Domain\Actions\PopulateRun;
-
-use App\Cli\Responders\CliResponder;
 
 final class PopulateRunCommand extends Command
 {
@@ -21,7 +22,7 @@ final class PopulateRunCommand extends Command
 
     private $responder;
 
-    public function __construct(PopulateRun $domain, CliResponder $responder)
+    public function __construct(PopulateRun $domain, RunResponder $responder)
     {
         $this->domain = $domain;
         $this->responder = $responder;
@@ -43,8 +44,10 @@ final class PopulateRunCommand extends Command
             'id' => (int) ((array) $input->getArgument('id'))[0],
         ];
 
-        $payload = ($this->domain)($input, function ($payload) use ($output) {
-            return ($this->responder)($output, $payload);
+        $responder = new PublicationResponder;
+
+        $payload = ($this->domain)($input, function ($payload) use ($responder, $output) {
+            return $responder($output, $payload);
         });
 
         return ($this->responder)($output, $payload);
