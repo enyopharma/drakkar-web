@@ -6,7 +6,7 @@ namespace Domain\Actions;
 
 use Domain\Payloads\PageOutOfRange;
 use Domain\Payloads\ResourceNotFound;
-use Domain\Payloads\DescriptionCollection;
+use Domain\Payloads\DomainDataCollection;
 use Domain\Payloads\DomainPayloadInterface;
 use Domain\ReadModel\RunViewInterface;
 use Domain\ReadModel\PublicationViewInterface;
@@ -67,10 +67,15 @@ final class CollectDescriptions implements DomainActionInterface
             ->all($run_id, $pmid, $limit, $offset)
             ->fetchAll();
 
-        return new DescriptionCollection($run, $publication, $descriptions, [
-            'page' => $page,
-            'total' => $total,
-            'limit' => $limit,
+        return new DomainDataCollection($descriptions, [
+            'run' => $run,
+            'publication' => $publication,
+            'state' => $state,
+            'pagination' => [
+                'page' => $page,
+                'total' => $total,
+                'limit' => $limit,
+            ],
         ]);
     }
 }

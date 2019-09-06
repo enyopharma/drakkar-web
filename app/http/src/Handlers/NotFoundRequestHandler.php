@@ -9,53 +9,47 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
+use League\Plates\Engine;
+
 final class NotFoundRequestHandler implements RequestHandlerInterface
 {
     private $factory;
 
-    public function __construct(ResponseFactoryInterface $factory)
+    private $engine;
+
+    public function __construct(ResponseFactoryInterface $factory, Engine $engine)
     {
         $this->factory = $factory;
+        $this->engine = $engine;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $accept = $request->getHeaderLine('Accept');
 
-        $reason = sprintf('Path %s does not exists', $request->getUri()->getPath());
+        $message = sprintf('Path %s does not exists', $request->getUri()->getPath());
 
         return strpos($accept, 'application/json') === false
-            ? $this->html($reason)
-            : $this->json($reason);
+            ? $this->html($message)
+            : $this->json($message);
     }
 
-    private function html(string $reason): ResponseInterface
+    private function html(string $message): ResponseInterface
     {
-        $tpl = <<<EOT
-<!doctype html>
-<html>
-    <head>
-        <title>Not found</title>
-    </head>
-    <body>
-        <h1>Not found</h1>
-        <p>%s.</p>
-    </body>
-</html>
-EOT;
-
         $response = $this->factory
             ->createResponse(404)
             ->withHeader('content-type', 'text/html');
 
-        $body = sprintf($tpl, $reason);
+        $body = $this->engine->render('_errors/404', [
+            'message' => $message,
+        ]);
 
         $response->getBody()->write($body);
 
         return $response;
     }
 
-    private function json(string $reason): ResponseInterface
+    private function json(string $message): ResponseInterface
     {
         $response = $this->factory
             ->createResponse(404)
@@ -64,7 +58,7 @@ EOT;
         $response->getBody()->write(json_encode([
             'code' => 404,
             'success' => false,
-            'reason' => $reason,
+            'reason' => $message,
             'data' => [],
         ]));
 

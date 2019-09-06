@@ -23,23 +23,23 @@ final class DatasetResponder implements HttpResponderInterface
 
     public function __invoke(ServerRequestInterface $request, DomainPayloadInterface $payload): ResponseInterface
     {
-        if ($payload instanceof \Domain\Payloads\Dataset) {
-            return $this->dataset($request, $payload);
+        if ($payload instanceof \Domain\Payloads\DomainData) {
+            return $this->domainData($request, $payload);
         }
 
         throw new UnexpectedPayload($this, $payload);
     }
 
-    private function dataset($request, $payload): ResponseInterface
+    private function domainData($request, $payload)
     {
         $filename = sprintf('vinland-%s', date('Y-m-d'));
 
-        ['statement' => $statement] = $payload->data();
+        ['dataset' => $dataset] = $payload->data();
 
         return $this->factory
             ->createResponse(200)
             ->withHeader('content-type', 'text/plain')
             ->withHeader('content-disposition', 'attachment; filename="' . $filename . '"')
-            ->withBody(IteratorStream::json($statement));
+            ->withBody(IteratorStream::json($dataset));
     }
 }

@@ -38,13 +38,13 @@ return function (): array {
         'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/create' => [
             'name' => 'runs.publications.descriptions.create',
             'action' => Domain\Actions\SelectPublication::class,
-            'responder' => App\Http\Responders\DescriptionResponder::class,
+            'responder' => App\Http\Responders\FormResponder::class,
         ],
 
         'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/edit' => [
             'name' => 'runs.publications.descriptions.edit',
             'action' => Domain\Actions\SelectDescription::class,
-            'responder' => App\Http\Responders\DescriptionResponder::class,
+            'responder' => App\Http\Responders\FormResponder::class,
         ],
 
         'POST /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions' => [

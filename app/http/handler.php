@@ -10,6 +10,8 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use App\Http\Handlers\Dispatcher;
 use App\Http\Handlers\NotFoundRequestHandler;
 
+use League\Plates\Engine;
+
 /**
  * A factory producing the application request handler.
  *
@@ -45,7 +47,8 @@ return function (string $env, bool $debug): RequestHandlerInterface {
      * Get the inner most request handler.
      */
     $handler = new NotFoundRequestHandler(
-        $container->get(ResponseFactoryInterface::class)
+        $container->get(ResponseFactoryInterface::class),
+        $container->get(Engine::class)
     );
 
     /**

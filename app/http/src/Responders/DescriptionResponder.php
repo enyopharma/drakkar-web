@@ -30,20 +30,12 @@ final class DescriptionResponder implements HttpResponderInterface
 
     public function __invoke(ServerRequestInterface $request, DomainPayloadInterface $payload): ResponseInterface
     {
-        if ($payload instanceof \Domain\Payloads\DescriptionCollection) {
+        if ($payload instanceof \Domain\Payloads\DomainDataCollection) {
             return $this->descriptionCollectionData($request, $payload);
         }
 
         if ($payload instanceof \Domain\Payloads\PageOutOfRange) {
             return $this->pageOutOfRange($request, $payload);
-        }
-
-        if ($payload instanceof \Domain\Payloads\Publication) {
-            return $this->publicationData($request, $payload);
-        }
-
-        if ($payload instanceof \Domain\Payloads\Description) {
-            return $this->descriptionData($request, $payload);
         }
 
         if ($payload instanceof \Domain\Payloads\ResourceNotFound) {
@@ -53,22 +45,22 @@ final class DescriptionResponder implements HttpResponderInterface
         throw new UnexpectedPayload($this, $payload);
     }
 
-    private function descriptionCollectionData($request, $payload): ResponseInterface
+    private function descriptionCollectionData($request, $payload)
     {
-        $data = ['descriptions' => $payload->data()] + $payload->meta();
-
-        $body = $this->engine->render('descriptions/index', $data);
-
         $response = $this->factory
             ->createResponse(200)
             ->withHeader('content-type', 'text/html');
+
+        $body = $this->engine->render('descriptions/index', [
+            'descriptions' => $payload->data()
+        ] + $payload->meta());
 
         $response->getBody()->write($body);
 
         return $response;
     }
 
-    private function pageOutOfRange($request, $payload): ResponseInterface
+    private function pageOutOfRange($request, $payload)
     {
         $run_id = (int) $request->getAttribute('run_id');
         $pmid = (int) $request->getAttribute('pmid');
@@ -86,61 +78,13 @@ final class DescriptionResponder implements HttpResponderInterface
             ->withHeader('location', $url);
     }
 
-    private function publicationData($request, $payload): ResponseInterface
+    private function resourceNotFound($request, $payload)
     {
-        $data = [
-            'publication' => $payload->data(),
-            'description' => [],
-        ] + $payload->meta();
-
-        $body = $this->engine->render('descriptions/form', $data);
-
         $response = $this->factory
-            ->createResponse(200)
+            ->createResponse(404)
             ->withHeader('content-type', 'text/html');
 
-        $response->getBody()->write($body);
-
-        return $response;
-    }
-
-    private function descriptionData($request, $payload): ResponseInterface
-    {
-        $data = ['description' => $payload->data()] + $payload->meta();
-
-        $body = $this->engine->render('descriptions/form', $data);
-
-        $response = $this->factory
-            ->createResponse(200)
-            ->withHeader('content-type', 'text/html');
-
-        $response->getBody()->write($body);
-
-        return $response;
-    }
-
-    private function resourceNotFound($request, $payload): ResponseInterface
-    {
-        $tpl = <<<EOT
-<!doctype html>
-<html>
-    <head>
-        <title>Not found</title>
-    </head>
-    <body>
-        <h1>Not found</h1>
-        <p>%s.</p>
-    </body>
-</html>
-EOT;
-
-        ['message' => $message] = $payload->meta();
-
-        $body = sprintf($tpl, $message);
-
-        $response = $this->factory
-            ->createResponse(200)
-            ->withHeader('content-type', 'text/html');
+        $body = $this->engine->render('_errors/404', $payload->meta());
 
         $response->getBody()->write($body);
 

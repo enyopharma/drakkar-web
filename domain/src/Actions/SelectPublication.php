@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Actions;
 
-use Domain\Payloads\Publication;
+use Domain\Payloads\DomainData;
 use Domain\Payloads\ResourceNotFound;
 use Domain\Payloads\DomainPayloadInterface;
 use Domain\ReadModel\RunViewInterface;
@@ -44,6 +44,8 @@ final class SelectPublication implements DomainActionInterface
             ]);
         }
 
-        return new Publication($run, $publication);
+        return new DomainData($publication, [
+            'run' => $run,
+        ]);
     }
 }

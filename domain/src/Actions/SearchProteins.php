@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Actions;
 
-use Domain\Payloads\ProteinCollection;
+use Domain\Payloads\DomainDataCollection;
 use Domain\Payloads\DomainPayloadInterface;
 use Domain\ReadModel\ProteinViewInterface;
 
@@ -25,6 +25,6 @@ final class SearchProteins implements DomainActionInterface
 
         $proteins = $this->proteins->search($type, $q, $limit)->fetchAll();
 
-        return new ProteinCollection($proteins);
+        return new DomainDataCollection($proteins);
     }
 }

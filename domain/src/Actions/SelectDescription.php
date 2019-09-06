@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Actions;
 
-use Domain\Payloads\Description;
+use Domain\Payloads\DomainData;
 use Domain\Payloads\ResourceNotFound;
 use Domain\Payloads\DomainPayloadInterface;
 use Domain\ReadModel\RunViewInterface;
@@ -60,6 +60,9 @@ final class SelectDescription implements DomainActionInterface
             ]);
         }
 
-        return new Description($run, $publication, $description);
+        return new DomainData($description, [
+            'run' => $run,
+            'publication' => $publication,
+        ]);
     }
 }

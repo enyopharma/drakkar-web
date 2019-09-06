@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Actions;
 
-use Domain\Payloads\Protein;
+use Domain\Payloads\DomainData;
 use Domain\Payloads\ResourceNotFound;
 use Domain\Payloads\DomainPayloadInterface;
 use Domain\ReadModel\ProteinViewInterface;
@@ -23,7 +23,7 @@ final class SelectProtein implements DomainActionInterface
         $accession = (string) $input['accession'];
 
         if ($protein = $this->proteins->accession($accession)->fetch()) {
-            return new Protein($protein);
+            return new DomainData($protein);
         }
 
         return new ResourceNotFound('protein', ['accession' => $accession]);

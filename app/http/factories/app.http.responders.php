@@ -2,14 +2,9 @@
 
 declare(strict_types=1);
 
-use Psr\Http\Message\ResponseFactoryInterface;
-
-use League\Plates\Engine;
-use Zend\Expressive\Helper\UrlHelper;
-
 use App\Http\Responders\RunResponder;
-use App\Http\Responders\HtmlResponder;
 use App\Http\Responders\JsonResponder;
+use App\Http\Responders\FormResponder;
 use App\Http\Responders\DatasetResponder;
 use App\Http\Responders\PublicationResponder;
 use App\Http\Responders\DescriptionResponder;
@@ -17,42 +12,43 @@ use App\Http\Responders\DescriptionResponder;
 return [
     RunResponder::class => function ($container) {
         return new RunResponder(
-            $container->get(ResponseFactoryInterface::class),
-            $container->get(Engine::class)
+            $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
+            $container->get(League\Plates\Engine::class)
         );
     },
 
     PublicationResponder::class => function ($container) {
         return new PublicationResponder(
-            $container->get(ResponseFactoryInterface::class),
-            $container->get(Engine::class),
-            $container->get(UrlHelper::class)
+            $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
+            $container->get(League\Plates\Engine::class),
+            $container->get(Zend\Expressive\Helper\UrlHelper::class)
         );
     },
 
     DescriptionResponder::class => function ($container) {
         return new DescriptionResponder(
-            $container->get(ResponseFactoryInterface::class),
-            $container->get(Engine::class),
-            $container->get(UrlHelper::class)
+            $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
+            $container->get(League\Plates\Engine::class),
+            $container->get(Zend\Expressive\Helper\UrlHelper::class)
+        );
+    },
+
+    FormResponder::class => function ($container) {
+        return new FormResponder(
+            $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
+            $container->get(League\Plates\Engine::class)
         );
     },
 
     DatasetResponder::class => function ($container) {
         return new DatasetResponder(
-            $container->get(ResponseFactoryInterface::class)
-        );
-    },
-
-    HtmlResponder::class => function ($container) {
-        return new HtmlResponder(
-            $container->get(ResponseFactoryInterface::class)
+            $container->get(Psr\Http\Message\ResponseFactoryInterface::class)
         );
     },
 
     JsonResponder::class => function ($container) {
         return new JsonResponder(
-            $container->get(ResponseFactoryInterface::class)
+            $container->get(Psr\Http\Message\ResponseFactoryInterface::class)
         );
     },
 ];

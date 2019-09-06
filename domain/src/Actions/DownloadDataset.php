@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Actions;
 
-use Domain\Payloads\Dataset;
+use Domain\Payloads\DomainData;
 use Domain\Payloads\DomainPayloadInterface;
 use Domain\ReadModel\DatasetViewInterface;
 
@@ -19,8 +19,10 @@ final class DownloadDataset implements DomainActionInterface
 
     public function __invoke(array $input): DomainPayloadInterface
     {
-        $statement = $this->dataset->all();
+        $dataset = $this->dataset->all();
 
-        return new Dataset($statement);
+        return new DomainData([
+            'dataset' => $dataset,
+        ]);
     }
 }

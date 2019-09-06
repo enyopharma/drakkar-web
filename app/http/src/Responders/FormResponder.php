@@ -12,7 +12,7 @@ use Domain\Payloads\DomainPayloadInterface;
 
 use League\Plates\Engine;
 
-final class RunResponder implements HttpResponderInterface
+final class FormResponder implements HttpResponderInterface
 {
     private $factory;
 
@@ -26,8 +26,8 @@ final class RunResponder implements HttpResponderInterface
 
     public function __invoke(ServerRequestInterface $request, DomainPayloadInterface $payload): ResponseInterface
     {
-        if ($payload instanceof \Domain\Payloads\DomainDataCollection) {
-            return $this->domainDataCollection($request, $payload);
+        if ($payload instanceof \Domain\Payloads\DomainData) {
+            return $this->domainData($request, $payload);
         }
 
         if ($payload instanceof \Domain\Payloads\ResourceNotFound) {
@@ -37,16 +37,20 @@ final class RunResponder implements HttpResponderInterface
         throw new UnexpectedPayload($this, $payload);
     }
 
-    private function domainDataCollection($request, $payload)
+    private function domainData($request, $payload)
     {
+        $data = $payload->data();
+        $meta = $payload->meta();
+
+        $data = key_exists('publication', $meta)
+            ? ['description' => $data] + $meta
+            : ['publication' => $data, 'description' => []] + $meta;
+
+        $body = $this->engine->render('descriptions/form', $data);
+
         $response = $this->factory
             ->createResponse(200)
             ->withHeader('content-type', 'text/html');
-
-        $body = $this->engine->render('runs/index', [
-            'user' => (array) $request->getAttribute('user', ['name' => 'Anonymous']),
-            'runs' => $payload->data(),
-        ]);
 
         $response->getBody()->write($body);
 

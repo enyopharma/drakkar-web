@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain\Payloads;
 
-final class DomainData implements DomainPayloadInterface
+final class DomainDataCollection implements DomainPayloadInterface
 {
     private $data;
 

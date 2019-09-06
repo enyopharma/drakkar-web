@@ -30,8 +30,8 @@ final class PublicationResponder implements HttpResponderInterface
 
     public function __invoke(ServerRequestInterface $request, DomainPayloadInterface $payload): ResponseInterface
     {
-        if ($payload instanceof \Domain\Payloads\PublicationCollection) {
-            return $this->publicationCollectionData($request, $payload);
+        if ($payload instanceof \Domain\Payloads\DomainDataCollection) {
+            return $this->domainDataCollection($request, $payload);
         }
 
         if ($payload instanceof \Domain\Payloads\PageOutOfRange) {
@@ -49,24 +49,22 @@ final class PublicationResponder implements HttpResponderInterface
         throw new UnexpectedPayload($this, $payload);
     }
 
-    private function publicationCollectionData($request, $payload): ResponseInterface
+    private function domainDataCollection($request, $payload)
     {
-        $query = (array) $request->getQueryParams();
-
-        $data = ['publications' => $payload->data()] + $payload->meta();
-
-        $body = $this->engine->render('publications/index', $data);
-
         $response = $this->factory
             ->createResponse(200)
             ->withHeader('content-type', 'text/html');
+
+        $body = $this->engine->render('publications/index', [
+            'publications' => $payload->data(),
+        ] + $payload->meta());
 
         $response->getBody()->write($body);
 
         return $response;
     }
 
-    private function pageOutOfRange($request, $payload): ResponseInterface
+    private function pageOutOfRange($request, $payload)
     {
         $query = (array) $request->getQueryParams();
 
@@ -83,7 +81,7 @@ final class PublicationResponder implements HttpResponderInterface
             ->withHeader('location', $url);
     }
 
-    private function resourceUpdated($request, $payload): ResponseInterface
+    private function resourceUpdated($request, $payload)
     {
         $body = $request->getParsedBody();
 
@@ -94,28 +92,13 @@ final class PublicationResponder implements HttpResponderInterface
             ->withHeader('location', $url);
     }
 
-    private function resourceNotFound($request, $payload): ResponseInterface
+    private function resourceNotFound($request, $payload)
     {
-        $tpl = <<<EOT
-<!doctype html>
-<html>
-    <head>
-        <title>Not found</title>
-    </head>
-    <body>
-        <h1>Not found</h1>
-        <p>%s.</p>
-    </body>
-</html>
-EOT;
-
-        ['message' => $message] = $payload->meta();
-
-        $body = sprintf($tpl, $message);
-
         $response = $this->factory
-            ->createResponse(200)
+            ->createResponse(404)
             ->withHeader('content-type', 'text/html');
+
+        $body = $this->engine->render('_errors/404', $payload->meta());
 
         $response->getBody()->write($body);
 
