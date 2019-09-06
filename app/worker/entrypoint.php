@@ -16,7 +16,7 @@ require __DIR__ . '/../../vendor/autoload.php';
  * Build the container.
  */
 $files = array_merge(
-    glob(__DIR__ . '/../../infrastructure/factories/predis.php')
+    (array) glob(__DIR__ . '/../../infrastructure/factories/predis.php')
 );
 
 $container = new Quanta\Container(array_reduce($files, function ($factories, $file) {

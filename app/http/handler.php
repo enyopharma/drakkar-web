@@ -24,9 +24,9 @@ return function (string $env, bool $debug): RequestHandlerInterface {
      * Build the container.
      */
     $files = array_merge(
-        glob(__DIR__ . '/../../infrastructure/factories/*.php'),
-        glob(__DIR__ . '/../../domain/factories/*.php'),
-        glob(__DIR__ . '/factories/*.php')
+        (array) glob(__DIR__ . '/../../infrastructure/factories/*.php'),
+        (array) glob(__DIR__ . '/../../domain/factories/*.php'),
+        (array) glob(__DIR__ . '/factories/*.php')
     );
 
     $container = new Quanta\Container(array_reduce($files, function ($factories, $file) {
@@ -36,7 +36,9 @@ return function (string $env, bool $debug): RequestHandlerInterface {
     /**
      * Run the boot scripts.
      */
-    foreach (glob(__DIR__ . '/boot/*.php') as $boot) (require $boot)($container);
+    foreach ((array) glob(__DIR__ . '/boot/*.php') as $boot) {
+        (require $boot)($container);
+    }
 
     /**
      * Get the middleware factories.

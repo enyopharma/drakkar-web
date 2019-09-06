@@ -16,9 +16,9 @@ require __DIR__ . '/../../vendor/autoload.php';
  * Build the container.
  */
 $files = array_merge(
-    glob(__DIR__ . '/../../infrastructure/factories/*.php'),
-    glob(__DIR__ . '/../../domain/factories/*.php'),
-    glob(__DIR__ . '/factories/*.php')
+    (array) glob(__DIR__ . '/../../infrastructure/factories/*.php'),
+    (array) glob(__DIR__ . '/../../domain/factories/*.php'),
+    (array) glob(__DIR__ . '/factories/*.php')
 );
 
 $container = new Quanta\Container(array_reduce($files, function ($factories, $file) {
@@ -38,7 +38,9 @@ $commands = (require __DIR__ . '/config/commands.php')($container);
 /**
  * add the commands to the application.
  */
-array_map([$application, 'add'], $commands);
+foreach ($commands as $command) {
+    $application->add($command);
+}
 
 /**
  * Run the cli application.
