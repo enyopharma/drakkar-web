@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 10.9 (Ubuntu 10.9-0ubuntu0.18.04.1)
--- Dumped by pg_dump version 10.9 (Ubuntu 10.9-0ubuntu0.18.04.1)
+-- Dumped from database version 10.10 (Ubuntu 10.10-0ubuntu0.18.04.1)
+-- Dumped by pg_dump version 10.10 (Ubuntu 10.10-0ubuntu0.18.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -94,7 +94,8 @@ CREATE TABLE public.descriptions (
     interactor1_id integer NOT NULL,
     interactor2_id integer NOT NULL,
     created_at timestamp(0) without time zone DEFAULT now() NOT NULL,
-    deleted_at timestamp(0) without time zone
+    deleted_at timestamp(0) without time zone,
+    stable_id character(10) NOT NULL
 );
 
 
@@ -365,6 +366,33 @@ ALTER SEQUENCE public.sequences_id_seq OWNED BY public.sequences.id;
 
 
 --
+-- Name: taxon; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.taxon (
+    taxon_id integer NOT NULL,
+    ncbi_taxon_id integer,
+    parent_taxon_id integer,
+    node_rank character varying(32),
+    genetic_code smallint,
+    mito_genetic_code smallint,
+    left_value integer,
+    right_value integer
+);
+
+
+--
+-- Name: taxon_name; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.taxon_name (
+    taxon_id integer NOT NULL,
+    name character varying(255) NOT NULL,
+    name_class character varying(32) NOT NULL
+);
+
+
+--
 -- Name: associations id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -460,6 +488,14 @@ ALTER TABLE ONLY public.descriptions
 
 
 --
+-- Name: descriptions descriptions_stable_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.descriptions
+    ADD CONSTRAINT descriptions_stable_id_key UNIQUE (stable_id);
+
+
+--
 -- Name: features features_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -529,6 +565,46 @@ ALTER TABLE ONLY public.runs
 
 ALTER TABLE ONLY public.sequences
     ADD CONSTRAINT sequences_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: taxon taxon_left_value_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.taxon
+    ADD CONSTRAINT taxon_left_value_key UNIQUE (left_value);
+
+
+--
+-- Name: taxon taxon_ncbi_taxon_id_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.taxon
+    ADD CONSTRAINT taxon_ncbi_taxon_id_key UNIQUE (ncbi_taxon_id);
+
+
+--
+-- Name: taxon taxon_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.taxon
+    ADD CONSTRAINT taxon_pkey PRIMARY KEY (taxon_id);
+
+
+--
+-- Name: taxon taxon_right_value_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.taxon
+    ADD CONSTRAINT taxon_right_value_key UNIQUE (right_value);
+
+
+--
+-- Name: taxon_name unique; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.taxon_name
+    ADD CONSTRAINT "unique" UNIQUE (taxon_id, name, name_class);
 
 
 --
@@ -650,6 +726,14 @@ ALTER TABLE ONLY public.associations
 
 ALTER TABLE ONLY public.associations
     ADD CONSTRAINT associations_run_id_fkey FOREIGN KEY (run_id) REFERENCES public.runs(id);
+
+
+--
+-- Name: taxon_name taxon_id; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.taxon_name
+    ADD CONSTRAINT taxon_id FOREIGN KEY (taxon_id) REFERENCES public.taxon(taxon_id) ON DELETE CASCADE;
 
 
 --

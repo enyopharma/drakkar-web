@@ -7,6 +7,7 @@ namespace Domain\Actions;
 use Domain\Run;
 use Domain\Protein;
 use Domain\Description;
+use Domain\Services\StableId;
 use Domain\Payloads\InputNotValid;
 use Domain\Payloads\DomainConflict;
 use Domain\Payloads\ResourceCreated;
@@ -76,15 +77,18 @@ SQL;
 
     const INSERT_DESCRIPTION_STH = <<<SQL
         INSERT INTO descriptions
-        (association_id, method_id, interactor1_id, interactor2_id)
-        VALUES (?, ?, ?, ?)
+        (association_id, method_id, interactor1_id, interactor2_id, stable_id)
+        VALUES (?, ?, ?, ?, ?)
 SQL;
 
     private $pdo;
 
-    public function __construct(\PDO $pdo)
+    private $stableid;
+
+    public function __construct(\PDO $pdo, StableId $stableid)
     {
         $this->pdo = $pdo;
+        $this->stableid = $stableid;
     }
 
     public function __invoke(array $input): DomainPayloadInterface
@@ -301,12 +305,31 @@ SQL;
 
         $interactor2['id'] = $this->pdo->lastInsertId();
 
-        $insert_description_sth->execute([
-            $association['id'],
-            $method['id'],
-            $interactor1['id'],
-            $interactor2['id'],
-        ]);
+        $tries = 0;
+        $inserted = false;
+
+        while (! $inserted && $tries < 10) {
+            try {
+                $tries++;
+
+                $inserted = $insert_description_sth->execute([
+                    $association['id'],
+                    $method['id'],
+                    $interactor1['id'],
+                    $interactor2['id'],
+                    $this->stableid->newStableId(),
+                ]);
+            }
+            catch (\PDOException $e) {
+                $inserted = false;
+            }
+        }
+
+        if (! $inserted) {
+            $this->pdo->rollback();
+
+            return new DomainConflict('Failed to save the description');
+        }
 
         $this->pdo->commit();
 

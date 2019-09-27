@@ -22,6 +22,7 @@ final class DatasetViewSql implements DatasetViewInterface
             ->select('i2.name AS name2, i2.start AS start2, i2.stop AS stop2, i2.mapping AS mapping2')
             ->select('p1.id AS protein1_id, p1.accession AS accession1')
             ->select('p2.id AS protein2_id, p2.accession AS accession2')
+            ->select('d.stable_id')
             ->from('runs AS r')
             ->from('associations AS a')
             ->from('descriptions AS d')
@@ -58,6 +59,7 @@ final class DatasetViewSql implements DatasetViewInterface
     private function formatted(array $description): array
     {
         return [
+            'stable_id' => $description['stable_id'],
             'publication' => [
                 'pmid' => $description['pmid'],
             ],

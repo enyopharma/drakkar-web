@@ -55,7 +55,8 @@ return [
 
     CreateDescription::class => function ($container) {
         return new CreateDescription(
-            $container->get(PDO::class)
+            $container->get(PDO::class),
+            new Domain\Services\StableId
         );
     },
 
