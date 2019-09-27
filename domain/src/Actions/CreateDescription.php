@@ -7,7 +7,6 @@ namespace Domain\Actions;
 use Domain\Run;
 use Domain\Protein;
 use Domain\Description;
-use Domain\Services\StableId;
 use Domain\Payloads\InputNotValid;
 use Domain\Payloads\DomainConflict;
 use Domain\Payloads\ResourceCreated;
@@ -83,12 +82,9 @@ SQL;
 
     private $pdo;
 
-    private $stableid;
-
-    public function __construct(\PDO $pdo, StableId $stableid)
+    public function __construct(\PDO $pdo)
     {
         $this->pdo = $pdo;
-        $this->stableid = $stableid;
     }
 
     public function __invoke(array $input): DomainPayloadInterface
@@ -317,7 +313,7 @@ SQL;
                     $method['id'],
                     $interactor1['id'],
                     $interactor2['id'],
-                    $this->stableid->newStableId(),
+                    'EY' . strtoupper(bin2hex(random_bytes(4))),
                 ]);
             }
             catch (\PDOException $e) {
