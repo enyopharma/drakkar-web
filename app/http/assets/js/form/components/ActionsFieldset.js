@@ -23,7 +23,7 @@ const ActionsFieldset = ({ top, feedback, saving, savable, resetable, save, rese
                         type="button"
                         className="btn btn-block btn-primary"
                         onClick={e => save()}
-                        disabled={saving || ! savable}
+                        disabled={saving || !savable}
                     >
                         {saving
                             ? <span className="spinner-border spinner-border-sm"></span>
@@ -38,7 +38,7 @@ const ActionsFieldset = ({ top, feedback, saving, savable, resetable, save, rese
                         type="button"
                         className="btn btn-block btn-primary"
                         onClick={e => setModal(true)}
-                        disabled={! resetable}
+                        disabled={!resetable}
                     >
                         <i className="fas fa-eraser" /> Reset form data
                     </button>
@@ -70,7 +70,7 @@ const ActionsFieldset = ({ top, feedback, saving, savable, resetable, save, rese
                 <div className={feedback.success ? 'text-success' : 'text-danger'}>
                     {feedback.success
                         ? 'Description successfully saved!'
-                        : feedback.message
+                        : <ul>{feedback.errors.map((e, i) => <li key={i}>{e}</li>)}</ul>
                     }
                 </div>
             )}

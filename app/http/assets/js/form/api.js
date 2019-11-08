@@ -4,7 +4,7 @@ import fetch from 'cross-fetch'
 const uuid = require('uuid/v4')
 
 const methods = {
-    search: q => fetch('/methods?' + qs.stringify({q: q}))
+    search: q => fetch('/methods?' + qs.stringify({ q: q }))
         .then(response => response.json())
         .then(json => json.data, error => console.log(error)),
 
@@ -14,7 +14,7 @@ const methods = {
 }
 
 const proteins = {
-    search: (type, q) => fetch('/proteins?' + qs.stringify({type: type, q: q}))
+    search: (type, q) => fetch('/proteins?' + qs.stringify({ type: type, q: q }))
         .then(response => response.json(), error => console.log(error))
         .then(json => json.data, error => console.log(error)),
 
@@ -75,8 +75,8 @@ const save = (run_id, pmid, body) => {
         },
         body: JSON.stringify(body)
     })
-    .then(response => response.json(), error => console.log(error))
-    .then(json => json, error => console.log(error))
+        .then(response => response.json(), error => console.log(error))
+        .then(json => json, error => console.log(error))
 }
 
 export default { methods, proteins, alignment, save }

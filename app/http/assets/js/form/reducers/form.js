@@ -17,7 +17,7 @@ const saving = (state = false, action) => {
 const feedback = (state = null, action) => {
     switch (action.type) {
         case actions.SHOW_FEEDBACK:
-            return { success: action.success, message: action.message }
+            return { success: action.success, errors: action.errors }
         default:
             return null
     }

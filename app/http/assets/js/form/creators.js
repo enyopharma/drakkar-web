@@ -124,13 +124,13 @@ const alignment = {
 }
 
 const save = (run_id, pmid) => {
-    return (dispatch, getState) =>  {
+    return (dispatch, getState) => {
         dispatch({ type: actions.FIRE_SAVE })
 
         api.save(run_id, pmid, getState()).then(json => dispatch({
             type: actions.SHOW_FEEDBACK,
             success: json.success,
-            message: json.reason,
+            errors: json.reason ? [json.reason] : json.errors,
         }))
     }
 }
