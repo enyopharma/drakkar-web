@@ -36,15 +36,15 @@ const MappingModal = ({ description, close }) => {
                             description.interactor1.mapping.length == 0 ? (
                                 <p>No mapping on interactor 1</p>
                             ) : (
-                                <Mapping
-                                    type="h"
-                                    name={description.interactor1.name}
-                                    start={description.interactor1.start}
-                                    stop={description.interactor1.stop}
-                                    protein={protein1}
-                                    mapping={description.interactor1.mapping}
-                                />
-                            )
+                                    <Mapping
+                                        type={description.interactor1.type == 'h' ? 'h' : 'v'}
+                                        name={description.interactor1.name}
+                                        start={description.interactor1.start}
+                                        stop={description.interactor1.stop}
+                                        protein={protein1}
+                                        mapping={description.interactor1.mapping}
+                                    />
+                                )
                         )}
                     </div>
                     <div className="col">
@@ -52,15 +52,15 @@ const MappingModal = ({ description, close }) => {
                             description.interactor2.mapping.length == 0 ? (
                                 <p>No mapping on interactor 2</p>
                             ) : (
-                                <Mapping
-                                    type={description.type == 'hh' ? 'h' : 'v'}
-                                    name={description.interactor2.name}
-                                    start={description.interactor2.start}
-                                    stop={description.interactor2.stop}
-                                    protein={protein2}
-                                    mapping={description.interactor2.mapping}
-                                />
-                            )
+                                    <Mapping
+                                        type={description.interactor2.type == 'h' ? 'h' : 'v'}
+                                        name={description.interactor2.name}
+                                        start={description.interactor2.start}
+                                        stop={description.interactor2.stop}
+                                        protein={protein2}
+                                        mapping={description.interactor2.mapping}
+                                    />
+                                )
                         )}
                     </div>
                 </div>
