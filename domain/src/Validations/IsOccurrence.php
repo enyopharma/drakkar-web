@@ -6,9 +6,12 @@ namespace Domain\Validations;
 
 use Quanta\Validation\Input;
 use Quanta\Validation\Error;
-use Quanta\Validation\Success;
 use Quanta\Validation\Failure;
 use Quanta\Validation\InputInterface;
+use Quanta\Validation\Rules\HasType;
+use Quanta\Validation\Rules\ArrayKey;
+use Quanta\Validation\Rules\IsLessThan;
+use Quanta\Validation\Rules\IsGreaterThan;
 
 final class IsOccurrence
 {
@@ -24,35 +27,39 @@ final class IsOccurrence
 
     public function __invoke(array $data): InputInterface
     {
-        $slice = new Slice;
-        $isflt = new IsTypedAs('float');
+        $isflt = new HasType('float');
         $ispos = new IsGreaterThan(0);
         $islt100 = new IsLessThan(100);
-        $iscdx = new IsCoordinates;
-        $arecdxvalid = \Closure::fromCallable([$this, 'areCdxValid']);
+        $iscoordinates = new IsCoordinates;
+        $arecoordinatesvalid = \Closure::fromCallable([$this, 'areCoordinatesValid']);
 
-        $factory = Input::pure(fn (array $cdx, float $identity) => [
-            'start' => $cdx['start'], 'stop' => $cdx['stop'], 'identity' => $identity,
+        $makeOccurrence = Input::map(fn (array $coordinates, float $identity) => [
+            'start' => $coordinates['start'],
+            'stop' => $coordinates['stop'],
+            'identity' => $identity,
         ]);
 
-        $cdx = Input::unit($data)->validate($iscdx, $arecdxvalid);
-        $identity = $slice($data, 'identity')->validate($isflt, $ispos, $islt100);
+        $makeCoordinates = new IsCoordinates;
+        $makeIdentity = new ArrayKey('identity', $isflt, $ispos, $islt100);
 
-        return $factory($cdx, $identity);
+        return $makeOccurrence(
+            $makeCoordinates($data),
+            $makeIdentity($data),
+        );
     }
 
-    private function areCdxValid(array $cdx): InputInterface
+    private function areCoordinatesValid(array $coordinates): InputInterface
     {
         $errors = [];
 
-        if ($cdx['stop'] > strlen($this->subject)) {
-            $errors[] = new Error('%%s => alignment coordinates must be inside the subject');
+        if ($coordinates['stop'] > strlen($this->subject)) {
+            $errors[] = new Error('occurrence must be inside the subject');
         }
 
-        if ($cdx['stop'] - $cdx['start'] + 1 != strlen($this->query)) {
-            $errors[] = new Error('%%s => alignment coordinates length must be equal to the query length');
+        if ($coordinates['stop'] - $coordinates['start'] + 1 != strlen($this->query)) {
+            $errors[] = new Error('occurrence length must be equal to the query length');
         }
 
-        return count($errors) == 0 ? new Success($cdx) : new Failure(...$errors);
+        return count($errors) == 0 ? Input::unit($coordinates) : new Failure(...$errors);
     }
 }

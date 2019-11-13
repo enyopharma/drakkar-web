@@ -6,9 +6,12 @@ namespace Domain\Validations;
 
 use Quanta\Validation\Input;
 use Quanta\Validation\Error;
-use Quanta\Validation\Success;
 use Quanta\Validation\Failure;
 use Quanta\Validation\InputInterface;
+use Quanta\Validation\Rules\HasType;
+use Quanta\Validation\Rules\ArrayShape;
+use Quanta\Validation\Rules\IsNotEmpty;
+use Quanta\Validation\Rules\IsMatching;
 
 final class IsMethod
 {
@@ -27,27 +30,26 @@ final class IsMethod
 
     public function __invoke(array $data): InputInterface
     {
-        $slice = new Slice;
-        $isstr = new IsTypedAs('string');
+        $isstr = new HasType('string');
         $isnotempty = new IsNotEmpty;
-        $ismatching = new IsMatching(self::PSIMI_ID_PATTERN);
-        $ismethod = \Closure::fromCallable([$this, 'isMethod']);
+        $ispsimiid = new IsMatching(self::PSIMI_ID_PATTERN);
+        $isexisting = \Closure::fromCallable([$this, 'isExistingPsimiId']);
 
-        $factory = Input::pure(fn (string $psimi_id) => compact('psimi_id'));
+        $makeIsoform = new ArrayShape([
+            'psimi_id' => [$isstr, $isnotempty, $ispsimiid, $isexisting],
+        ]);
 
-        $psimi_id = $slice($data, 'psimi_id')->validate($isstr, $isnotempty, $ismatching, $ismethod);
-
-        return $factory($psimi_id);
+        return $makeIsoform($data);
     }
 
-    public function isMethod(string $psimi_id): InputInterface
+    public function isExistingPsimiId(string $psimi_id): InputInterface
     {
         $select_method_sth = $this->pdo->prepare(self::SELECT_METHOD_SQL);
 
         $select_method_sth->execute([$psimi_id]);
 
         return $select_method_sth->fetch()
-            ? new Success($psimi_id)
-            : new Failure(new Error('%%s => no method with psimi id %s', $psimi_id));
+            ? Input::unit($psimi_id)
+            : new Failure(new Error(sprintf('no method with psimi id %s', $psimi_id)));
     }
 }

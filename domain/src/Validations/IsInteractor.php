@@ -8,9 +8,12 @@ use Domain\Protein;
 
 use Quanta\Validation\Input;
 use Quanta\Validation\Error;
-use Quanta\Validation\Success;
 use Quanta\Validation\Failure;
 use Quanta\Validation\InputInterface;
+use Quanta\Validation\Rules\HasType;
+use Quanta\Validation\Rules\ArrayKey;
+use Quanta\Validation\Rules\IsNotEmpty;
+use Quanta\Validation\Rules\IsMatching;
 
 final class IsInteractor
 {
@@ -28,19 +31,12 @@ final class IsInteractor
 
     public function __invoke(array $data): InputInterface
     {
-        $factory = Input::pure(fn (array $protein, string $name, array $cdx, array ...$mapping) => [
-            'protein' => $protein,
-            'name' => $name,
-            'start' => $cdx['start'],
-            'stop' => $cdx['stop'],
-            'mapping' => $mapping,
-        ]);
-
-        return Input::unit($data)->validate(
-            fn ($x) => $this->step1($factory, $x),
-            fn ($x) => $this->step2($factory, $x),
-            fn ($x) => $this->step3($factory, $x),
-            fn ($x) => $this->step4($factory, $x),
+        return Input::unit($data)->bind(
+            fn ($x) => $this->makeInteractor($x),
+            fn ($x) => $this->validateCoordinates($x),
+            fn ($x) => $this->isNameConsistent($x),
+            fn ($x) => $this->areCoordinatesConsistent($x),
+            fn ($x) => $this->validateAlignments($x),
         );
     }
 
@@ -49,25 +45,55 @@ final class IsInteractor
         $data = $this->source->protein($protein['accession']);
 
         return $data['type'] == $this->type
-            ? new Success($protein)
-            : new Failure(new Error('%%s => protein must have type %s', $this->type));
+            ? Input::unit($protein)
+            : new Failure(new Error('protein must have type %s', $this->type));
     }
 
-    private function areCdxValid(array $interactor): InputInterface
+    private function makeInteractor(array $data): InputInterface
+    {
+        $isarr = new HasType('array');
+        $isstr = new HasType('string');
+        $isnotempty = new IsNotEmpty;
+        $isname = new IsMatching(self::NAME_PATTERN);
+        $isprotein = new IsProtein($this->source);
+        $istypevalid = \Closure::fromCallable([$this, 'isTypeValid']);
+
+        $makeInteractor = Input::map(fn (array $protein, string $name, array $coordinates, array $mapping) => [
+            'protein' => $protein,
+            'name' => $name,
+            'start' => $coordinates['start'],
+            'stop' => $coordinates['stop'],
+            'mapping' => $mapping,
+        ]);
+
+        $makeProtein = new ArrayKey('protein', $isprotein, $istypevalid);
+        $makeName = new ArrayKey('name', $isstr, $isnotempty, $isname);
+        $makeCoordinates = new IsCoordinates;
+        $makeMapping = new ArrayKey('mapping', $isarr, Input::traverseA($isarr));
+
+        return $makeInteractor(
+            $makeProtein($data),
+            $makeName($data),
+            $makeCoordinates($data),
+            $makeMapping($data),
+        );
+    }
+
+    private function validateCoordinates(array $interactor): InputInterface
     {
         $data = $this->source->protein($interactor['protein']['accession']);
 
         $length = strlen($data['sequence']);
 
         if ($data['type'] == Protein::H && $interactor['stop'] != $length) {
-            return new Failure(new Error('%%s => human interactor must be full length'));
+            return new Failure(new Error('human interactor must be full length'));
         }
 
         if ($interactor['stop'] > $length) {
-            return new Failure(new Error('%%s => interactor coordinates must be inside the protein'));
+            return new Failure(new Error('interactor coordinates must be inside the protein'));
         }
 
-        return new Success($interactor);
+        return Input::unit($interactor);
     }
 
     private function isNameConsistent(array $interactor): InputInterface
@@ -79,18 +105,18 @@ final class IsInteractor
         );
 
         return ! $data || $interactor['name'] == $data['name']
-            ? new Success($interactor)
+            ? Input::unit($interactor)
             : new Failure(new Error(
-                '%%s => invalid name %s for interactor (%s, %s, %s) - %s expected',
-                $interactor['name'],
-                $interactor['protein']['accession'],
-                $interactor['start'],
-                $interactor['stop'],
-                $data['name'],
-            ));
+                vsprintf('invalid name %s for interactor (%s, %s, %s) - %s expected', [
+                    $interactor['name'],
+                    $interactor['protein']['accession'],
+                    $interactor['start'],
+                    $interactor['stop'],
+                    $data['name'],
+                ])));
     }
 
-    private function areCdxConsistent(array $interactor): InputInterface
+    private function areCoordinatesConsistent(array $interactor): InputInterface
     {
         $data = $this->source->coordinates(
             $interactor['protein']['accession'],
@@ -98,67 +124,27 @@ final class IsInteractor
         );
 
         return ! $data || ($interactor['start'] == $data['start'] && $interactor['stop'] == $data['stop'])
-            ? new Success($interactor)
+            ? Input::unit($interactor)
             : new Failure(new Error(
-                '%%s => invalid coordinates [%s - %s] for interactor (%s, %s) - [%s - %s] expected',
-                $interactor['start'],
-                $interactor['stop'],
-                $interactor['protein']['accession'],
-                $interactor['name'],
-                $data['start'],
-                $data['stop'],
-            ));
+                vsprintf('invalid coordinates [%s - %s] for interactor (%s, %s) - [%s - %s] expected', [
+                    $interactor['start'],
+                    $interactor['stop'],
+                    $interactor['protein']['accession'],
+                    $interactor['name'],
+                    $data['start'],
+                    $data['stop'],
+                ])));
     }
 
-    private function step1(callable $factory, array $data): InputInterface
+    private function validateAlignments(array $interactor): InputInterface
     {
-        $slice = new Slice;
-        $isarr = new IsTypedAs('array');
-        $isstr = new IsTypedAs('string');
-        $onkey = fn ($x) => new OnKey($x);
-        $isnotempty = new IsNotEmpty;
-        $isname = new IsMatching(self::NAME_PATTERN);
-        $isprotein = new IsProtein($this->source);
-        $istypevalid = \Closure::fromCallable([$this, 'isTypeValid']);
-        $iscdx = new IsCoordinates;
-
-        $protein = $slice($data, 'protein')->validate($isprotein, $istypevalid);
-        $name = $slice($data, 'name')->validate($isstr, $isnotempty, $isname);
-        $cdx = Input::unit($data)->validate($iscdx);
-        $mapping = $slice($data, 'mapping')->unpack($isarr);
-
-        return $factory($protein, $name, $cdx, ...$mapping);
-    }
-
-    private function step2(callable $factory, array $interactor): InputInterface
-    {
-        $arecdxvalid = \Closure::fromCallable([$this, 'areCdxValid']);
-
-        return Input::unit($interactor)->validate($arecdxvalid);
-    }
-
-    private function step3(callable $factory, array $interactor): InputInterface
-    {
-        $isnameconsistent = \Closure::fromCallable([$this, 'isNameConsistent']);
-        $arecdxconsistent = \Closure::fromCallable([$this, 'areCdxConsistent']);
-
-        return Input::unit($interactor)->validate($isnameconsistent, $arecdxconsistent);
-    }
-
-    private function step4(callable $factory, array $interactor): InputInterface
-    {
-        $isalignment = new IsAlignment(
+        $validate = new ArrayKey('mapping', Input::traverseA(new IsAlignment(
             $this->source,
             $interactor['protein']['accession'],
             $interactor['start'],
             $interactor['stop'],
-        );
+        )));
 
-        $protein = Input::unit($interactor['protein']);
-        $name = Input::unit($interactor['name']);
-        $cdx = Input::unit($interactor);
-        $mapping = (new Success($interactor['mapping'], 'mapping'))->unpack($isalignment);
-
-        return $factory($protein, $name, $cdx, ...$mapping);
+        return $validate($interactor)->bind(fn () => Input::unit($interactor));
     }
 }

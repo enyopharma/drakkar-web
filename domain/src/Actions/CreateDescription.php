@@ -194,6 +194,11 @@ final class CreateDescription implements DomainActionInterface
 
     private function failure(...$errors): DomainPayloadInterface
     {
-        return new InputNotValid(array_map(fn ($e) => $e->message(), $errors));
+        return new InputNotValid(array_map([$this, 'format'], $errors));
+    }
+
+    private function format($error): string
+    {
+        return '[descriptions]' . $error->name() . ' => ' . $error->message();
     }
 }

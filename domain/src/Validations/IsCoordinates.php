@@ -6,38 +6,39 @@ namespace Domain\Validations;
 
 use Quanta\Validation\Input;
 use Quanta\Validation\Error;
-use Quanta\Validation\Success;
 use Quanta\Validation\Failure;
 use Quanta\Validation\InputInterface;
+use Quanta\Validation\Rules\HasType;
+use Quanta\Validation\Rules\ArrayShape;
+use Quanta\Validation\Rules\IsGreaterThan;
 
 final class IsCoordinates
 {
     public function __invoke(array $data): InputInterface
     {
-        return Input::unit($data)->validate(
-            fn ($x) => $this->step1($x),
-            fn ($x) => $this->step2($x),
+        return Input::unit($data)->bind(
+            fn ($x) => $this->makeCoordinates($x),
+            fn ($x) => $this->validateCoordinates($x),
         );
     }
 
-    private function step1(array $data): InputInterface
+    private function makeCoordinates(array $data): InputInterface
     {
-        $slice = new Slice;
-        $isint = new IsTypedAs('integer');
+        $isint = new HasType('integer');
         $ispos = new IsGreaterThan(0);
 
-        $factory = Input::pure(fn (int $start, int $stop) => compact('start', 'stop'));
+        $makeCoordinates = new ArrayShape([
+            'start' => [$isint, $ispos],
+            'stop' => [$isint, $ispos],
+        ]);
 
-        $start = $slice($data, 'start')->validate($isint, $ispos);
-        $stop = $slice($data, 'stop')->validate($isint, $ispos);
-
-        return $factory($start, $stop);
+        return $makeCoordinates($data);
     }
 
-    private function step2(array $cdx): InputInterface
+    private function validateCoordinates(array $coordinates): InputInterface
     {
-        return $cdx['start'] <= $cdx['stop']
-            ? new Success($cdx)
-            : new Failure(new Error('%%s => start must be less than stop'));
+        return $coordinates['start'] <= $coordinates['stop']
+            ? Input::unit($coordinates)
+            : new Failure(new Error('start must be less than stop'));
     }
 }

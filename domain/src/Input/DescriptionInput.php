@@ -7,64 +7,39 @@ namespace Domain\Input;
 use Quanta\Validation\Input;
 use Quanta\Validation\InputInterface;
 
-use Domain\Run;
-use Domain\Protein;
-use Domain\Validations\Slice;
-use Domain\Validations\IsMethod;
-use Domain\Validations\IsTypedAs;
-use Domain\Validations\DataSource;
-use Domain\Validations\IsInteractor;
+use Domain\Validations\IsDescription;
 
 final class DescriptionInput
 {
-    private $method;
-    private $interactor1;
-    private $interactor2;
+    private $data;
 
     public static function from(\PDO $pdo, string $type, array $data): InputInterface
     {
-        if (! in_array($type, [Run::HH, Run::VH])) {
-            throw new \InvalidArgumentException(
-                sprintf('type must be either %s or %s, %s given', Run::HH, Run::VH, $type)
-            );
-        }
+        $makeDescription = new IsDescription($pdo, $type);
+        $makeInstance = fn (array $data) => Input::unit(new self($data));
 
-        $source = new DataSource($pdo);
-
-        $type1 = Protein::H;
-        $type2 = $type == Run::HH ? Protein::H : Protein::V;
-
-        $slice = new Slice;
-        $isarr = new IsTypedAs('array');
-
-        $factory = Input::pure(fn (...$xs) => new self(...$xs));
-
-        return $factory(
-            $slice($data, 'method')->validate($isarr, new IsMethod($pdo)),
-            $slice($data, 'interactor1')->validate($isarr, new IsInteractor($source, $type1)),
-            $slice($data, 'interactor2')->validate($isarr, new IsInteractor($source, $type2)),
-        );
+        return $makeDescription($data)->bind($makeInstance);
     }
 
-    private function __construct(array $method, array $interactor1, array $interactor2)
+    private function __construct(array $data)
     {
-        $this->method = $method;
-        $this->interactor1 = $interactor1;
-        $this->interactor2 = $interactor2;
+        $this->data['method'] = $data['method'];
+        $this->data['interactor1'] = $data['interactor1'];
+        $this->data['interactor2'] = $data['interactor2'];
     }
 
     public function method(): array
     {
-        return $this->method;
+        return $this->data['method'];
     }
 
     public function interactor1(): array
     {
-        return $this->interactor1;
+        return $this->data['interactor1'];
     }
 
     public function interactor2(): array
     {
-        return $this->interactor2;
+        return $this->data['interactor2'];
     }
 }

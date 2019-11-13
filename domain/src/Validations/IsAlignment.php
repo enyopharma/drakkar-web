@@ -6,10 +6,12 @@ namespace Domain\Validations;
 
 use Quanta\Validation\Input;
 use Quanta\Validation\Error;
-use Quanta\Validation\Success;
 use Quanta\Validation\Failure;
-use Quanta\Validation\NestedError;
 use Quanta\Validation\InputInterface;
+use Quanta\Validation\Rules\HasType;
+use Quanta\Validation\Rules\ArrayKey;
+use Quanta\Validation\Rules\ArrayShape;
+use Quanta\Validation\Rules\IsNotEmpty;
 
 final class IsAlignment
 {
@@ -35,13 +37,9 @@ final class IsAlignment
 
     public function __invoke(array $data): InputInterface
     {
-        $factory = Input::pure(fn (string $sequence, array ...$isoforms) => compact(
-            'sequence', 'isoforms',
-        ));
-
-        return Input::unit($data)->validate(
-            fn ($x) => $this->step1($factory, $x),
-            fn ($x) => $this->step2($factory, $x),
+        return Input::unit($data)->bind(
+            fn ($x) => $this->makeAlignment($x),
+            fn ($x) => $this->validateIsoforms($x),
         );
     }
 
@@ -50,43 +48,41 @@ final class IsAlignment
         $errors = [];
 
         if (strlen($sequence) < self::MIN_LENGTH) {
-            $errors[] = new Error('%%s => length must be greater than or equal to %s', self::MIN_LENGTH);
+            $errors[] = new Error(sprintf('length must be greater than or equal to %s', self::MIN_LENGTH));
         }
 
         if (preg_match(self::SEQUENCE_PATTERN, $sequence) !== 1) {
-            $errors[] = new Error('%%s => must contain only letters');
+            $errors[] = new Error('must contain only letters');
         }
 
-        return count($errors) == 0 ? new Success($sequence) : new Failure(...$errors);
+        return count($errors) == 0 ? Input::unit($sequence) : new Failure(...$errors);
     }
 
-    private function step1(callable $factory, array $data): InputInterface
+    private function makeAlignment(array $data): InputInterface
     {
-        $slice = new Slice;
-        $isarr = new IsTypedAs('array');
-        $isstr = new IsTypedAs('string');
+        $isarr = new HasType('array');
+        $isstr = new HasType('string');
         $isnotempty = new IsNotEmpty;
         $issequence = \Closure::fromCallable([$this, 'isSequence']);
 
-        $sequence = $slice($data, 'sequence')->validate($isstr, $isnotempty, $issequence);
-        $isoforms = $slice($data, 'isoforms')->validate($isarr)->unpack($isarr);
+        $makeAlignment = new ArrayShape([
+            'sequence' => [$isstr, $isnotempty, $issequence],
+            'isoforms' => [$isarr, Input::traverseA($isarr)],
+        ]);
 
-        return $factory($sequence, ...$isoforms);
+        return $makeAlignment($data);
     }
 
-    private function step2(callable $factory, array $alignment): InputInterface
+    private function validateIsoforms(array $alignment): InputInterface
     {
-        $isiso = new IsIsoform(
+        $validate = new ArrayKey('isoforms', Input::traverseA(new IsIsoform(
             $this->source,
             $this->protein,
             $this->start,
             $this->stop,
             $alignment['sequence'],
-        );
+        )));
 
-        $sequence = Input::unit($alignment['sequence']);
-        $isoforms = (new Success($alignment['isoforms'], 'isoforms'))->unpack($isiso);
-
-        return $factory($sequence, ...$isoforms);
+        return $validate($alignment)->bind(fn () => Input::unit($alignment));
     }
 }

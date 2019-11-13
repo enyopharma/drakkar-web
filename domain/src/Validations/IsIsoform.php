@@ -6,10 +6,13 @@ namespace Domain\Validations;
 
 use Quanta\Validation\Input;
 use Quanta\Validation\Error;
-use Quanta\Validation\Success;
 use Quanta\Validation\Failure;
-use Quanta\Validation\NestedError;
 use Quanta\Validation\InputInterface;
+use Quanta\Validation\Rules\HasType;
+use Quanta\Validation\Rules\ArrayKey;
+use Quanta\Validation\Rules\ArrayShape;
+use Quanta\Validation\Rules\IsNotEmpty;
+use Quanta\Validation\Rules\IsMatching;
 
 final class IsIsoform
 {
@@ -36,21 +39,19 @@ final class IsIsoform
 
     public function __invoke(array $data): InputInterface
     {
-        $factory = Input::pure(fn (string $accession, array ...$occurrences) => compact(
-            'accession', 'occurrences',
-        ));
-
-        return Input::unit($data)->validate(
-            fn ($x) => $this->step1($factory, $x),
-            fn ($x) => $this->step2($factory, $x),
+        return Input::unit($data)->bind(
+            fn ($x) => $this->makeIsoform($x),
+            fn ($x) => $this->validateOccurrences($x),
         );
     }
 
     private function isSequence(string $accession): InputInterface
     {
         return $this->source->sequence($accession)
-            ? new Success($accession)
-            : new Failure(new Error('%%s => no sequence with accession %s', $accession));
+            ? Input::unit($accession)
+            : new Failure(new Error(
+                sprintf('no sequence with accession %s', $accession)
+            ));
     }
 
     private function isIsoform(string $accession): InputInterface
@@ -58,31 +59,30 @@ final class IsIsoform
         $data = $this->source->sequence($accession);
 
         return $data['protein'] == $this->protein
-            ? new Success($accession)
+            ? Input::unit($accession)
             : new Failure(new Error(
-                '%%s => protein with accession %s has no isoform with accession %s',
-                $this->protein,
-                $accession,
+                sprintf('protein with accession %s has no isoform with accession %s', $this->protein, $accession)
             ));
     }
 
-    private function step1(callable $factory, array $data): InputInterface
+    private function makeIsoform(array $data): InputInterface
     {
-        $slice = new Slice;
-        $isarr = new IsTypedAs('array');
-        $isstr = new IsTypedAs('string');
+        $isarr = new HasType('array');
+        $isstr = new HasType('string');
         $isnotempty = new IsNotEmpty;
         $isaccession = new IsMatching(self::ACCESSION_PATTERN);
-        $isseq = \Closure::fromCallable([$this, 'isSequence']);
-        $isiso = \Closure::fromCallable([$this, 'isIsoform']);
+        $issequence = \Closure::fromCallable([$this, 'isSequence']);
+        $isisoform = \Closure::fromCallable([$this, 'isIsoform']);
 
-        $accession = $slice($data, 'accession')->validate($isstr, $isnotempty, $isaccession, $isseq, $isiso);
-        $occurrences = $slice($data, 'occurrences')->validate($isarr)->unpack($isarr);
+        $makeIsoform = new ArrayShape([
+            'accession' => [$isstr, $isnotempty, $isaccession, $issequence, $isisoform],
+            'occurrences' => [$isarr, Input::traverseA($isarr)],
+        ]);
 
-        return $factory($accession, ...$occurrences);
+        return $makeIsoform($data);
     }
 
-    private function step2(callable $factory, array $isoform): InputInterface
+    private function validateOccurrences(array $isoform): InputInterface
     {
         $data = $this->source->sequence($isoform['accession']);
 
@@ -90,11 +90,11 @@ final class IsIsoform
             ? substr($data['sequence'], $this->start, (int) ($this->stop - $this->start + 1))
             : $data['sequence'];
 
-        $isocc = new IsOccurrence($subject, $this->query);
+        $validate = new ArrayKey('occurrences', Input::traverseA(new IsOccurrence(
+            $subject,
+            $this->query,
+        )));
 
-        $accession = Input::unit($isoform['accession']);
-        $occurrences = (new Success($isoform['occurrences'], 'occurrences'))->unpack($isocc);
-
-        return $factory($accession, ...$occurrences);
+        return $validate($isoform)->bind(fn () => Input::unit($isoform));
     }
 }

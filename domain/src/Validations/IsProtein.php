@@ -6,9 +6,12 @@ namespace Domain\Validations;
 
 use Quanta\Validation\Input;
 use Quanta\Validation\Error;
-use Quanta\Validation\Success;
 use Quanta\Validation\Failure;
 use Quanta\Validation\InputInterface;
+use Quanta\Validation\Rules\HasType;
+use Quanta\Validation\Rules\ArrayShape;
+use Quanta\Validation\Rules\IsNotEmpty;
+use Quanta\Validation\Rules\IsMatching;
 
 final class IsProtein
 {
@@ -23,23 +26,22 @@ final class IsProtein
 
     public function __invoke(array $data): InputInterface
     {
-        $slice = new Slice;
-        $isstr = new IsTypedAs('string');
+        $isstr = new HasType('string');
         $isnotempty = new IsNotEmpty;
         $isaccession = new IsMatching(self::ACCESSION_PATTERN);
-        $isprotein = \Closure::fromCallable([$this, 'isProtein']);
+        $isexisting = \Closure::fromCallable([$this, 'isExistingAccession']);
 
-        $factory = Input::pure(fn (string $accession) => compact('accession'));
+        $makeProtein = new ArrayShape([
+            'accession' => [$isstr, $isnotempty, $isaccession, $isexisting],
+        ]);
 
-        $accession = $slice($data, 'accession')->validate($isstr, $isnotempty, $isaccession, $isprotein);
-
-        return $factory($accession);
+        return $makeProtein($data);
     }
 
-    public function isProtein(string $accession): InputInterface
+    public function isExistingAccession(string $accession): InputInterface
     {
         return $this->source->protein($accession)
-            ? new Success($accession)
-            : new Failure(new Error('%%s => no protein with accession %s', $accession));
+            ? Input::unit($accession)
+            : new Failure(new Error('no protein with accession %s', $accession));
     }
 }
