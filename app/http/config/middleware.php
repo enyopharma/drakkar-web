@@ -26,11 +26,6 @@ return function (ContainerInterface $container): array {
         new Middlewares\Whoops,
 
         /**
-         * SSO auth.
-         */
-        new App\Http\Middleware\SsoAuthentificationMiddleware($_ENV['SSO_HOST'], $factory),
-
-        /**
          * Override the post method
          */
         (new Middlewares\MethodOverride)->parsedBodyParameter('_method'),
