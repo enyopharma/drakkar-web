@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "358963d5c398342649f10b6119f8d681",
+    "content-hash": "b6039f8190acbf8ea1b4c705964d4501",
     "packages": [
         {
             "name": "dflydev/fig-cookies",
@@ -1319,16 +1319,16 @@
         },
         {
             "name": "quanta/validation",
-            "version": "0.1",
+            "version": "0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quantaphp/validation.git",
-                "reference": "974d595c7267be9a0db291b92345d620e129168a"
+                "reference": "bd813653bf6da082371a61ef8ee7d32d95945b47"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/validation/zipball/974d595c7267be9a0db291b92345d620e129168a",
-                "reference": "974d595c7267be9a0db291b92345d620e129168a",
+                "url": "https://api.github.com/repos/quantaphp/validation/zipball/bd813653bf6da082371a61ef8ee7d32d95945b47",
+                "reference": "bd813653bf6da082371a61ef8ee7d32d95945b47",
                 "shasum": ""
             },
             "require": {
@@ -1361,7 +1361,7 @@
                 "input",
                 "validation"
             ],
-            "time": "2019-11-13T12:26:37+00:00"
+            "time": "2019-11-14T11:11:00+00:00"
         },
         {
             "name": "ralouphie/getallheaders",

@@ -10,7 +10,7 @@ use Quanta\Validation\Failure;
 use Quanta\Validation\InputInterface;
 use Quanta\Validation\Rules\HasType;
 use Quanta\Validation\Rules\ArrayKey;
-use Quanta\Validation\Rules\ArrayShape;
+use Quanta\Validation\Rules\ArrayKeys;
 use Quanta\Validation\Rules\IsNotEmpty;
 use Quanta\Validation\Rules\IsMatching;
 
@@ -74,7 +74,7 @@ final class IsIsoform
         $issequence = \Closure::fromCallable([$this, 'isSequence']);
         $isisoform = \Closure::fromCallable([$this, 'isIsoform']);
 
-        $makeIsoform = new ArrayShape([
+        $makeIsoform = new ArrayKeys([
             'accession' => [$isstr, $isnotempty, $isaccession, $issequence, $isisoform],
             'occurrences' => [$isarr, Input::traverseA($isarr)],
         ]);

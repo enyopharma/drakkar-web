@@ -9,7 +9,7 @@ use Quanta\Validation\Error;
 use Quanta\Validation\Failure;
 use Quanta\Validation\InputInterface;
 use Quanta\Validation\Rules\HasType;
-use Quanta\Validation\Rules\ArrayShape;
+use Quanta\Validation\Rules\ArrayKeys;
 use Quanta\Validation\Rules\IsNotEmpty;
 use Quanta\Validation\Rules\IsMatching;
 
@@ -35,7 +35,7 @@ final class IsMethod
         $ispsimiid = new IsMatching(self::PSIMI_ID_PATTERN);
         $isexisting = \Closure::fromCallable([$this, 'isExistingPsimiId']);
 
-        $makeIsoform = new ArrayShape([
+        $makeIsoform = new ArrayKeys([
             'psimi_id' => [$isstr, $isnotempty, $ispsimiid, $isexisting],
         ]);
 

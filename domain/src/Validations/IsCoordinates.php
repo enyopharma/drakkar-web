@@ -9,7 +9,7 @@ use Quanta\Validation\Error;
 use Quanta\Validation\Failure;
 use Quanta\Validation\InputInterface;
 use Quanta\Validation\Rules\HasType;
-use Quanta\Validation\Rules\ArrayShape;
+use Quanta\Validation\Rules\ArrayKeys;
 use Quanta\Validation\Rules\IsGreaterThan;
 
 final class IsCoordinates
@@ -27,7 +27,7 @@ final class IsCoordinates
         $isint = new HasType('integer');
         $ispos = new IsGreaterThan(0);
 
-        $makeCoordinates = new ArrayShape([
+        $makeCoordinates = new ArrayKeys([
             'start' => [$isint, $ispos],
             'stop' => [$isint, $ispos],
         ]);

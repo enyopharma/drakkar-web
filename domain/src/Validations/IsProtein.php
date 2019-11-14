@@ -9,7 +9,7 @@ use Quanta\Validation\Error;
 use Quanta\Validation\Failure;
 use Quanta\Validation\InputInterface;
 use Quanta\Validation\Rules\HasType;
-use Quanta\Validation\Rules\ArrayShape;
+use Quanta\Validation\Rules\ArrayKeys;
 use Quanta\Validation\Rules\IsNotEmpty;
 use Quanta\Validation\Rules\IsMatching;
 
@@ -31,7 +31,7 @@ final class IsProtein
         $isaccession = new IsMatching(self::ACCESSION_PATTERN);
         $isexisting = \Closure::fromCallable([$this, 'isExistingAccession']);
 
-        $makeProtein = new ArrayShape([
+        $makeProtein = new ArrayKeys([
             'accession' => [$isstr, $isnotempty, $isaccession, $isexisting],
         ]);
 

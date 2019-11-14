@@ -10,7 +10,7 @@ use Quanta\Validation\Failure;
 use Quanta\Validation\InputInterface;
 use Quanta\Validation\Rules\HasType;
 use Quanta\Validation\Rules\ArrayKey;
-use Quanta\Validation\Rules\ArrayShape;
+use Quanta\Validation\Rules\ArrayKeys;
 use Quanta\Validation\Rules\IsNotEmpty;
 
 final class IsAlignment
@@ -65,7 +65,7 @@ final class IsAlignment
         $isnotempty = new IsNotEmpty;
         $issequence = \Closure::fromCallable([$this, 'isSequence']);
 
-        $makeAlignment = new ArrayShape([
+        $makeAlignment = new ArrayKeys([
             'sequence' => [$isstr, $isnotempty, $issequence],
             'isoforms' => [$isarr, Input::traverseA($isarr)],
         ]);

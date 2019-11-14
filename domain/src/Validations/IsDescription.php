@@ -7,7 +7,7 @@ namespace Domain\Validations;
 use Quanta\Validation\Input;
 use Quanta\Validation\InputInterface;
 use Quanta\Validation\Rules\HasType;
-use Quanta\Validation\Rules\ArrayShape;
+use Quanta\Validation\Rules\ArrayKeys;
 
 use Domain\Run;
 use Domain\Protein;
@@ -39,7 +39,7 @@ final class IsDescription
 
         $isarr = new HasType('array');
 
-        $makeDescription = new ArrayShape([
+        $makeDescription = new ArrayKeys([
             'method' => [$isarr, new IsMethod($this->pdo)],
             'interactor1' => [$isarr, new IsInteractor($source, $type1)],
             'interactor2' => [$isarr, new IsInteractor($source, $type2)],
