@@ -43,7 +43,7 @@ return function (string $env, bool $debug): RequestHandlerInterface {
     /**
      * Get the middleware factories.
      */
-    $middleware = (require __DIR__ . '/config/middleware.php')($container);
+    $middleware = (require __DIR__ . '/middleware.php')($container);
 
     /**
      * Get the inner most request handler.

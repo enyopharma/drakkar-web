@@ -5,12 +5,12 @@ declare(strict_types=1);
 /**
  * Set up the autoloader.
  */
-require __DIR__ . '/../../vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 /**
  * Complete the env with local values.
  */
-(new Symfony\Component\Dotenv\Dotenv(false))->load(__DIR__ . '/../../.env');
+(new Symfony\Component\Dotenv\Dotenv(false))->load(__DIR__ . '/../.env');
 
 /**
  * Get the env and debug mod from the env var.
@@ -26,7 +26,7 @@ $debug = ($val = $_ENV['APP_DEBUG'] ?? getenv('APP_DEBUG')) === false
 /**
  * Get the http application.
  */
-$application = (require __DIR__ . '/handler.php')($environment, $debug);
+$application = (require __DIR__ . '/../app/http/handler.php')($environment, $debug);
 
 /**
  * Wrapp the http application insinde a fake http server.

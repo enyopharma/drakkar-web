@@ -1,1 +1,48 @@
-app/cli/entrypoint.php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Set up the autoloader.
+ */
+require __DIR__ . '/vendor/autoload.php';
+
+/**
+ * Complete the env with local values.
+ */
+(new Symfony\Component\Dotenv\Dotenv(false))->load(__DIR__ . '/.env');
+
+/**
+ * Build the container.
+ */
+$files = array_merge(
+    (array) glob(__DIR__ . '/infrastructure/factories/*.php'),
+    (array) glob(__DIR__ . '/domain/factories/*.php'),
+    (array) glob(__DIR__ . '/app/cli/factories/*.php')
+);
+
+$container = new Quanta\Container(array_reduce($files, function ($factories, $file) {
+    return array_merge($factories, require $file);
+}, []));
+
+/**
+ * Get the cli application.
+ */
+$application = (require __DIR__ . '/app/cli/application.php')($container);
+
+/**
+ * Get the commands.
+ */
+$commands = (require __DIR__ . '/app/cli/commands.php')($container);
+
+/**
+ * add the commands to the application.
+ */
+foreach ($commands as $command) {
+    $application->add($command);
+}
+
+/**
+ * Run the cli application.
+ */
+return $application->run();

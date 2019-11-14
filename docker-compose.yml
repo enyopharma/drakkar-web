@@ -41,7 +41,7 @@ services:
         image: enyopharma/alignment:7.2
         user: ${UID}:${GID}
         volumes:
-            - ./process/worker.conf:/etc/process.conf:ro
+            - ./process/alignment.conf:/etc/process.conf:ro
             - .:/opt:rw
         depends_on:
             - redis

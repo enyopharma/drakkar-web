@@ -49,7 +49,7 @@ return [
     },
 
     AssetsExtension::class => function ($container) {
-        return new AssetsExtension(__DIR__ . '/../public/build/manifest.json');
+        return new AssetsExtension(__DIR__ . '/../../../public/build/manifest.json');
     },
 
     HelpersExtension::class => function () {
