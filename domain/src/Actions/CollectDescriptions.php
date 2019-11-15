@@ -70,7 +70,6 @@ final class CollectDescriptions implements DomainActionInterface
         return new DomainDataCollection($descriptions, [
             'run' => $run,
             'publication' => $publication,
-            'state' => $state,
             'pagination' => [
                 'page' => $page,
                 'total' => $total,
