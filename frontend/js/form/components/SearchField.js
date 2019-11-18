@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react'
 
-const SearchField = ({ query, update, search, select, max=5, children }) => {
+const SearchField = ({ query, update, search, select, max = 5, children }) => {
     const timeout = useRef(null)
     const [results, setResults] = useState([]);
     const [visible, setVisible] = useState(false)
@@ -24,7 +24,7 @@ const SearchField = ({ query, update, search, select, max=5, children }) => {
     }, [query])
 
     useEffect(() => setActive(0), [results])
-    useEffect(() => setVisible(! searching), [searching])
+    useEffect(() => setVisible(!searching), [searching])
 
     const regex = query.trim()
         .replace(/\s*\+$/, '')
@@ -46,7 +46,7 @@ const SearchField = ({ query, update, search, select, max=5, children }) => {
             ? results.slice(0, max).length
             : results.length
 
-        if (! visible && (e.keyCode == 38 || e.keyCode == 40)) {
+        if (!visible && (e.keyCode == 38 || e.keyCode == 40)) {
             setVisible(true)
         }
 
@@ -74,7 +74,7 @@ const SearchField = ({ query, update, search, select, max=5, children }) => {
                     <span className="input-group-text">
                         {searching
                             ? <span className="spinner-border spinner-border-sm"></span>
-                            : <i className="fas fa-search" />
+                            : <span className="fas fa-search"></span>
                         }
                     </span>
                 </div>
@@ -90,19 +90,19 @@ const SearchField = ({ query, update, search, select, max=5, children }) => {
                     onKeyDown={handleKeyDown}
                 />
             </div>
-            <div style={{position: 'relative', display: visible && results.length > 0 ? 'block' : 'none'}}>
-                <div style={{position: 'absolute', width: '100%', zIndex: 100}}>
+            <div style={{ position: 'relative', display: visible && results.length > 0 ? 'block' : 'none' }}>
+                <div style={{ position: 'absolute', width: '100%', zIndex: 100 }}>
                     <ul className="list-group">
-                    {results.slice(0, max).map((result, index) => (
-                        <li
-                            key={index}
-                            className={'list-group-item' + (active == index ? ' active' : '')}
-                            onMouseOver={e => setActive(index)}
-                            onMouseDown={e => selectValue(result.value)}
-                            dangerouslySetInnerHTML={{ __html: highlight(result.label) }}
-                        >
-                        </li>
-                    ))}
+                        {results.slice(0, max).map((result, index) => (
+                            <li
+                                key={index}
+                                className={'list-group-item' + (active == index ? ' active' : '')}
+                                onMouseOver={e => setActive(index)}
+                                onMouseDown={e => selectValue(result.value)}
+                                dangerouslySetInnerHTML={{ __html: highlight(result.label) }}
+                            >
+                            </li>
+                        ))}
                     </ul>
                 </div>
             </div>

@@ -1,41 +1,64 @@
-// Symfony encore configuration
-var Encore = require('@symfony/webpack-encore');
+const path = require('path')
 
-Encore
-    // the project directory where all compiled assets will be stored
-    .setOutputPath('./public/build/')
+const ManifestPlugin = require('webpack-manifest-plugin')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
+const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 
-    // the public path used by the web server to access the previous directory
-    .setPublicPath('/build')
-
-    // will create web/build/app.js and web/build/app.css
-    .addEntry('app', './frontend/js/app.js')
-    .addEntry('form', './frontend/js/form/index.js')
-    .addEntry('search', './frontend/js/search/index.js')
-    .addEntry('table', './frontend/js/table/index.js')
-
-    // enable runtime chunks
-    .enableSingleRuntimeChunk()
-
-    // allow sass/scss files to be processed
-    .enableSassLoader()
-
-    // allow legacy applications to use $/jQuery as a global variable
-    .autoProvidejQuery()
-
-    .enableSourceMaps(!Encore.isProduction())
-
-    // empty the outputPath dir before each build
-    .cleanupOutputBeforeBuild()
-
-    // show OS notifications when builds finish/fail
-    .enableBuildNotifications()
-
-    // create hashed filenames (e.g. app.abc123.css)
-    .enableVersioning()
-
-    // enable reactjs
-    .enableReactPreset()
-    ;
-
-module.exports = Encore.getWebpackConfig();
+module.exports = (env, argv) => {
+    return {
+        entry: {
+            app: './frontend/js/app.js',
+            form: './frontend/js/form/index.js',
+            search: './frontend/js/search/index.js',
+            table: './frontend/js/table/index.js',
+        },
+        watch: argv.mode == 'development',
+        devtool: argv.mode == 'development' ? 'inline-source-map' : false,
+        output: {
+            filename: '[name].[contenthash].js',
+            path: path.resolve(__dirname, './public/build'),
+            publicPath: 'build/',
+        },
+        resolve: {
+            extensions: ['.jsx', '.js', '.scss'],
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.js(x?)$/,
+                    exclude: /node_modules/,
+                    use: {
+                        loader: 'babel-loader',
+                        options: {
+                            presets: ['@babel/preset-env', '@babel/preset-react']
+                        },
+                    },
+                },
+                {
+                    test: /\.scss$/,
+                    use: [
+                        MiniCssExtractPlugin.loader,
+                        'css-loader',
+                        'sass-loader',
+                    ],
+                },
+                {
+                    enforce: "pre",
+                    test: /\.js$/,
+                    loader: "source-map-loader"
+                },
+            ],
+        },
+        plugins: [
+            new ManifestPlugin,
+            new CleanWebpackPlugin,
+            new MiniCssExtractPlugin({
+                filename: '[name].[contenthash].css',
+            }),
+        ],
+        optimization: {
+            moduleIds: 'hashed',
+            runtimeChunk: 'single',
+        },
+    }
+}

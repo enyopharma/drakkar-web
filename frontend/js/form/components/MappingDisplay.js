@@ -24,7 +24,7 @@ const MappingDisplay = ({ type, name, coordinates, mapping, remove }) => {
                                             className="btn btn-block btn-warning"
                                             onClick={e => remove(i)}
                                         >
-                                            <i className="fas fa-trash" />
+                                            <span className="fas fa-trash"></span>
                                         </button>
                                     </div>
                                 </div>

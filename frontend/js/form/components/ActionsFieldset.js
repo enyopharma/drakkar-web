@@ -13,7 +13,7 @@ const ActionsFieldset = ({ top, feedback, saving, savable, resetable, save, rese
     return (
         <fieldset>
             <legend>
-                <i className={'fas fa-circle small text-primary'} />
+                <span className={'fas fa-circle small text-primary'}></span>
                 &nbsp;
                 Actions
             </legend>
@@ -27,7 +27,7 @@ const ActionsFieldset = ({ top, feedback, saving, savable, resetable, save, rese
                     >
                         {saving
                             ? <span className="spinner-border spinner-border-sm"></span>
-                            : <i className="fas fa-save" />
+                            : <span className="fas fa-save" />
                         }
                         &nbsp;
                         Save description
@@ -40,7 +40,7 @@ const ActionsFieldset = ({ top, feedback, saving, savable, resetable, save, rese
                         onClick={e => setModal(true)}
                         disabled={!resetable}
                     >
-                        <i className="fas fa-eraser" /> Reset form data
+                        <span className="fas fa-eraser"></span> Reset form data
                     </button>
                 </div>
             </div>
@@ -62,7 +62,7 @@ const ActionsFieldset = ({ top, feedback, saving, savable, resetable, save, rese
                         className="btn btn-block btn-primary"
                         onClick={e => submitReset()}
                     >
-                        <i className="fas fa-eraser" /> Reset form data
+                        <span className="fas fa-eraser"></span> Reset form data
                     </button>
                 </div>
             </Modal>

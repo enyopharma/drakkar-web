@@ -41,15 +41,15 @@ const SequenceDisplay = ({ current, sequence, valid }) => {
                 <div className="col">
                     {valid ? (
                         <button className="btn btn-block btn-outline-success" disabled>
-                            <i className="fas fa-check" />&nbsp;Sequence is valid
+                            <span className="fas fa-check"></span>&nbsp;Sequence is valid
                         </button>
                     ) : (
-                        <button className="btn btn-block btn-outline-danger" disabled>
-                            <i className="fas fa-exclamation-triangle" />
-                            &nbsp;
-                            Please select a sequence.
+                            <button className="btn btn-block btn-outline-danger" disabled>
+                                <span className="fas fa-exclamation-triangle"></span>
+                                &nbsp;
+                                Please select a sequence.
                         </button>
-                    )}
+                        )}
                 </div>
             </div>
             <div className="row">

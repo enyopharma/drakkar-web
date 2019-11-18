@@ -2,7 +2,7 @@
 
 <?php if ($publication['state'] == $selected): ?>
 <?php $this->push('scripts'); ?>
-<script type="text/javascript" src="<?= $this->asset('build/form.js') ?>"></script>
+<script type="text/javascript" src="<?= $this->asset('form.js') ?>"></script>
 <script type="text/javascript">
     $(document).ready(function () {
         description.form(

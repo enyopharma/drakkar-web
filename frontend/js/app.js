@@ -1,6 +1,9 @@
 const $ = require('jquery');
 
-require('../sass/app.scss');
-require('@fortawesome/fontawesome-free/css/all.min.css');
+import '../sass/app.scss'
+
+import '@fortawesome/fontawesome-free/js/fontawesome'
+import '@fortawesome/fontawesome-free/js/solid'
+import '@fortawesome/fontawesome-free/js/regular'
 
 window.$ = $;

@@ -21,21 +21,21 @@ const MappingEditor = ({ query, sequence, domains, processing, mapping, update, 
         <React.Fragment>
             <DomainsFormGroup
                 domains={domains}
-                enabled={! processing}
+                enabled={!processing}
                 select={selectDomain}
             >
                 Extract feature sequence
             </DomainsFormGroup>
             <CoordinatesFormGroup
                 sequence={sequence}
-                enabled={! processing}
+                enabled={!processing}
                 set={update}
             >
                 Extract sequence to map
             </CoordinatesFormGroup>
             <ExtractFormGroup
                 sequence={sequence}
-                enabled={! processing}
+                enabled={!processing}
                 set={setCoordinates}
             >
                 Extract sequence to map
@@ -57,11 +57,11 @@ const MappingEditor = ({ query, sequence, domains, processing, mapping, update, 
                         type="button"
                         className="btn btn-block btn-primary"
                         onClick={e => fire()}
-                        disabled={processing || ! isQueryValid}
+                        disabled={processing || !isQueryValid}
                     >
                         {processing
                             ? <span className="spinner-border spinner-border-sm"></span>
-                            : <i className="fas fa-cogs" />
+                            : <span className="fas fa-cogs"></span>
                         }
                         &nbsp;
                         Start alignment

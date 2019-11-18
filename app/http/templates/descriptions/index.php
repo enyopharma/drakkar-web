@@ -1,7 +1,7 @@
 <?php $this->layout('layout'); ?>
 
 <?php $this->push('scripts'); ?>
-<script type="text/javascript" src="<?= $this->asset('build/table.js') ?>"></script>
+<script type="text/javascript" src="<?= $this->asset('table.js') ?>"></script>
 <script type="text/javascript">
     $(document).ready(function () {
         description.table('descriptions-table', <?= json_encode($descriptions) ?>);

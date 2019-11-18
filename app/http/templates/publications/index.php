@@ -1,7 +1,7 @@
 <?php $this->layout('layout'); ?>
 
 <?php $this->push('scripts'); ?>
-<script type="text/javascript" src="<?= $this->asset('build/search.js') ?>"></script>
+<script type="text/javascript" src="<?= $this->asset('search.js') ?>"></script>
 <script type="text/javascript">
     $(document).ready(function () {
         search.form('#search', <?= $run['id'] ?>);

@@ -24,7 +24,7 @@ final class AssetsExtension implements ExtensionInterface
             $map = $this->cachedMap();
 
             if (array_key_exists($path, $map)) {
-                return $map[$path];
+                return '/' . $map[$path];
             }
 
             throw new \LogicException(sprintf("Asset not found: '%s'.", $path));

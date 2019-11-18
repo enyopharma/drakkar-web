@@ -6,7 +6,8 @@ import MethodSection from './MethodSection'
 const MethodSectionset = ({ psimi_id, ...props }) => {
     const [method, setMethod] = useState(null)
 
-    useEffect(() => { psimi_id == null
+    useEffect(() => {
+        psimi_id == null
         ? setMethod(null)
         : api.methods.select(psimi_id).then(method => setMethod(method))
     }, [psimi_id])
@@ -14,11 +15,11 @@ const MethodSectionset = ({ psimi_id, ...props }) => {
     return (
         <fieldset>
             <legend>
-                <i className="fas fa-circle small text-info" />
+                <span className="fas fa-circle small text-info"></span>
                 &nbsp;
                 Method
             </legend>
-            <MethodSection { ...props } method={method} />
+            <MethodSection {...props} method={method} />
         </fieldset>
     )
 }
