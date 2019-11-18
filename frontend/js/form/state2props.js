@@ -4,7 +4,7 @@ const mapStateToUniprotProps = (i, type, state) => {
     return {
         type: type,
         query: state.protein.query,
-        editable: ! state.ui.processing,
+        editable: !state.ui.processing,
     }
 }
 
@@ -16,9 +16,9 @@ const mapStateToSequenceProps = (i, type, state) => {
             start: state.start,
             stop: state.stop,
         },
-        valid: ! state.ui.editing,
+        valid: !state.ui.editing,
         editing: state.ui.editing,
-        editable: type == 'v' && ! state.ui.editing && ! state.ui.processing,
+        editable: type == 'v' && !state.ui.editing && !state.ui.processing,
     }
 }
 
@@ -92,18 +92,18 @@ const mapStateToProps = (state, { wrapper, type }) => {
             top: wrapper,
             saving: state.ui.saving,
             feedback: state.ui.feedback,
-            resetable: ! state.interactor1.ui.processing && ! state.interactor2.ui.processing,
-            savable: ! state.interactor1.ui.editing && ! state.interactor2.ui.editing
-                    && ! state.interactor1.ui.processing && ! state.interactor2.ui.processing
-                    && state.method.psimi_id != null
-                    && state.interactor1.protein.accession != null
-                    && state.interactor1.name != ''
-                    && state.interactor1.start != ''
-                    && state.interactor1.stop != ''
-                    && state.interactor2.protein.accession != null
-                    && state.interactor2.name != ''
-                    && state.interactor2.start != ''
-                    && state.interactor2.stop != '',
+            resetable: !state.interactor1.ui.processing && !state.interactor2.ui.processing,
+            savable: !state.interactor1.ui.editing && !state.interactor2.ui.editing
+                && !state.interactor1.ui.processing && !state.interactor2.ui.processing
+                && state.method.psimi_id != null
+                && state.interactor1.protein.accession != null
+                && state.interactor1.name != ''
+                && state.interactor1.start != ''
+                && state.interactor1.stop != ''
+                && state.interactor2.protein.accession != null
+                && state.interactor2.name != ''
+                && state.interactor2.start != ''
+                && state.interactor2.stop != '',
         },
     }
 }

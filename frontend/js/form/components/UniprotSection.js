@@ -18,7 +18,7 @@ const UniprotSection = ({ type, query, protein, editable, update, select, unsele
     return (
         <div className="row">
             <div className="col">
-                <div style={{display: protein == null ? 'block' : 'none'}}>
+                <div style={{ display: protein == null ? 'block' : 'none' }}>
                     <SearchField query={query} update={update} search={search} select={select}>
                         Search an uniprot entry...
                     </SearchField>
@@ -34,7 +34,7 @@ const UniprotSection = ({ type, query, protein, editable, update, select, unsele
                             type="button"
                             className="close"
                             onClick={e => unselect()}
-                            disabled={! editable}
+                            disabled={!editable}
                         >
                             <span>&times;</span>
                         </button>

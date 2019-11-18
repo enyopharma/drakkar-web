@@ -53,7 +53,7 @@ const ChainsFormGroup = ({ chains, enabled = true, set, children }) => {
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={e => submit()}
-                    disabled={! enabled || ! isValid || filtered.length == 0}
+                    disabled={!enabled || !isValid || filtered.length == 0}
                 >
                     {children}
                 </button>

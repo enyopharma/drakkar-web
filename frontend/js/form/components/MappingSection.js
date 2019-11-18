@@ -14,7 +14,7 @@ const MappingSection = ({ protein, fire, ...props }) => {
             sequences[isoform.accession] = isoform.sequence
             return sequences
         }, {})
-        : {[protein.accession]: sequence}
+        : { [protein.accession]: sequence }
 
     const coordinates = isMature
         ? protein.isoforms.reduce((reduced, isoform) => {
@@ -25,11 +25,13 @@ const MappingSection = ({ protein, fire, ...props }) => {
             }
             return reduced
         }, {})
-        : {[protein.accession]: {
-            start: props.start,
-            stop: props.stop,
-            width: props.stop - props.start + 1
-        }}
+        : {
+            [protein.accession]: {
+                start: props.start,
+                stop: props.stop,
+                width: props.stop - props.start + 1
+            }
+        }
 
     const domains = protein.domains.map(domain => {
         return {
@@ -49,7 +51,7 @@ const MappingSection = ({ protein, fire, ...props }) => {
                 fire={() => fire(props.query, sequences)}
             />
             <MappingDisplay {...props} coordinates={coordinates} />
-            {! props.selecting ? null : (
+            {!props.selecting ? null : (
                 <MappingModal {...props} coordinates={coordinates} />
             )}
         </React.Fragment>

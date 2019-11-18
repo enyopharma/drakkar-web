@@ -1,5 +1,5 @@
 
-const extract =  (sequence, subsequence) => {
+const extract = (sequence, subsequence) => {
     const source = sequence.toLowerCase()
     const target = subsequence.toLowerCase()
     const start = source.indexOf(target) + 1

@@ -32,7 +32,7 @@ const CoordinatesFormGroup = ({ sequence, enabled = true, set, children }) => {
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={e => submit()}
-                    disabled={! enabled || start == '' || stop == ''}
+                    disabled={!enabled || start == '' || stop == ''}
                 >
                     {children}
                 </button>

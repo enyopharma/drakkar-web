@@ -1,9 +1,9 @@
 import React from 'react'
 
 const MappingImg = ({ type, start, stop, width, active = true }) => {
-    const startp = (start, length) => ((start - 1) * 100/length) + '%'
-    const stopp = (stop, length) => (stop * 100/length) + '%'
-    const widthp = (start, stop, length) => ((stop - start + 1) * 100/length) + '%'
+    const startp = (start, length) => ((start - 1) * 100 / length) + '%'
+    const stopp = (stop, length) => (stop * 100 / length) + '%'
+    const widthp = (start, stop, length) => ((stop - start + 1) * 100 / length) + '%'
 
     return (
         <svg className="alignment" width="100%" height="30">

@@ -45,7 +45,7 @@ const ExtractFormGroup = ({ sequence, enabled = true, set, children }) => {
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={e => submit()}
-                    disabled={! enabled || from.trim() == '' || to.trim() == ''}
+                    disabled={!enabled || from.trim() == '' || to.trim() == ''}
                 >
                     {children}
                 </button>

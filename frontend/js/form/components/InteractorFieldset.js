@@ -10,8 +10,8 @@ const InteractorFieldset = ({ i, type, accession, editing, uniprot, sequence, ma
 
     useEffect(() => {
         accession == null
-        ? setProtein(null)
-        : api.proteins.select(accession).then(protein => setProtein(protein))
+            ? setProtein(null)
+            : api.proteins.select(accession).then(protein => setProtein(protein))
     }, [accession, editing])
 
     return (

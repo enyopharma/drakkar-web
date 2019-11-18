@@ -16,7 +16,7 @@ const MethodSection = ({ query, method, update, select, unselect }) => {
     return (
         <div className="row">
             <div className="col">
-                <div style={{display: method == null ? 'block' : 'none'}}>
+                <div style={{ display: method == null ? 'block' : 'none' }}>
                     <SearchField query={query} update={update} search={search} select={select}>
                         Search a method...
                     </SearchField>

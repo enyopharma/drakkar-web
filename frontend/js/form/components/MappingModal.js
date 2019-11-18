@@ -84,31 +84,31 @@ const MappingModal = ({ i, type, name, coordinates, alignment, add, cancel }) =>
                                     No alignment of the sequence on this isoform.
                                 </p>
                             ) : (
-                                <ul className="list-unstyled">
-                                    {isoform.occurrences.sort((a, b) => a.start - b.start).map((occurrence, j) => (
-                                        <li key={j}>
-                                            <div className="row">
-                                                <div className="col-11">
-                                                    <MappingImg
-                                                        type={type}
-                                                        start={occurrence.start}
-                                                        stop={occurrence.stop}
-                                                        width={coordinates[isoform.accession].width}
-                                                        active={isOccurrenceSelected(i, j)}
-                                                    />
+                                    <ul className="list-unstyled">
+                                        {isoform.occurrences.sort((a, b) => a.start - b.start).map((occurrence, j) => (
+                                            <li key={j}>
+                                                <div className="row">
+                                                    <div className="col-11">
+                                                        <MappingImg
+                                                            type={type}
+                                                            start={occurrence.start}
+                                                            stop={occurrence.stop}
+                                                            width={coordinates[isoform.accession].width}
+                                                            active={isOccurrenceSelected(i, j)}
+                                                        />
+                                                    </div>
+                                                    <div className="col">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={isOccurrenceSelected(i, j)}
+                                                            onChange={e => toggle(e.target.checked, i, j)}
+                                                        />
+                                                    </div>
                                                 </div>
-                                                <div className="col">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={isOccurrenceSelected(i, j)}
-                                                        onChange={e => toggle(e.target.checked, i, j)}
-                                                    />
-                                                </div>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
                         </li>
                     ))}
                 </ul>
@@ -117,7 +117,7 @@ const MappingModal = ({ i, type, name, coordinates, alignment, add, cancel }) =>
                 <button
                     type="button"
                     className="btn btn-block btn-primary"
-                    disabled={! isValid}
+                    disabled={!isValid}
                     onClick={e => add(filtered)}
                 >
                     Save selected

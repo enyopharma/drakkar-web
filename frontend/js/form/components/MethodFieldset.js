@@ -8,8 +8,8 @@ const MethodSectionset = ({ psimi_id, ...props }) => {
 
     useEffect(() => {
         psimi_id == null
-        ? setMethod(null)
-        : api.methods.select(psimi_id).then(method => setMethod(method))
+            ? setMethod(null)
+            : api.methods.select(psimi_id).then(method => setMethod(method))
     }, [psimi_id])
 
     return (

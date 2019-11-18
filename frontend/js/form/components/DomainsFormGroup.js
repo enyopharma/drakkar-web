@@ -18,7 +18,7 @@ const DomainsFormGroup = ({ domains, enabled = true, select, children }) => {
                 >
                     <option value="">Please select a domain</option>
                     {domains.map((domain, i) => (
-                        <option key={i} value={i} disabled={! domain.valid}>
+                        <option key={i} value={i} disabled={!domain.valid}>
                             {domain.key} - {domain.description} [{domain.valid
                                 ? [domain.start, domain.stop].join(', ')
                                 : 'out of selected sequence'
@@ -32,7 +32,7 @@ const DomainsFormGroup = ({ domains, enabled = true, select, children }) => {
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={e => submit()}
-                    disabled={! enabled || domain == ''}
+                    disabled={!enabled || domain == ''}
                 >
                     {children}
                 </button>

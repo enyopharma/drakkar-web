@@ -29,12 +29,12 @@ const SequenceEditor = ({ current, sequence, matures, chains, update }) => {
         return m.name == name.trim() && m.start == start && m.stop == stop
     }).length > 0
 
-    const isNameValid = ! isNameSet || (isNameWellFormatted && ! doesNameExist) || doesMatureExist
+    const isNameValid = !isNameSet || (isNameWellFormatted && !doesNameExist) || doesMatureExist
 
-    const areCoordinatesValid = ! areCoordinatesSet || ! doCoordinatesExist || doesMatureExist
+    const areCoordinatesValid = !areCoordinatesSet || !doCoordinatesExist || doesMatureExist
 
     const isMatureValid = isNameSet && isNameWellFormatted && areCoordinatesSet
-        && (doesMatureExist || (! doesNameExist && ! doCoordinatesExist))
+        && (doesMatureExist || (!doesNameExist && !doCoordinatesExist))
 
     const setCoordinates = (start, stop) => {
         setStart(start)
@@ -42,7 +42,7 @@ const SequenceEditor = ({ current, sequence, matures, chains, update }) => {
     }
 
     const submit = () => {
-        update({name: name.trim(), start: start, stop: stop})
+        update({ name: name.trim(), start: start, stop: stop })
     }
 
     const reset = () => {
@@ -56,13 +56,13 @@ const SequenceEditor = ({ current, sequence, matures, chains, update }) => {
                     No sequence defined on this uniprot entry yet.
                 </p>
             ) : (
-                <React.Fragment>
-                    <p>
-                        Existing sequences on this uniprot entry:
+                    <React.Fragment>
+                        <p>
+                            Existing sequences on this uniprot entry:
                     </p>
-                    <MatureProteinList matures={matures} select={update} />
-                </React.Fragment>
-            )}
+                        <MatureProteinList matures={matures} select={update} />
+                    </React.Fragment>
+                )}
             <div className="row">
                 <div className="col-3">
                     <input
@@ -98,7 +98,7 @@ const SequenceEditor = ({ current, sequence, matures, chains, update }) => {
                         type="button"
                         className="btn btn-block btn-primary"
                         onClick={e => submit()}
-                        disabled={! isMatureValid}
+                        disabled={!isMatureValid}
                     >
                         Validate
                     </button>

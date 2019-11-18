@@ -32,7 +32,7 @@ const SubsequenceFormGroup = ({ sequence, enabled = true, set, children }) => {
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={e => submit()}
-                    disabled={! enabled || subsequence.trim() == ''}
+                    disabled={!enabled || subsequence.trim() == ''}
                 >
                     {children}
                 </button>
