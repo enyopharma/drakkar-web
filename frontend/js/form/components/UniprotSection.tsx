@@ -1,8 +1,8 @@
 import React from 'react'
 
+import { proteins as api } from '../api'
 import { SearchResult, ProteinType, Protein } from '../types'
 
-import { proteins as api } from '../api'
 import { SearchField } from './SearchField'
 
 type Props = {
@@ -16,16 +16,7 @@ type Props = {
 }
 
 export const UniprotSection: React.FC<Props> = ({ type, query, protein, editable, update, select, unselect }) => {
-    const search = (q: string): Promise<SearchResult[]> => api.search(type, q).then(proteins => {
-        return proteins.map(protein => ({
-            value: protein.accession, label: [
-                protein.accession,
-                protein.taxon,
-                protein.name,
-                protein.description,
-            ].join(' - '),
-        }))
-    })
+    const search = (q: string): Promise<SearchResult[]> => api.search(type, q)
 
     return (
         <div className="row">

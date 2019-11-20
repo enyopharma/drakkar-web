@@ -1,30 +1,62 @@
 export type DescriptionType = 'hh' | 'vh'
 
+export type ProteinType = 'h' | 'v'
+
+export type InteractorI = 1 | 2
+
+export type AppState = {
+    description: Description,
+    uinterface: UInterface,
+}
+
+export type Description = {
+    method: {
+        psimi_id: string,
+    },
+    interactor1: Interactor,
+    interactor2: Interactor,
+}
+
+export type Interactor = {
+    protein: {
+        accession: string,
+    },
+    name: string,
+    start: number,
+    stop: number,
+    mapping: Alignment[],
+}
+
+export type UInterface = {
+    method: {
+        query: string,
+    }
+    interactor1: InteractorInterface,
+    interactor2: InteractorInterface,
+    saving: boolean,
+    feedback: Feedback
+}
+
+export type InteractorInterface = {
+    protein: {
+        query: string,
+    }
+    editing: boolean,
+    processing: boolean,
+    alignment: {
+        query: string,
+        current: Alignment,
+    }
+}
+
 export type SearchResult = {
     value: string,
     label: string,
 }
 
-export type MethodSearchResult = {
-    psimi_id: string,
-    name: string,
-}
-
 export type Method = {
     psimi_id: string,
     name: string,
-}
-
-export type InteractorI = 1 | 2
-
-export type ProteinType = 'h' | 'v'
-
-export type ProteinSearchResult = {
-    type: ProteinType,
-    accession: string,
-    taxon: string,
-    name: string,
-    description: string,
 }
 
 export type Protein = {
@@ -85,49 +117,4 @@ export type Alignment = {
 export type Feedback = {
     success: boolean,
     errors: string[],
-}
-
-export type AppState = {
-    description: Description,
-    uinterface: UInterface,
-}
-
-export type Description = {
-    method: {
-        psimi_id: string,
-    },
-    interactor1: Interactor,
-    interactor2: Interactor,
-}
-
-export type Interactor = {
-    protein: {
-        accession: string,
-    },
-    name: string,
-    start: number,
-    stop: number,
-    mapping: Alignment[],
-}
-
-export type UInterface = {
-    method: {
-        query: string,
-    }
-    interactor1: InteractorInterface,
-    interactor2: InteractorInterface,
-    saving: boolean,
-    feedback: Feedback
-}
-
-export type InteractorInterface = {
-    protein: {
-        query: string,
-    }
-    editing: boolean,
-    processing: boolean,
-    alignment: {
-        query: string,
-        current: Alignment,
-    }
 }

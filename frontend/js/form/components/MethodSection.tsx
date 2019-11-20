@@ -1,8 +1,8 @@
 import React from 'react'
 
+import { methods as api } from '../api'
 import { SearchResult, Method } from '../types'
 
-import { methods as api } from '../api'
 import { SearchField } from './SearchField'
 
 type Props = {
@@ -14,14 +14,7 @@ type Props = {
 }
 
 export const MethodSection: React.FC<Props> = ({ query, method, update, select, unselect }) => {
-    const search = (q: string): Promise<SearchResult[]> => api.search(q).then(methods => {
-        return methods.map(method => ({
-            value: method.psimi_id, label: [
-                method.psimi_id,
-                method.name,
-            ].join(' - '),
-        }))
-    })
+    const search = (q: string): Promise<SearchResult[]> => api.search(q)
 
     return (
         <div className="row">

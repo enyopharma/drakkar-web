@@ -1,35 +1,53 @@
 import qs from 'query-string'
 import fetch from 'cross-fetch'
 
-import { Description } from './types'
-import { MethodSearchResult, Method } from './types'
-import { ProteinType, ProteinSearchResult, Protein } from './types'
+import { Description, Method, ProteinType, Protein } from './types'
 import { Sequences, Alignment } from './types'
-import { Feedback } from './types'
+import { SearchResult, Feedback } from './types'
 
 const uuid = require('uuid/v4')
 
 export const methods = {
-    search: async (q: string): Promise<MethodSearchResult[]> => fetch('/methods?' + qs.stringify({ q: q }))
-        .then(response => response.json())
-        .then(json => json.data, error => console.log(error)),
+    search: async (q: string): Promise<SearchResult[]> => {
+        return fetch('/methods?' + qs.stringify({ q: q }))
+            .then(response => response.json(), error => console.log(error))
+            .then(json => json.data.map(method => ({
+                value: method.psimi_id, label: [
+                    method.psimi_id,
+                    method.name,
+                ].join(' - '),
+            })))
+    },
 
-    select: async (psimi_id: string): Promise<Method> => fetch(`/methods/${psimi_id}`)
-        .then(response => response.json(), error => console.log(error))
-        .then(json => json.data, error => console.log(error)),
+    select: async (psimi_id: string): Promise<Method> => {
+        return fetch(`/methods/${psimi_id}`)
+            .then(response => response.json(), error => console.log(error))
+            .then(json => json.data)
+    }
 }
 
 export const proteins = {
-    search: async (type: ProteinType, q: string): Promise<ProteinSearchResult[]> => fetch('/proteins?' + qs.stringify({ type: type, q: q }))
-        .then(response => response.json(), error => console.log(error))
-        .then(json => json.data, error => console.log(error)),
+    search: async (type: ProteinType, q: string): Promise<SearchResult[]> => {
+        return fetch('/proteins?' + qs.stringify({ type: type, q: q }))
+            .then(response => response.json(), error => console.log(error))
+            .then(json => json.data.map(protein => ({
+                value: protein.accession, label: [
+                    protein.accession,
+                    protein.taxon,
+                    protein.name,
+                    protein.description,
+                ].join(' - '),
+            })))
+    },
 
-    select: async (accession: string): Promise<Protein> => fetch(`/proteins/${accession}`)
-        .then(response => response.json(), error => console.log(error))
-        .then(json => json.data, error => console.log(error)),
+    select: async (accession: string): Promise<Protein> => {
+        return fetch(`/proteins/${accession}`)
+            .then(response => response.json(), error => console.log(error))
+            .then(json => json.data)
+    }
 }
 
-export const alignment = (query: string, sequences: Sequences): Promise<Alignment> => {
+export const alignment = async (query: string, sequences: Sequences): Promise<Alignment> => {
     const id = uuid()
 
     return new Promise((resolve, reject) => {
@@ -57,7 +75,7 @@ export const alignment = (query: string, sequences: Sequences): Promise<Alignmen
             }
         }
 
-        fetch('/jobs/alignments', {
+        const params = {
             method: 'POST',
             headers: {
                 'accept': 'application/json',
@@ -68,19 +86,23 @@ export const alignment = (query: string, sequences: Sequences): Promise<Alignmen
                 query: query,
                 sequences: sequences,
             })
-        }).catch(error => reject(error))
+        }
+
+        fetch('/jobs/alignments', params).catch(error => reject(error))
     })
 }
 
 export const save = async (run_id: number, pmid: number, description: Description): Promise<Feedback> => {
-    return fetch(`/runs/${run_id}/publications/${pmid}/descriptions`, {
+    const params = {
         method: 'POST',
         headers: {
             'accept': 'application/json',
             'content-type': 'application/json',
         },
         body: JSON.stringify(description)
-    })
+    }
+
+    return fetch(`/runs/${run_id}/publications/${pmid}/descriptions`, params)
         .then(response => response.json(), error => console.log(error))
         .then(json => ({ success: json.success, errors: json.reason ? [json.reason] : json.errors }))
 }
