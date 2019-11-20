@@ -8,9 +8,9 @@ module.exports = (env, argv) => {
     return {
         entry: {
             app: './frontend/js/app.js',
-            form: './frontend/js/form/index.js',
+            form: './frontend/js/form/index.ts',
+            table: './frontend/js/table/index.ts',
             search: './frontend/js/search/index.js',
-            table: './frontend/js/table/index.js',
         },
         watch: argv.mode == 'development',
         devtool: argv.mode == 'development' ? 'inline-source-map' : false,
@@ -20,12 +20,12 @@ module.exports = (env, argv) => {
             publicPath: 'build/',
         },
         resolve: {
-            extensions: ['.jsx', '.js', '.scss'],
+            extensions: ['.js', '.ts', '.tsx', '.scss'],
         },
         module: {
             rules: [
                 {
-                    test: /\.js(x?)$/,
+                    test: /\.js$/,
                     exclude: /node_modules/,
                     use: {
                         loader: 'babel-loader',
@@ -40,6 +40,15 @@ module.exports = (env, argv) => {
                         MiniCssExtractPlugin.loader,
                         'css-loader',
                         'sass-loader',
+                    ],
+                },
+                {
+                    test: /\.tsx?$/,
+                    exclude: /node_modules/,
+                    use: [
+                        {
+                            loader: "ts-loader",
+                        },
                     ],
                 },
                 {

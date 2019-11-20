@@ -3,9 +3,7 @@
 <?php $this->push('scripts'); ?>
 <script type="text/javascript" src="<?= $this->asset('search.js') ?>"></script>
 <script type="text/javascript">
-    $(document).ready(function () {
-        search.form('#search', <?= $run['id'] ?>);
-    })
+    search.form('#search', <?= $run['id'] ?>);
 </script>
 <?php $this->end(); ?>
 

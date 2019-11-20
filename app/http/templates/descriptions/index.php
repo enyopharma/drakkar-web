@@ -3,9 +3,7 @@
 <?php $this->push('scripts'); ?>
 <script type="text/javascript" src="<?= $this->asset('table.js') ?>"></script>
 <script type="text/javascript">
-    $(document).ready(function () {
-        description.table('descriptions-table', <?= json_encode($descriptions) ?>);
-    })
+    descriptions.table('descriptions-table', <?= json_encode($descriptions) ?>);
 </script>
 <?php $this->end(); ?>
 

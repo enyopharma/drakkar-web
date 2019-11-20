@@ -1,11 +1,13 @@
-const init = (container, run_id) => $(container).on('submit', e => {
-    const pmid = $(e.target).find('.pmid').val().trim()
+import $ from 'jquery'
 
-    if (pmid.length > 0) {
-        window.open(`/runs/${run_id}/publications/${pmid}/descriptions`)
-    }
+window.search = {
+    form: (container, run_id) => $(container).on('submit', e => {
+        const pmid = $(e.target).find('.pmid').val().trim()
 
-    return false
-});
+        if (pmid.length > 0) {
+            window.open(`/runs/${run_id}/publications/${pmid}/descriptions`)
+        }
 
-window.search = { form: init }
+        return false
+    })
+}

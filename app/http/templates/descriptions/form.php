@@ -4,16 +4,14 @@
 <?php $this->push('scripts'); ?>
 <script type="text/javascript" src="<?= $this->asset('form.js') ?>"></script>
 <script type="text/javascript">
-    $(document).ready(function () {
-        description.form(
-            'description-wrap',
-            'description-form',
-            '<?= $run['type'] ?>',
-            <?= $run['id'] ?>,
-            <?= $publication['pmid'] ?>,
-            <?= count($description) == 0 ? '{}' : json_encode($description) ?>
-        );
-    })
+    descriptions.form(
+        'description-wrap',
+        'description-form',
+        '<?= $run['type'] ?>',
+        <?= $run['id'] ?>,
+        <?= $publication['pmid'] ?>,
+        <?= count($description) == 0 ? 'null' : json_encode($description) ?>
+    );
 </script>
 <?php $this->end(); ?>
 <?php endif ?>
