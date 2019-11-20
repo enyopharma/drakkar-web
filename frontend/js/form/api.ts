@@ -1,7 +1,7 @@
 import qs from 'query-string'
 import fetch from 'cross-fetch'
 
-import { AppState } from './types'
+import { Description } from './types'
 import { MethodSearchResult, Method } from './types'
 import { ProteinType, ProteinSearchResult, Protein } from './types'
 import { Sequences, Alignment } from './types'
@@ -72,14 +72,14 @@ export const alignment = (query: string, sequences: Sequences): Promise<Alignmen
     })
 }
 
-export const save = async (run_id: number, pmid: number, body: AppState): Promise<Feedback> => {
+export const save = async (run_id: number, pmid: number, description: Description): Promise<Feedback> => {
     return fetch(`/runs/${run_id}/publications/${pmid}/descriptions`, {
         method: 'POST',
         headers: {
             'accept': 'application/json',
             'content-type': 'application/json',
         },
-        body: JSON.stringify(body)
+        body: JSON.stringify(description)
     })
         .then(response => response.json(), error => console.log(error))
         .then(json => ({ success: json.success, errors: json.reason ? [json.reason] : json.errors }))

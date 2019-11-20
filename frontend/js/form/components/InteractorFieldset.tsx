@@ -15,7 +15,6 @@ type Props = {
     uniprot: {
         type: ProteinType,
         query: string,
-        protein: Protein,
         editable: boolean,
         update: (query: string) => void,
         select: (protein: string) => void,
@@ -24,7 +23,6 @@ type Props = {
     sequence: {
         type: ProteinType,
         current: Mature,
-        protein: Protein,
         valid: boolean,
         editable: boolean,
         editing: boolean,
@@ -34,7 +32,6 @@ type Props = {
     mapping: {
         i: InteractorI,
         type: ProteinType,
-        protein: Protein,
         name: string,
         start: number,
         stop: number,

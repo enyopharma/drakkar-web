@@ -1,6 +1,6 @@
 import { render } from 'react-dom'
 
-import { AppState, DescriptionType } from './types'
+import { AppState, Description, DescriptionType } from './types'
 
 import { Form } from './components/Form'
 
@@ -9,27 +9,48 @@ declare global {
 }
 
 window.descriptions = {
-    form: (wrapper: string, container: string, type: DescriptionType, run_id: number, pmid: number, state) => {
-        render(Form(wrapper, type, run_id, pmid, initialState(state)), document.getElementById(container))
+    form: (wrapper: string, container: string, type: DescriptionType, run_id: number, pmid: number, description) => {
+        render(Form(wrapper, type, run_id, pmid, initialState(description)), document.getElementById(container))
     }
 }
 
-const initialState = (state): AppState => ({
-    method: {
-        query: '',
-        psimi_id: state == null ? null : state.method.psimi_id,
-    },
-    interactor1: {
-        i: 1,
-        protein: {
-            query: '',
-            accession: state == null ? null : state.interactor1.protein.accession,
+const initialState = (description: Description): AppState => ({
+    description: description == null ? init.description : description,
+    uinterface: init.uinterface,
+})
+
+const init: AppState = {
+    description: {
+        method: {
+            psimi_id: null,
         },
-        name: state == null ? '' : state.interactor1.name,
-        start: state == null ? null : state.interactor1.start,
-        stop: state == null ? null : state.interactor1.stop,
-        mapping: state == null ? '' : state.interactor1.mapping,
-        ui: {
+        interactor1: {
+            protein: {
+                accession: null,
+            },
+            name: '',
+            start: null,
+            stop: null,
+            mapping: [],
+        },
+        interactor2: {
+            protein: {
+                accession: null,
+            },
+            name: '',
+            start: null,
+            stop: null,
+            mapping: [],
+        },
+    },
+    uinterface: {
+        method: {
+            query: '',
+        },
+        interactor1: {
+            protein: {
+                query: '',
+            },
             editing: false,
             processing: false,
             alignment: {
@@ -37,18 +58,10 @@ const initialState = (state): AppState => ({
                 current: null,
             },
         },
-    },
-    interactor2: {
-        i: 2,
-        protein: {
-            query: '',
-            accession: state == null ? null : state.interactor2.protein.accession,
-        },
-        name: state == null ? '' : state.interactor2.name,
-        start: state == null ? null : state.interactor2.start,
-        stop: state == null ? null : state.interactor2.stop,
-        mapping: state == null ? '' : state.interactor2.mapping,
-        ui: {
+        interactor2: {
+            protein: {
+                query: '',
+            },
             editing: false,
             processing: false,
             alignment: {
@@ -56,9 +69,7 @@ const initialState = (state): AppState => ({
                 current: null,
             },
         },
-    },
-    ui: {
         saving: false,
         feedback: null,
-    },
-})
+    }
+}

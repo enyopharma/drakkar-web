@@ -238,9 +238,11 @@ export const cancelAlignment = (i: InteractorI): CancelAlignmentAction => ({
 
 export const fireSave = (run_id: number, pmid: number): ThunkAction<Promise<void>, {}, {}, AppAction> => {
     return async (dispatch: ThunkDispatch<{}, {}, AppAction>, getState: () => AppState): Promise<void> => {
+        const description = getState().description;
+
         dispatch({ type: AppActionTypes.FIRE_SAVE })
 
-        api.save(run_id, pmid, getState()).then(json => dispatch({
+        api.save(run_id, pmid, description).then(json => dispatch({
             type: AppActionTypes.SHOW_FEEDBACK,
             success: json.success,
             errors: json.errors,

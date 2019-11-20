@@ -1,9 +1,58 @@
-import { AppActionTypes, AppAction, InteractorAction, isInteractorAction } from '../actions'
+import { AppActionTypes, AppAction } from './actions'
+import { InteractorAction, isInteractorAction } from './actions'
+import { Description, InteractorI, Interactor, Alignment } from '../types'
 
-import { InteractorState, InteractorI, Alignment } from '../../types'
+export const description = (state: Description, action: AppAction): Description => {
+    return {
+        method: {
+            psimi_id: psimi_id(state.method.psimi_id, action)
+        },
+        interactor1: interactor(1)(state.interactor1, action),
+        interactor2: interactor(2)(state.interactor2, action),
+    }
+}
 
-import { protein } from './interactor/protein'
-import { ui } from './interactor/ui'
+const psimi_id = (state: string, action: AppAction): string => {
+    switch (action.type) {
+        case AppActionTypes.SELECT_METHOD:
+            return action.method.psimi_id
+        case AppActionTypes.UNSELECT_METHOD:
+            return null
+        case AppActionTypes.RESET_FORM:
+            return null
+        default:
+            return state
+    }
+}
+
+const interactor = (i: InteractorI) => (state: Interactor, action: AppAction): Interactor => {
+    if (isInteractorAction(action) && i == action.i) {
+        return {
+            protein: {
+                accession: accession(state.protein.accession, action)
+            },
+            name: name(state.name, action),
+            start: start(state.start, action),
+            stop: stop(state.stop, action),
+            mapping: mapping(state.mapping, action),
+        }
+    }
+
+    return state
+}
+
+const accession = (state: string, action: InteractorAction): string => {
+    switch (action.type) {
+        case AppActionTypes.SELECT_PROTEIN:
+            return action.protein.accession
+        case AppActionTypes.UNSELECT_PROTEIN:
+            return null
+        case AppActionTypes.RESET_INTERACTOR:
+            return null
+        default:
+            return state
+    }
+}
 
 const name = (state: string, action: InteractorAction): string => {
     switch (action.type) {
@@ -73,23 +122,5 @@ const mapping = (state: Alignment[], action: InteractorAction): Alignment[] => {
             return []
         default:
             return state
-    }
-}
-
-export const interactor = (i: InteractorI) => {
-    return (state: InteractorState, action: AppAction): InteractorState => {
-        if (isInteractorAction(action) && action.i == i) {
-            return {
-                i: i,
-                protein: protein(state.protein, action),
-                name: name(state.name, action),
-                start: start(state.start, action),
-                stop: stop(state.stop, action),
-                mapping: mapping(state.mapping, action),
-                ui: ui(state.ui, action),
-            }
-        }
-
-        return state
     }
 }

@@ -88,44 +88,46 @@ export type Feedback = {
 }
 
 export type AppState = {
-    method: MethodState,
-    interactor1: InteractorState,
-    interactor2: InteractorState,
-    ui: AppUiState,
+    description: Description,
+    uinterface: UInterface,
 }
 
-export type AppUiState = {
-    saving: boolean,
-    feedback: Feedback
+export type Description = {
+    method: {
+        psimi_id: string,
+    },
+    interactor1: Interactor,
+    interactor2: Interactor,
 }
 
-export type MethodState = {
-    query: string,
-    psimi_id: string,
-}
-
-export type ProteinState = {
-    query: string,
-    accession: string,
-}
-
-export type AlignmentState = {
-    query: string,
-    current: Alignment,
-}
-
-export type InteractorState = {
-    i: InteractorI,
-    protein: ProteinState,
+export type Interactor = {
+    protein: {
+        accession: string,
+    },
     name: string,
     start: number,
     stop: number,
     mapping: Alignment[],
-    ui: InteractorUiState,
 }
 
-export type InteractorUiState = {
+export type UInterface = {
+    method: {
+        query: string,
+    }
+    interactor1: InteractorInterface,
+    interactor2: InteractorInterface,
+    saving: boolean,
+    feedback: Feedback
+}
+
+export type InteractorInterface = {
+    protein: {
+        query: string,
+    }
     editing: boolean,
     processing: boolean,
-    alignment: AlignmentState,
+    alignment: {
+        query: string,
+        current: Alignment,
+    }
 }
