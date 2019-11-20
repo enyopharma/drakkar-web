@@ -33,7 +33,7 @@ const interactor = (i: InteractorI) => (state: InteractorInterface, action: AppA
                 query: qprotein(state.protein.query, action),
             },
             editing: editing(state.editing, action),
-            processing: processing(state.editing, action),
+            processing: processing(state.processing, action),
             alignment: {
                 query: qalignment(state.alignment.query, action),
                 current: current(state.alignment.current, action),
@@ -55,7 +55,7 @@ const qprotein = (state: string, action: InteractorAction): string => {
     }
 }
 
-const editing = (state: boolean, action: AppAction): boolean => {
+const editing = (state: boolean, action: InteractorAction): boolean => {
     switch (action.type) {
         case AppActionTypes.SELECT_PROTEIN:
             return action.protein.type == 'v'
@@ -70,7 +70,7 @@ const editing = (state: boolean, action: AppAction): boolean => {
     }
 }
 
-const processing = (state: boolean, action: AppAction): boolean => {
+const processing = (state: boolean, action: InteractorAction): boolean => {
     switch (action.type) {
         case AppActionTypes.FIRE_ALIGNMENT:
             return true
@@ -85,7 +85,7 @@ const processing = (state: boolean, action: AppAction): boolean => {
     }
 }
 
-const qalignment = (state: string, action: AppAction): string => {
+const qalignment = (state: string, action: InteractorAction): string => {
     switch (action.type) {
         case AppActionTypes.UPDATE_ALIGNMENT_QUERY:
             return action.query
@@ -102,7 +102,7 @@ const qalignment = (state: string, action: AppAction): string => {
     }
 }
 
-const current = (state: Alignment, action: AppAction): Alignment => {
+const current = (state: Alignment, action: InteractorAction): Alignment => {
     switch (action.type) {
         case AppActionTypes.SHOW_ALIGNMENT:
             return action.alignment
