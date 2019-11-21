@@ -72,7 +72,6 @@ const mapDispatchToInteractorProps = (i: InteractorI, dispatch) => ({
     unselectProtein: () => dispatch(creators.unselectProtein(i)),
     editSequence: () => dispatch(creators.editMature(i)),
     updateSequence: (mature: Mature) => dispatch(creators.updateMature(i, mature)),
-    updateAlignment: (query: string) => dispatch(creators.updateAlignmentQuery(i, query)),
     fireAlignment: (query: string, sequences: Sequences) => dispatch(creators.fireAlignment(i, query, sequences)),
     addAlignment: (alignment: Alignment) => dispatch(creators.addAlignment(i, alignment)),
     removeAlignment: (index: number) => dispatch(creators.removeAlignment(i, index)),
