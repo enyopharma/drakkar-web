@@ -1,5 +1,5 @@
 import * as redux from 'react-redux'
-import * as creators from './actions'
+import * as creators from './creators'
 
 import { DescriptionType, ProteinType, InteractorI, Mature, Sequences, Alignment } from '../types'
 
