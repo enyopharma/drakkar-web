@@ -14,7 +14,6 @@ export enum AppActionTypes {
     UNSELECT_PROTEIN,
     EDIT_MATURE,
     UPDATE_MATURE,
-    UPDATE_ALIGNMENT_QUERY,
     SHOW_ALIGNMENT,
     FIRE_ALIGNMENT,
     ADD_ALIGNMENT,
@@ -42,7 +41,6 @@ export type InteractorAction =
     | UnselectProteinAction
     | EditMatureAction
     | UpdateMatureAction
-    | UpdateAlignmentQueryAction
     | FireAlignmentAction
     | ShowAlignmentAction
     | AddAlignmentAction
@@ -90,12 +88,6 @@ type UpdateMatureAction = {
     i: InteractorI,
     type: AppActionTypes.UPDATE_MATURE,
     mature: Mature,
-}
-
-type UpdateAlignmentQueryAction = {
-    i: InteractorI,
-    type: AppActionTypes.UPDATE_ALIGNMENT_QUERY,
-    query: string,
 }
 
 type FireAlignmentAction = {
@@ -199,12 +191,6 @@ export const updateMature = (i: InteractorI, mature: Mature): UpdateMatureAction
     i: i,
     type: AppActionTypes.UPDATE_MATURE,
     mature: mature,
-})
-
-export const updateAlignmentQuery = (i: InteractorI, query: string): UpdateAlignmentQueryAction => ({
-    i: i,
-    type: AppActionTypes.UPDATE_ALIGNMENT_QUERY,
-    query: query,
 })
 
 export const fireAlignment = (i: InteractorI, query: string, sequences: Sequences): ThunkAction<Promise<void>, {}, {}, AppAction> => {
