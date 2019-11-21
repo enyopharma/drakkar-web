@@ -28,21 +28,21 @@ const mergeProps = (props: AppStateProps, actions: AppDispatchProps, { wrapper, 
 
     return {
         method: {
-            query: props.uinterface.method.query,
+            query: props.ui.method.query,
             psimi_id: props.description.method.psimi_id,
             update: actions.updateMethod,
             select: actions.selectMethod,
             unselect: actions.unselectMethod,
         },
-        interactor1: mergeInteractorProps(1, type1, props.description.interactor1, props.uinterface.interactor1, actions.interactor1),
-        interactor2: mergeInteractorProps(2, type2, props.description.interactor2, props.uinterface.interactor2, actions.interactor2),
+        interactor1: mergeInteractorProps(1, type1, props.description.interactor1, props.ui.interactor1, actions.interactor1),
+        interactor2: mergeInteractorProps(2, type2, props.description.interactor2, props.ui.interactor2, actions.interactor2),
         actions: {
             top: wrapper,
-            saving: props.uinterface.saving,
-            feedback: props.uinterface.feedback,
-            resetable: !props.uinterface.interactor1.processing && !props.uinterface.interactor2.processing,
-            savable: !props.uinterface.interactor1.editing && !props.uinterface.interactor2.editing
-                && !props.uinterface.interactor1.processing && !props.uinterface.interactor2.processing
+            saving: props.ui.saving,
+            feedback: props.ui.feedback,
+            resetable: !props.ui.interactor1.processing && !props.ui.interactor2.processing,
+            savable: !props.ui.interactor1.editing && !props.ui.interactor2.editing
+                && !props.ui.interactor1.processing && !props.ui.interactor2.processing
                 && props.description.method.psimi_id != null
                 && props.description.interactor1.protein.accession != null
                 && props.description.interactor1.name != ''
@@ -62,7 +62,7 @@ export const connect = redux.connect(mapStateToProps, mapDispatchToProps, mergeP
 
 
 // interactor
-import { Interactor, InteractorInterface } from '../types'
+import { Interactor, InteractorUI } from '../types'
 
 type InteractorDispatchProps = ReturnType<typeof mapDispatchToInteractorProps>
 
@@ -79,47 +79,33 @@ const mapDispatchToInteractorProps = (i: InteractorI, dispatch) => ({
     cancelAlignment: () => dispatch(creators.cancelAlignment(i)),
 });
 
-const mergeInteractorProps = (i: InteractorI, type: ProteinType, interactor: Interactor, uinterface: InteractorInterface, actions: InteractorDispatchProps) => ({
+const mergeInteractorProps = (i: InteractorI, type: ProteinType, interactor: Interactor, ui: InteractorUI, actions: InteractorDispatchProps) => ({
     i: i,
     type: type,
+    query: ui.protein.query,
     accession: interactor.protein.accession,
-    editing: uinterface.editing,
-    uniprot: {
-        type: type,
-        query: uinterface.protein.query,
-        editable: !uinterface.processing,
-        update: actions.updateProtein,
-        select: actions.selectProtein,
-        unselect: actions.unselectProtein,
-    },
-    sequence: {
-        type: type,
-        current: {
-            name: interactor.name,
-            start: interactor.start,
-            stop: interactor.stop,
+    name: interactor.name,
+    start: interactor.start,
+    stop: interactor.stop,
+    mapping: interactor.mapping,
+    editing: ui.editing,
+    processing: ui.processing,
+    alignment: ui.alignment,
+    actions: {
+        protein: {
+            update: actions.updateProtein,
+            select: actions.selectProtein,
+            unselect: actions.unselectProtein,
         },
-        valid: !uinterface.editing,
-        editing: uinterface.editing,
-        editable: type == 'v' && !uinterface.editing && !uinterface.processing,
-        edit: actions.editSequence,
-        update: actions.updateSequence,
-    },
-    mapping: {
-        i: i,
-        type: type,
-        query: uinterface.alignment.query,
-        name: interactor.name,
-        start: interactor.start,
-        stop: interactor.stop,
-        mapping: interactor.mapping,
-        selecting: uinterface.alignment.current != null,
-        processing: uinterface.processing,
-        alignment: uinterface.alignment.current,
-        update: actions.updateAlignment,
-        fire: actions.fireAlignment,
-        add: actions.addAlignment,
-        remove: actions.removeAlignment,
-        cancel: actions.cancelAlignment,
-    },
+        sequence: {
+            edit: actions.editSequence,
+            update: actions.updateSequence,
+        },
+        mapping: {
+            fire: actions.fireAlignment,
+            add: actions.addAlignment,
+            remove: actions.removeAlignment,
+            cancel: actions.cancelAlignment,
+        }
+    }
 })

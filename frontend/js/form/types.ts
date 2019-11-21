@@ -1,13 +1,9 @@
-export type DescriptionType = 'hh' | 'vh'
-
-export type ProteinType = 'h' | 'v'
-
-export type InteractorI = 1 | 2
-
 export type AppState = {
     description: Description,
-    uinterface: UInterface,
+    ui: UI,
 }
+
+export type DescriptionType = 'hh' | 'vh'
 
 export type Description = {
     method: {
@@ -16,6 +12,8 @@ export type Description = {
     interactor1: Interactor,
     interactor2: Interactor,
 }
+
+export type InteractorI = 1 | 2
 
 export type Interactor = {
     protein: {
@@ -27,37 +25,48 @@ export type Interactor = {
     mapping: Alignment[],
 }
 
-export type UInterface = {
+export type Alignment = {
+    sequence: string,
+    isoforms: Array<{
+        accession: string,
+        occurrences: Array<{
+            start: number,
+            stop: number,
+            identity: number,
+        }>
+    }>,
+}
+
+export type UI = {
     method: {
         query: string,
     }
-    interactor1: InteractorInterface,
-    interactor2: InteractorInterface,
+    interactor1: InteractorUI,
+    interactor2: InteractorUI,
     saving: boolean,
     feedback: Feedback
 }
 
-export type InteractorInterface = {
+export type InteractorUI = {
     protein: {
         query: string,
     }
     editing: boolean,
     processing: boolean,
-    alignment: {
-        query: string,
-        current: Alignment,
-    }
+    alignment: Alignment,
 }
 
-export type SearchResult = {
-    value: string,
-    label: string,
+export type Feedback = {
+    success: boolean,
+    errors: string[],
 }
 
 export type Method = {
     psimi_id: string,
     name: string,
 }
+
+export type ProteinType = 'h' | 'v'
 
 export type Protein = {
     type: ProteinType,
@@ -98,23 +107,14 @@ export type Mature = {
     stop: number,
 }
 
+export type ScaledDomain = {
+    key: string,
+    description: string,
+    start: number,
+    stop: number,
+    valid: boolean,
+}
+
 export type Sequences = Record<string, string>
 
-export type Coordinates = Record<string, { start: number, stop: number, width: number }>
-
-export type Alignment = {
-    sequence: string,
-    isoforms: Array<{
-        accession: string,
-        occurrences: Array<{
-            start: number,
-            stop: number,
-            identity: number,
-        }>
-    }>,
-}
-
-export type Feedback = {
-    success: boolean,
-    errors: string[],
-}
+export type Coordinates = Record<string, { start: number, stop: number, length: number }>

@@ -15,61 +15,43 @@ window.descriptions = {
 }
 
 const initialState = (description: Description): AppState => ({
+    ui: init.ui,
     description: description == null ? init.description : description,
-    uinterface: init.uinterface,
 })
 
 const init: AppState = {
-    description: {
-        method: {
-            psimi_id: null,
-        },
+    ui: {
+        method: { query: '' },
         interactor1: {
-            protein: {
-                accession: null,
-            },
+            protein: { query: '' },
+            editing: false,
+            processing: false,
+            alignment: null,
+        },
+        interactor2: {
+            protein: { query: '' },
+            editing: false,
+            processing: false,
+            alignment: null,
+        },
+        saving: false,
+        feedback: null,
+    },
+    description: {
+        method: { psimi_id: null },
+        interactor1: {
+            protein: { accession: null },
             name: '',
             start: null,
             stop: null,
             mapping: [],
         },
         interactor2: {
-            protein: {
-                accession: null,
-            },
+            protein: { accession: null },
             name: '',
             start: null,
             stop: null,
             mapping: [],
         },
     },
-    uinterface: {
-        method: {
-            query: '',
-        },
-        interactor1: {
-            protein: {
-                query: '',
-            },
-            editing: false,
-            processing: false,
-            alignment: {
-                query: '',
-                current: null,
-            },
-        },
-        interactor2: {
-            protein: {
-                query: '',
-            },
-            editing: false,
-            processing: false,
-            alignment: {
-                query: '',
-                current: null,
-            },
-        },
-        saving: false,
-        feedback: null,
-    }
 }

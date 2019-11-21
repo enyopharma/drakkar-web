@@ -3,9 +3,14 @@ import fetch from 'cross-fetch'
 
 import { Description, Method, ProteinType, Protein } from './types'
 import { Sequences, Alignment } from './types'
-import { SearchResult, Feedback } from './types'
+import { Feedback } from './types'
 
 const uuid = require('uuid/v4')
+
+export type SearchResult = {
+    value: string,
+    label: string,
+}
 
 export const methods = {
     search: async (q: string): Promise<SearchResult[]> => {
@@ -20,6 +25,8 @@ export const methods = {
     },
 
     select: async (psimi_id: string): Promise<Method> => {
+        if (psimi_id == null) return null
+
         return fetch(`/methods/${psimi_id}`)
             .then(response => response.json(), error => console.log(error))
             .then(json => json.data)
@@ -27,7 +34,7 @@ export const methods = {
 }
 
 export const proteins = {
-    search: async (type: ProteinType, q: string): Promise<SearchResult[]> => {
+    search: (type: ProteinType) => async (q: string): Promise<SearchResult[]> => {
         return fetch('/proteins?' + qs.stringify({ type: type, q: q }))
             .then(response => response.json(), error => console.log(error))
             .then(json => json.data.map(protein => ({
@@ -41,6 +48,8 @@ export const proteins = {
     },
 
     select: async (accession: string): Promise<Protein> => {
+        if (accession == null) return null
+
         return fetch(`/proteins/${accession}`)
             .then(response => response.json(), error => console.log(error))
             .then(json => json.data)

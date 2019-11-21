@@ -1,8 +1,8 @@
 import React from 'react'
 
-import { ProteinType, Coordinates, Alignment } from '../types'
+import { ProteinType, Coordinates, Alignment } from '../../types'
 
-import { MappingImg } from './MappingImg'
+import { SequenceImg } from '../Shared/SequenceImg'
 
 type Props = {
     type: ProteinType,
@@ -53,11 +53,11 @@ export const MappingDisplay: React.FC<Props> = ({ type, name, coordinates, mappi
                                         <ul className="list-unstyled">
                                             {isoform.occurrences.sort((a, b) => a.start - b.start).map((occurrence, k) => (
                                                 <li key={k}>
-                                                    <MappingImg
+                                                    <SequenceImg
                                                         type={type}
                                                         start={occurrence.start}
                                                         stop={occurrence.stop}
-                                                        width={coordinates[isoform.accession].width}
+                                                        length={coordinates[isoform.accession].length}
                                                     />
                                                 </li>
                                             ))}

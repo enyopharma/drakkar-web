@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react'
 
+import { methods as api } from '../api'
+
 import { Method } from '../types'
 
-import { methods as api } from '../api'
-import { MethodSection } from './MethodSection'
+import { MethodAlert } from './MethodAlert'
+import { SearchField } from './Shared/SearchField'
 
 type Props = {
-    psimi_id: string | null,
+    psimi_id: string,
     query: string,
     update: (query: string) => void,
     select: (psimi_id: string) => void,
@@ -16,20 +18,21 @@ type Props = {
 export const MethodFieldset: React.FC<Props> = ({ psimi_id, ...props }) => {
     const [method, setMethod] = useState<Method>(null)
 
-    useEffect(() => {
-        psimi_id == null
-            ? setMethod(null)
-            : api.select(psimi_id).then(method => setMethod(method))
-    }, [psimi_id])
+    useEffect(() => { api.select(psimi_id).then(m => setMethod(m)) }, [psimi_id])
 
     return (
         <fieldset>
             <legend>
-                <span className="fas fa-circle small text-info"></span>
-                &nbsp;
-                Method
+                <span className="fas fa-circle small text-info"></span>&nbsp;Method
             </legend>
-            <MethodSection {...props} method={method} />
+            <div className="row">
+                <div className="col">
+                    {method == null
+                        ? <SearchField {...props} search={api.search} placeholder="Search a method..." />
+                        : <MethodAlert {...props} method={method} />
+                    }
+                </div>
+            </div>
         </fieldset>
     )
 }

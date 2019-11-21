@@ -1,28 +1,28 @@
-import React from 'react'
+import React, { useState } from 'react'
 
-import { Domain, Alignment } from '../types'
+import { ScaledDomain, Alignment } from '../../types'
 
-import { ExtractFormGroup } from './ExtractFormGroup'
 import { DomainsFormGroup } from './DomainsFormGroup'
-import { CoordinatesFormGroup } from './CoordinatesFormGroup'
+import { ExtractFormGroup } from '../Shared/ExtractFormGroup'
+import { CoordinatesFormGroup } from '../Shared/CoordinatesFormGroup'
 
 type Props = {
-    query: string,
     sequence: string,
-    domains: Domain[],
-    processing: boolean,
+    domains: ScaledDomain[],
     mapping: Alignment[],
-    update: (sequence: string) => void,
-    fire: () => void,
+    processing: boolean,
+    fire: (query: string) => void,
 }
 
-export const MappingEditor: React.FC<Props> = ({ query, sequence, domains, processing, mapping, update, fire }) => {
+export const MappingEditor: React.FC<Props> = ({ sequence, domains, mapping, processing, fire }) => {
+    const [query, setQuery] = useState<string>('')
+
     const isQueryValid = query.trim() != '' && mapping.filter(alignment => {
         return query.toUpperCase().trim() == alignment.sequence.toUpperCase().trim()
     }).length == 0
 
     const setCoordinates = (start, stop) => {
-        update(sequence.slice(start - 1, stop))
+        setQuery(sequence.slice(start - 1, stop))
     }
 
     const selectDomain = domain => {
@@ -31,25 +31,13 @@ export const MappingEditor: React.FC<Props> = ({ query, sequence, domains, proce
 
     return (
         <React.Fragment>
-            <DomainsFormGroup
-                domains={domains}
-                enabled={!processing}
-                select={selectDomain}
-            >
+            <DomainsFormGroup domains={domains} enabled={!processing} select={selectDomain}>
                 Extract feature sequence
             </DomainsFormGroup>
-            <CoordinatesFormGroup
-                sequence={sequence}
-                enabled={!processing}
-                set={update}
-            >
+            <CoordinatesFormGroup sequence={sequence} enabled={!processing} set={setQuery}>
                 Extract sequence to map
             </CoordinatesFormGroup>
-            <ExtractFormGroup
-                sequence={sequence}
-                enabled={!processing}
-                set={setCoordinates}
-            >
+            <ExtractFormGroup sequence={sequence} enabled={!processing} set={setCoordinates}>
                 Extract sequence to map
             </ExtractFormGroup>
             <div className="row">
@@ -58,7 +46,7 @@ export const MappingEditor: React.FC<Props> = ({ query, sequence, domains, proce
                         className="form-control"
                         placeholder="Sequence to map"
                         value={query}
-                        onChange={e => update(e.target.value)}
+                        onChange={e => setQuery(e.target.value)}
                         readOnly={processing}
                     />
                 </div>
@@ -68,13 +56,10 @@ export const MappingEditor: React.FC<Props> = ({ query, sequence, domains, proce
                     <button
                         type="button"
                         className="btn btn-block btn-primary"
-                        onClick={e => fire()}
+                        onClick={e => fire(query)}
                         disabled={processing || !isQueryValid}
                     >
-                        {processing
-                            ? <span className="spinner-border spinner-border-sm"></span>
-                            : <span className="fas fa-cogs"></span>
-                        }
+                        <span className={processing ? 'spinner-border spinner-border-sm' : 'fas fa-cogs'}></span>
                         &nbsp;
                         Start alignment
                     </button>

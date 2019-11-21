@@ -1,41 +1,39 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 
-import { SearchResult } from '../types'
+import { SearchResult } from '../../api'
 
 type Props = {
     query: string,
-    max?: number
-    placeholder?: string,
-    update: (query: string) => void,
     search: (query: string) => Promise<SearchResult[]>,
+    update: (query: string) => void,
     select: (value: string) => void,
+    placeholder?: string,
+    max?: number
 }
 
-export const SearchField: React.FC<Props> = ({ query, update, search, select, max = 5, placeholder }) => {
-    const timeout = useRef(null)
+export const SearchField: React.FC<Props> = ({ query, update, search, select, placeholder = '', max = 5 }) => {
     const [results, setResults] = useState<SearchResult[]>([]);
     const [visible, setVisible] = useState<boolean>(false)
     const [active, setActive] = useState<number>(0)
     const [searching, setSearching] = useState<boolean>(false)
 
     useEffect(() => {
-        if (timeout.current) clearTimeout(timeout.current)
-
-        setResults([])
-        setSearching(query.trim() != '')
-
-        if (query.trim() != '') {
-            timeout.current = setTimeout(() => {
+        const timeout = setTimeout(() => {
+            if (query.trim().length > 0) {
                 search(query)
                     .then(results => setResults(results))
                     .catch(error => console.log(error))
                     .finally(() => setSearching(false))
-            }, 400)
-        }
+            }
+        }, 300)
+
+        return () => clearTimeout(timeout)
     }, [query])
 
-    useEffect(() => setActive(0), [results])
+    useEffect(() => setResults([]), [query])
     useEffect(() => setVisible(!searching), [searching])
+    useEffect(() => setActive(0), [results])
+    useEffect(() => setSearching(query.trim().length > 0), [query])
 
     const regex = query.trim()
         .replace(/\s*\+$/, '')
@@ -79,7 +77,7 @@ export const SearchField: React.FC<Props> = ({ query, update, search, select, ma
     }
 
     return (
-        <React.Fragment>
+        <div>
             <div className="input-group">
                 <div className="input-group-prepend">
                     <span className="input-group-text">
@@ -117,6 +115,6 @@ export const SearchField: React.FC<Props> = ({ query, update, search, select, ma
                     </ul>
                 </div>
             </div>
-        </React.Fragment>
+        </div>
     )
 }

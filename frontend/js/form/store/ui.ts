@@ -1,9 +1,9 @@
 import { AppActionTypes, AppAction } from './actions'
 import { InteractorAction, isInteractorAction } from './actions'
 
-import { UInterface, InteractorInterface, InteractorI, Feedback, Alignment } from '../types'
+import { UI, InteractorUI, InteractorI, Feedback, Alignment } from '../types'
 
-export const uinterface = (state: UInterface, action: AppAction): UInterface => {
+export const ui = (state: UI, action: AppAction): UI => {
     return {
         method: {
             query: qmethod(state.method.query, action),
@@ -26,25 +26,22 @@ const qmethod = (state: string, action: AppAction): string => {
     }
 }
 
-const interactor = (i: InteractorI) => (state: InteractorInterface, action: AppAction): InteractorInterface => {
+const interactor = (i: InteractorI) => (state: InteractorUI, action: AppAction): InteractorUI => {
     if (isInteractorAction(action) && i == action.i) {
         return {
             protein: {
-                query: qprotein(state.protein.query, action),
+                query: query(state.protein.query, action),
             },
             editing: editing(state.editing, action),
             processing: processing(state.processing, action),
-            alignment: {
-                query: qalignment(state.alignment.query, action),
-                current: current(state.alignment.current, action),
-            }
+            alignment: alignment(state.alignment, action),
         }
     }
 
     return state
 }
 
-const qprotein = (state: string, action: InteractorAction): string => {
+const query = (state: string, action: InteractorAction): string => {
     switch (action.type) {
         case AppActionTypes.UPDATE_PROTEIN_QUERY:
             return action.query
@@ -85,24 +82,7 @@ const processing = (state: boolean, action: InteractorAction): boolean => {
     }
 }
 
-const qalignment = (state: string, action: InteractorAction): string => {
-    switch (action.type) {
-        case AppActionTypes.UPDATE_ALIGNMENT_QUERY:
-            return action.query
-        case AppActionTypes.SELECT_PROTEIN:
-            return ''
-        case AppActionTypes.UNSELECT_PROTEIN:
-            return ''
-        case AppActionTypes.ADD_ALIGNMENT:
-            return ''
-        case AppActionTypes.RESET_INTERACTOR:
-            return ''
-        default:
-            return state
-    }
-}
-
-const current = (state: Alignment, action: InteractorAction): Alignment => {
+const alignment = (state: Alignment, action: InteractorAction): Alignment => {
     switch (action.type) {
         case AppActionTypes.SHOW_ALIGNMENT:
             return action.alignment

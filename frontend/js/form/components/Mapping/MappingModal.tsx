@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import Modal from 'react-bootstrap4-modal';
 
-import { ProteinType, InteractorI, Coordinates, Alignment } from '../types'
+import { ProteinType, InteractorI, Coordinates, Alignment } from '../../types'
 
-import { MappingImg } from './MappingImg';
+import { SequenceImg } from '../Shared/SequenceImg';
+
+type Index = [number, number]
 
 type Props = {
     i: InteractorI,
@@ -14,8 +16,6 @@ type Props = {
     add: (alignment: Alignment) => void,
     cancel: () => void,
 }
-
-type Index = [number, number]
 
 const indexes = (alignment: Alignment): Index[] => {
     const indexes = []
@@ -50,15 +50,15 @@ export const MappingModal: React.FC<Props> = ({ i, type, name, coordinates, alig
         return selected.filter(s => s[0] == i && s[1] == j).length > 0
     }
 
-    const select = (i: number, j: number): void => {
+    const select = (i: number, j: number) => {
         setSelected([].concat(selected, [[i, j]]))
     }
 
-    const unselect = (i: number, j: number): void => {
+    const unselect = (i: number, j: number) => {
         setSelected(selected.filter(s => s[0] != i || s[1] != j))
     }
 
-    const toggle = (checked: boolean, i: number, j: number): void => {
+    const toggle = (checked: boolean, i: number, j: number) => {
         checked ? select(i, j) : unselect(i, j)
     }
 
@@ -103,11 +103,11 @@ export const MappingModal: React.FC<Props> = ({ i, type, name, coordinates, alig
                                             <li key={j}>
                                                 <div className="row">
                                                     <div className="col-11">
-                                                        <MappingImg
+                                                        <SequenceImg
                                                             type={type}
                                                             start={occurrence.start}
                                                             stop={occurrence.stop}
-                                                            width={coordinates[isoform.accession].width}
+                                                            length={coordinates[isoform.accession].length}
                                                             active={isOccurrenceSelected(i, j)}
                                                         />
                                                     </div>
