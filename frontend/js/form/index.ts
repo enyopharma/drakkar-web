@@ -10,8 +10,8 @@ declare global {
 }
 
 window.descriptions = {
-    form: (wrapper: string, container: string, type: DescriptionType, run_id: number, pmid: number, description) => {
-        render(App(wrapper, type, run_id, pmid, initialState(description)), document.getElementById(container))
+    form: (container: string, type: DescriptionType, run_id: number, pmid: number, description) => {
+        render(App(type, run_id, pmid, initialState(description)), document.getElementById(container))
     }
 }
 

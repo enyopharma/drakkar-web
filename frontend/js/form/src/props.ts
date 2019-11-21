@@ -4,16 +4,15 @@ import * as creators from './creators'
 import { AppState, InteractorUI } from './state'
 import { DescriptionType, InteractorI, Interactor, ProteinType, Mature, Sequences, Alignment } from './types'
 
-type OwnProps = { wrapper: string, type: DescriptionType, run_id: number, pmid: number }
+type OwnProps = { type: DescriptionType, run_id: number, pmid: number }
 export type AppProps = ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>
 export type MethodProps = ReturnType<typeof mapStateToMethodProps> & ReturnType<typeof mapDispatchToMethodProps>
 export type InteractorProps = ReturnType<typeof mapStateToInteractorProps> & ReturnType<typeof mapDispatchToInteractorProps>
-export type SubmitProps = ReturnType<typeof mapStateToSubmitProps> & ReturnType<typeof mapDispatchToSubmitProps>
 
 export const connect = (component) => redux.connect(mapStateToProps, mapDispatchToProps)(component);
 
 // mapStateToProps
-const mapStateToProps = (state: AppState, { wrapper, type }: OwnProps) => {
+const mapStateToProps = (state: AppState, { type }: OwnProps) => {
     const [type1, type2] = type == 'hh'
         ? ['h' as ProteinType, 'h' as ProteinType]
         : ['h' as ProteinType, 'v' as ProteinType]
@@ -22,7 +21,20 @@ const mapStateToProps = (state: AppState, { wrapper, type }: OwnProps) => {
         method: mapStateToMethodProps(state),
         interactor1: mapStateToInteractorProps(1, type1, state.description.interactor1, state.ui.interactor1),
         interactor2: mapStateToInteractorProps(2, type2, state.description.interactor2, state.ui.interactor2),
-        submit: mapStateToSubmitProps(state, wrapper),
+        feedback: state.ui.feedback,
+        saving: state.ui.saving,
+        resetable: !state.ui.interactor1.processing && !state.ui.interactor2.processing,
+        savable: !state.ui.interactor1.editing && !state.ui.interactor2.editing
+            && !state.ui.interactor1.processing && !state.ui.interactor2.processing
+            && state.description.method.psimi_id != null
+            && state.description.interactor1.protein.accession != null
+            && state.description.interactor1.name != ''
+            && state.description.interactor1.start != null
+            && state.description.interactor1.stop != null
+            && state.description.interactor2.protein.accession != null
+            && state.description.interactor2.name != ''
+            && state.description.interactor2.start != null
+            && state.description.interactor2.stop != null,
     }
 }
 
@@ -45,32 +57,15 @@ const mapStateToInteractorProps = (i: InteractorI, type: ProteinType, interactor
     alignment: ui.alignment,
 })
 
-const mapStateToSubmitProps = (state: AppState, wrapper: string) => ({
-    top: wrapper,
-    saving: state.ui.saving,
-    feedback: state.ui.feedback,
-    resetable: !state.ui.interactor1.processing && !state.ui.interactor2.processing,
-    savable: !state.ui.interactor1.editing && !state.ui.interactor2.editing
-        && !state.ui.interactor1.processing && !state.ui.interactor2.processing
-        && state.description.method.psimi_id != null
-        && state.description.interactor1.protein.accession != null
-        && state.description.interactor1.name != ''
-        && state.description.interactor1.start != null
-        && state.description.interactor1.stop != null
-        && state.description.interactor2.protein.accession != null
-        && state.description.interactor2.name != ''
-        && state.description.interactor2.start != null
-        && state.description.interactor2.stop != null,
-})
-
 // mapDispatchToProps
 const mapDispatchToProps = (dispatch, { run_id, pmid }: OwnProps) => ({
     actions: {
         method: mapDispatchToMethodProps(dispatch),
         interactor1: mapDispatchToInteractorProps(1, dispatch),
         interactor2: mapDispatchToInteractorProps(2, dispatch),
-        submit: mapDispatchToSubmitProps(dispatch, run_id, pmid),
     },
+    save: () => dispatch(creators.fireSave(run_id, pmid)),
+    reset: () => dispatch(creators.resetForm()),
 })
 
 const mapDispatchToMethodProps = (dispatch) => ({
@@ -98,12 +93,5 @@ const mapDispatchToInteractorProps = (i: InteractorI, dispatch) => ({
             remove: (index: number) => dispatch(creators.removeAlignment(i, index)),
             cancel: () => dispatch(creators.cancelAlignment(i)),
         },
-    },
-})
-
-const mapDispatchToSubmitProps = (dispatch, run_id: number, pmid: number) => ({
-    actions: {
-        save: () => dispatch(creators.fireSave(run_id, pmid)),
-        reset: () => dispatch(creators.resetForm()),
     },
 })

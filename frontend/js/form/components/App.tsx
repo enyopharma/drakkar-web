@@ -8,25 +8,16 @@ import { AppState } from '../src/state'
 import { AppProps } from '../src/props'
 import { DescriptionType } from '../src/types'
 
-import { MethodFieldset } from './MethodFieldset'
-import { SubmitFieldset } from './SubmitFieldset'
-import { InteractorFieldset } from './InteractorFieldset'
+import { Form } from './Form'
 
-const StatelessForm: React.FC<AppProps> = ({ method, interactor1, interactor2, submit, actions }) => {
-    return (
-        <form onSubmit={e => e.preventDefault()}>
-            <MethodFieldset {...method} {...actions.method} />
-            <InteractorFieldset {...interactor1} {...actions.interactor1} />
-            <InteractorFieldset {...interactor2} {...actions.interactor2} />
-            <SubmitFieldset {...submit} {...actions.submit} />
-        </form>
-    )
+const StatelessApp: React.FC<AppProps> = (props) => {
+    return <Form {...props} />
 }
 
-const StatefulForm = connect(StatelessForm);
+const StatefulApp = connect(StatelessApp);
 
-export const App = (wrapper: string, type: DescriptionType, run_id: number, pmid: number, state: AppState) => (
+export const App = (type: DescriptionType, run_id: number, pmid: number, state: AppState) => (
     <Provider store={create(state)}>
-        <StatefulForm type={type} run_id={run_id} pmid={pmid} wrapper={wrapper} />
+        <StatefulApp type={type} run_id={run_id} pmid={pmid} />
     </Provider>
 )

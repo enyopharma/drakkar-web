@@ -5,7 +5,6 @@
 <script type="text/javascript" src="<?= $this->asset('form.js') ?>"></script>
 <script type="text/javascript">
     descriptions.form(
-        'description-wrap',
         'description-form',
         '<?= $run['type'] ?>',
         <?= $run['id'] ?>,
@@ -38,21 +37,10 @@
         : $this->url('runs.publications.descriptions.edit', $description)
 ]) ?>
 
-<div id="description-wrap" class="row">
-    <div class="col">
-        <div class="card">
-            <h3 class="card-header">
-                Add a new description
-            </h3>
-            <div class="card-body">
-                <?php if ($publication['state'] == $selected): ?>
-                <div id="description-form"></div>
-                <?php else: ?>
-                <p class="card-text text-warning">
-                    Publication state must be 'selected' in order to add new descriptions.
-                </p>
-                <?php endif ?>
-            </div>
-        </div>
-    </div>
-</div>
+<?php if ($publication['state'] == $selected): ?>
+<div id="description-form"></div>
+<?php else: ?>
+<p class="card-text text-warning">
+    Publication state must be 'selected' in order to add new descriptions.
+</p>
+<?php endif ?>
