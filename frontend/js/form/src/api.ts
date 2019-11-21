@@ -1,16 +1,9 @@
 import qs from 'query-string'
 import fetch from 'cross-fetch'
 
-import { Description, Method, ProteinType, Protein } from './types'
-import { Sequences, Alignment } from './types'
-import { Feedback } from './types'
+import { SearchResult, Description, Method, ProteinType, Protein, Sequences, Alignment, Feedback } from './types'
 
 const uuid = require('uuid/v4')
-
-export type SearchResult = {
-    value: string,
-    label: string,
-}
 
 export const methods = {
     search: async (q: string): Promise<SearchResult[]> => {

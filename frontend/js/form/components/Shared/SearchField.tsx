@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { SearchResult } from '../../src/api'
+import { SearchResult } from '../../src/types'
 
 type Props = {
     query: string,

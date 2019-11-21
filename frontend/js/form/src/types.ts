@@ -94,3 +94,8 @@ export type Feedback = {
     success: boolean,
     errors: string[],
 }
+
+export type SearchResult = {
+    value: string,
+    label: string,
+}
