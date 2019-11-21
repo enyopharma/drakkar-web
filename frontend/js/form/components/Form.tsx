@@ -8,16 +8,16 @@ import { AppProps } from '../store/connect'
 import { AppState, DescriptionType } from '../types'
 
 import { MethodFieldset } from './MethodFieldset'
-import { ActionsFieldset } from './ActionsFieldset'
+import { SubmitFieldset } from './SubmitFieldset'
 import { InteractorFieldset } from './InteractorFieldset'
 
-const StatelessForm: React.FC<AppProps> = ({ method, interactor1, interactor2, actions }) => {
+const StatelessForm: React.FC<AppProps> = ({ method, interactor1, interactor2, submit, actions }) => {
     return (
         <form onSubmit={e => e.preventDefault()}>
-            <MethodFieldset {...method} />
-            <InteractorFieldset {...interactor1} />
-            <InteractorFieldset {...interactor2} />
-            <ActionsFieldset {...actions} />
+            <MethodFieldset {...method} {...actions.method} />
+            <InteractorFieldset {...interactor1} {...actions.interactor1} />
+            <InteractorFieldset {...interactor2} {...actions.interactor2} />
+            <SubmitFieldset {...submit} {...actions.submit} />
         </form>
     )
 }

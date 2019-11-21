@@ -1,84 +1,37 @@
 import * as redux from 'react-redux'
 import * as creators from './creators'
 
-import { DescriptionType, ProteinType, InteractorI, Mature, Sequences, Alignment } from '../types'
+import { AppState, DescriptionType, InteractorI, Interactor, InteractorUI, ProteinType, Mature, Sequences, Alignment } from '../types'
 
-type AppStateProps = ReturnType<typeof mapStateToProps>
-type AppDispatchProps = ReturnType<typeof mapDispatchToProps>
 type OwnProps = { wrapper: string, type: DescriptionType, run_id: number, pmid: number }
 
-export type AppProps = ReturnType<typeof mergeProps>
+export type AppProps = ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>
+export type MethodProps = ReturnType<typeof mapStateToMethodProps> & ReturnType<typeof mapDispatchToMethodProps>
+export type InteractorProps = ReturnType<typeof mapStateToInteractorProps> & ReturnType<typeof mapDispatchToInteractorProps>
+export type SubmitProps = ReturnType<typeof mapStateToSubmitProps> & ReturnType<typeof mapDispatchToSubmitProps>
 
-const mapStateToProps = (state) => state
+export const connect = (component) => redux.connect(mapStateToProps, mapDispatchToProps)(component);
 
-const mapDispatchToProps = (dispatch, { run_id, pmid }: OwnProps) => ({
-    updateMethod: (query: string) => dispatch(creators.updateMethodQuery(query)),
-    selectMethod: (psimi_id: string) => dispatch(creators.selectMethod(psimi_id)),
-    unselectMethod: () => dispatch(creators.unselectMethod()),
-    interactor1: mapDispatchToInteractorProps(1, dispatch),
-    interactor2: mapDispatchToInteractorProps(2, dispatch),
-    save: () => dispatch(creators.fireSave(run_id, pmid)),
-    reset: () => dispatch(creators.resetForm()),
-})
-
-const mergeProps = (props: AppStateProps, actions: AppDispatchProps, { wrapper, type }: OwnProps) => {
+// mapStateToProps
+const mapStateToProps = (state: AppState, { wrapper, type }: OwnProps) => {
     const [type1, type2] = type == 'hh'
         ? ['h' as ProteinType, 'h' as ProteinType]
         : ['h' as ProteinType, 'v' as ProteinType]
 
     return {
-        method: {
-            query: props.ui.method.query,
-            psimi_id: props.description.method.psimi_id,
-            update: actions.updateMethod,
-            select: actions.selectMethod,
-            unselect: actions.unselectMethod,
-        },
-        interactor1: mergeInteractorProps(1, type1, props.description.interactor1, props.ui.interactor1, actions.interactor1),
-        interactor2: mergeInteractorProps(2, type2, props.description.interactor2, props.ui.interactor2, actions.interactor2),
-        actions: {
-            top: wrapper,
-            saving: props.ui.saving,
-            feedback: props.ui.feedback,
-            resetable: !props.ui.interactor1.processing && !props.ui.interactor2.processing,
-            savable: !props.ui.interactor1.editing && !props.ui.interactor2.editing
-                && !props.ui.interactor1.processing && !props.ui.interactor2.processing
-                && props.description.method.psimi_id != null
-                && props.description.interactor1.protein.accession != null
-                && props.description.interactor1.name != ''
-                && props.description.interactor1.start != null
-                && props.description.interactor1.stop != null
-                && props.description.interactor2.protein.accession != null
-                && props.description.interactor2.name != ''
-                && props.description.interactor2.start != null
-                && props.description.interactor2.stop != null,
-            save: actions.save,
-            reset: actions.reset,
-        },
+        method: mapStateToMethodProps(state),
+        interactor1: mapStateToInteractorProps(1, type1, state.description.interactor1, state.ui.interactor1),
+        interactor2: mapStateToInteractorProps(2, type2, state.description.interactor2, state.ui.interactor2),
+        submit: mapStateToSubmitProps(state, wrapper),
     }
 }
 
-export const connect = redux.connect(mapStateToProps, mapDispatchToProps, mergeProps);
+const mapStateToMethodProps = (state: AppState) => ({
+    query: state.ui.method.query,
+    psimi_id: state.description.method.psimi_id,
+})
 
-
-// interactor
-import { Interactor, InteractorUI } from '../types'
-
-type InteractorDispatchProps = ReturnType<typeof mapDispatchToInteractorProps>
-
-const mapDispatchToInteractorProps = (i: InteractorI, dispatch) => ({
-    updateProtein: (query: string) => dispatch(creators.updateProteinQuery(i, query)),
-    selectProtein: (accession: string) => dispatch(creators.selectProtein(i, accession)),
-    unselectProtein: () => dispatch(creators.unselectProtein(i)),
-    editSequence: () => dispatch(creators.editMature(i)),
-    updateSequence: (mature: Mature) => dispatch(creators.updateMature(i, mature)),
-    fireAlignment: (query: string, sequences: Sequences) => dispatch(creators.fireAlignment(i, query, sequences)),
-    addAlignment: (alignment: Alignment) => dispatch(creators.addAlignment(i, alignment)),
-    removeAlignment: (index: number) => dispatch(creators.removeAlignment(i, index)),
-    cancelAlignment: () => dispatch(creators.cancelAlignment(i)),
-});
-
-const mergeInteractorProps = (i: InteractorI, type: ProteinType, interactor: Interactor, ui: InteractorUI, actions: InteractorDispatchProps) => ({
+const mapStateToInteractorProps = (i: InteractorI, type: ProteinType, interactor: Interactor, ui: InteractorUI) => ({
     i: i,
     type: type,
     query: ui.protein.query,
@@ -90,21 +43,67 @@ const mergeInteractorProps = (i: InteractorI, type: ProteinType, interactor: Int
     editing: ui.editing,
     processing: ui.processing,
     alignment: ui.alignment,
+})
+
+const mapStateToSubmitProps = (state: AppState, wrapper: string) => ({
+    top: wrapper,
+    saving: state.ui.saving,
+    feedback: state.ui.feedback,
+    resetable: !state.ui.interactor1.processing && !state.ui.interactor2.processing,
+    savable: !state.ui.interactor1.editing && !state.ui.interactor2.editing
+        && !state.ui.interactor1.processing && !state.ui.interactor2.processing
+        && state.description.method.psimi_id != null
+        && state.description.interactor1.protein.accession != null
+        && state.description.interactor1.name != ''
+        && state.description.interactor1.start != null
+        && state.description.interactor1.stop != null
+        && state.description.interactor2.protein.accession != null
+        && state.description.interactor2.name != ''
+        && state.description.interactor2.start != null
+        && state.description.interactor2.stop != null,
+})
+
+// mapDispatchToProps
+const mapDispatchToProps = (dispatch, { run_id, pmid }: OwnProps) => ({
+    actions: {
+        method: mapDispatchToMethodProps(dispatch),
+        interactor1: mapDispatchToInteractorProps(1, dispatch),
+        interactor2: mapDispatchToInteractorProps(2, dispatch),
+        submit: mapDispatchToSubmitProps(dispatch, run_id, pmid),
+    },
+})
+
+const mapDispatchToMethodProps = (dispatch) => ({
+    actions: {
+        update: (query: string) => dispatch(creators.updateMethodQuery(query)),
+        select: (psimi_id: string) => dispatch(creators.selectMethod(psimi_id)),
+        unselect: () => dispatch(creators.unselectMethod()),
+    },
+})
+
+const mapDispatchToInteractorProps = (i: InteractorI, dispatch) => ({
     actions: {
         protein: {
-            update: actions.updateProtein,
-            select: actions.selectProtein,
-            unselect: actions.unselectProtein,
+            update: (query: string) => dispatch(creators.updateProteinQuery(i, query)),
+            select: (accession: string) => dispatch(creators.selectProtein(i, accession)),
+            unselect: () => dispatch(creators.unselectProtein(i)),
         },
         sequence: {
-            edit: actions.editSequence,
-            update: actions.updateSequence,
+            edit: () => dispatch(creators.editMature(i)),
+            update: (mature: Mature) => dispatch(creators.updateMature(i, mature)),
         },
         mapping: {
-            fire: actions.fireAlignment,
-            add: actions.addAlignment,
-            remove: actions.removeAlignment,
-            cancel: actions.cancelAlignment,
-        }
-    }
+            fire: (query: string, sequences: Sequences) => dispatch(creators.fireAlignment(i, query, sequences)),
+            add: (alignment: Alignment) => dispatch(creators.addAlignment(i, alignment)),
+            remove: (index: number) => dispatch(creators.removeAlignment(i, index)),
+            cancel: () => dispatch(creators.cancelAlignment(i)),
+        },
+    },
+})
+
+const mapDispatchToSubmitProps = (dispatch, run_id: number, pmid: number) => ({
+    actions: {
+        save: () => dispatch(creators.fireSave(run_id, pmid)),
+        reset: () => dispatch(creators.resetForm()),
+    },
 })

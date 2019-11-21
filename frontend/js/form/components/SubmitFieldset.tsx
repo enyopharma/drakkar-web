@@ -1,23 +1,13 @@
 import React, { useState } from 'react'
 import Modal from 'react-bootstrap4-modal';
 
-import { Feedback } from '../types'
+import { SubmitProps } from '../store/connect'
 
-type Props = {
-    top: string,
-    feedback: Feedback,
-    saving: boolean,
-    savable: boolean,
-    resetable: boolean,
-    save: () => void,
-    reset: () => void,
-}
-
-export const ActionsFieldset: React.FC<Props> = ({ top, feedback, saving, savable, resetable, save, reset }) => {
+export const SubmitFieldset: React.FC<SubmitProps> = ({ top, saving, savable, resetable, feedback, actions }) => {
     const [modal, setModal] = useState<boolean>(false)
 
     const submitReset = (): void => {
-        reset()
+        actions.reset()
         setModal(false)
         document.getElementById(top).scrollIntoView()
     }
@@ -34,7 +24,7 @@ export const ActionsFieldset: React.FC<Props> = ({ top, feedback, saving, savabl
                     <button
                         type="button"
                         className="btn btn-block btn-primary"
-                        onClick={e => save()}
+                        onClick={e => actions.save()}
                         disabled={saving || !savable}
                     >
                         {saving
@@ -81,7 +71,7 @@ export const ActionsFieldset: React.FC<Props> = ({ top, feedback, saving, savabl
             {feedback == null ? null : (
                 <div className={feedback.success ? 'text-success' : 'text-danger'}>
                     {feedback.success
-                        ? 'Description successfully saved!'
+                        ? <ul><li>'Description successfully saved!'</li></ul>
                         : <ul>{feedback.errors.map((e, i) => <li key={i}>{e}</li>)}</ul>
                     }
                 </div>
