@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 
 import { ScaledDomain, Alignment } from '../../src/types'
 
@@ -7,22 +7,22 @@ import { ExtractFormGroup } from '../Shared/ExtractFormGroup'
 import { CoordinatesFormGroup } from '../Shared/CoordinatesFormGroup'
 
 type Props = {
+    query: string,
     sequence: string,
     domains: ScaledDomain[],
     mapping: Alignment[],
     processing: boolean,
+    update: (query: string) => void,
     fire: (query: string) => void,
 }
 
-export const MappingEditor: React.FC<Props> = ({ sequence, domains, mapping, processing, fire }) => {
-    const [query, setQuery] = useState<string>('')
-
+export const MappingEditor: React.FC<Props> = ({ query, sequence, domains, mapping, processing, update, fire }) => {
     const isQueryValid = query.trim() != '' && mapping.filter(alignment => {
         return query.toUpperCase().trim() == alignment.sequence.toUpperCase().trim()
     }).length == 0
 
     const setCoordinates = (start, stop) => {
-        setQuery(sequence.slice(start - 1, stop))
+        update(sequence.slice(start - 1, stop))
     }
 
     const selectDomain = domain => {
@@ -34,7 +34,7 @@ export const MappingEditor: React.FC<Props> = ({ sequence, domains, mapping, pro
             <DomainsFormGroup domains={domains} enabled={!processing} select={selectDomain}>
                 Extract feature sequence
             </DomainsFormGroup>
-            <CoordinatesFormGroup sequence={sequence} enabled={!processing} set={setQuery}>
+            <CoordinatesFormGroup sequence={sequence} enabled={!processing} set={update}>
                 Extract sequence to map
             </CoordinatesFormGroup>
             <ExtractFormGroup sequence={sequence} enabled={!processing} set={setCoordinates}>
@@ -46,7 +46,7 @@ export const MappingEditor: React.FC<Props> = ({ sequence, domains, mapping, pro
                         className="form-control"
                         placeholder="Sequence to map"
                         value={query}
-                        onChange={e => setQuery(e.target.value)}
+                        onChange={e => update(e.target.value)}
                         readOnly={processing}
                     />
                 </div>

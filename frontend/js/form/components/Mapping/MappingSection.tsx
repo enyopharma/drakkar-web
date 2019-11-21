@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 
 import { InteractorI, Protein, ScaledDomain, Coordinates, Sequences, Alignment } from '../../src/types'
 
@@ -22,6 +22,14 @@ type Props = {
 }
 
 export const MappingSection: React.FC<Props> = ({ protein, ...props }) => {
+    const [query, setQuery] = useState<string>('')
+
+    useEffect(() => {
+        if (props.alignment == null) {
+            setQuery('')
+        }
+    }, [props.alignment])
+
     const isFull = props.start == 1 && props.stop == protein.sequence.length
 
     const sequence = protein.sequence.slice(props.start - 1, props.stop)
@@ -65,7 +73,7 @@ export const MappingSection: React.FC<Props> = ({ protein, ...props }) => {
 
     return (
         <React.Fragment>
-            <MappingEditor {...props} sequence={sequence} domains={domains} fire={fire} />
+            <MappingEditor {...props} query={query} sequence={sequence} domains={domains} update={setQuery} fire={fire} />
             <MappingDisplay {...props} type={type} coordinates={coordinates} />
             {props.alignment == null ? null : (
                 <MappingModal {...props} type={type} coordinates={coordinates} />
