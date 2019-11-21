@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react'
 
-import { proteins as api } from '../api'
-import { InteractorProps } from '../store/connect'
+import { proteins as api } from '../src/api'
 
-import { Protein } from '../types'
+import { Protein } from '../src/types'
+import { InteractorProps } from '../src/props'
 
 import { ProteinAlert } from './ProteinAlert'
 import { SearchField } from './Shared/SearchField'

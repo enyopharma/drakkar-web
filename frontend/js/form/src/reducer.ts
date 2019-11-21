@@ -1,6 +1,5 @@
+import { AppState } from './state'
 import { AppAction } from './actions'
-
-import { AppState } from '../types'
 
 import { ui } from './ui'
 import { description } from './description'

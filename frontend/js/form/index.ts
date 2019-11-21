@@ -1,8 +1,9 @@
 import { render } from 'react-dom'
 
-import { AppState, Description, DescriptionType } from './types'
+import { AppState } from './src/state'
+import { Description, DescriptionType } from './src/types'
 
-import { Form } from './components/Form'
+import { App } from './components/App'
 
 declare global {
     interface Window { descriptions: any; }
@@ -10,7 +11,7 @@ declare global {
 
 window.descriptions = {
     form: (wrapper: string, container: string, type: DescriptionType, run_id: number, pmid: number, description) => {
-        render(Form(wrapper, type, run_id, pmid, initialState(description)), document.getElementById(container))
+        render(App(wrapper, type, run_id, pmid, initialState(description)), document.getElementById(container))
     }
 }
 

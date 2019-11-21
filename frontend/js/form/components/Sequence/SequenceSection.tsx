@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Protein, Mature } from '../../types'
+import { Protein, Mature } from '../../src/types'
 
 import { SequenceEditor } from './SequenceEditor'
 import { SequenceTextarea } from './SequenceTextarea'

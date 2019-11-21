@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { Chain } from '../../types'
+import { Chain } from '../../src/types'
 
 type Props = {
     chains: Chain[],

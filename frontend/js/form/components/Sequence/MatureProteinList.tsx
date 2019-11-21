@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { Mature } from '../../types'
+import { Mature } from '../../src/types'
 
 type Props = {
     matures: Mature[],

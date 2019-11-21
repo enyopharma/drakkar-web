@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Modal from 'react-bootstrap4-modal';
 
-import { ProteinType, InteractorI, Coordinates, Alignment } from '../../types'
+import { ProteinType, InteractorI, Coordinates, Alignment } from '../../src/types'
 
 import { SequenceImg } from '../Shared/SequenceImg';
 

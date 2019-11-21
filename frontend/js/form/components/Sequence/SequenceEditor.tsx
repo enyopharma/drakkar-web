@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { Mature, Chain } from '../../types'
+import { Mature, Chain } from '../../src/types'
 
 import { ChainsFormGroup } from './ChainsFormGroup'
 import { MatureProteinList } from './MatureProteinList'

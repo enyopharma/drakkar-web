@@ -1,9 +1,9 @@
 import { ThunkAction, ThunkDispatch } from 'redux-thunk'
 
-import * as api from '../api'
-import { AppState, InteractorI, Mature, Sequences, Alignment } from '../types'
-
+import * as api from './api'
+import { AppState } from './state'
 import { AppActionTypes, AppAction } from './actions'
+import { InteractorI, Mature, Sequences, Alignment } from './types'
 
 export const updateMethodQuery = (query: string): AppAction => ({
     type: AppActionTypes.UPDATE_METHOD_QUERY,

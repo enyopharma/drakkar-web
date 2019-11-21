@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Modal from 'react-bootstrap4-modal';
 
-import { SubmitProps } from '../store/connect'
+import { SubmitProps } from '../src/props'
 
 export const SubmitFieldset: React.FC<SubmitProps> = ({ top, saving, savable, resetable, feedback, actions }) => {
     const [modal, setModal] = useState<boolean>(false)

@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 
-import { ScaledDomain, Alignment } from '../../types'
+import { ScaledDomain, Alignment } from '../../src/types'
 
 import { DomainsFormGroup } from './DomainsFormGroup'
 import { ExtractFormGroup } from '../Shared/ExtractFormGroup'

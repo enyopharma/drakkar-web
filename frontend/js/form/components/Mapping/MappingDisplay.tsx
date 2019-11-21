@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { ProteinType, Coordinates, Alignment } from '../../types'
+import { ProteinType, Coordinates, Alignment } from '../../src/types'
 
 import { SequenceImg } from '../Shared/SequenceImg'
 

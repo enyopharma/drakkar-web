@@ -1,10 +1,10 @@
 import * as redux from 'react-redux'
-import * as creators from './creators'
 
-import { AppState, DescriptionType, InteractorI, Interactor, InteractorUI, ProteinType, Mature, Sequences, Alignment } from '../types'
+import * as creators from './creators'
+import { AppState, InteractorUI } from './state'
+import { DescriptionType, InteractorI, Interactor, ProteinType, Mature, Sequences, Alignment } from './types'
 
 type OwnProps = { wrapper: string, type: DescriptionType, run_id: number, pmid: number }
-
 export type AppProps = ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatchToProps>
 export type MethodProps = ReturnType<typeof mapStateToMethodProps> & ReturnType<typeof mapDispatchToMethodProps>
 export type InteractorProps = ReturnType<typeof mapStateToInteractorProps> & ReturnType<typeof mapDispatchToInteractorProps>

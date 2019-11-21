@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react'
 
-import { methods as api } from '../api'
+import { methods as api } from '../src/api'
 
-import { MethodProps } from '../store/connect'
-
-import { Method } from '../types'
+import { Method } from '../src/types'
+import { MethodProps } from '../src/props'
 
 import { MethodAlert } from './MethodAlert'
 import { SearchField } from './Shared/SearchField'

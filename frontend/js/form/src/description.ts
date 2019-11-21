@@ -1,6 +1,6 @@
 import { AppActionTypes, AppAction } from './actions'
 import { InteractorAction, isInteractorAction } from './actions'
-import { Description, InteractorI, Interactor, Alignment } from '../types'
+import { Description, InteractorI, Interactor, Alignment } from './types'
 
 export const description = (state: Description, action: AppAction): Description => {
     return {

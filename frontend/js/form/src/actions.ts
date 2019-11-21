@@ -1,4 +1,4 @@
-import { Method, InteractorI, Protein, Mature, Alignment } from '../types'
+import { Method, InteractorI, Protein, Mature, Alignment } from './types'
 
 export enum AppActionTypes {
     UPDATE_METHOD_QUERY,

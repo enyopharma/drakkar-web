@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Method } from '../types'
+import { Method } from '../src/types'
 
 type Props = {
     method: Method,

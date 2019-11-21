@@ -1,8 +1,3 @@
-export type AppState = {
-    description: Description,
-    ui: UI,
-}
-
 export type DescriptionType = 'hh' | 'vh'
 
 export type Description = {
@@ -35,30 +30,6 @@ export type Alignment = {
             identity: number,
         }>
     }>,
-}
-
-export type UI = {
-    method: {
-        query: string,
-    }
-    interactor1: InteractorUI,
-    interactor2: InteractorUI,
-    saving: boolean,
-    feedback: Feedback
-}
-
-export type InteractorUI = {
-    protein: {
-        query: string,
-    }
-    editing: boolean,
-    processing: boolean,
-    alignment: Alignment,
-}
-
-export type Feedback = {
-    success: boolean,
-    errors: string[],
 }
 
 export type Method = {
@@ -118,3 +89,8 @@ export type ScaledDomain = {
 export type Sequences = Record<string, string>
 
 export type Coordinates = Record<string, { start: number, stop: number, length: number }>
+
+export type Feedback = {
+    success: boolean,
+    errors: string[],
+}

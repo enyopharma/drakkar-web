@@ -1,7 +1,6 @@
 import React from 'react'
 
-import { Coordinates, Sequences, Alignment } from '../../types'
-import { InteractorI, ProteinType, Protein, ScaledDomain } from '../../types'
+import { InteractorI, Protein, ScaledDomain, Coordinates, Sequences, Alignment } from '../../src/types'
 
 import { MappingModal } from './MappingModal'
 import { MappingEditor } from './MappingEditor'
