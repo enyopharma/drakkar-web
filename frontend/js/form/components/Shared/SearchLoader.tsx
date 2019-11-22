@@ -1,15 +1,15 @@
 import React from 'react'
 
-import { SearchTypes } from '../../src/types'
+import { SearchType } from '../../src/types'
 
 import { SearchOverlay } from './SearchOverlay'
 
 type Props = {
-    type: string,
+    type: SearchType,
     enabled: boolean,
 }
 
-const classes: Record<SearchTypes, string> = {
+const classes: Record<SearchType, string> = {
     'method': 'progress-bar progress-bar-striped progress-bar-animated bg-info',
     'human': 'progress-bar progress-bar-striped progress-bar-animated bg-primary',
     'virus': 'progress-bar progress-bar-striped progress-bar-animated bg-danger',

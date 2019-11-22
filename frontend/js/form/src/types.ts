@@ -95,7 +95,7 @@ export type Feedback = {
     errors: string[],
 }
 
-export type SearchTypes = 'method' | 'human' | 'virus'
+export type SearchType = 'method' | 'human' | 'virus'
 
 export type SearchResult = {
     value: string,

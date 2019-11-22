@@ -1,12 +1,12 @@
 import React, { useState, useRef } from 'react'
 
-import { SearchTypes, SearchResult } from '../../src/types'
+import { SearchType, SearchResult } from '../../src/types'
 
 import { SearchLoader } from './SearchLoader'
 import { SearchResultList } from './SearchResultList'
 
 type Props = {
-    type: SearchTypes,
+    type: SearchType,
     query: string,
     search: (query: string) => SearchResult[],
     update: (query: string) => void,
