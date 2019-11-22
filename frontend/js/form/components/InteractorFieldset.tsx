@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React from 'react'
 
 import { proteins as api } from '../src/api'
-
-import { Protein } from '../src/types'
 import { InteractorProps } from '../src/props'
 
 import { ProteinAlert } from './ProteinAlert'
@@ -10,16 +8,7 @@ import { SearchField } from './Shared/SearchField'
 import { MappingSection } from './Mapping/MappingSection'
 import { SequenceSection } from './Sequence/SequenceSection'
 
-export const InteractorFieldset: React.FC<InteractorProps> = ({ accession, ...props }) => {
-    const [protein, setProtein] = useState<Protein>(null)
-
-    useEffect(() => { api.select(accession).then(p => setProtein(p)) }, [accession])
-
-    const search = api.search(props.type)
-    const enabled = !props.processing
-    const editing = props.editing
-    const actions = props.actions
-
+export const InteractorFieldset: React.FC<InteractorProps> = ({ actions, ...props }) => {
     return (
         <fieldset>
             <legend>
@@ -28,19 +17,19 @@ export const InteractorFieldset: React.FC<InteractorProps> = ({ accession, ...pr
                 Interactor {props.i}
             </legend>
             <h3>Uniprot</h3>
-            {protein == null
-                ? <SearchField {...props} {...actions.protein} search={search} placeholder="Search an uniprot entry..." />
-                : <ProteinAlert {...props} {...actions.protein} protein={protein} enabled={enabled} />
+            {props.protein == null
+                ? <SearchField {...props} {...actions.protein} search={api.search(props.type)} placeholder="Search an uniprot entry..." />
+                : <ProteinAlert {...props} {...actions.protein} enabled={!props.processing} />
             }
             <h3>Sequence</h3>
-            {protein == null
+            {props.protein == null
                 ? <p>Please select an uniprot entry first.</p>
-                : <SequenceSection {...props} {...actions.sequence} protein={protein} />
+                : <SequenceSection {...props} {...actions.sequence} />
             }
             <h3>Mapping</h3>
-            {protein == null || editing
+            {props.protein == null || props.editing
                 ? <p>Please select a sequence first.</p>
-                : <MappingSection {...props} {...actions.mapping} protein={protein} />
+                : <MappingSection {...props} {...actions.mapping} />
             }
         </fieldset>
     )

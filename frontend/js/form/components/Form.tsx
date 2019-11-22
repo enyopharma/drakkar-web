@@ -10,7 +10,7 @@ export const Form: React.FC<AppProps> = ({ method, interactor1, interactor2, act
     const [modal, setModal] = useState(false)
 
     const resetAndScrollTop = () => {
-        props.reset()
+        actions.reset()
         setModal(false)
         document.getElementById('form-top').scrollIntoView()
     }
@@ -32,7 +32,7 @@ export const Form: React.FC<AppProps> = ({ method, interactor1, interactor2, act
                             <button
                                 type="button"
                                 className="btn btn-block btn-primary"
-                                onClick={e => props.save()}
+                                onClick={e => actions.save()}
                                 disabled={props.saving || !props.savable}
                             >
                                 {props.saving

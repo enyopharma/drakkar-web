@@ -13,9 +13,8 @@ export const connect = (component) => redux.connect(mapStateToProps, mapDispatch
 
 // mapStateToProps
 const mapStateToProps = (state: AppState, { type }: OwnProps) => {
-    const [type1, type2] = type == 'hh'
-        ? ['h' as ProteinType, 'h' as ProteinType]
-        : ['h' as ProteinType, 'v' as ProteinType]
+    const type1 = 'h'
+    const type2 = type == 'hh' ? 'h' : 'v'
 
     return {
         method: mapStateToMethodProps(state),
@@ -39,15 +38,15 @@ const mapStateToProps = (state: AppState, { type }: OwnProps) => {
 }
 
 const mapStateToMethodProps = (state: AppState) => ({
-    query: state.ui.method.query,
-    psimi_id: state.description.method.psimi_id,
+    query: state.ui.query,
+    method: state.ui.method,
 })
 
 const mapStateToInteractorProps = (i: InteractorI, type: ProteinType, interactor: Interactor, ui: InteractorUI) => ({
     i: i,
     type: type,
-    query: ui.protein.query,
-    accession: interactor.protein.accession,
+    query: ui.query,
+    protein: ui.protein,
     name: interactor.name,
     start: interactor.start,
     stop: interactor.stop,
@@ -63,9 +62,9 @@ const mapDispatchToProps = (dispatch, { run_id, pmid }: OwnProps) => ({
         method: mapDispatchToMethodProps(dispatch),
         interactor1: mapDispatchToInteractorProps(1, dispatch),
         interactor2: mapDispatchToInteractorProps(2, dispatch),
+        save: () => dispatch(creators.fireSave(run_id, pmid)),
+        reset: () => dispatch(creators.resetForm()),
     },
-    save: () => dispatch(creators.fireSave(run_id, pmid)),
-    reset: () => dispatch(creators.resetForm()),
 })
 
 const mapDispatchToMethodProps = (dispatch) => ({
@@ -73,7 +72,7 @@ const mapDispatchToMethodProps = (dispatch) => ({
         update: (query: string) => dispatch(creators.updateMethodQuery(query)),
         select: (psimi_id: string) => dispatch(creators.selectMethod(psimi_id)),
         unselect: () => dispatch(creators.unselectMethod()),
-    },
+    }
 })
 
 const mapDispatchToInteractorProps = (i: InteractorI, dispatch) => ({

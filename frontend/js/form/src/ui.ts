@@ -1,13 +1,12 @@
 import { AppActionTypes, AppAction } from './actions'
 import { InteractorAction, isInteractorAction } from './actions'
 import { UI, InteractorUI } from './state'
-import { InteractorI, Feedback, Alignment } from './types'
+import { Method, Protein, InteractorI, Feedback, Alignment } from './types'
 
 export const ui = (state: UI, action: AppAction): UI => {
     return {
-        method: {
-            query: qmethod(state.method.query, action),
-        },
+        query: qmethod(state.query, action),
+        method: method(state.method, action),
         interactor1: interactor(1)(state.interactor1, action),
         interactor2: interactor(2)(state.interactor2, action),
         saving: saving(state.saving, action),
@@ -26,12 +25,24 @@ const qmethod = (state: string, action: AppAction): string => {
     }
 }
 
+const method = (state: Method, action: AppAction): Method => {
+    switch (action.type) {
+        case AppActionTypes.SELECT_METHOD:
+            return action.method
+        case AppActionTypes.UNSELECT_METHOD:
+            return null
+        case AppActionTypes.RESET_FORM:
+            return null
+        default:
+            return state
+    }
+}
+
 const interactor = (i: InteractorI) => (state: InteractorUI, action: AppAction): InteractorUI => {
     if (isInteractorAction(action) && i == action.i) {
         return {
-            protein: {
-                query: query(state.protein.query, action),
-            },
+            query: qprotein(state.query, action),
+            protein: protein(state.protein, action),
             editing: editing(state.editing, action),
             processing: processing(state.processing, action),
             alignment: alignment(state.alignment, action),
@@ -41,12 +52,25 @@ const interactor = (i: InteractorI) => (state: InteractorUI, action: AppAction):
     return state
 }
 
-const query = (state: string, action: InteractorAction): string => {
+const qprotein = (state: string, action: InteractorAction): string => {
     switch (action.type) {
         case AppActionTypes.UPDATE_PROTEIN_QUERY:
             return action.query
         case AppActionTypes.RESET_INTERACTOR:
             return ''
+        default:
+            return state
+    }
+}
+
+const protein = (state: Protein, action: InteractorAction): Protein => {
+    switch (action.type) {
+        case AppActionTypes.SELECT_PROTEIN:
+            return action.protein
+        case AppActionTypes.UNSELECT_PROTEIN:
+            return null
+        case AppActionTypes.RESET_INTERACTOR:
+            return null
         default:
             return state
     }

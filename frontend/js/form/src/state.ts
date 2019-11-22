@@ -1,14 +1,13 @@
-import { Description, Feedback, Alignment } from './types'
+import { Description, Method, Protein, Feedback, Alignment } from './types'
 
 export type AppState = {
-    description: Description,
     ui: UI,
+    description: Description,
 }
 
 export type UI = {
-    method: {
-        query: string,
-    }
+    query: string,
+    method: Method,
     interactor1: InteractorUI,
     interactor2: InteractorUI,
     saving: boolean,
@@ -16,9 +15,8 @@ export type UI = {
 }
 
 export type InteractorUI = {
-    protein: {
-        query: string,
-    }
+    query: string,
+    protein: Protein,
     editing: boolean,
     processing: boolean,
     alignment: Alignment,

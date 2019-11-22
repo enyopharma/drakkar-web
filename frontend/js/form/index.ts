@@ -22,15 +22,18 @@ const initialState = (description: Description): AppState => ({
 
 const init: AppState = {
     ui: {
-        method: { query: '' },
+        query: '',
+        method: null,
         interactor1: {
-            protein: { query: '' },
+            query: '',
+            protein: null,
             editing: false,
             processing: false,
             alignment: null,
         },
         interactor2: {
-            protein: { query: '' },
+            query: '',
+            protein: null,
             editing: false,
             processing: false,
             alignment: null,
