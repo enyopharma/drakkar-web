@@ -2,7 +2,7 @@ import qs from 'query-string'
 import fetch from 'cross-fetch'
 const uuid = require('uuid/v4')
 
-import { SearchResult, Description, Method, ProteinType, Protein, Sequences, Alignment, Feedback } from './types'
+import { SearchResult, Description, Method, ProteinType, Protein, Sequences, Alignment, Feedback } from './src/types'
 
 type Cache = Record<string, SearchResult[]>
 

@@ -1,6 +1,6 @@
 import { ThunkAction, ThunkDispatch } from 'redux-thunk'
 
-import * as api from './api'
+import * as api from '../api'
 import { AppState } from './state'
 import { AppActionTypes, AppAction } from './actions'
 import { InteractorI, Mature, Sequences, Alignment } from './types'

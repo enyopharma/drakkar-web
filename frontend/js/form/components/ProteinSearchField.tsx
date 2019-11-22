@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { proteins as api } from '../src/api'
+import { proteins as api } from '../api'
 
 import { ProteinType } from '../src/types'
 

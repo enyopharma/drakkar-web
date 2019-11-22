@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { methods as api } from '../src/api'
+import { methods as api } from '../api'
 
 import { SearchField } from './Shared/SearchField'
 
