@@ -1,24 +1,27 @@
 import React from 'react'
 
-import { proteins as api } from '../src/api'
+import { ProteinType } from '../src/types'
 import { InteractorProps } from '../src/props'
 
 import { ProteinAlert } from './ProteinAlert'
-import { SearchField } from './Shared/SearchField'
 import { MappingSection } from './Mapping/MappingSection'
 import { SequenceSection } from './Sequence/SequenceSection'
+import { ProteinSearchField } from './ProteinSearchField'
+
+const classes: Record<ProteinType, string> = {
+    'h': 'fas fa-circle small text-primary',
+    'v': 'fas fa-circle small text-danger',
+}
 
 export const InteractorFieldset: React.FC<InteractorProps> = ({ actions, ...props }) => {
     return (
         <fieldset>
             <legend>
-                <span className={'fas fa-circle small text-' + (props.type == 'h' ? 'primary' : 'danger')}></span>
-                &nbsp;
-                Interactor {props.i}
+                <span className={classes[props.type]}></span> Interactor {props.i}
             </legend>
             <h3>Uniprot</h3>
             {props.protein == null
-                ? <SearchField {...props} {...actions.protein} search={api.search(props.type)} placeholder="Search an uniprot entry..." />
+                ? <ProteinSearchField {...props} {...actions.protein} />
                 : <ProteinAlert {...props} {...actions.protein} enabled={!props.processing} />
             }
             <h3>Sequence</h3>

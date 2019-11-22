@@ -4,7 +4,7 @@ import { methods as api } from '../src/api'
 import { MethodProps } from '../src/props'
 
 import { MethodAlert } from './MethodAlert'
-import { SearchField } from './Shared/SearchField'
+import { MethodSearchField } from './MethodSearchField'
 
 export const MethodFieldset: React.FC<MethodProps> = ({ actions, ...props }) => {
     return (
@@ -13,7 +13,7 @@ export const MethodFieldset: React.FC<MethodProps> = ({ actions, ...props }) => 
                 <span className="fas fa-circle small text-info"></span>&nbsp;Method
             </legend>
             {props.method == null
-                ? <SearchField {...props} {...actions} search={api.search} placeholder="Search a method..." />
+                ? <MethodSearchField {...props} {...actions} />
                 : <MethodAlert {...props} {...actions} />
             }
         </fieldset>

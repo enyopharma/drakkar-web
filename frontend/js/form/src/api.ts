@@ -1,20 +1,32 @@
 import qs from 'query-string'
 import fetch from 'cross-fetch'
+const uuid = require('uuid/v4')
 
 import { SearchResult, Description, Method, ProteinType, Protein, Sequences, Alignment, Feedback } from './types'
 
-const uuid = require('uuid/v4')
+type Cache = Record<string, SearchResult[]>
+
+const mcache: Cache = {}
+const pcache: Record<ProteinType, Cache> = { h: {}, v: {} }
 
 export const methods = {
-    search: async (q: string): Promise<SearchResult[]> => {
-        return fetch('/methods?' + qs.stringify({ q: q }))
-            .then(response => response.json(), error => console.log(error))
-            .then(json => json.data.map(method => ({
-                value: method.psimi_id, label: [
-                    method.psimi_id,
-                    method.name,
-                ].join(' - '),
-            })))
+    search: (limit: number) => {
+        return (query: string): SearchResult[] => {
+            if (query == '') return []
+            if (mcache[query]) return mcache[query]
+
+            throw new Promise((resolve) => {
+                setTimeout(() => {
+                    fetch('/methods?' + qs.stringify({ q: query, limit: limit }))
+                        .then(response => response.json(), error => console.log(error))
+                        .then(json => mcache[query] = json.data.map(({ psimi_id, name }) => ({
+                            value: psimi_id,
+                            label: [psimi_id, name].join(' - '),
+                        })))
+                        .finally(resolve)
+                }, 300)
+            })
+        }
     },
 
     select: async (psimi_id: string): Promise<Method> => {
@@ -27,17 +39,23 @@ export const methods = {
 }
 
 export const proteins = {
-    search: (type: ProteinType) => async (q: string): Promise<SearchResult[]> => {
-        return fetch('/proteins?' + qs.stringify({ type: type, q: q }))
-            .then(response => response.json(), error => console.log(error))
-            .then(json => json.data.map(protein => ({
-                value: protein.accession, label: [
-                    protein.accession,
-                    protein.taxon,
-                    protein.name,
-                    protein.description,
-                ].join(' - '),
-            })))
+    search: (type: ProteinType, limit: number) => {
+        return (query: string): SearchResult[] => {
+            if (query == '') return []
+            if (pcache[type][query]) return pcache[type][query]
+
+            throw new Promise((resolve) => {
+                setTimeout(() => {
+                    fetch('/proteins?' + qs.stringify({ type: type, q: query, limit: limit }))
+                        .then(response => response.json(), error => console.log(error))
+                        .then(json => pcache[type][query] = json.data.map(({ accession, taxon, name, description }) => ({
+                            value: accession,
+                            label: [accession, taxon, name, description].join(' - '),
+                        })))
+                        .finally(resolve)
+                }, 300)
+            })
+        }
     },
 
     select: async (accession: string): Promise<Protein> => {
