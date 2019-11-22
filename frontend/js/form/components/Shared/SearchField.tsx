@@ -16,7 +16,7 @@ type Props = {
 }
 
 export const SearchField: React.FC<Props> = ({ type, query, update, search, select, placeholder = '' }) => {
-    const input = useRef(null)
+    const input = useRef<HTMLInputElement>(null)
     const [enabled, setEnabled] = useState<boolean>(false)
 
     const handleKeyDown = e => {

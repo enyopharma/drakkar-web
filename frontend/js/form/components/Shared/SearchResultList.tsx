@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, MutableRefObject } from 'react'
 
 import { SearchResult } from '../../src/types'
 
 import { SearchOverlay } from './SearchOverlay'
 
 type Props = {
-    input: any
+    input: MutableRefObject<HTMLInputElement>
     query: string,
     enabled: boolean,
     search: (query: string) => SearchResult[],
