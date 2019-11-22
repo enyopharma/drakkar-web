@@ -8,7 +8,7 @@ type Props = {
 }
 
 export const MatureProteinList: React.FC<Props> = ({ matures, select }) => {
-    const [active, setActive] = useState<number>(null)
+    const [active, setActive] = useState<number | null>(null)
 
     return (
         <ul className="list-group">

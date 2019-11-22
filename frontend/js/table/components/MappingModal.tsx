@@ -12,8 +12,8 @@ type Props = {
 }
 
 export const MappingModal: React.FC<Props> = ({ description, close }) => {
-    const [protein1, setProtein1] = useState<Protein>(null)
-    const [protein2, setProtein2] = useState<Protein>(null)
+    const [protein1, setProtein1] = useState<Protein | null>(null)
+    const [protein2, setProtein2] = useState<Protein | null>(null)
 
     useEffect(() => {
         setProtein1(null)

@@ -25,7 +25,7 @@ const qmethod = (state: string, action: AppAction): string => {
     }
 }
 
-const method = (state: Method, action: AppAction): Method => {
+const method = (state: Method | null, action: AppAction): Method | null => {
     switch (action.type) {
         case AppActionTypes.SELECT_METHOD:
             return action.method
@@ -63,7 +63,7 @@ const qprotein = (state: string, action: InteractorAction): string => {
     }
 }
 
-const protein = (state: Protein, action: InteractorAction): Protein => {
+const protein = (state: Protein | null, action: InteractorAction): Protein | null => {
     switch (action.type) {
         case AppActionTypes.SELECT_PROTEIN:
             return action.protein
@@ -106,7 +106,7 @@ const processing = (state: boolean, action: InteractorAction): boolean => {
     }
 }
 
-const alignment = (state: Alignment, action: InteractorAction): Alignment => {
+const alignment = (state: Alignment | null, action: InteractorAction): Alignment | null => {
     switch (action.type) {
         case AppActionTypes.SHOW_ALIGNMENT:
             return action.alignment
@@ -132,7 +132,7 @@ const saving = (state: boolean, action: AppAction): boolean => {
     }
 }
 
-const feedback = (_, action: AppAction): Feedback => {
+const feedback = (_: any, action: AppAction): Feedback | null => {
     switch (action.type) {
         case AppActionTypes.SHOW_FEEDBACK:
             return { success: action.success, errors: action.errors }

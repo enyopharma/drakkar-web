@@ -10,8 +10,8 @@ import { SequenceImg } from '../Shared/SequenceImg'
 type Props = {
     protein: Protein,
     name: string,
-    start: number,
-    stop: number,
+    start: number | null,
+    stop: number | null,
     editing: boolean,
     processing: boolean,
     edit: () => void,

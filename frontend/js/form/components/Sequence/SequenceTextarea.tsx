@@ -2,8 +2,8 @@ import React from 'react'
 
 type Props = {
     sequence: string,
-    start: number,
-    stop: number,
+    start: number | null,
+    stop: number | null,
 }
 
 export const SequenceTextarea: React.FC<Props> = ({ sequence, start, stop }) => {

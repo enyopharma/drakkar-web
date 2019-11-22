@@ -7,17 +7,57 @@ export type AppState = {
 
 export type UI = {
     query: string,
-    method: Method,
+    method: Method | null,
     interactor1: InteractorUI,
     interactor2: InteractorUI,
     saving: boolean,
-    feedback: Feedback
+    feedback: Feedback | null
 }
 
 export type InteractorUI = {
     query: string,
-    protein: Protein,
+    protein: Protein | null,
     editing: boolean,
     processing: boolean,
-    alignment: Alignment,
+    alignment: Alignment | null,
+}
+
+export const init: AppState = {
+    ui: {
+        query: '',
+        method: null,
+        interactor1: {
+            query: '',
+            protein: null,
+            editing: false,
+            processing: false,
+            alignment: null,
+        },
+        interactor2: {
+            query: '',
+            protein: null,
+            editing: false,
+            processing: false,
+            alignment: null,
+        },
+        saving: false,
+        feedback: null,
+    },
+    description: {
+        method: { psimi_id: null },
+        interactor1: {
+            protein: { accession: null },
+            name: '',
+            start: null,
+            stop: null,
+            mapping: [],
+        },
+        interactor2: {
+            protein: { accession: null },
+            name: '',
+            start: null,
+            stop: null,
+            mapping: [],
+        },
+    },
 }

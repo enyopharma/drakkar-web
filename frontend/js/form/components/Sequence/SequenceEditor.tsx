@@ -8,58 +8,73 @@ import { CoordinateField } from '../Shared/CoordinateField'
 import { ExtractFormGroup } from '../Shared/ExtractFormGroup'
 import { SubsequenceFormGroup } from '../Shared/SubsequenceFormGroup'
 
-type Props = {
+type Current = {
     name: string,
-    start: number,
-    stop: number,
+    start: number | null,
+    stop: number | null,
+}
+
+type Props = {
     sequence: string,
+    name: string,
+    start: number | null,
+    stop: number | null,
     matures: Mature[],
     chains: Chain[],
     update: (mature: Mature) => void,
 }
 
-export const SequenceEditor: React.FC<Props> = ({ name, start, stop, sequence, matures, chains, update }) => {
-    const [mature, setMature] = useState<Mature>({ name: name, start: start, stop: stop })
+const isMature = (current: Current): current is Mature => {
+    return current.start != null && current.stop != null
+}
 
-    const isNameSet = mature.name.trim() != ''
+export const SequenceEditor: React.FC<Props> = ({ sequence, name, start, stop, matures, chains, update }) => {
+    const [current, setCurrent] = useState<Current>({ name: name, start: start, stop: stop })
 
-    const isNameWellFormatted = mature.name.trim().match(/^[^\s]+$/)
+    const isNameSet = current.name.trim() != ''
 
-    const areCoordinatesSet = mature.start != null && mature.stop != null
+    const isNameWellFormatted = current.name.trim().match(/^[^\s]+$/)
+
+    const areCoordinatesSet = current.start != null && current.stop != null
+
+    const areCoordinatesWellFormatted = current.start != null && current.stop != null
+        && current.start <= current.stop
 
     const doesNameExist = matures.filter(m => {
-        return m.name.trim().toLowerCase() == mature.name.trim().toLowerCase()
+        return m.name.trim().toLowerCase() == current.name.trim().toLowerCase()
     }).length > 0
 
     const doCoordinatesExist = matures.filter(m => {
-        return m.start == mature.start && m.stop == mature.stop
+        return m.start == current.start && m.stop == current.stop
     }).length > 0
 
     const doesMatureExist = matures.filter(m => {
-        return m.name.trim().toLowerCase() == mature.name.trim().toLowerCase()
-            && m.start == mature.start
-            && m.stop == mature.stop
+        return m.name.trim().toLowerCase() == current.name.trim().toLowerCase()
+            && m.start == current.start
+            && m.stop == current.stop
     }).length > 0
 
-    const isNameValid = !isNameSet || (isNameWellFormatted && !doesNameExist) || doesMatureExist
+    const isNameValid = doesMatureExist || !isNameSet || isNameWellFormatted && !doesNameExist
 
-    const areCoordinatesValid = (!areCoordinatesSet || !doCoordinatesExist || doesMatureExist)
-        && mature.start <= mature.stop
+    const areCoordinatesValid = doesMatureExist || !areCoordinatesSet || areCoordinatesWellFormatted && !doCoordinatesExist
 
-    const isMatureValid = isNameSet && isNameWellFormatted && areCoordinatesSet
-        && (doesMatureExist || (!doesNameExist && !doCoordinatesExist))
+    const isMatureValid = doesMatureExist ||
+        isNameSet && isNameWellFormatted && !doesNameExist &&
+        areCoordinatesSet && areCoordinatesWellFormatted && !doCoordinatesExist
 
-    const setName = (name: string) => setMature({ name: name, start: mature.start, stop: mature.stop })
-    const setStart = (start: number) => setMature({ name: mature.name, start: start, stop: mature.stop })
-    const setStop = (stop: number) => setMature({ name: mature.name, start: mature.start, stop: stop })
+    const setName = (name: string) => setCurrent({ name: name, start: current.start, stop: current.stop })
+    const setStart = (start: number | null) => setCurrent({ name: current.name, start: start, stop: current.stop })
+    const setStop = (stop: number | null) => setCurrent({ name: current.name, start: current.start, stop: stop })
 
-    const setCoordinates = (start: number, stop: number) => setMature({
-        name: mature.name,
+    const setCoordinates = (start: number, stop: number) => setCurrent({
+        name: current.name,
         start: start,
         stop: stop,
     })
 
     const setFullLength = () => setCoordinates(1, sequence.length)
+
+    const submit = () => { if (isMature(current)) { update(current) } }
 
     return (
         <React.Fragment>
@@ -80,13 +95,13 @@ export const SequenceEditor: React.FC<Props> = ({ name, start, stop, sequence, m
                         type="text"
                         className={'form-control' + (isNameValid ? '' : ' is-invalid')}
                         placeholder="Name"
-                        value={mature.name}
+                        value={current.name}
                         onChange={e => setName(e.target.value)}
                     />
                 </div>
                 <div className="col-3">
                     <CoordinateField
-                        value={mature.start}
+                        value={current.start}
                         set={setStart}
                         max={sequence.length}
                         valid={areCoordinatesValid}
@@ -95,7 +110,7 @@ export const SequenceEditor: React.FC<Props> = ({ name, start, stop, sequence, m
                 </div>
                 <div className="col-3">
                     <CoordinateField
-                        value={mature.stop}
+                        value={current.stop}
                         set={setStop}
                         max={sequence.length}
                         valid={areCoordinatesValid}
@@ -106,7 +121,7 @@ export const SequenceEditor: React.FC<Props> = ({ name, start, stop, sequence, m
                     <button
                         type="button"
                         className="btn btn-block btn-primary"
-                        onClick={e => update(mature)}
+                        onClick={e => submit()}
                         disabled={!isMatureValid}
                     >
                         Validate

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { InteractorI, Protein, ScaledDomain, Coordinates, Sequences, Alignment } from '../../src/types'
+import { InteractorI, Protein, Isoform, ScaledDomain, Coordinates, Sequences, Alignment } from '../../src/types'
 
 import { MappingModal } from './MappingModal'
 import { MappingEditor } from './MappingEditor'
@@ -14,35 +14,31 @@ type Props = {
     stop: number,
     mapping: Alignment[],
     processing: boolean,
-    alignment: Alignment,
+    alignment: Alignment | null,
     fire: (query: string, sequences: Sequences) => void,
     add: (alignment: Alignment) => void,
     remove: (i: number) => void,
     cancel: () => void,
 }
 
-export const MappingSection: React.FC<Props> = ({ protein, ...props }) => {
+export const MappingSection: React.FC<Props> = ({ protein, alignment, ...props }) => {
     const [query, setQuery] = useState<string>('')
 
-    useEffect(() => {
-        if (props.alignment == null) {
-            setQuery('')
-        }
-    }, [props.alignment])
+    useEffect(() => { if (alignment == null) setQuery('') }, [alignment])
 
     const isFull = props.start == 1 && props.stop == protein.sequence.length
 
     const sequence = protein.sequence.slice(props.start - 1, props.stop)
 
     const sequences: Sequences = isFull
-        ? protein.isoforms.reduce((sequences, isoform) => {
+        ? protein.isoforms.reduce((sequences: Sequences, isoform: Isoform) => {
             sequences[isoform.accession] = isoform.sequence
             return sequences
         }, {})
         : { [protein.accession]: sequence }
 
     const coordinates: Coordinates = isFull
-        ? protein.isoforms.reduce((reduced, isoform) => {
+        ? protein.isoforms.reduce((reduced: Coordinates, isoform: Isoform) => {
             reduced[isoform.accession] = {
                 start: 1,
                 stop: isoform.sequence.length,
@@ -75,8 +71,8 @@ export const MappingSection: React.FC<Props> = ({ protein, ...props }) => {
         <React.Fragment>
             <MappingEditor {...props} query={query} sequence={sequence} domains={domains} update={setQuery} fire={fire} />
             <MappingDisplay {...props} type={type} coordinates={coordinates} />
-            {props.alignment == null ? null : (
-                <MappingModal {...props} type={type} coordinates={coordinates} />
+            {alignment == null ? null : (
+                <MappingModal {...props} type={type} coordinates={coordinates} alignment={alignment} />
             )}
         </React.Fragment>
     )

@@ -28,7 +28,7 @@ export const ChainsFormGroup: React.FC<Props> = ({ chains, enabled = true, set, 
 
     const isValid = areContiguous(filtered)
 
-    const select = options => {
+    const select = (options: any) => {
         setSelected([...options]
             .filter(o => o.selected)
             .map(o => o.value)

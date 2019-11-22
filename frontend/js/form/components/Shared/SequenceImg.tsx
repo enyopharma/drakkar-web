@@ -4,13 +4,21 @@ import { ProteinType } from '../../src/types'
 
 type Props = {
     type: ProteinType,
-    start: number,
-    stop: number,
+    start: number | null,
+    stop: number | null,
     length: number,
     active?: boolean,
 }
 
 export const SequenceImg: React.FC<Props> = ({ type, start, stop, length, active = true }) => {
+    if (start == null || stop == null) {
+        return (
+            <svg className="alignment" width="100%" height="30">
+                <rect x="0" y="16" width="100%" height="2"></rect>
+            </svg>
+        )
+    }
+
     const startp = (start: number, length: number): string => {
         return ((start - 1) * 100 / length) + '%'
     }

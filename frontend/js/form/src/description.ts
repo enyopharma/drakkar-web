@@ -12,7 +12,7 @@ export const description = (state: Description, action: AppAction): Description 
     }
 }
 
-const psimi_id = (state: string, action: AppAction): string => {
+const psimi_id = (state: string | null, action: AppAction): string | null => {
     switch (action.type) {
         case AppActionTypes.SELECT_METHOD:
             return action.method.psimi_id
@@ -41,7 +41,7 @@ const interactor = (i: InteractorI) => (state: Interactor, action: AppAction): I
     return state
 }
 
-const accession = (state: string, action: InteractorAction): string => {
+const accession = (state: string | null, action: InteractorAction): string | null => {
     switch (action.type) {
         case AppActionTypes.SELECT_PROTEIN:
             return action.protein.accession
@@ -69,7 +69,7 @@ const name = (state: string, action: InteractorAction): string => {
     }
 }
 
-const start = (state: number, action: InteractorAction): number => {
+const start = (state: number | null, action: InteractorAction): number | null => {
     switch (action.type) {
         case AppActionTypes.SELECT_PROTEIN:
             return action.protein.type == 'h' || action.protein.matures.length == 0
@@ -86,7 +86,7 @@ const start = (state: number, action: InteractorAction): number => {
     }
 }
 
-const stop = (state: number, action: InteractorAction): number => {
+const stop = (state: number | null, action: InteractorAction): number | null => {
     switch (action.type) {
         case AppActionTypes.SELECT_PROTEIN:
             return action.protein.type == 'h' || action.protein.matures.length == 0

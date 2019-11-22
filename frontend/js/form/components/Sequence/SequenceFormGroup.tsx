@@ -2,8 +2,8 @@ import React from 'react'
 
 type Props = {
     name: string,
-    start: number,
-    stop: number,
+    start: number | null,
+    stop: number | null,
     valid: boolean,
 }
 

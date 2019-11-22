@@ -9,14 +9,14 @@ type Props = {
 }
 
 export const CoordinatesFormGroup: React.FC<Props> = ({ sequence, enabled = true, set, children }) => {
-    const [start, setStart] = useState<number>(null)
-    const [stop, setStop] = useState<number>(null)
+    const [start, setStart] = useState<number | null>(null)
+    const [stop, setStop] = useState<number | null>(null)
     const [valid, setValid] = useState<boolean>(true)
 
     useEffect(() => setValid(true), [start, stop])
 
     const submit = () => {
-        typeof start == 'number' && typeof stop == 'number' && start <= stop
+        start != null && stop != null && start <= stop
             ? set(sequence.slice(start - 1, stop))
             : setValid(false)
     }

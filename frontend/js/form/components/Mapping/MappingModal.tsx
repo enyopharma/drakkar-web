@@ -18,7 +18,7 @@ type Props = {
 }
 
 const indexes = (alignment: Alignment): Index[] => {
-    const indexes = []
+    const indexes: Index[] = []
 
     alignment.isoforms.map((r, i) => {
         r.occurrences.map((o, j) => indexes.push([i, j]))
@@ -51,7 +51,7 @@ export const MappingModal: React.FC<Props> = ({ i, type, name, coordinates, alig
     }
 
     const select = (i: number, j: number) => {
-        setSelected([].concat(selected, [[i, j]]))
+        setSelected(selected.concat([[i, j]]))
     }
 
     const unselect = (i: number, j: number) => {

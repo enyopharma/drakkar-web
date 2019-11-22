@@ -19,9 +19,9 @@ export const methods = {
                 setTimeout(() => {
                     fetch('/methods?' + qs.stringify({ q: query, limit: limit }))
                         .then(response => response.json(), error => console.log(error))
-                        .then(json => mcache[query] = json.data.map(({ psimi_id, name }) => ({
-                            value: psimi_id,
-                            label: [psimi_id, name].join(' - '),
+                        .then(json => mcache[query] = json.data.map((m: Method) => ({
+                            value: m.psimi_id,
+                            label: [m.psimi_id, m.name].join(' - '),
                         })))
                         .finally(resolve)
                 }, 300)
@@ -30,8 +30,6 @@ export const methods = {
     },
 
     select: async (psimi_id: string): Promise<Method> => {
-        if (psimi_id == null) return null
-
         return fetch(`/methods/${psimi_id}`)
             .then(response => response.json(), error => console.log(error))
             .then(json => json.data)
@@ -48,9 +46,9 @@ export const proteins = {
                 setTimeout(() => {
                     fetch('/proteins?' + qs.stringify({ type: type, q: query, limit: limit }))
                         .then(response => response.json(), error => console.log(error))
-                        .then(json => pcache[type][query] = json.data.map(({ accession, taxon, name, description }) => ({
-                            value: accession,
-                            label: [accession, taxon, name, description].join(' - '),
+                        .then(json => pcache[type][query] = json.data.map((p: Protein) => ({
+                            value: p.accession,
+                            label: [p.accession, p.taxon, p.name, p.description].join(' - '),
                         })))
                         .finally(resolve)
                 }, 300)
@@ -59,8 +57,6 @@ export const proteins = {
     },
 
     select: async (accession: string): Promise<Protein> => {
-        if (accession == null) return null
-
         return fetch(`/proteins/${accession}`)
             .then(response => response.json(), error => console.log(error))
             .then(json => json.data)

@@ -2,7 +2,7 @@ export type DescriptionType = 'hh' | 'vh'
 
 export type Description = {
     method: {
-        psimi_id: string,
+        psimi_id: string | null,
     },
     interactor1: Interactor,
     interactor2: Interactor,
@@ -12,11 +12,11 @@ export type InteractorI = 1 | 2
 
 export type Interactor = {
     protein: {
-        accession: string,
+        accession: string | null,
     },
     name: string,
-    start: number,
-    stop: number,
+    start: number | null,
+    stop: number | null,
     mapping: Alignment[],
 }
 

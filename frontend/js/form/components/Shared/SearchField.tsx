@@ -19,7 +19,7 @@ export const SearchField: React.FC<Props> = ({ type, query, update, search, sele
     const input = useRef<HTMLInputElement>(null)
     const [enabled, setEnabled] = useState<boolean>(false)
 
-    const handleKeyDown = e => {
+    const handleKeyDown = (e: any) => {
         if (e.keyCode == 27) {
             setEnabled(!enabled)
         }
@@ -55,29 +55,3 @@ export const SearchField: React.FC<Props> = ({ type, query, update, search, sele
         </div>
     )
 }
-
-//const handleKeyDown = e => {
-//    const length = results.length > max
-//        ? results.slice(0, max).length
-//        : results.length
-//
-//    if (!visible && (e.keyCode == 38 || e.keyCode == 40)) {
-//        setVisible(true)
-//    }
-//
-//    if (visible && e.keyCode == 27) {
-//        setVisible(false)
-//    }
-//
-//    if (visible && e.keyCode == 13 && results[active]) {
-//        selectValue(results[active].value)
-//    }
-//
-//    if (visible && e.keyCode == 38) {
-//        setActive(active == 0 ? length - 1 : active - 1)
-//    }
-//
-//    if (visible && e.keyCode == 40) {
-//        setActive((active + 1) % length)
-//    }
-//}

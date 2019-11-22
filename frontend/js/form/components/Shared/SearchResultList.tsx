@@ -1,11 +1,11 @@
-import React, { useState, useEffect, MutableRefObject } from 'react'
+import React, { useState, useEffect, RefObject } from 'react'
 
 import { SearchResult } from '../../src/types'
 
 import { SearchOverlay } from './SearchOverlay'
 
 type Props = {
-    input: MutableRefObject<HTMLInputElement>
+    input: RefObject<HTMLInputElement>
     query: string,
     enabled: boolean,
     search: (query: string) => SearchResult[],
@@ -20,7 +20,7 @@ export const SearchResultList: React.FC<Props> = ({ query, input, enabled, searc
     useEffect(() => setActive(0), [query])
 
     if (input.current) {
-        input.current.onkeydown = e => {
+        input.current.onkeydown = (e: any) => {
             if (enabled && e.keyCode == 38) {
                 setActive(active - 1)
             }
@@ -42,10 +42,10 @@ export const SearchResultList: React.FC<Props> = ({ query, input, enabled, searc
         .replace(/\s*\+$/, '')
         .replace(/\s*\+\s*/g, '|');
 
-    const highlight = value => {
+    const highlight = (label: string) => {
         return regex.length > 0
-            ? value.replace(new RegExp('(' + regex + ')', 'gi'), '<strong>$1</strong>')
-            : value
+            ? label.replace(new RegExp('(' + regex + ')', 'gi'), '<strong>$1</strong>')
+            : label
     }
 
     return !enabled || query == '' ? null : (

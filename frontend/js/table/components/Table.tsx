@@ -11,8 +11,8 @@ type Props = {
 }
 
 const StatelessTable: React.FC<Props> = ({ descriptions }) => {
-    const [selected, setSelected] = useState<Description>(null)
-    const [deleting, setDeleting] = useState<number>(null)
+    const [selected, setSelected] = useState<Description | null>(null)
+    const [deleting, setDeleting] = useState<number | null>(null)
     const [deleted, setDeleted] = useState<boolean[]>(descriptions.map(d => d.deleted))
 
     const editUrl = (index: number): string => {
@@ -23,30 +23,32 @@ const StatelessTable: React.FC<Props> = ({ descriptions }) => {
         return `/runs/${run_id}/publications/${pmid}/descriptions/${id}/edit`
     }
 
-    const showMapping = (index: number): void => {
+    const showMapping = (index: number) => {
         setSelected(descriptions[index])
     }
 
-    const hideMapping = (): void => {
+    const hideMapping = () => {
         setSelected(null)
     }
 
-    const deleteDescription = (index: number): void => {
+    const deleteDescription = (index: number) => {
         setDeleting(index)
     }
 
-    const confirmDeletion = (): void => {
-        const id = descriptions[deleting].id
-        const pmid = descriptions[deleting].pmid
-        const run_id = descriptions[deleting].run_id
+    const confirmDeletion = () => {
+        if (deleting != null) {
+            const id = descriptions[deleting].id
+            const pmid = descriptions[deleting].pmid
+            const run_id = descriptions[deleting].run_id
 
-        api.delete(run_id, pmid, id).then(_ => {
-            setDeleted(deleted.map((d, i) => d || i == deleting))
-            setDeleting(null)
-        })
+            api.delete(run_id, pmid, id).then(_ => {
+                setDeleted(deleted.map((d, i) => d || i == deleting))
+                setDeleting(null)
+            })
+        }
     }
 
-    const cancelDeletion = (): void => {
+    const cancelDeletion = () => {
         setDeleting(null)
     }
 

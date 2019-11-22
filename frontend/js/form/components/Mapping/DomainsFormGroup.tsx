@@ -1,19 +1,31 @@
 import React, { useState } from 'react'
 
-export const DomainsFormGroup = ({ domains, enabled = true, select, children }) => {
-    const [domain, setDomain] = useState('')
+import { Domain, ScaledDomain } from '../../src/types'
+
+type Props = {
+    domains: ScaledDomain[]
+    enabled?: boolean,
+    select: (domain: Domain) => void,
+}
+
+export const DomainsFormGroup: React.FC<Props> = ({ domains, enabled = true, select, children }) => {
+    const [domain, setDomain] = useState<number | null>(null)
+
+    const handleChange = (e: any) => {
+        setDomain(e.target.value == '' ? null : parseInt(e.target.value))
+    }
 
     const submit = () => {
-        select(domains[domain])
+        if (domain != null) select(domains[domain])
     }
 
     return (
         <div className="row">
             <div className="col">
                 <select
-                    value={domain}
+                    value={domain == null ? '' : domain}
                     className="form-control"
-                    onChange={e => setDomain(e.target.value)}
+                    onChange={e => handleChange(e)}
                     disabled={domains.length == 0}
                 >
                     <option value="">Please select a domain</option>
@@ -32,7 +44,7 @@ export const DomainsFormGroup = ({ domains, enabled = true, select, children }) 
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={e => submit()}
-                    disabled={!enabled || domain == ''}
+                    disabled={!enabled || domain == null}
                 >
                     {children}
                 </button>

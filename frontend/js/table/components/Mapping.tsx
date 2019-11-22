@@ -1,12 +1,12 @@
 import React from 'react'
 
-import { MappingImg } from './MappingImg'
+import { SequenceImg } from './SequenceImg'
 
 import { Protein, Isoform, Alignment } from '../types'
 
 type Reduced = Record<string, Isoform>
 
-type Coordinates = Record<string, { start: number, stop: number, width: number }>
+type Coordinates = Record<string, { start: number, stop: number, length: number }>
 
 type Props = {
     name: string,
@@ -18,7 +18,7 @@ type Props = {
 
 export const Mapping: React.FC<Props> = ({ name, start, stop, protein, mapping }) => {
     const reduced: Reduced = mapping.reduce((reduced: Reduced, alignment: Alignment): Reduced => {
-        alignment.isoforms.map((isoform: Isoform): void => {
+        alignment.isoforms.map((isoform: Isoform) => {
             isoform.occurrences.map(occurrence => {
                 if (!reduced[isoform.accession]) reduced[isoform.accession] = {
                     accession: isoform.accession,
@@ -33,19 +33,19 @@ export const Mapping: React.FC<Props> = ({ name, start, stop, protein, mapping }
         , {})
 
     const coordinates: Coordinates = start == 1 && stop == protein.sequence.length
-        ? protein.isoforms.reduce((reduced, isoform) => {
-            reduced[isoform.accession] = {
+        ? protein.isoforms.reduce((coordinates: Coordinates, isoform) => {
+            coordinates[isoform.accession] = {
                 start: 1,
                 stop: isoform.sequence.length,
-                width: isoform.sequence.length,
+                length: isoform.sequence.length,
             }
-            return reduced
+            return coordinates
         }, {})
         : {
             [protein.accession]: {
                 start: start,
                 stop: stop,
-                width: stop - start + 1
+                length: stop - start + 1
             }
         }
 
@@ -64,11 +64,11 @@ export const Mapping: React.FC<Props> = ({ name, start, stop, protein, mapping }
                     <div className="card-body">
                         {isoform.occurrences.sort((a, b) => a.start - b.start).map((occurrence, j) => (
                             <p key={j}>
-                                <MappingImg
+                                <SequenceImg
                                     type={protein.type}
                                     start={occurrence.start}
                                     stop={occurrence.stop}
-                                    width={coordinates[isoform.accession].width}
+                                    length={coordinates[isoform.accession].length}
                                 />
                             </p>
                         ))}

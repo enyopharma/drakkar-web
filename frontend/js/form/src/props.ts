@@ -9,7 +9,7 @@ export type AppProps = ReturnType<typeof mapStateToProps> & ReturnType<typeof ma
 export type MethodProps = ReturnType<typeof mapStateToMethodProps> & ReturnType<typeof mapDispatchToMethodProps>
 export type InteractorProps = ReturnType<typeof mapStateToInteractorProps> & ReturnType<typeof mapDispatchToInteractorProps>
 
-export const connect = (component) => redux.connect(mapStateToProps, mapDispatchToProps)(component);
+export const connect = (component: any) => redux.connect(mapStateToProps, mapDispatchToProps)(component);
 
 // mapStateToProps
 const mapStateToProps = (state: AppState, { type }: OwnProps) => {
@@ -57,7 +57,7 @@ const mapStateToInteractorProps = (i: InteractorI, type: ProteinType, interactor
 })
 
 // mapDispatchToProps
-const mapDispatchToProps = (dispatch, { run_id, pmid }: OwnProps) => ({
+const mapDispatchToProps = (dispatch: any, { run_id, pmid }: OwnProps) => ({
     actions: {
         method: mapDispatchToMethodProps(dispatch),
         interactor1: mapDispatchToInteractorProps(1, dispatch),
@@ -67,7 +67,7 @@ const mapDispatchToProps = (dispatch, { run_id, pmid }: OwnProps) => ({
     },
 })
 
-const mapDispatchToMethodProps = (dispatch) => ({
+const mapDispatchToMethodProps = (dispatch: any) => ({
     actions: {
         update: (query: string) => dispatch(creators.updateMethodQuery(query)),
         select: (psimi_id: string) => dispatch(creators.selectMethod(psimi_id)),
@@ -75,7 +75,7 @@ const mapDispatchToMethodProps = (dispatch) => ({
     }
 })
 
-const mapDispatchToInteractorProps = (i: InteractorI, dispatch) => ({
+const mapDispatchToInteractorProps = (i: InteractorI, dispatch: any) => ({
     actions: {
         protein: {
             update: (query: string) => dispatch(creators.updateProteinQuery(i, query)),

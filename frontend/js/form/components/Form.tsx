@@ -12,7 +12,8 @@ export const Form: React.FC<AppProps> = ({ method, interactor1, interactor2, act
     const resetAndScrollTop = () => {
         actions.reset()
         setModal(false)
-        document.getElementById('form-top').scrollIntoView()
+        const elem = document.getElementById('form-top')
+        if (elem) elem.scrollIntoView()
     }
 
     return (

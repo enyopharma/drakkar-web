@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { ScaledDomain, Alignment } from '../../src/types'
+import { Domain, ScaledDomain, Alignment } from '../../src/types'
 
 import { DomainsFormGroup } from './DomainsFormGroup'
 import { ExtractFormGroup } from '../Shared/ExtractFormGroup'
@@ -21,11 +21,11 @@ export const MappingEditor: React.FC<Props> = ({ query, sequence, domains, mappi
         return query.toUpperCase().trim() == alignment.sequence.toUpperCase().trim()
     }).length == 0
 
-    const setCoordinates = (start, stop) => {
+    const setCoordinates = (start: number, stop: number) => {
         update(sequence.slice(start - 1, stop))
     }
 
-    const selectDomain = domain => {
+    const selectDomain = (domain: Domain) => {
         setCoordinates(domain.start, domain.stop)
     }
 
