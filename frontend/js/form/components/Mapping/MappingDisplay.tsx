@@ -1,4 +1,5 @@
 import React from 'react'
+import { FaTrash } from 'react-icons/fa'
 
 import { ProteinType, Coordinates, Alignment } from '../../src/types'
 
@@ -34,7 +35,7 @@ export const MappingDisplay: React.FC<Props> = ({ type, name, coordinates, mappi
                                             className="btn btn-block btn-warning"
                                             onClick={e => remove(i)}
                                         >
-                                            <span className="fas fa-trash"></span>
+                                            <FaTrash />
                                         </button>
                                     </div>
                                 </div>

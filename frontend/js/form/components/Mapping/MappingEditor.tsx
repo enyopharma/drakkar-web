@@ -1,4 +1,5 @@
 import React from 'react'
+import { FaCogs } from 'react-icons/fa'
 
 import { Domain, ScaledDomain, Alignment } from '../../src/types'
 
@@ -59,7 +60,10 @@ export const MappingEditor: React.FC<Props> = ({ query, sequence, domains, mappi
                         onClick={e => fire(query)}
                         disabled={processing || !isQueryValid}
                     >
-                        <span className={processing ? 'spinner-border spinner-border-sm' : 'fas fa-cogs'}></span>
+                        {processing
+                            ? <span className="spinner-border spinner-border-sm"></span>
+                            : <FaCogs />
+                        }
                         &nbsp;
                         Start alignment
                     </button>

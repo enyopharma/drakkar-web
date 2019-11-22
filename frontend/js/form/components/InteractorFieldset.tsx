@@ -1,4 +1,5 @@
 import React from 'react'
+import { FaCircle } from 'react-icons/fa'
 
 import { ProteinType } from '../src/types'
 import { InteractorProps } from '../src/props'
@@ -9,15 +10,15 @@ import { SequenceSection } from './Sequence/SequenceSection'
 import { ProteinSearchField } from './ProteinSearchField'
 
 const classes: Record<ProteinType, string> = {
-    'h': 'fas fa-circle small text-primary',
-    'v': 'fas fa-circle small text-danger',
+    'h': 'small text-primary',
+    'v': 'small text-danger',
 }
 
 export const InteractorFieldset: React.FC<InteractorProps> = ({ protein, actions, ...props }) => {
     return (
         <fieldset>
             <legend>
-                <span className={classes[props.type]}></span> Interactor {props.i}
+                <span className={classes[props.type]}><FaCircle /></span> Interactor {props.i}
             </legend>
             <h3>Uniprot</h3>
             {protein == null

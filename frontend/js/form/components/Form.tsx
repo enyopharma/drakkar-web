@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Modal from 'react-bootstrap4-modal';
+import { FaSave, FaEraser } from 'react-icons/fa'
 
 import { AppProps } from '../src/props'
 
@@ -38,7 +39,7 @@ export const Form: React.FC<AppProps> = ({ method, interactor1, interactor2, act
                             >
                                 {props.saving
                                     ? <span className="spinner-border spinner-border-sm"></span>
-                                    : <span className="fas fa-save" />
+                                    : <FaSave />
                                 }
                                 &nbsp;
                                 Save description
@@ -51,7 +52,7 @@ export const Form: React.FC<AppProps> = ({ method, interactor1, interactor2, act
                                 onClick={e => setModal(true)}
                                 disabled={!props.resetable}
                             >
-                                <span className="fas fa-eraser"></span> Reset form data
+                                <FaEraser /> Reset form data
                             </button>
                         </div>
                     </div>
@@ -87,7 +88,7 @@ export const Form: React.FC<AppProps> = ({ method, interactor1, interactor2, act
                         className="btn btn-block btn-primary"
                         onClick={e => resetAndScrollTop()}
                     >
-                        <span className="fas fa-eraser"></span> Reset form data
+                        <FaEraser /> Reset form data
                     </button>
                 </div>
             </Modal>

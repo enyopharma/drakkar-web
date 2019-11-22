@@ -1,4 +1,5 @@
 import React from 'react'
+import { FaCircle } from 'react-icons/fa'
 
 import { MethodProps } from '../src/props'
 
@@ -9,7 +10,7 @@ export const MethodFieldset: React.FC<MethodProps> = ({ method, actions, ...prop
     return (
         <fieldset>
             <legend>
-                <span className="fas fa-circle small text-info"></span>&nbsp;Method
+                <span className="small text-info"><FaCircle /></span>&nbsp;Method
             </legend>
             {method == null
                 ? <MethodSearchField {...props} {...actions} />

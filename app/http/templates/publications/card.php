@@ -31,14 +31,14 @@
                     href="https://www.ncbi.nlm.nih.gov/pubmed/<?= $publication['pmid'] ?>"
                     target="_blank"
                 >
-                    PUBMED <i class="fas fa-external-link-alt"></i>
+                    PUBMED
                 </a>
             </div>
             <div class="col-2">
                 <form method="POST" action="https://sci-hub.tw" target="_blank" class="m-0 p-0">
                     <input type="hidden" name="request" value="<?= $publication['pmid'] ?>">
                     <button type="submit" class="btn btn-sm btn-block btn-link" style="text-decoration: none">
-                        SCIHUB <i class="fas fa-external-link-alt"></i>
+                        SCIHUB
                     </button>
                 </form>
             </div>

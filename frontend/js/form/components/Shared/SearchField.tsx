@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react'
+import { FaSearch } from 'react-icons/fa'
 
 import { SearchType, SearchResult } from '../../src/types'
 
@@ -34,7 +35,7 @@ export const SearchField: React.FC<Props> = ({ type, query, update, search, sele
             <div className="input-group">
                 <div className="input-group-prepend">
                     <span className="input-group-text">
-                        <span className="fas fa-search"></span>
+                        <FaSearch />
                     </span>
                 </div>
                 <input

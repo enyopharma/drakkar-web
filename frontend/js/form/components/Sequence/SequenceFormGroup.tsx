@@ -1,4 +1,5 @@
 import React from 'react'
+import { FaCheck, FaExclamationTriangle } from 'react-icons/fa'
 
 type Props = {
     name: string,
@@ -41,11 +42,13 @@ export const SequenceFormGroup: React.FC<Props> = ({ name, start, stop, valid })
                 {valid
                     ? (
                         <button className="btn btn-block btn-outline-success" disabled>
-                            <span className="fas fa-check"></span>&nbsp;Sequence is valid
+                            <FaCheck />
+                            &nbsp;
+                            Sequence is valid
                         </button>
                     ) : (
                         <button className="btn btn-block btn-outline-danger" disabled>
-                            <span className="fas fa-exclamation-triangle"></span>
+                            <FaExclamationTriangle />
                             &nbsp;
                             Please select a sequence.
                         </button>

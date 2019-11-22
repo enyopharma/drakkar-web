@@ -1,4 +1,5 @@
 import React from 'react'
+import { FaEdit } from 'react-icons/fa'
 
 import { Protein, Mature } from '../../src/types'
 
@@ -49,7 +50,7 @@ export const SequenceSection: React.FC<Props> = ({ edit, ...props }) => {
                         onClick={e => edit()}
                         disabled={!enabled}
                     >
-                        <span className="fas fa-edit"></span>
+                        <FaEdit />
                     </button>
                 </div>
             </div>

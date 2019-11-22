@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import Modal from 'react-bootstrap4-modal';
+import { FaSearch, FaTrash, FaCopy } from 'react-icons/fa'
 
 import { descriptions as api } from '../api'
 import { Description } from '../types'
@@ -91,7 +92,7 @@ const StatelessTable: React.FC<Props> = ({ descriptions }) => {
                                         <span className="text-muted">-</span>
                                     ) : (
                                         <a href="#" onClick={(e) => { e.preventDefault(); showMapping(i) }}>
-                                            <i className="fas fa-search"></i> Mapping
+                                            <FaSearch /> Mapping
                                     </a>
                                     )}
                             </td>
@@ -103,17 +104,17 @@ const StatelessTable: React.FC<Props> = ({ descriptions }) => {
                             </td>
                             <td className="text-center">
                                 <a href={editUrl(i)}>
-                                    <i className="fas fa-copy"></i> Copy
+                                    <FaCopy /> Copy
                                 </a>
                             </td>
                             <td className="text-center">
                                 {deleted[i] ? (
                                     <span className="text-muted">
-                                        <i className="fas fa-trash"></i> Delete
+                                        <FaTrash /> Delete
                                     </span>
                                 ) : (
                                         <a href="#" className="text-danger" onClick={(e) => { e.preventDefault(); deleteDescription(i) }}>
-                                            <i className="fas fa-trash"></i> Delete
+                                            <FaTrash /> Delete
                                     </a>
                                     )}
                             </td>
