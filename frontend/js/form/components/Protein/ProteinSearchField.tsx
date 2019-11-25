@@ -17,12 +17,18 @@ const placeholders: Record<ProteinType, string> = {
     'v': 'Search a viral uniprot entry',
 }
 
+const helps: Record<ProteinType, string> = {
+    'h': 'You may use + to perform queries with multiple search terms (eg: bile acid + transport)',
+    'v': 'You may use + to perform queries with multiple search terms (eg: influenza A + swine + thailand)',
+}
+
 export const ProteinSearchField: React.FC<Props> = ({ type, ...props }) => {
     return (
         <SearchField {...props}
             type={type == 'h' ? 'human' : 'virus'}
             search={api.search(type, 5)}
             placeholder={placeholders[type]}
+            help={helps[type]}
         />
     )
 }

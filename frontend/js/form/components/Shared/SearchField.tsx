@@ -13,10 +13,10 @@ type Props = {
     update: (query: string) => void,
     select: (value: string) => void,
     placeholder?: string,
-    max?: number
+    help?: string | null
 }
 
-export const SearchField: React.FC<Props> = ({ type, query, update, search, select, placeholder = '' }) => {
+export const SearchField: React.FC<Props> = ({ type, query, update, search, select, placeholder = '', help = null }) => {
     const input = useRef<HTMLInputElement>(null)
     const [enabled, setEnabled] = useState<boolean>(false)
 
@@ -53,6 +53,9 @@ export const SearchField: React.FC<Props> = ({ type, query, update, search, sele
             <React.Suspense fallback={<SearchLoader type={type} enabled={enabled} />}>
                 <SearchResultList input={input} query={query} enabled={enabled} search={search} select={select} />
             </React.Suspense>
+            {help == null ? null : (
+                <small className="form-text text-muted">{help}</small>
+            )}
         </div>
     )
 }

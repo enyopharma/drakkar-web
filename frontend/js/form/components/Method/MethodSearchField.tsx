@@ -16,6 +16,7 @@ export const MethodSearchField: React.FC<Props> = ({ ...props }) => {
             type="method"
             search={api.search(5)}
             placeholder="Search a method..."
+            help="You may use + to perform queries with multiple search terms (eg: bio + tag)"
         />
     )
 }
