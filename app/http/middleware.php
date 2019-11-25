@@ -11,7 +11,7 @@ use Psr\Container\ContainerInterface;
  * @return Psr\Http\Server\MiddlewareInterface[]
  */
 return function (ContainerInterface $container): array {
-    if (file_exists(__DIR__ . '/../shutdown')) {
+    if (file_exists(__DIR__ . '/shutdown')) {
         return [
             new Middlewares\Shutdown,
         ];
