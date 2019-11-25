@@ -3,8 +3,8 @@ import { Reducer } from 'redux'
 import { AppState } from './state'
 import { AppAction } from './actions'
 
-import { ui } from './ui'
-import { description } from './description'
+import { ui } from './reducers/ui'
+import { description } from './reducers/description'
 
 export const reducer: Reducer<AppState, AppAction> = (state: AppState = initialState, action: AppAction): AppState => {
     return {

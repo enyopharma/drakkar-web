@@ -1,7 +1,7 @@
-import { AppActionTypes, AppAction } from './actions'
-import { InteractorAction, isInteractorAction } from './actions'
-import { UI, InteractorUI } from './state'
-import { Method, Protein, InteractorI, Feedback, Alignment } from './types'
+import { AppActionTypes, AppAction } from '../actions'
+import { InteractorAction, isInteractorAction } from '../actions'
+import { UI, InteractorUI } from '../state'
+import { Method, Protein, InteractorI, Feedback, Alignment } from '../types'
 
 export const ui = (state: UI, action: AppAction): UI => {
     return {

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 
-import { extract } from '../../src/shared'
+import { extract } from '../../src/utils/shared'
 
 type Props = {
     sequence: string,
