@@ -1,13 +1,13 @@
 import React from 'react'
 
-import { methods as api } from '../api'
+import { methods as api } from '../../api'
 
-import { SearchField } from './Shared/SearchField'
+import { SearchField } from '../Shared/SearchField'
 
 type Props = {
     query: string,
     update: (query: string) => void,
-    select: (accession: string) => void,
+    select: (psimi_id: string) => void,
 }
 
 export const MethodSearchField: React.FC<Props> = ({ ...props }) => {

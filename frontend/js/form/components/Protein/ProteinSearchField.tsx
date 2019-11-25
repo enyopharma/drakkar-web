@@ -1,10 +1,9 @@
 import React from 'react'
 
-import { proteins as api } from '../api'
+import { proteins as api } from '../../api'
+import { ProteinType } from '../../src/types'
 
-import { ProteinType } from '../src/types'
-
-import { SearchField } from './Shared/SearchField'
+import { SearchField } from '../Shared/SearchField'
 
 type Props = {
     type: ProteinType,

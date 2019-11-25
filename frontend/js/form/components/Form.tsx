@@ -3,12 +3,15 @@ import Modal from 'react-bootstrap4-modal';
 import { FaSave, FaEraser } from 'react-icons/fa'
 
 import { AppProps } from '../src/props'
+import { InteractorI } from '../src/types'
 
-import { MethodFieldset } from './MethodFieldset'
-import { InteractorFieldset } from './InteractorFieldset'
+import { MethodSection } from './MethodSection'
+import { InteractorNav } from './InteractorNav'
+import { InteractorSection } from './InteractorSection'
 
-export const Form: React.FC<AppProps> = ({ method, interactor1, interactor2, actions, ...props }) => {
-    const [modal, setModal] = useState(false)
+export const Form: React.FC<AppProps> = ({ type, method, interactor1, interactor2, actions, ...props }) => {
+    const [tab, setTab] = useState<InteractorI>(1)
+    const [modal, setModal] = useState<boolean>(false)
 
     const resetAndScrollTop = () => {
         actions.reset()
@@ -20,13 +23,16 @@ export const Form: React.FC<AppProps> = ({ method, interactor1, interactor2, act
     return (
         <form id="form-top" onSubmit={e => e.preventDefault()}>
             <div id="form-top" className="card">
-                <h3 className="card-header">
-                    Add a new description
-                </h3>
+                <h3 className="card-header">Add a new {type} description</h3>
                 <div className="card-body">
-                    <MethodFieldset {...method} {...actions.method} />
-                    <InteractorFieldset {...interactor1} {...actions.interactor1} />
-                    <InteractorFieldset {...interactor2} {...actions.interactor2} />
+                    <MethodSection {...method} {...actions.method} />
+                </div>
+                <div className="card-header py-0">
+                    <InteractorNav type={type} current={tab} update={setTab} />
+                </div>
+                <div className="card-body">
+                    {tab == 1 ? <InteractorSection {...interactor1} {...actions.interactor1} /> : null}
+                    {tab == 2 ? <InteractorSection {...interactor2} {...actions.interactor2} /> : null}
                 </div>
                 <div className="card-footer">
                     <div className="row">

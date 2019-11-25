@@ -18,6 +18,7 @@ const mapStateToProps = (state: AppState, { type }: OwnProps) => {
 
     return {
         init: state.ui.init,
+        type: type,
         method: mapStateToMethodProps(state),
         interactor1: mapStateToInteractorProps(1, type1, state.description.interactor1, state.ui.interactor1),
         interactor2: mapStateToInteractorProps(2, type2, state.description.interactor2, state.ui.interactor2),

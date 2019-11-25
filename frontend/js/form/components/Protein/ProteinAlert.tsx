@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { ProteinType, Protein } from '../src/types'
+import { ProteinType, Protein } from '../../src/types'
 
 type Props = {
     protein: Protein,
