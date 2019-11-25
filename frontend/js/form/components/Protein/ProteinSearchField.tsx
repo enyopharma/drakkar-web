@@ -12,12 +12,17 @@ type Props = {
     select: (accession: string) => void,
 }
 
+const placeholders: Record<ProteinType, string> = {
+    'h': 'Search a human uniprot entry',
+    'v': 'Search a viral uniprot entry',
+}
+
 export const ProteinSearchField: React.FC<Props> = ({ type, ...props }) => {
     return (
         <SearchField {...props}
             type={type == 'h' ? 'human' : 'virus'}
             search={api.search(type, 5)}
-            placeholder="Search an uniprot entry..."
+            placeholder={placeholders[type]}
         />
     )
 }
