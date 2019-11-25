@@ -5,12 +5,22 @@ import { Method, Protein, InteractorI, Feedback, Alignment } from './types'
 
 export const ui = (state: UI, action: AppAction): UI => {
     return {
+        init: init(state.init, action),
         query: qmethod(state.query, action),
         method: method(state.method, action),
         interactor1: interactor(1)(state.interactor1, action),
         interactor2: interactor(2)(state.interactor2, action),
         saving: saving(state.saving, action),
         feedback: feedback(state.feedback, action),
+    }
+}
+
+const init = (state: boolean, action: AppAction): boolean => {
+    switch (action.type) {
+        case AppActionTypes.SHOW_FORM:
+            return true
+        default:
+            return state
     }
 }
 
@@ -27,6 +37,8 @@ const qmethod = (state: string, action: AppAction): string => {
 
 const method = (state: Method | null, action: AppAction): Method | null => {
     switch (action.type) {
+        case AppActionTypes.INIT_METHOD:
+            return action.method
         case AppActionTypes.SELECT_METHOD:
             return action.method
         case AppActionTypes.UNSELECT_METHOD:
@@ -65,6 +77,8 @@ const qprotein = (state: string, action: InteractorAction): string => {
 
 const protein = (state: Protein | null, action: InteractorAction): Protein | null => {
     switch (action.type) {
+        case AppActionTypes.INIT_PROTEIN:
+            return action.protein
         case AppActionTypes.SELECT_PROTEIN:
             return action.protein
         case AppActionTypes.UNSELECT_PROTEIN:

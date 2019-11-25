@@ -1,23 +1,38 @@
 import React from 'react'
+import { createStore, applyMiddleware } from 'redux'
 import { Provider } from 'react-redux'
+import thunk from 'redux-thunk'
 
-import { create } from '../src/store'
 import { connect } from '../src/props'
+import { reducer } from '../src/reducer'
 
 import { AppState } from '../src/state'
 import { AppProps } from '../src/props'
-import { DescriptionType } from '../src/types'
+import { initialState } from '../src/reducer'
+import { DescriptionType, Description } from '../src/types'
 
-import { Form } from './Form'
+import { FormInit } from './FormInit'
+
 
 const StatelessApp: React.FC<AppProps> = (props) => {
-    return <Form {...props} />
+    return <FormInit {...props} />
 }
 
 const StatefulApp = connect(StatelessApp);
 
-export const App = (type: DescriptionType, run_id: number, pmid: number, state: AppState) => (
-    <Provider store={create(state)}>
-        <StatefulApp type={type} run_id={run_id} pmid={pmid} />
-    </Provider>
-)
+export const App = (type: DescriptionType, run_id: number, pmid: number, description: Description | null) => {
+    const preloadedState: AppState = {
+        ui: initialState.ui,
+        description: description == null
+            ? initialState.description
+            : description
+    }
+
+    const store = createStore(reducer, preloadedState, applyMiddleware(thunk))
+
+    return (
+        <Provider store={store}>
+            <StatefulApp type={type} run_id={run_id} pmid={pmid} />
+        </Provider>
+    )
+}

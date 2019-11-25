@@ -17,6 +17,7 @@ const mapStateToProps = (state: AppState, { type }: OwnProps) => {
     const type2 = type == 'hh' ? 'h' : 'v'
 
     return {
+        init: state.ui.init,
         method: mapStateToMethodProps(state),
         interactor1: mapStateToInteractorProps(1, type1, state.description.interactor1, state.ui.interactor1),
         interactor2: mapStateToInteractorProps(2, type2, state.description.interactor2, state.ui.interactor2),
@@ -59,11 +60,12 @@ const mapStateToInteractorProps = (i: InteractorI, type: ProteinType, interactor
 // mapDispatchToProps
 const mapDispatchToProps = (dispatch: any, { run_id, pmid }: OwnProps) => ({
     actions: {
+        init: () => dispatch(creators.initForm()),
+        save: () => dispatch(creators.fireSave(run_id, pmid)),
+        reset: () => dispatch(creators.resetForm()),
         method: mapDispatchToMethodProps(dispatch),
         interactor1: mapDispatchToInteractorProps(1, dispatch),
         interactor2: mapDispatchToInteractorProps(2, dispatch),
-        save: () => dispatch(creators.fireSave(run_id, pmid)),
-        reset: () => dispatch(creators.resetForm()),
     },
 })
 
