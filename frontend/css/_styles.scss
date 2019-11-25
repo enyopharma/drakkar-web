@@ -14,11 +14,11 @@ body {
     }
 }
 
-div.row, div.card, nav, form, fieldset {
+div.row, div.card, nav, form, fieldset, ul.list-group {
     margin-bottom: $spacer;
 }
 
-div.row, div.card, nav, form, fieldset, ul, p, table, .alert {
+div.row, div.card, nav, form, fieldset, ul.list-group, ul, p, table, .alert {
     &:last-child {
         margin-bottom: 0;
     }
