@@ -32,11 +32,11 @@ final class ProteinViewSql implements ProteinViewInterface
         );
     }
 
-    public function search(string $type, string $q, int $limit): Statement
+    public function search(string $type, string $query, int $limit): Statement
     {
         $qs = array_map(function ($q) {
             return '%' . trim($q) . '%';
-        }, array_filter(explode('+', $q)));
+        }, array_filter(explode('+', $query)));
 
         $select_proteins_sth = Query::instance($this->pdo)
             ->select('p.type, p.accession, tn.name AS taxon, p.name, p.description')

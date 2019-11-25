@@ -17,7 +17,7 @@ export const methods = {
 
             throw new Promise((resolve) => {
                 setTimeout(() => {
-                    fetch('/methods?' + qs.stringify({ q: query, limit: limit }))
+                    fetch('/methods?' + qs.stringify({ query: query, limit: limit }))
                         .then(response => response.json(), error => console.log(error))
                         .then(json => mcache[query] = json.data.map((m: Method) => ({
                             value: m.psimi_id,
@@ -44,7 +44,7 @@ export const proteins = {
 
             throw new Promise((resolve) => {
                 setTimeout(() => {
-                    fetch('/proteins?' + qs.stringify({ type: type, q: query, limit: limit }))
+                    fetch('/proteins?' + qs.stringify({ type: type, query: query, limit: limit }))
                         .then(response => response.json(), error => console.log(error))
                         .then(json => pcache[type][query] = json.data.map((p: Protein) => ({
                             value: p.accession,

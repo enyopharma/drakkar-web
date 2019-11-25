@@ -20,10 +20,10 @@ final class SearchProteins implements DomainActionInterface
     public function __invoke(array $input): DomainPayloadInterface
     {
         $type = (string) ($input['type'] ?? '');
-        $q = (string) ($input['q'] ?? '');
+        $query = (string) ($input['query'] ?? '');
         $limit = (int) ($input['limit'] ?? 5);
 
-        $proteins = $this->proteins->search($type, $q, $limit)->fetchAll();
+        $proteins = $this->proteins->search($type, $query, $limit)->fetchAll();
 
         return new DomainDataCollection($proteins);
     }

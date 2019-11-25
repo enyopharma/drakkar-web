@@ -19,10 +19,10 @@ final class SearchMethods implements DomainActionInterface
 
     public function __invoke(array $input): DomainPayloadInterface
     {
-        $q = (string) ($input['q'] ?? '');
+        $query = (string) ($input['query'] ?? '');
         $limit = (int) ($input['limit'] ?? 5);
 
-        $methods = $this->methods->search($q, $limit)->fetchAll();
+        $methods = $this->methods->search($query, $limit)->fetchAll();
 
         return new DomainDataCollection($methods);
     }
