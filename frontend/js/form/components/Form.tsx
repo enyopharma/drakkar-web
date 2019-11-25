@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import Modal from 'react-bootstrap4-modal';
 import { FaSave, FaEraser } from 'react-icons/fa'
 
 import { AppProps } from '../src/props'
 import { InteractorI } from '../src/types'
 
+import { ResetModal } from './ResetModal'
 import { MethodSection } from './MethodSection'
 import { InteractorNav } from './InteractorNav'
 import { InteractorSection } from './InteractorSection'
@@ -12,13 +12,6 @@ import { InteractorSection } from './InteractorSection'
 export const Form: React.FC<AppProps> = ({ type, method, interactor1, interactor2, actions, ...props }) => {
     const [tab, setTab] = useState<InteractorI>(1)
     const [modal, setModal] = useState<boolean>(false)
-
-    const resetAndScrollTop = () => {
-        actions.reset()
-        setModal(false)
-        const elem = document.getElementById('form-top')
-        if (elem) elem.scrollIntoView()
-    }
 
     return (
         <form id="form-top" onSubmit={e => e.preventDefault()}>
@@ -76,28 +69,7 @@ export const Form: React.FC<AppProps> = ({ type, method, interactor1, interactor
                     )}
                 </div>
             </div>
-            <Modal visible={modal} dialogClassName="modal-lg">
-                <div className="modal-header">
-                    <h5 className="modal-title">
-                        Reseting form data
-                    </h5>
-                    <button type="button" className="close" onClick={e => setModal(false)}>
-                        &times;
-                    </button>
-                </div>
-                <div className="modal-body">
-                    Are you sure you want to reset the form data?
-                </div>
-                <div className="modal-footer">
-                    <button
-                        type="button"
-                        className="btn btn-block btn-primary"
-                        onClick={e => resetAndScrollTop()}
-                    >
-                        <FaEraser /> Reset form data
-                    </button>
-                </div>
-            </Modal>
+            <ResetModal top="form-top" show={modal} reset={actions.reset} close={() => setModal(false)} />
         </form>
     )
 }
