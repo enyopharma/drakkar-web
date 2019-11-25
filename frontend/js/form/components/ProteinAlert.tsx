@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Protein } from '../src/types'
+import { ProteinType, Protein } from '../src/types'
 
 type Props = {
     protein: Protein,
@@ -8,9 +8,14 @@ type Props = {
     unselect: () => void,
 }
 
+const classes: Record<ProteinType, string> = {
+    'h': 'alert alert-primary',
+    'v': 'alert alert-danger',
+}
+
 export const ProteinAlert: React.FC<Props> = ({ protein, enabled, unselect }) => {
     return (
-        <div className={'alert alert-' + (protein.type == 'h' ? 'primary' : 'danger')}>
+        <div className={classes[protein.type]}>
             <strong>{protein.accession}</strong> - {[
                 protein.taxon,
                 protein.name,
