@@ -21,10 +21,14 @@ export const InteractorFieldset: React.FC<InteractorProps> = ({ protein, actions
                 <span className={classes[props.type]}><FaCircle /></span> Interactor {props.i}
             </legend>
             <h3>Uniprot</h3>
-            {protein == null
-                ? <ProteinSearchField {...props} {...actions.protein} />
-                : <ProteinAlert {...props} {...actions.protein} protein={protein} enabled={!props.processing} />
-            }
+            <div className="row">
+                <div className="col">
+                    {protein == null
+                        ? <ProteinSearchField {...props} {...actions.protein} />
+                        : <ProteinAlert {...props} {...actions.protein} protein={protein} enabled={!props.processing} />
+                    }
+                </div>
+            </div>
             <h3>Sequence</h3>
             {protein == null
                 ? <p>Please select an uniprot entry first.</p>

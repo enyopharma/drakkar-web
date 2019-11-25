@@ -5,7 +5,7 @@
         <small class="d-none d-md-inline">Lets sail toward the vinland!</small>
     </h1>
 </div>
-<div class="row my-4">
+<div class="row">
     <div class="col">
         <a href="<?= $this->url('dataset') ?>" class="btn btn-primary btn-lg btn-block">
             Download current vinland dataset
@@ -13,17 +13,14 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-4 d-none d-md-block">
-        <img src="<?= 'img/viking.png' ?>" class="img-fluid" style="width: 180px; opacity: 0.8;">
+    <div class="col-4">
+        <img src="<?= 'img/viking.png' ?>" class="img-fluid" style="width: 140px; opacity: 0.8;">
     </div>
-    <div class="col offset-md-1">
+    <div class="col">
         <div class="card">
             <h3 class="card-header">Ahoy mate, here is how to sail</h3>
             <div class="card-body">
                 <ul class="my-0">
-                    <li>
-                        Logged as <strong><?= $user['name'] ?></strong>
-                    </li>
                     <li>
                         Select/discard publications for each curation run listed below
                     </li>

@@ -10,7 +10,7 @@ type Props = {
 
 export const ProteinAlert: React.FC<Props> = ({ protein, enabled, unselect }) => {
     return (
-        <div className={'mb-0 alert alert-' + (protein.type == 'h' ? 'primary' : 'danger')}>
+        <div className={'alert alert-' + (protein.type == 'h' ? 'primary' : 'danger')}>
             <strong>{protein.accession}</strong> - {[
                 protein.taxon,
                 protein.name,

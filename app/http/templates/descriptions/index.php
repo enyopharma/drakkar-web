@@ -32,9 +32,7 @@
 
 <?php if ($publication['state'] == $selected): ?>
 <p>
-    <a
-        href="<?= $this->url('runs.publications.descriptions.create', $publication) ?>"
-    >
+    <a href="<?= $this->url('runs.publications.descriptions.create', $publication) ?>">
         Add new descriptions.
     </a>
 </p>
@@ -61,7 +59,11 @@
         );
     },
 ]) ?>
-<div id="descriptions-table" class="wrapper"></div>
+<div class="row">
+    <div class="col">
+        <div id="descriptions-table"></div>
+    </div>
+</div>
 <?php $this->insert('pagination/nav', [
     'pagination' => $this->pagination($total, $page, $limit),
     'url' => function (int $page) use ($publication, $limit) {

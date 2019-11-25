@@ -12,10 +12,14 @@ export const MethodFieldset: React.FC<MethodProps> = ({ method, actions, ...prop
             <legend>
                 <span className="small text-info"><FaCircle /></span>&nbsp;Method
             </legend>
-            {method == null
-                ? <MethodSearchField {...props} {...actions} />
-                : <MethodAlert {...props} {...actions} method={method} />
-            }
+            <div className="row">
+                <div className="col">
+                    {method == null
+                        ? <MethodSearchField {...props} {...actions} />
+                        : <MethodAlert {...props} {...actions} method={method} />
+                    }
+                </div>
+            </div>
         </fieldset>
     )
 }

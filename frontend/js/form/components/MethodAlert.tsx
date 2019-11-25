@@ -9,7 +9,7 @@ type Props = {
 
 export const MethodAlert: React.FC<Props> = ({ method, unselect }) => {
     return (
-        <div className="mb-0 alert alert-info">
+        <div className="alert alert-info">
             <strong>{method.psimi_id}</strong> - {method.name}
             <button type="button" className="close" onClick={e => unselect()}>
                 <span>&times;</span>

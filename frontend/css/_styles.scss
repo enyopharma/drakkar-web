@@ -1,5 +1,5 @@
 body {
-    padding-bottom: $spacer * 40;
+    padding-bottom: $spacer * 50;
 }
 
 .page-header {
@@ -14,21 +14,13 @@ body {
     }
 }
 
-.row, .card, p, ul, table, fieldset {
-    margin-top: $spacer;
+div.row, div.card, nav, form, fieldset {
     margin-bottom: $spacer;
-    &:first-child {
-        margin-top: 0;
-    }
-    &:last-child {
-        margin-bottom: 0;
-    }
 }
 
-.wrapper {
-    &>.row, &>.card, &>p, &>ul, &>table, &>fieldset {
-        margin-top: $spacer;
-        margin-bottom: $spacer;
+div.row, div.card, nav, form, fieldset, ul, p, table, .alert {
+    &:last-child {
+        margin-bottom: 0;
     }
 }
 
