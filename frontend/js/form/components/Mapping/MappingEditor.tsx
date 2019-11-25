@@ -18,7 +18,7 @@ type Props = {
 }
 
 export const MappingEditor: React.FC<Props> = ({ query, sequence, domains, mapping, processing, update, fire }) => {
-    const isQueryValid = query.trim() != '' && mapping.filter(alignment => {
+    const isQueryValid = query.trim().length >= 4 && mapping.filter(alignment => {
         return query.toUpperCase().trim() == alignment.sequence.toUpperCase().trim()
     }).length == 0
 
