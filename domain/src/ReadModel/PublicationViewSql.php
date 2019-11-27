@@ -87,6 +87,10 @@ final class PublicationViewSql implements PublicationViewInterface
             'run_id' => $publication['run_id'],
             'pmid' => $publication['pmid'],
             'state' => $publication['state'],
+            'title' => '',
+            'journal' => '',
+            'abstract' => ['Unknown format'],
+            'authors' => [],
             'annotation' => $publication['annotation'],
             'keywords' => $keywords,
             'pending' => $publication['state'] == \Domain\Association::PENDING,
@@ -107,15 +111,12 @@ final class PublicationViewSql implements PublicationViewInterface
             if (key_exists('PubmedBookArticle', $metadata)) {
                 return array_merge($raw, $this->book($metadata['PubmedBookArticle']['BookDocument']));
             }
+
+            return $raw;
         }
 
         catch (\Throwable $e) {
-            return array_merge($raw, [
-                'title' => '',
-                'journal' => '',
-                'abstract' => ['Unknown format'],
-                'authors' => [],
-            ]);
+            return $raw;
         }
     }
 
