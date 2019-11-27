@@ -55,6 +55,29 @@ const StatelessTable: React.FC<Props> = ({ descriptions }) => {
 
     return (
         <React.Fragment>
+            {selected == null ? null : (
+                <MappingModal description={selected} close={hideMapping} />
+            )}
+            {deleting == null ? null : (
+                <Modal visible={true} dialogClassName="modal-lg">
+                    <div className="modal-header">
+                        <h5 className="modal-title">
+                            Deleting description from publication {descriptions[deleting].pmid}
+                        </h5>
+                        <button type="button" className="close" onClick={e => cancelDeletion()}>
+                            &times;
+                        </button>
+                    </div>
+                    <div className="modal-body">
+                        Are you sure you want to delete this description?
+                    </div>
+                    <div className="modal-footer">
+                        <button type="button" className="btn btn-block btn-danger" onClick={e => confirmDeletion()}>
+                            Delete description
+                        </button>
+                    </div>
+                </Modal>
+            )}
             <table className="table">
                 <thead>
                     <tr>
@@ -122,29 +145,6 @@ const StatelessTable: React.FC<Props> = ({ descriptions }) => {
                     ))}
                 </tbody>
             </table>
-            {selected == null ? null : (
-                <MappingModal description={selected} close={hideMapping} />
-            )}
-            {deleting == null ? null : (
-                <Modal visible={true} dialogClassName="modal-lg">
-                    <div className="modal-header">
-                        <h5 className="modal-title">
-                            Deleting description from publication {descriptions[deleting].pmid}
-                        </h5>
-                        <button type="button" className="close" onClick={e => cancelDeletion()}>
-                            &times;
-                        </button>
-                    </div>
-                    <div className="modal-body">
-                        Are you sure you want to delete this description?
-                    </div>
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-block btn-danger" onClick={e => confirmDeletion()}>
-                            Delete description
-                        </button>
-                    </div>
-                </Modal>
-            )}
         </React.Fragment>
     )
 }
