@@ -69,11 +69,11 @@ export const MappingSection: React.FC<Props> = ({ protein, alignment, ...props }
 
     return (
         <React.Fragment>
-            <MappingEditor {...props} query={query} sequence={sequence} domains={domains} update={setQuery} fire={fire} />
-            <MappingDisplay {...props} type={type} coordinates={coordinates} />
             {alignment == null ? null : (
                 <MappingModal {...props} type={type} coordinates={coordinates} alignment={alignment} />
             )}
+            <MappingEditor {...props} query={query} sequence={sequence} domains={domains} update={setQuery} fire={fire} />
+            <MappingDisplay {...props} type={type} coordinates={coordinates} />
         </React.Fragment>
     )
 }

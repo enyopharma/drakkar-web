@@ -18,6 +18,7 @@ export const Form: React.FC<AppProps> = ({ type, savable, resetable, saving, fee
 
     return (
         <form id="form-top" onSubmit={e => e.preventDefault()}>
+            <ResetModal top="form-top" show={modal} reset={reset} close={() => setModal(false)} />
             <div id="form-top" className="card">
                 <h3 className="card-header">Add a new {type} description</h3>
                 <div className="card-body">
@@ -72,7 +73,6 @@ export const Form: React.FC<AppProps> = ({ type, savable, resetable, saving, fee
                     )}
                 </div>
             </div>
-            <ResetModal top="form-top" show={modal} reset={reset} close={() => setModal(false)} />
         </form>
     )
 }
