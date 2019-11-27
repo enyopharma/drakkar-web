@@ -23,20 +23,24 @@ final class DataSource
 
     const SELECT_INTERACTOR_NAME_SQL = <<<SQL
         SELECT i.name
-        FROM proteins AS p, interactors AS i
-        WHERE p.id = i.protein_id
+        FROM descriptions AS d, interactors AS i, proteins AS p
+        WHERE (i.id = d.interactor1_id OR i.id = d.interactor2_id)
+        AND p.id = i.protein_id
         AND p.accession = ?
         AND i.start = ?
         AND i.stop = ?
+        AND d.deleted_at IS NULL
         LIMIT 1
     SQL;
 
     const SELECT_INTERACTOR_COORDINATES_SQL = <<<SQL
         SELECT i.start, i.stop
-        FROM proteins AS p, interactors AS i
-        WHERE p.id = i.protein_id
+        FROM descriptions AS d, interactors AS i, proteins AS p
+        WHERE (i.id = d.interactor1_id OR i.id = d.interactor2_id)
+        AND p.id = i.protein_id
         AND p.accession = ?
         AND i.name = ?
+        AND d.deleted_at IS NULL
         LIMIT 1
     SQL;
 
