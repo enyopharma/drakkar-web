@@ -37,9 +37,7 @@ final class RunViewSql implements RunViewInterface
 
     public function all(): Statement
     {
-        $select_runs_sth = $this->selectRunsQuery()
-            ->orderby('created_at DESC, id DESC')
-            ->prepare();
+        $select_runs_sth = $this->selectRunsQuery()->prepare();
 
         $select_runs_sth->execute();
 
@@ -86,7 +84,13 @@ final class RunViewSql implements RunViewInterface
             $nbs[$row['run_id']][$row['state']] = $row['nb'];
         }
 
-        while ($run = $sth->fetch()) {
+        $runs = $sth->fetchAll();
+
+        usort($runs, function (array $a, array $b) {
+            return strnatcmp($b['name'], $a['name']);
+        });
+
+        foreach ($runs as $run) {
             yield $this->formatted($run, $nbs);
         }
     }
