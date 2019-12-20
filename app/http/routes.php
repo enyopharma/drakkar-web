@@ -55,7 +55,7 @@ return function (): array {
             'action' => Domain\Actions\DeleteDescription::class,
         ],
 
-        'GET /dataset' => [
+        'GET /dataset/{type:hh|vh}' => [
             'name' => 'dataset',
             'action' => Domain\Actions\DownloadDataset::class,
             'responder' => App\Http\Responders\DatasetResponder::class,

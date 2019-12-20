@@ -32,9 +32,9 @@ final class DatasetResponder implements HttpResponderInterface
 
     private function domainData($request, $payload)
     {
-        $filename = sprintf('vinland-%s', date('Y-m-d'));
+        ['type' => $type, 'dataset' => $dataset] = $payload->data();
 
-        ['dataset' => $dataset] = $payload->data();
+        $filename = sprintf('vinland-%s-%s', $type, date('Y-m-d'));
 
         return $this->factory
             ->createResponse(200)

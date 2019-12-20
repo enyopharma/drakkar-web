@@ -6,5 +6,5 @@ namespace Domain\ReadModel;
 
 interface DatasetViewInterface
 {
-    public function all(): Statement;
+    public function all(string $type): Statement;
 }

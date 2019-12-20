@@ -7,8 +7,13 @@
 </div>
 <div class="row">
     <div class="col">
-        <a href="<?= $this->url('dataset') ?>" class="btn btn-primary btn-lg btn-block">
-            Download current vinland dataset
+        <a href="<?= $this->url('dataset', ['type' => Domain\Run::HH]) ?>" class="btn btn-primary btn-lg btn-block">
+            Download current HH dataset
+        </a>
+    </div>
+    <div class="col">
+        <a href="<?= $this->url('dataset', ['type' => Domain\Run::VH]) ?>" class="btn btn-primary btn-lg btn-block">
+            Download current VH dataset
         </a>
     </div>
 </div>

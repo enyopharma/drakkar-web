@@ -19,9 +19,12 @@ final class DownloadDataset implements DomainActionInterface
 
     public function __invoke(array $input): DomainPayloadInterface
     {
-        $dataset = $this->dataset->all();
+        $type = $input['type'];
+
+        $dataset = $this->dataset->all($type);
 
         return new DomainData([
+            'type' => $type,
             'dataset' => $dataset,
         ]);
     }

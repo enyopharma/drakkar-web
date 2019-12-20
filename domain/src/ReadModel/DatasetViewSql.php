@@ -13,7 +13,7 @@ final class DatasetViewSql implements DatasetViewInterface
         $this->pdo = $pdo;
     }
 
-    public function all(): Statement
+    public function all(string $type): Statement
     {
         $select_descriptions_sth = Query::instance($this->pdo)
             ->select('r.type')
@@ -30,6 +30,7 @@ final class DatasetViewSql implements DatasetViewInterface
             ->from('methods AS m')
             ->from('interactors AS i1, interactors AS i2')
             ->from('proteins AS p1, proteins AS p2')
+            ->where('r.type = ?')
             ->where('r.id = a.run_id')
             ->where('a.id = d.association_id')
             ->where('m.id = d.method_id')
@@ -43,7 +44,7 @@ final class DatasetViewSql implements DatasetViewInterface
             ->orderby('d.created_at DESC, d.id DESC')
             ->prepare();
 
-        $select_descriptions_sth->execute();
+        $select_descriptions_sth->execute([$type]);
 
         return new Statement(
             $this->generator($select_descriptions_sth)
