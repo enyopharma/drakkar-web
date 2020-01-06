@@ -7,19 +7,19 @@ namespace App\Http\Extensions\Plates;
 use League\Plates\Engine;
 use League\Plates\Extension\ExtensionInterface;
 
-use App\Http\Helpers\UrlHelper;
+use App\Http\UrlGenerator;
 
 final class UrlExtension implements ExtensionInterface
 {
-    private $helper;
+    private $url;
 
-    public function __construct(UrlHelper $helper)
+    public function __construct(UrlGenerator $url)
     {
-        $this->helper = $helper;
+        $this->url = $url;
     }
 
     public function register(Engine $engine)
     {
-        $engine->registerFunction('url', [$this->helper, 'generate']);
+        $engine->registerFunction('url', [$this->url, 'generate']);
     }
 }

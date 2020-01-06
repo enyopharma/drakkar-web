@@ -44,7 +44,7 @@ return [
 
     UrlExtension::class => function ($container) {
         return new UrlExtension(
-            $container->get(App\Http\Helpers\UrlHelper::class)
+            $container->get(App\Http\UrlGenerator::class)
         );
     },
 

@@ -10,7 +10,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 
 use League\Plates\Engine;
 
-use App\Http\Helpers\UrlHelper;
+use App\Http\UrlGenerator;
 use Domain\Payloads\DomainPayloadInterface;
 
 final class PublicationResponder implements HttpResponderInterface
@@ -21,7 +21,7 @@ final class PublicationResponder implements HttpResponderInterface
 
     private $url;
 
-    public function __construct(ResponseFactoryInterface $factory, Engine $engine, UrlHelper $url)
+    public function __construct(ResponseFactoryInterface $factory, Engine $engine, UrlGenerator $url)
     {
         $this->factory = $factory;
         $this->engine = $engine;
