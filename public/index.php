@@ -15,29 +15,36 @@ require __DIR__ . '/../vendor/autoload.php';
 /**
  * Get the env and debug mod from the env var.
  */
-$environment = ($val = $_ENV['APP_ENV'] ?? getenv('APP_ENV')) === false
-    ? 'production'
-    : $val;
-
-$debug = ($val = $_ENV['APP_DEBUG'] ?? getenv('APP_DEBUG')) === false
-    ? false
-    : filter_var($val, FILTER_VALIDATE_BOOLEAN);
+$env = $_ENV['APP_ENV'] ?? 'production';
+$debug = filter_var($_ENV['APP_DEBUG'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
 /**
- * Get the http application.
+ * Get the container.
  */
-$application = (require __DIR__ . '/../app/http/handler.php')($environment, $debug);
+$container = (require __DIR__ . '/../app/http/container.php')($env, $debug);
 
 /**
- * Wrapp the http application insinde a fake http server.
+ * Run the boot scripts.
  */
-$server = new App\Http\Server(
-    new App\Http\Server\NyholmContext(
-        $application
-    )
-);
+foreach ((array) glob(__DIR__ . '/../app/http/boot/*.php') as $boot) {
+    (require $boot)($container);
+}
 
 /**
- * Run the http server.
+ * Get the http request handler.
  */
-$server->run();
+$handler = (require __DIR__ . '/../app/http/handler.php')($container);
+
+/**
+ * Run the application.
+ */
+use function Http\Response\send;
+
+$factory = new Nyholm\Psr7\Factory\Psr17Factory;
+$creator = new Nyholm\Psr7Server\ServerRequestCreator($factory, $factory, $factory, $factory);
+
+$request = $creator->fromGlobals();
+
+$response = $handler->handle($request);
+
+send($response);

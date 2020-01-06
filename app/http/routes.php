@@ -12,37 +12,31 @@ use Psr\Container\ContainerInterface;
 return function (): array {
     return [
         'GET /' => [
-            'name' => 'runs.index',
             'action' => Domain\Actions\CollectRuns::class,
             'responder' => App\Http\Responders\RunResponder::class,
         ],
 
         'GET /runs/{run_id:\d+}/publications' => [
-            'name' => 'runs.publications.index',
             'action' => Domain\Actions\CollectPublications::class,
             'responder' => App\Http\Responders\PublicationResponder::class,
         ],
 
         'PUT /runs/{run_id:\d+}/publications/{pmid:\d+}' => [
-            'name' => 'runs.publications.update',
             'action' => Domain\Actions\UpdatePublicationState::class,
             'responder' => App\Http\Responders\PublicationResponder::class,
         ],
 
         'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions' => [
-            'name' => 'runs.publications.descriptions.index',
             'action' => Domain\Actions\CollectDescriptions::class,
             'responder' => App\Http\Responders\DescriptionResponder::class,
         ],
 
         'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/create' => [
-            'name' => 'runs.publications.descriptions.create',
             'action' => Domain\Actions\SelectPublication::class,
             'responder' => App\Http\Responders\FormResponder::class,
         ],
 
         'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/edit' => [
-            'name' => 'runs.publications.descriptions.edit',
             'action' => Domain\Actions\SelectDescription::class,
             'responder' => App\Http\Responders\FormResponder::class,
         ],
@@ -56,7 +50,6 @@ return function (): array {
         ],
 
         'GET /dataset/{type:hh|vh}' => [
-            'name' => 'dataset',
             'action' => Domain\Actions\DownloadDataset::class,
             'responder' => App\Http\Responders\DatasetResponder::class,
         ],

@@ -8,10 +8,10 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
-use Domain\Payloads\DomainPayloadInterface;
-
 use League\Plates\Engine;
-use Zend\Expressive\Helper\UrlHelper;
+
+use App\Http\Helpers\UrlHelper;
+use Domain\Payloads\DomainPayloadInterface;
 
 final class PublicationResponder implements HttpResponderInterface
 {

@@ -1,11 +1,13 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace App\Http\Extensions\Plates;
 
 use League\Plates\Engine;
 use League\Plates\Extension\ExtensionInterface;
 
-use Zend\Expressive\Helper\UrlHelper;
+use App\Http\Helpers\UrlHelper;
 
 final class UrlExtension implements ExtensionInterface
 {
@@ -18,6 +20,6 @@ final class UrlExtension implements ExtensionInterface
 
     public function register(Engine $engine)
     {
-        $engine->registerFunction('url', $this->helper);
+        $engine->registerFunction('url', [$this->helper, 'generate']);
     }
 }

@@ -5,58 +5,44 @@ declare(strict_types=1);
 use Psr\Container\ContainerInterface;
 
 use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Http\Message\ResponseFactoryInterface;
-
-use App\Http\Handlers\Dispatcher;
-use App\Http\Handlers\NotFoundRequestHandler;
-
-use League\Plates\Engine;
 
 /**
  * A factory producing the application request handler.
  *
- * @param string    $env
- * @param bool      $debug
+ * @param Psr\Container\ContainerInterface $container
  * @return Psr\Http\Server\RequestHandlerInterface
  */
-return function (string $env, bool $debug): RequestHandlerInterface {
-    /**
-     * Build the container.
-     */
-    $files = array_merge(
-        (array) glob(__DIR__ . '/../../infrastructure/factories/*.php'),
-        (array) glob(__DIR__ . '/../../domain/factories/*.php'),
-        (array) glob(__DIR__ . '/factories/*.php')
-    );
-
-    $container = new Quanta\Container(array_reduce($files, function ($factories, $file) {
-        return array_merge($factories, require $file);
-    }, []));
-
-    /**
-     * Run the boot scripts.
-     */
-    foreach ((array) glob(__DIR__ . '/boot/*.php') as $boot) {
-        (require $boot)($container);
+return function (ContainerInterface $container): RequestHandlerInterface {
+    if (file_exists(__DIR__ . '/shutdown')) {
+        return Quanta\Http\Dispatcher::queue(new Middlewares\Shutdown);
     }
 
-    /**
-     * Get the middleware factories.
-     */
-    $middleware = (require __DIR__ . '/middleware.php')($container);
+    return Quanta\Http\Dispatcher::queue(
+        /**
+         * Whoops error handler.
+         */
+        new Middlewares\Whoops,
 
-    /**
-     * Get the inner most request handler.
-     */
-    $handler = new NotFoundRequestHandler(
-        $container->get(ResponseFactoryInterface::class),
-        $container->get(Engine::class)
+        /**
+         * Override the post method
+         */
+        (new Middlewares\MethodOverride)->parsedBodyParameter('_method'),
+
+        /**
+         * Json body parser.
+         */
+        new Middlewares\JsonPayload,
+
+        /**
+         * Router.
+         */
+        new Zend\Expressive\Router\Middleware\RouteMiddleware(
+            $container->get(Zend\Expressive\Router\RouterInterface::class)
+        ),
+
+        /**
+         * Route dispatcher.
+         */
+        new Zend\Expressive\Router\Middleware\DispatchMiddleware,
     );
-
-    /**
-     * Return the application.
-     */
-    return array_reduce(array_reverse($middleware), function ($app, $middleware) {
-        return new Dispatcher($app, $middleware);
-    }, $handler);
 };

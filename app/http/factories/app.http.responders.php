@@ -21,7 +21,7 @@ return [
         return new PublicationResponder(
             $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
             $container->get(League\Plates\Engine::class),
-            $container->get(Zend\Expressive\Helper\UrlHelper::class)
+            $container->get(App\Http\Helpers\UrlHelper::class)
         );
     },
 
@@ -29,7 +29,7 @@ return [
         return new DescriptionResponder(
             $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
             $container->get(League\Plates\Engine::class),
-            $container->get(Zend\Expressive\Helper\UrlHelper::class)
+            $container->get(App\Http\Helpers\UrlHelper::class)
         );
     },
 
