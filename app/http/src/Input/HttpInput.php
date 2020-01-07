@@ -13,7 +13,7 @@ final class HttpInput implements HttpInputInterface
         return array_merge(
             (array) $request->getQueryParams(),
             (array) $request->getParsedBody(),
-            (array) $request->getAttributes(),
+            (array) $request->getAttribute(\Quanta\Http\RouteAttributeMap::class)->all(),
             (array) $request->getUploadedFiles()
         );
     }

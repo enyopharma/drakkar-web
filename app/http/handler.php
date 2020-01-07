@@ -17,6 +17,18 @@ return function (ContainerInterface $container): RequestHandlerInterface {
         return Quanta\Http\Dispatcher::queue(new Middlewares\Shutdown);
     }
 
+    /**
+     * Get the response factory from the container.
+     */
+    $factory = $container->get(Psr\Http\Message\ResponseFactoryInterface::class);
+
+    /**
+     * Get the fast route dispatcher and build a router.
+     */
+    $router = new App\Http\FastRouteRouter(
+        $container->get(FastRoute\Dispatcher::class)
+    );
+
     return Quanta\Http\Dispatcher::queue(
         /**
          * Whoops error handler.
@@ -29,20 +41,23 @@ return function (ContainerInterface $container): RequestHandlerInterface {
         (new Middlewares\MethodOverride)->parsedBodyParameter('_method'),
 
         /**
-         * Json body parser.
+         * Parse json body.
          */
         new Middlewares\JsonPayload,
 
         /**
          * Router.
          */
-        new Zend\Expressive\Router\Middleware\RouteMiddleware(
-            $container->get(Zend\Expressive\Router\RouterInterface::class)
-        ),
+        new Quanta\Http\RoutingMiddleware($router),
 
         /**
-         * Route dispatcher.
+         * Return a not allowed response.
          */
-        new Zend\Expressive\Router\Middleware\DispatchMiddleware,
+        new Quanta\Http\NotAllowedMiddleware($factory),
+
+        /**
+         * Return a not found response.
+         */
+        new Quanta\Http\NotFoundMiddleware($factory),
     );
 };

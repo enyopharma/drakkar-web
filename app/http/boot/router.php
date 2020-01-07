@@ -11,9 +11,7 @@ use Psr\Container\ContainerInterface;
  * @return void
  */
 return function (ContainerInterface $container) {
-    $collector = new Zend\Expressive\Router\RouteCollector(
-        $container->get(Zend\Expressive\Router\RouterInterface::class)
-    );
+    $collector = $container->get(FastRoute\RouteCollector::class);
 
     $routes = (require __DIR__ . '/../routes.php')();
 
@@ -30,20 +28,17 @@ return function (ContainerInterface $container) {
 
         $method = (string) array_shift($parts);
         $path = (string) array_shift($parts);
-        $name = $route['name'] ?? null;
         $action = $route['action'];
         $responder = $route['responder'] ?? App\Http\Responders\JsonResponder::class;
 
-        $middleware = new App\Http\Middleware\RequestHandlerMiddleware(
-            new App\Http\Handlers\LazyRequestHandler(function () use ($container, $action, $responder) {
-                return new App\Http\Handlers\Endpoint(
-                    new App\Http\Input\HttpInput,
-                    $container->get($action),
-                    $container->get($responder)
-                );
-            })
-        );
+        $handler = new App\Http\Handlers\LazyRequestHandler(function () use ($container, $action, $responder) {
+            return new App\Http\Handlers\Endpoint(
+                new App\Http\Input\HttpInput,
+                $container->get($action),
+                $container->get($responder)
+            );
+        });
 
-        $collector->route($path, $middleware, [$method], $name);
+        $collector->addRoute($method, $path, $handler);
     }
 };
