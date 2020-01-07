@@ -11,6 +11,9 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use League\Plates\Engine;
 
 use App\Http\UrlGenerator;
+use Domain\Payloads\PageOutOfRange;
+use Domain\Payloads\ResourceNotFound;
+use Domain\Payloads\DomainDataCollection;
 use Domain\Payloads\DomainPayloadInterface;
 
 final class DescriptionResponder implements HttpResponderInterface
@@ -30,22 +33,22 @@ final class DescriptionResponder implements HttpResponderInterface
 
     public function __invoke(ServerRequestInterface $request, DomainPayloadInterface $payload): ResponseInterface
     {
-        if ($payload instanceof \Domain\Payloads\DomainDataCollection) {
+        if ($payload instanceof DomainDataCollection) {
             return $this->descriptionCollectionData($request, $payload);
         }
 
-        if ($payload instanceof \Domain\Payloads\PageOutOfRange) {
+        if ($payload instanceof PageOutOfRange) {
             return $this->pageOutOfRange($request, $payload);
         }
 
-        if ($payload instanceof \Domain\Payloads\ResourceNotFound) {
+        if ($payload instanceof ResourceNotFound) {
             return $this->resourceNotFound($request, $payload);
         }
 
         throw new UnexpectedPayload($this, $payload);
     }
 
-    private function descriptionCollectionData($request, $payload)
+    private function descriptionCollectionData(ServerRequestInterface $request, DomainDataCollection $payload): ResponseInterface
     {
         $response = $this->factory
             ->createResponse(200)
@@ -60,7 +63,7 @@ final class DescriptionResponder implements HttpResponderInterface
         return $response;
     }
 
-    private function pageOutOfRange($request, $payload)
+    private function pageOutOfRange(ServerRequestInterface $request, PageOutOfRange $payload): ResponseInterface
     {
         $run_id = (int) $request->getAttribute('run_id');
         $pmid = (int) $request->getAttribute('pmid');
@@ -78,7 +81,7 @@ final class DescriptionResponder implements HttpResponderInterface
             ->withHeader('location', $url);
     }
 
-    private function resourceNotFound($request, $payload)
+    private function resourceNotFound(ServerRequestInterface $request, ResourceNotFound $payload): ResponseInterface
     {
         $response = $this->factory
             ->createResponse(404)

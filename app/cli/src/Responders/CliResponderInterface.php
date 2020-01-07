@@ -10,5 +10,5 @@ use Domain\Payloads\DomainPayloadInterface;
 
 interface CliResponderInterface
 {
-    public function __invoke(OutputInterface $output, DomainPayloadInterface $payload);
+    public function __invoke(OutputInterface $output, DomainPayloadInterface $payload): int;
 }

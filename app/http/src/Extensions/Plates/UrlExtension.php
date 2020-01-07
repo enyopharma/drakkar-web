@@ -18,7 +18,7 @@ final class UrlExtension implements ExtensionInterface
         $this->url = $url;
     }
 
-    public function register(Engine $engine)
+    public function register(Engine $engine): void
     {
         $engine->registerFunction('url', [$this->url, 'generate']);
     }

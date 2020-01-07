@@ -30,7 +30,7 @@ final class PopulateRunCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Populate the metadata of the publications of a curation run')

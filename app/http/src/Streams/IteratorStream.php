@@ -8,12 +8,24 @@ use Psr\Http\Message\StreamInterface;
 
 final class IteratorStream implements StreamInterface
 {
+    /**
+     * @var int
+     */
     private $i;
 
+    /**
+     * @var bool
+     */
     private $eof;
 
+    /**
+     * @var \Iterator
+     */
     private $iterator;
 
+    /**
+     * @var callable
+     */
     private $format;
 
     public static function json(\Traversable $traversable, int $options = 0, int $depth = 512): self
@@ -27,9 +39,7 @@ final class IteratorStream implements StreamInterface
     {
         $this->i = 0;
         $this->eof = false;
-        $this->iterator = $traversable instanceof \IteratorAggregate
-            ? new \IteratorIterator($traversable)
-            : $traversable;
+        $this->iterator = new \IteratorIterator($traversable);
         $this->format = $format;
     }
 
@@ -68,12 +78,12 @@ final class IteratorStream implements StreamInterface
         return false;
     }
 
-    public function seek($offset, $whence = SEEK_SET)
+    public function seek($offset, $whence = SEEK_SET): void
     {
         throw new \RuntimeException;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         throw new \RuntimeException;
     }

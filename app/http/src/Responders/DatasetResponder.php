@@ -10,6 +10,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 
 use App\Http\Streams\IteratorStream;
 
+use Domain\Payloads\DomainData;
 use Domain\Payloads\DomainPayloadInterface;
 
 final class DatasetResponder implements HttpResponderInterface
@@ -23,14 +24,14 @@ final class DatasetResponder implements HttpResponderInterface
 
     public function __invoke(ServerRequestInterface $request, DomainPayloadInterface $payload): ResponseInterface
     {
-        if ($payload instanceof \Domain\Payloads\DomainData) {
+        if ($payload instanceof DomainData) {
             return $this->domainData($request, $payload);
         }
 
         throw new UnexpectedPayload($this, $payload);
     }
 
-    private function domainData($request, $payload)
+    private function domainData(ServerRequestInterface $request, DomainData $payload): ResponseInterface
     {
         ['type' => $type, 'dataset' => $dataset] = $payload->data();
 

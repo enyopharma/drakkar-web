@@ -8,6 +8,10 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
+use Domain\Payloads\InputNotValid;
+use Domain\Payloads\DomainConflict;
+use Domain\Payloads\RuntimeFailure;
+use Domain\Payloads\ResourceNotFound;
 use Domain\Payloads\DomainPayloadInterface;
 
 final class JsonResponder implements HttpResponderInterface
@@ -21,26 +25,26 @@ final class JsonResponder implements HttpResponderInterface
 
     public function __invoke(ServerRequestInterface $request, DomainPayloadInterface $payload): ResponseInterface
     {
-        if ($payload instanceof \Domain\Payloads\ResourceNotFound) {
+        if ($payload instanceof ResourceNotFound) {
             return $this->response(404, $payload);
         }
 
-        if ($payload instanceof \Domain\Payloads\DomainConflict) {
+        if ($payload instanceof DomainConflict) {
             return $this->response(409, $payload);
         }
 
-        if ($payload instanceof \Domain\Payloads\InputNotValid) {
+        if ($payload instanceof InputNotValid) {
             return $this->response(422, $payload);
         }
 
-        if ($payload instanceof \Domain\Payloads\RuntimeFailure) {
+        if ($payload instanceof RuntimeFailure) {
             return $this->response(500, $payload);
         }
 
         return $this->response(200, $payload);
     }
 
-    private function response(int $code, $payload): ResponseInterface
+    private function response(int $code, DomainPayloadInterface $payload): ResponseInterface
     {
         $data = [
             'code' => $code,
@@ -52,7 +56,9 @@ final class JsonResponder implements HttpResponderInterface
             ->createResponse($code)
             ->withHeader('content-type', 'application/json');
 
-        $response->getBody()->write(json_encode($data));
+        $body = ($tmp = json_encode($data)) === false ? '' : $tmp;
+
+        $response->getBody()->write($body);
 
         return $response;
     }

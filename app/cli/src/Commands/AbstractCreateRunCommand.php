@@ -30,7 +30,7 @@ abstract class AbstractCreateRunCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription(sprintf('Create a %s curation run', strtoupper($this->type)))

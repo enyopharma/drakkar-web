@@ -29,7 +29,7 @@ final class PopulatePublicationCommand extends Command
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
         $this
             ->setDescription('Populate the metadata of a publication')

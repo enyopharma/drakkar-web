@@ -11,6 +11,10 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use League\Plates\Engine;
 
 use App\Http\UrlGenerator;
+use Domain\Payloads\PageOutOfRange;
+use Domain\Payloads\ResourceUpdated;
+use Domain\Payloads\ResourceNotFound;
+use Domain\Payloads\DomainDataCollection;
 use Domain\Payloads\DomainPayloadInterface;
 
 final class PublicationResponder implements HttpResponderInterface
@@ -30,26 +34,26 @@ final class PublicationResponder implements HttpResponderInterface
 
     public function __invoke(ServerRequestInterface $request, DomainPayloadInterface $payload): ResponseInterface
     {
-        if ($payload instanceof \Domain\Payloads\DomainDataCollection) {
+        if ($payload instanceof DomainDataCollection) {
             return $this->domainDataCollection($request, $payload);
         }
 
-        if ($payload instanceof \Domain\Payloads\PageOutOfRange) {
+        if ($payload instanceof PageOutOfRange) {
             return $this->pageOutOfRange($request, $payload);
         }
 
-        if ($payload instanceof \Domain\Payloads\ResourceUpdated) {
+        if ($payload instanceof ResourceUpdated) {
             return $this->resourceUpdated($request, $payload);
         }
 
-        if ($payload instanceof \Domain\Payloads\ResourceNotFound) {
+        if ($payload instanceof ResourceNotFound) {
             return $this->resourceNotFound($request, $payload);
         }
 
         throw new UnexpectedPayload($this, $payload);
     }
 
-    private function domainDataCollection($request, $payload)
+    private function domainDataCollection(ServerRequestInterface $request, DomainDataCollection $payload): ResponseInterface
     {
         $response = $this->factory
             ->createResponse(200)
@@ -64,7 +68,7 @@ final class PublicationResponder implements HttpResponderInterface
         return $response;
     }
 
-    private function pageOutOfRange($request, $payload)
+    private function pageOutOfRange(ServerRequestInterface $request, PageOutOfRange $payload): ResponseInterface
     {
         $query = (array) $request->getQueryParams();
 
@@ -81,7 +85,7 @@ final class PublicationResponder implements HttpResponderInterface
             ->withHeader('location', $url);
     }
 
-    private function resourceUpdated($request, $payload)
+    private function resourceUpdated(ServerRequestInterface $request, ResourceUpdated $payload): ResponseInterface
     {
         $body = $request->getParsedBody();
 
@@ -92,7 +96,7 @@ final class PublicationResponder implements HttpResponderInterface
             ->withHeader('location', $url);
     }
 
-    private function resourceNotFound($request, $payload)
+    private function resourceNotFound(ServerRequestInterface $request, ResourceNotFound $payload): ResponseInterface
     {
         $response = $this->factory
             ->createResponse(404)

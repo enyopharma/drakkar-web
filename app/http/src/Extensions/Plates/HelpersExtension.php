@@ -9,6 +9,9 @@ use League\Plates\Extension\ExtensionInterface;
 
 final class HelpersExtension implements ExtensionInterface
 {
+    /**
+     * @var array
+     */
     private $map = [
         \Domain\Association::PENDING => [
             'header' => 'Pending publication',
@@ -44,52 +47,48 @@ final class HelpersExtension implements ExtensionInterface
         ],
     ];
 
-    public function register(Engine $engine)
+    public function register(Engine $engine): void
     {
-        /** @var \League\Plates\callback */
-        $header = function (string $state) {
-            return $this->map[$state]['header'] ?? '';
-        };
+        $engine->registerFunction('header', \Closure::fromCallable([$this, 'header']));
+        $engine->registerFunction('empty', \Closure::fromCallable([$this, 'empty']));
+        $engine->registerFunction('textclass', \Closure::fromCallable([$this, 'textclass']));
+        $engine->registerFunction('badgeclass', \Closure::fromCallable([$this, 'badgeclass']));
+        $engine->registerFunction('highlighted', \Closure::fromCallable([$this, 'highlighted']));
+    }
 
-        /** @var \League\Plates\callback */
-        $empty = function (string $state) {
-            return $this->map[$state]['empty'] ?? '';
-        };
+    private function header(string $state): string
+    {
+        return $this->map[$state]['header'] ?? '';
+    }
 
-        /** @var \League\Plates\callback */
-        $textclass = function (string $state) {
-            return $this->map[$state]['classes']['text'] ?? '';
-        };
+    private function empty(string $state): string
+    {
+        return $this->map[$state]['empty'] ?? '';
+    }
 
-        /** @var \League\Plates\callback */
-        $badgeclass = function (string $state) {
-            return $this->map[$state]['classes']['badge'] ?? '';
-        };
+    private function textclass(string $state): string
+    {
+        return $this->map[$state]['classes']['text'] ?? '';
+    }
 
-        /** @var \League\Plates\callback */
-        $highlighted = function (string $str, array $keywords) {
-            if (count($keywords) > 0) {
-                $patterns = [
-                    $this->pattern('g', $keywords),
-                    $this->pattern('v', $keywords),
-                ];
+    private function badgeclass(string $state): string
+    {
+        return $this->map[$state]['classes']['badge'] ?? '';
+    }
 
-                $replacements = [
-                    '<strong class="kv g">$0</strong>',
-                    '<strong class="kv v">$0</strong>',
-                ];
+    private function highlighted(string $str, array $keywords): string
+    {
+        $patterns = [
+            $this->pattern('g', $keywords),
+            $this->pattern('v', $keywords),
+        ];
 
-                return preg_replace($patterns, $replacements, $str);
-            }
+        $replacements = [
+            '<strong class="kv g">$0</strong>',
+            '<strong class="kv v">$0</strong>',
+        ];
 
-            return $str;
-        };
-
-        $engine->registerFunction('header', $header);
-        $engine->registerFunction('empty', $empty);
-        $engine->registerFunction('textclass', $textclass);
-        $engine->registerFunction('badgeclass', $badgeclass);
-        $engine->registerFunction('highlighted', $highlighted);
+        return is_null($highlighted = preg_replace($patterns, $replacements, $str)) ? $str : $highlighted;
     }
 
     private function pattern(string $type, array $keywords): string

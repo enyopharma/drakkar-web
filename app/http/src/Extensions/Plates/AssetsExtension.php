@@ -9,42 +9,44 @@ use League\Plates\Extension\ExtensionInterface;
 
 final class AssetsExtension implements ExtensionInterface
 {
-    private $manifest;
+    /**
+     * @var array|null
+     */
+    private $map = null;
 
-    private $map;
+    private $manifest;
 
     public function __construct(string $manifest)
     {
         $this->manifest = $manifest;
-        $this->map = null;
     }
 
-    public function register(Engine $engine)
+    public function register(Engine $engine): void
     {
-        /** @var \League\Plates\callback */
-        $asset = function (string $path) {
-            $map = $this->cachedMap();
-
-            if (array_key_exists($path, $map)) {
-                return '/' . $map[$path];
-            }
-
-            throw new \LogicException(sprintf("Asset not found: '%s'.", $path));
-        };
-
-        $engine->registerFunction('asset', $asset);
+        $engine->registerFunction('asset', \Closure::fromCallable([$this, 'asset']));
     }
 
-    private function cachedMap()
+    private function asset(string $path): string
     {
-        if (is_null($this->map)) {
+        $map = $this->cachedMap();
+
+        if (array_key_exists($path, $map)) {
+            return '/' . $map[$path];
+        }
+
+        throw new \LogicException(sprintf("Asset not found: '%s'.", $path));
+    }
+
+    private function cachedMap(): array
+    {
+        if (! $this->map) {
             $this->map = $this->map();
         }
 
         return $this->map;
     }
 
-    private function map()
+    private function map(): array
     {
         if (file_exists($this->manifest)) {
             $contents = file_get_contents($this->manifest);

@@ -9,12 +9,9 @@ use League\Plates\Extension\ExtensionInterface;
 
 final class PaginationExtension implements ExtensionInterface
 {
-    public function register(Engine $engine)
+    public function register(Engine $engine): void
     {
-        /** @var \League\Plates\callback */
-        $pagination = \Closure::fromCallable([$this, 'pagination']);
-
-        $engine->registerFunction('pagination', $pagination);
+        $engine->registerFunction('pagination', \Closure::fromCallable([$this, 'pagination']));
     }
 
     private function pagination(int $total, int $current, int $limit, int $n = 10): array

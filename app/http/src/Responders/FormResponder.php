@@ -8,9 +8,11 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
-use Domain\Payloads\DomainPayloadInterface;
-
 use League\Plates\Engine;
+
+use Domain\Payloads\DomainData;
+use Domain\Payloads\ResourceNotFound;
+use Domain\Payloads\DomainPayloadInterface;
 
 final class FormResponder implements HttpResponderInterface
 {
@@ -26,18 +28,18 @@ final class FormResponder implements HttpResponderInterface
 
     public function __invoke(ServerRequestInterface $request, DomainPayloadInterface $payload): ResponseInterface
     {
-        if ($payload instanceof \Domain\Payloads\DomainData) {
+        if ($payload instanceof DomainData) {
             return $this->domainData($request, $payload);
         }
 
-        if ($payload instanceof \Domain\Payloads\ResourceNotFound) {
+        if ($payload instanceof ResourceNotFound) {
             return $this->resourceNotFound($request, $payload);
         }
 
         throw new UnexpectedPayload($this, $payload);
     }
 
-    private function domainData($request, $payload)
+    private function domainData(ServerRequestInterface $request, DomainData $payload): ResponseInterface
     {
         $data = $payload->data();
         $meta = $payload->meta();
@@ -57,7 +59,7 @@ final class FormResponder implements HttpResponderInterface
         return $response;
     }
 
-    private function resourceNotFound($request, $payload)
+    private function resourceNotFound(ServerRequestInterface $request, ResourceNotFound $payload): ResponseInterface
     {
         $response = $this->factory
             ->createResponse(404)
