@@ -2,14 +2,8 @@
 
 declare(strict_types=1);
 
-use Infrastructure\FactoryWithEnv;
-
 return [
     PDO::class => function ($container) {
-        return $container->get('pdo.clients.default');
-    },
-
-    'pdo.clients.default' => function ($container) {
         return new PDO(
             vsprintf('pgsql:host=%s;port=%s;dbname=%s', [
                 $_ENV['DB_HOSTNAME'] ?? 'localhost',

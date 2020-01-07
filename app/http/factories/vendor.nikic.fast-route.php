@@ -6,12 +6,16 @@ use FastRoute\Dispatcher;
 use FastRoute\RouteCollector;
 
 return [
-    RouteCollector::class => fn () => new RouteCollector(
-        new FastRoute\RouteParser\Std,
-        new FastRoute\DataGenerator\GroupCountBased,
-    ),
+    RouteCollector::class => function () {
+        return new RouteCollector(
+            new FastRoute\RouteParser\Std,
+            new FastRoute\DataGenerator\GroupCountBased,
+        );
+    },
 
-    Dispatcher::class => fn ($container) => new FastRoute\Dispatcher\GroupCountBased(
-        $container->get(FastRoute\RouteCollector::class)->getData(),
-    ),
+    Dispatcher::class => function ($container) {
+        return new FastRoute\Dispatcher\GroupCountBased(
+            $container->get(FastRoute\RouteCollector::class)->getData(),
+        );
+    },
 ];
