@@ -33,7 +33,7 @@
         "quanta/container": "^0.3.0",
         "quanta/http-dispatcher": "^0.4.0",
         "quanta/http-routing": "^0.2.0",
-        "quanta/validation": "^0.2.0",
+        "quanta/validation": "^0.4.0",
         "symfony/console": "^4.2",
         "symfony/dotenv": "^4.3",
         "symfony/process": "^4.3"

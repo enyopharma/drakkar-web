@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace Domain\Validations;
 
-use Quanta\Validation\Input;
+use Quanta\Validation\Is;
 use Quanta\Validation\Error;
-use Quanta\Validation\Failure;
+use Quanta\Validation\Field;
+use Quanta\Validation\Bound;
+use Quanta\Validation\Merged;
+use Quanta\Validation\TraverseA;
 use Quanta\Validation\InputInterface;
-use Quanta\Validation\Rules\HasType;
-use Quanta\Validation\Rules\ArrayKey;
-use Quanta\Validation\Rules\ArrayKeys;
-use Quanta\Validation\Rules\IsNotEmpty;
-use Quanta\Validation\Rules\IsMatching;
+use Quanta\Validation\Rules\OfType;
+use Quanta\Validation\Rules\NotEmpty;
+use Quanta\Validation\Rules\Matching;
 
 final class IsIsoform
 {
@@ -39,62 +40,76 @@ final class IsIsoform
 
     public function __invoke(array $data): InputInterface
     {
-        return Input::unit($data)->bind(
-            fn ($x) => $this->makeIsoform($x),
-            fn ($x) => $this->validateOccurrences($x),
+        $validateIsoform = \Closure::fromCallable([$this, 'validateIsoform']);
+        $validateOccurrences = \Closure::fromCallable([$this, 'validateOccurrences']);
+
+        $validate = new Bound($validateIsoform, $validateOccurrences);
+
+        return $validate($data);
+    }
+
+    private function validateIsoform(array $data): InputInterface
+    {
+        $sequenceExists = \Closure::fromCallable([$this, 'sequenceExists']);
+        $isoformExists = \Closure::fromCallable([$this, 'isoformExists']);
+
+        $isStr = new Is(new OfType('string'));
+        $isArr = new Is(new OfType('array'));
+        $isNotEmpty = new Is(new NotEmpty);
+        $isAccession = new Is(new Matching(self::ACCESSION_PATTERN));
+        $isSequence = new Is($sequenceExists);
+        $isIsoform = new Is($isoformExists);
+
+        $validate = new Merged(
+            Field::required('accession', $isStr, $isNotEmpty, $isAccession, $isSequence, $isIsoform),
+            Field::required('occurrences', $isArr, new TraverseA($isArr)),
         );
-    }
 
-    private function isSequence(string $accession): InputInterface
-    {
-        return $this->source->sequence($accession)
-            ? Input::unit($accession)
-            : new Failure(new Error(
-                sprintf('no sequence with accession %s', $accession)
-            ));
-    }
-
-    private function isIsoform(string $accession): InputInterface
-    {
-        $data = $this->source->sequence($accession);
-
-        return $data['protein'] == $this->protein
-            ? Input::unit($accession)
-            : new Failure(new Error(
-                sprintf('protein with accession %s has no isoform with accession %s', $this->protein, $accession)
-            ));
-    }
-
-    private function makeIsoform(array $data): InputInterface
-    {
-        $isarr = new HasType('array');
-        $isstr = new HasType('string');
-        $isnotempty = new IsNotEmpty;
-        $isaccession = new IsMatching(self::ACCESSION_PATTERN);
-        $issequence = \Closure::fromCallable([$this, 'isSequence']);
-        $isisoform = \Closure::fromCallable([$this, 'isIsoform']);
-
-        $makeIsoform = new ArrayKeys([
-            'accession' => [$isstr, $isnotempty, $isaccession, $issequence, $isisoform],
-            'occurrences' => [$isarr, Input::traverseA($isarr)],
-        ]);
-
-        return $makeIsoform($data);
+        return $validate($data);
     }
 
     private function validateOccurrences(array $isoform): InputInterface
     {
         $data = $this->source->sequence($isoform['accession']);
 
+        if (! $data) {
+            throw new \LogicException;
+        }
+
         $subject = $data['is_canonical']
             ? substr($data['sequence'], $this->start, (int) ($this->stop - $this->start + 1))
             : $data['sequence'];
 
-        $validate = new ArrayKey('occurrences', Input::traverseA(new IsOccurrence(
-            $subject,
-            $this->query,
-        )));
+        $isOccurrence = new IsOccurrence($subject, $this->query);
 
-        return $validate($isoform)->bind(fn () => Input::unit($isoform));
+        $validate = new Merged(
+            Field::required('accession'),
+            Field::required('occurrences', new TraverseA($isOccurrence))
+        );
+
+        return $validate($isoform);
     }
+
+    private function sequenceExists(string $accession): array
+    {
+        $data = $this->source->sequence($accession);
+
+        return $data !== false ? [] : [
+            new Error(sprintf('no sequence with accession %s', $accession)),
+        ];
+    }
+
+    private function isoformExists(string $accession): array
+    {
+        $data = $this->source->sequence($accession);
+
+        if (! $data) {
+            throw new \LogicException;
+        }
+
+        return $data['protein'] == $this->protein ? [] : [
+            new Error(sprintf('protein with accession %s has no isoform with accession %s', $this->protein, $accession)),
+        ];
+    }
+
 }

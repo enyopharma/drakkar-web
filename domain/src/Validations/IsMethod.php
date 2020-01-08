@@ -4,52 +4,45 @@ declare(strict_types=1);
 
 namespace Domain\Validations;
 
-use Quanta\Validation\Input;
+use Quanta\Validation\Is;
 use Quanta\Validation\Error;
-use Quanta\Validation\Failure;
+use Quanta\Validation\Field;
 use Quanta\Validation\InputInterface;
-use Quanta\Validation\Rules\HasType;
-use Quanta\Validation\Rules\ArrayKeys;
-use Quanta\Validation\Rules\IsNotEmpty;
-use Quanta\Validation\Rules\IsMatching;
+use Quanta\Validation\Rules\OfType;
+use Quanta\Validation\Rules\NotEmpty;
+use Quanta\Validation\Rules\Matching;
 
 final class IsMethod
 {
     const PSIMI_ID_PATTERN = '/^MI:[0-9]{4}$/';
 
-    const SELECT_METHOD_SQL = <<<SQL
-        SELECT * FROM methods WHERE psimi_id = ?
-    SQL;
+    private $source;
 
-    private $pdo;
-
-    public function __construct(\PDO $pdo)
+    public function __construct(DataSource $source)
     {
-        $this->pdo = $pdo;
+        $this->source = $source;
     }
 
     public function __invoke(array $data): InputInterface
     {
-        $isstr = new HasType('string');
-        $isnotempty = new IsNotEmpty;
-        $ispsimiid = new IsMatching(self::PSIMI_ID_PATTERN);
-        $isexisting = \Closure::fromCallable([$this, 'isExistingPsimiId']);
+        $methodExists = \Closure::fromCallable([$this, 'methodExists']);
 
-        $makeIsoform = new ArrayKeys([
-            'psimi_id' => [$isstr, $isnotempty, $ispsimiid, $isexisting],
-        ]);
+        $isStr = new Is(new OfType('string'));
+        $isNotEmpty = new Is(new NotEmpty);
+        $isPsimiId = new Is(new Matching(self::PSIMI_ID_PATTERN));
+        $isMethod = new Is($methodExists);
 
-        return $makeIsoform($data);
+        $validate = Field::required('psimi_id', $isStr, $isNotEmpty, $isPsimiId, $isMethod);
+
+        return $validate($data);
     }
 
-    public function isExistingPsimiId(string $psimi_id): InputInterface
+    private function methodExists(string $psimi_id): array
     {
-        $select_method_sth = $this->pdo->prepare(self::SELECT_METHOD_SQL);
+        $method = $this->source->method($psimi_id);
 
-        $select_method_sth->execute([$psimi_id]);
-
-        return $select_method_sth->fetch()
-            ? Input::unit($psimi_id)
-            : new Failure(new Error(sprintf('no method with psimi id %s', $psimi_id)));
+        return $method !== false ? [] : [
+            new Error(sprintf('no method with psimi id %s', $psimi_id))
+        ];
     }
 }

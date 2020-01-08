@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "95749416f917bb1e00a4e3fe1afc00ea",
+    "content-hash": "5e67a74c73f7b953e44e66ac3b9827fd",
     "packages": [
         {
             "name": "filp/whoops",
@@ -1171,16 +1171,16 @@
         },
         {
             "name": "quanta/validation",
-            "version": "0.2",
+            "version": "0.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quantaphp/validation.git",
-                "reference": "bd813653bf6da082371a61ef8ee7d32d95945b47"
+                "reference": "96398eb7a64377574862dcd772d8cea91430941d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/validation/zipball/bd813653bf6da082371a61ef8ee7d32d95945b47",
-                "reference": "bd813653bf6da082371a61ef8ee7d32d95945b47",
+                "url": "https://api.github.com/repos/quantaphp/validation/zipball/96398eb7a64377574862dcd772d8cea91430941d",
+                "reference": "96398eb7a64377574862dcd772d8cea91430941d",
                 "shasum": ""
             },
             "require": {
@@ -1189,7 +1189,7 @@
             "require-dev": {
                 "eloquent/phony-kahlan": "^2.0",
                 "kahlan/kahlan": "^4.0",
-                "phpstan/phpstan": "^0.11.0"
+                "phpstan/phpstan": "^0.12.0"
             },
             "type": "library",
             "autoload": {
@@ -1213,7 +1213,7 @@
                 "input",
                 "validation"
             ],
-            "time": "2019-11-14T11:11:00+00:00"
+            "time": "2019-12-09T13:57:28+00:00"
         },
         {
             "name": "symfony/console",

@@ -4,21 +4,22 @@ declare(strict_types=1);
 
 namespace Domain\Validations;
 
-use Quanta\Validation\Input;
+use Quanta\Validation\Is;
+use Quanta\Validation\Field;
+use Quanta\Validation\Merged;
 use Quanta\Validation\InputInterface;
-use Quanta\Validation\Rules\HasType;
-use Quanta\Validation\Rules\ArrayKeys;
+use Quanta\Validation\Rules\OfType;
 
 use Domain\Run;
 use Domain\Protein;
 
 final class IsDescription
 {
-    private $pdo;
+    private $source;
 
     private $type;
 
-    public function __construct(\PDO $pdo, string $type)
+    public function __construct(DataSource $source, string $type)
     {
         if (! in_array($type, [Run::HH, Run::VH])) {
             throw new \InvalidArgumentException(
@@ -26,25 +27,26 @@ final class IsDescription
             );
         }
 
-        $this->pdo = $pdo;
+        $this->source = $source;
         $this->type = $type;
     }
 
     public function __invoke(array $data): InputInterface
     {
-        $source = new DataSource($this->pdo);
-
         $type1 = Protein::H;
         $type2 = $this->type == Run::HH ? Protein::H : Protein::V;
 
-        $isarr = new HasType('array');
+        $isArr = new Is(new OfType('array'));
+        $isMethod = new IsMethod($this->source);
+        $isInteractor1 = new IsInteractor($this->source, $type1);
+        $isInteractor2 = new IsInteractor($this->source, $type2);
 
-        $makeDescription = new ArrayKeys([
-            'method' => [$isarr, new IsMethod($this->pdo)],
-            'interactor1' => [$isarr, new IsInteractor($source, $type1)],
-            'interactor2' => [$isarr, new IsInteractor($source, $type2)],
-        ]);
+        $validate = new Merged(
+            Field::required('method', $isArr, $isMethod),
+            Field::required('interactor1', $isArr, $isInteractor1),
+            Field::required('interactor2', $isArr, $isInteractor2),
+        );
 
-        return $makeDescription($data);
+        return $validate($data);
     }
 }

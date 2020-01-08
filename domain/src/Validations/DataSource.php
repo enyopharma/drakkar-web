@@ -6,6 +6,10 @@ namespace Domain\Validations;
 
 final class DataSource
 {
+    const SELECT_METHOD_SQL = <<<SQL
+        SELECT * FROM methods WHERE psimi_id = ?
+    SQL;
+
     const SELECT_PROTEIN_SQL = <<<SQL
         SELECT p.*, s.sequence
         FROM proteins AS p, sequences AS s
@@ -48,6 +52,8 @@ final class DataSource
 
     private $sths;
 
+    private $methods;
+
     private $proteins;
 
     private $sequences;
@@ -60,6 +66,7 @@ final class DataSource
     {
         $this->pdo = $pdo;
         $this->sths = [];
+        $this->methods = [];
         $this->proteins = [];
         $this->sequences = [];
         $this->names = [];
@@ -77,6 +84,25 @@ final class DataSource
         return $this->sths[$key];
     }
 
+    /**
+     * @return array|false
+     */
+    public function method(string $psimi_id)
+    {
+        if (! key_exists($psimi_id, $this->methods)) {
+            $select_method_sth = $this->prepare(self::SELECT_METHOD_SQL);
+
+            $select_method_sth->execute([$psimi_id]);
+
+            $this->methods[$psimi_id] = $select_method_sth->fetch();
+        }
+
+        return $this->methods[$psimi_id];
+    }
+
+    /**
+     * @return array|false
+     */
     public function protein(string $accession)
     {
         if (! key_exists($accession, $this->proteins)) {
@@ -90,6 +116,9 @@ final class DataSource
         return $this->proteins[$accession];
     }
 
+    /**
+     * @return array|false
+     */
     public function sequence(string $accession)
     {
         if (! key_exists($accession, $this->sequences)) {
@@ -103,6 +132,9 @@ final class DataSource
         return $this->sequences[$accession];
     }
 
+    /**
+     * @return array|false
+     */
     public function name(string $accession, int $start, int $stop)
     {
         $key = implode('.', [$accession, $start, $stop]);
@@ -118,6 +150,9 @@ final class DataSource
         return $this->names[$key];
     }
 
+    /**
+     * @return array|false
+     */
     public function coordinates(string $accession, string $name)
     {
         $key = implode('.', [$accession, $name]);

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Domain\Input;
 
-use Quanta\Validation\Input;
+use Quanta\Validation\Bound;
+use Quanta\Validation\Success;
 use Quanta\Validation\InputInterface;
 
+use Domain\Validations\DataSource;
 use Domain\Validations\IsDescription;
 
 final class DescriptionInput
@@ -15,17 +17,18 @@ final class DescriptionInput
 
     public static function from(\PDO $pdo, string $type, array $data): InputInterface
     {
-        $makeDescription = new IsDescription($pdo, $type);
-        $makeInstance = fn (array $data) => Input::unit(new self($data));
+        $source = new DataSource($pdo);
+        $isDescription = new IsDescription($source, $type);
+        $factory = fn (array $data) => new Success(new self($data));
 
-        return $makeDescription($data)->bind($makeInstance);
+        $validate = new Bound($isDescription, $factory);
+
+        return $validate($data);
     }
 
     private function __construct(array $data)
     {
-        $this->data['method'] = $data['method'];
-        $this->data['interactor1'] = $data['interactor1'];
-        $this->data['interactor2'] = $data['interactor2'];
+        $this->data = $data;
     }
 
     public function method(): array

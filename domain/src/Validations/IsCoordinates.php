@@ -4,41 +4,46 @@ declare(strict_types=1);
 
 namespace Domain\Validations;
 
-use Quanta\Validation\Input;
+use Quanta\Validation\Is;
 use Quanta\Validation\Error;
-use Quanta\Validation\Failure;
+use Quanta\Validation\Field;
+use Quanta\Validation\Bound;
+use Quanta\Validation\Merged;
 use Quanta\Validation\InputInterface;
-use Quanta\Validation\Rules\HasType;
-use Quanta\Validation\Rules\ArrayKeys;
-use Quanta\Validation\Rules\IsGreaterThan;
+use Quanta\Validation\Rules\OfType;
+use Quanta\Validation\Rules\GreaterThan;
 
 final class IsCoordinates
 {
     public function __invoke(array $data): InputInterface
     {
-        return Input::unit($data)->bind(
-            fn ($x) => $this->makeCoordinates($x),
-            fn ($x) => $this->validateCoordinates($x),
-        );
+        $makeCoordinates = \Closure::fromCallable([$this, 'makeCoordinates']);
+        $startIsLessThanStop = \Closure::fromCallable([$this, 'startIsLessThanStop']);
+
+        $isStartLessThanStop = new Is($startIsLessThanStop);
+
+        $validate = new Bound($makeCoordinates, $isStartLessThanStop);
+
+        return $validate($data);
     }
 
     private function makeCoordinates(array $data): InputInterface
     {
-        $isint = new HasType('integer');
-        $ispos = new IsGreaterThan(0);
+        $isInt = new Is(new OfType('integer'));
+        $isPos = new Is(new GreaterThan(0));
 
-        $makeCoordinates = new ArrayKeys([
-            'start' => [$isint, $ispos],
-            'stop' => [$isint, $ispos],
-        ]);
+        $validate = new Merged(
+            Field::required('start', $isInt, $isPos),
+            Field::required('stop', $isInt, $isPos),
+        );
 
-        return $makeCoordinates($data);
+        return $validate($data);
     }
 
-    private function validateCoordinates(array $coordinates): InputInterface
+    private function startIsLessThanStop(array $coordinates): array
     {
-        return $coordinates['start'] <= $coordinates['stop']
-            ? Input::unit($coordinates)
-            : new Failure(new Error('start must be less than stop'));
+        return $coordinates['start'] <= $coordinates['stop'] ? [] : [
+            new Error('start must be less than stop'),
+        ];
     }
 }

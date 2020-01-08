@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Domain\Validations;
 
-use Quanta\Validation\Input;
+use Quanta\Validation\Is;
 use Quanta\Validation\Error;
-use Quanta\Validation\Failure;
+use Quanta\Validation\Field;
+use Quanta\Validation\Bound;
+use Quanta\Validation\Merged;
 use Quanta\Validation\InputInterface;
-use Quanta\Validation\Rules\HasType;
-use Quanta\Validation\Rules\ArrayKey;
-use Quanta\Validation\Rules\IsLessThan;
-use Quanta\Validation\Rules\IsGreaterThan;
+use Quanta\Validation\Rules\OfType;
+use Quanta\Validation\Rules\LessThan;
+use Quanta\Validation\Rules\GreaterThan;
 
 final class IsOccurrence
 {
@@ -27,39 +28,34 @@ final class IsOccurrence
 
     public function __invoke(array $data): InputInterface
     {
-        $isflt = new HasType('float');
-        $ispos = new IsGreaterThan(0);
-        $islt100 = new IsLessThan(100);
-        $iscoordinates = new IsCoordinates;
-        $arecoordinatesvalid = \Closure::fromCallable([$this, 'areCoordinatesValid']);
+        $coordinatesAreInsideSubject = \Closure::fromCallable([$this, 'coordinatesAreInsideSubject']);
+        $coordinatesHaveSameLengthAsQuery = \Closure::fromCallable([$this, 'coordinatesHaveSameLengthAsQuery']);
 
-        $makeOccurrence = Input::map(fn (array $coordinates, float $identity) => [
-            'start' => $coordinates['start'],
-            'stop' => $coordinates['stop'],
-            'identity' => $identity,
-        ]);
+        $isFlt = new Is(new OfType('float'));
+        $isGt96 = new Is(new GreaterThan(96));
+        $isLt100 = new Is(new LessThan(100));
+        $isCoordinates = new IsCoordinates;
+        $areCoordinatesValid = new Is($coordinatesAreInsideSubject, $coordinatesHaveSameLengthAsQuery);
 
-        $makeCoordinates = new IsCoordinates;
-        $makeIdentity = new ArrayKey('identity', $isflt, $ispos, $islt100);
-
-        return $makeOccurrence(
-            $makeCoordinates($data),
-            $makeIdentity($data),
+        $validate = new Merged(
+            new Bound($isCoordinates, $areCoordinatesValid),
+            Field::required('identity', $isFlt, $isGt96, $isLt100),
         );
+
+        return $validate($data);
     }
 
-    private function areCoordinatesValid(array $coordinates): InputInterface
+    private function coordinatesAreInsideSubject(array $coordinates): array
     {
-        $errors = [];
+        return $coordinates['stop'] <= strlen($this->subject) ? [] : [
+            new Error('occurrence must be inside the subject'),
+        ];
+    }
 
-        if ($coordinates['stop'] > strlen($this->subject)) {
-            $errors[] = new Error('occurrence must be inside the subject');
-        }
-
-        if ($coordinates['stop'] - $coordinates['start'] + 1 != strlen($this->query)) {
-            $errors[] = new Error('occurrence length must be equal to the query length');
-        }
-
-        return count($errors) == 0 ? Input::unit($coordinates) : new Failure(...$errors);
+    private function coordinatesHaveSameLengthAsQuery(array $coordinates): array
+    {
+        return $coordinates['stop'] - $coordinates['start'] + 1 == strlen($this->query) ? [] : [
+            new Error('occurrence length must be equal to the query length'),
+        ];
     }
 }

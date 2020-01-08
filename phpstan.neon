@@ -1,6 +1,7 @@
 parameters:
     inferPrivatePropertyTypeFromConstructor: true
     checkMissingIterableValueType: false
+    reportUnmatchedIgnoredErrors: false
     ignoreErrors:
         - message: '#League\\Plates\\Engine::registerFunction\(\) expects League\\Plates\\callback#'
           path: %currentWorkingDirectory%/app/http/src/Extensions/Plates
