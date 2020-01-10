@@ -4,74 +4,118 @@ declare(strict_types=1);
 
 use Psr\Container\ContainerInterface;
 
+use App\Http\Handlers\LazyRequestHandler;
+
 /**
  * Return the route definitions.
  *
+ * @param Psr\Container\ContainerInterface $container
  * @return array[]
  */
-return function (): array {
+return function (ContainerInterface $container): array {
     return [
-        'GET /' => [
-            'action' => Domain\Actions\CollectRuns::class,
-            'responder' => App\Http\Responders\RunResponder::class,
-        ],
+        'GET /' => new LazyRequestHandler(function () use ($container) {
+            return new App\Http\Handlers\Runs\IndexHandler(
+                $container->get(App\Http\Responders\HtmlResponder::class),
+                $container->get(Domain\ReadModel\RunViewInterface::class)
+            );
+        }),
 
-        'GET /runs/{run_id:\d+}/publications' => [
-            'action' => Domain\Actions\CollectPublications::class,
-            'responder' => App\Http\Responders\PublicationResponder::class,
-        ],
+        'GET /runs/{run_id:\d+}/publications' => new LazyRequestHandler(function () use ($container) {
+            return new App\Http\Handlers\Publications\IndexHandler(
+                $container->get(App\Http\Responders\HtmlResponder::class),
+                $container->get(Domain\ReadModel\RunViewInterface::class),
+                $container->get(Domain\ReadModel\PublicationViewInterface::class)
+            );
+        }),
 
-        'PUT /runs/{run_id:\d+}/publications/{pmid:\d+}' => [
-            'action' => Domain\Actions\UpdatePublicationState::class,
-            'responder' => App\Http\Responders\PublicationResponder::class,
-        ],
+        'PUT /runs/{run_id:\d+}/publications/{pmid:\d+}' => new LazyRequestHandler(function () use ($container) {
+            return new App\Http\Handlers\Publications\UpdateHandler(
+                $container->get(PDO::class),
+                $container->get(App\Http\Responders\HtmlResponder::class)
+            );
+        }),
 
-        'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions' => [
-            'action' => Domain\Actions\CollectDescriptions::class,
-            'responder' => App\Http\Responders\DescriptionResponder::class,
-        ],
+        'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions' => new LazyRequestHandler(function () use ($container) {
+            return new App\Http\Handlers\Descriptions\IndexHandler(
+                $container->get(App\Http\Responders\HtmlResponder::class),
+                $container->get(Domain\ReadModel\RunViewInterface::class),
+                $container->get(Domain\ReadModel\PublicationViewInterface::class),
+                $container->get(Domain\ReadModel\DescriptionViewInterface::class)
+            );
+        }),
 
-        'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/create' => [
-            'action' => Domain\Actions\SelectPublication::class,
-            'responder' => App\Http\Responders\FormResponder::class,
-        ],
+        'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/create' => new LazyRequestHandler(function () use ($container) {
+            return new App\Http\Handlers\Descriptions\CreateHandler(
+                $container->get(App\Http\Responders\HtmlResponder::class),
+                $container->get(Domain\ReadModel\RunViewInterface::class),
+                $container->get(Domain\ReadModel\PublicationViewInterface::class)
+            );
+        }),
 
-        'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/edit' => [
-            'action' => Domain\Actions\SelectDescription::class,
-            'responder' => App\Http\Responders\FormResponder::class,
-        ],
+        'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/edit' => new LazyRequestHandler(function () use ($container) {
+            return new App\Http\Handlers\Descriptions\EditHandler(
+                $container->get(App\Http\Responders\HtmlResponder::class),
+                $container->get(Domain\ReadModel\RunViewInterface::class),
+                $container->get(Domain\ReadModel\PublicationViewInterface::class),
+                $container->get(Domain\ReadModel\DescriptionViewInterface::class)
+            );
+        }),
 
-        'POST /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions' => [
-            'action' => Domain\Actions\CreateDescription::class,
-        ],
+        'POST /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions' => new LazyRequestHandler(function () use ($container) {
+            return new App\Http\Handlers\Descriptions\StoreHandler(
+                $container->get(PDO::class),
+                $container->get(App\Http\Responders\JsonResponder::class)
+            );
+        }),
 
-        'DELETE /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}' => [
-            'action' => Domain\Actions\DeleteDescription::class,
-        ],
+        'DELETE /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}' => new LazyRequestHandler(function () use ($container) {
+            return new App\Http\Handlers\Descriptions\DeleteHandler(
+                $container->get(PDO::class),
+                $container->get(App\Http\Responders\JsonResponder::class)
+            );
+        }),
 
-        'GET /dataset/{type:hh|vh}' => [
-            'action' => Domain\Actions\DownloadDataset::class,
-            'responder' => App\Http\Responders\DatasetResponder::class,
-        ],
+        'GET /dataset/{type:hh|vh}' => new LazyRequestHandler(function () use ($container) {
+            return new App\Http\Handlers\Dataset\DownloadHandler(
+                $container->get(App\Http\Responders\FileResponder::class),
+                $container->get(Domain\ReadModel\DatasetViewInterface::class)
+            );
+        }),
 
-        'GET /methods' => [
-            'action' => Domain\Actions\SearchMethods::class,
-        ],
+        'GET /methods' => new LazyRequestHandler(function () use ($container) {
+            return new App\Http\Handlers\Methods\IndexHandler(
+                $container->get(App\Http\Responders\JsonResponder::class),
+                $container->get(Domain\ReadModel\MethodViewInterface::class)
+            );
+        }),
 
-        'GET /methods/{psimi_id}' => [
-            'action' => Domain\Actions\SelectMethod::class,
-        ],
+        'GET /methods/{psimi_id}' => new LazyRequestHandler(function () use ($container) {
+            return new App\Http\Handlers\Methods\ShowHandler(
+                $container->get(App\Http\Responders\JsonResponder::class),
+                $container->get(Domain\ReadModel\MethodViewInterface::class)
+            );
+        }),
 
-        'GET /proteins' => [
-            'action' => Domain\Actions\SearchProteins::class,
-        ],
+        'GET /proteins' => new LazyRequestHandler(function () use ($container) {
+            return new App\Http\Handlers\Proteins\IndexHandler(
+                $container->get(App\Http\Responders\JsonResponder::class),
+                $container->get(Domain\ReadModel\ProteinViewInterface::class)
+            );
+        }),
 
-        'GET /proteins/{accession}' => [
-            'action' => Domain\Actions\SelectProtein::class,
-        ],
+        'GET /proteins/{accession}' => new LazyRequestHandler(function () use ($container) {
+            return new App\Http\Handlers\Proteins\ShowHandler(
+                $container->get(App\Http\Responders\JsonResponder::class),
+                $container->get(Domain\ReadModel\ProteinViewInterface::class)
+            );
+        }),
 
-        'POST /jobs/alignments' => [
-            'action' => Domain\Actions\StartAlignment::class,
-        ],
+        'POST /jobs/alignments' => new LazyRequestHandler(function () use ($container) {
+            return new App\Http\Handlers\Alignments\StartHandler(
+                $container->get(Predis\Client::class),
+                $container->get(App\Http\Responders\JsonResponder::class)
+            );
+        }),
     ];
 };

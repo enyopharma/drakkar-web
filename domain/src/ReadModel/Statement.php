@@ -16,6 +16,9 @@ final class Statement implements \IteratorAggregate
         $this->generator = $generator;
     }
 
+    /**
+     * @return array|false
+     */
     public function fetch()
     {
         $this->i == 0

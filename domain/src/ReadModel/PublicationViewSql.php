@@ -140,11 +140,17 @@ final class PublicationViewSql implements PublicationViewInterface
         ];
     }
 
+    /**
+     * @param mixed $title
+     */
     private function title($title): string
     {
         return is_string($title) ? $title : '';
     }
 
+    /**
+     * @param mixed $journal
+     */
     private function journal($journal): string
     {
         return is_string($journal) ? $journal : '';

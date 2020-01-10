@@ -5,6 +5,8 @@
     </head>
     <body>
         <h1>Not found</h1>
-        <p><?= $message ?>.</p>
+        <p>
+            <?= $method ?> <?= $url ?>
+        </p>
     </body>
 </html>

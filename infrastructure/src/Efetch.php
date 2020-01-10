@@ -8,54 +8,40 @@ final class Efetch
 {
     const REMOTE_URL = 'https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi';
 
-    public function metadata(int $pmid): array
+    public function metadata(int $pmid): string
     {
         // download xml using ncbi efetch.
-        $url = self::REMOTE_URL . '?' . http_build_query([
-            'db' => 'pubmed',
-            'id' => $pmid,
-            'retmode' => 'xml',
-        ]);
+        $url = self::REMOTE_URL . '?' . http_build_query(['db' => 'pubmed', 'id' => $pmid, 'retmode' => 'xml']);
 
-        $contents = @file_get_contents($url);
+        $xml = @file_get_contents($url);
 
-        if ($contents === false) {
-            return [
-                'success' => false,
-                'error' => error_get_last(),
-            ];
+        if ($xml === false) {
+            $error = error_get_last() ?? ['message' => ''];
+
+            throw new InfrastructureException($error['message']);
         }
 
         // PUT CDATA AROUND TITLE AND ABSTRACT TO PARSE HTML
-        $contents = (string) preg_replace('/<ArticleTitle(.*?)>(.+?)<\/ArticleTitle>/s', '<ArticleTitle$1><![CDATA[$2]]></ArticleTitle>', $contents);
-        $contents = (string) preg_replace('/<AbstractText(.*?)>(.+?)<\/AbstractText>/s', '<AbstractText$1><![CDATA[$2]]></AbstractText>', $contents);
+        $xml = (string) preg_replace('/<ArticleTitle(.*?)>(.+?)<\/ArticleTitle>/s', '<ArticleTitle$1><![CDATA[$2]]></ArticleTitle>', $xml);
+        $xml = (string) preg_replace('/<AbstractText(.*?)>(.+?)<\/AbstractText>/s', '<AbstractText$1><![CDATA[$2]]></AbstractText>', $xml);
 
         // parse xml.
         libxml_use_internal_errors(true);
 
-        $xml = simplexml_load_string($contents, 'SimpleXMLElement', LIBXML_NOCDATA);
+        $metadata = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
 
-        if ($xml === false) {
-            return [
-                'success' => false,
-                'errors' => libxml_get_errors(),
-            ];
+        if ($metadata === false) {
+            throw new InfrastructureException(implode("\n", libxml_get_errors()));
         }
 
         // convert xml to json.
-        $json = json_encode($xml);
+        $json = json_encode($metadata);
 
         if ($json === false) {
-            return [
-                'success' => false,
-                'error' => json_last_error(),
-            ];
+            throw new InfrastructureException(json_last_error_msg());
         }
 
         // return the json data.
-        return [
-            'success' => true,
-            'data' => $json,
-        ];
+        return $json;
     }
 }

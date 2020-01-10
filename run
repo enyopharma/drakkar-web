@@ -31,18 +31,6 @@ $container = new Quanta\Container(array_reduce($files, function ($factories, $fi
 $application = (require __DIR__ . '/app/cli/application.php')($container);
 
 /**
- * Get the commands.
- */
-$commands = (require __DIR__ . '/app/cli/commands.php')($container);
-
-/**
- * add the commands to the application.
- */
-foreach ($commands as $command) {
-    $application->add($command);
-}
-
-/**
  * Run the cli application.
  */
 return $application->run();

@@ -4,26 +4,25 @@ declare(strict_types=1);
 
 namespace App\Cli\Commands;
 
-use Domain\Actions\PopulatePublication;
-
-use App\Cli\Responders\PublicationResponder;
-
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Domain\Services\PublicationMetadataService;
+use App\Cli\Responders\PublicationMetadataResponder;
+
 final class PopulatePublicationCommand extends Command
 {
     protected static $defaultName = 'publications:populate';
 
-    private $domain;
+    private $service;
 
     private $responder;
 
-    public function __construct(PopulatePublication $domain, PublicationResponder $responder)
+    public function __construct(PublicationMetadataService $service, PublicationMetadataResponder $responder)
     {
-        $this->domain = $domain;
+        $this->service = $service;
         $this->responder = $responder;
 
         parent::__construct();
@@ -39,12 +38,10 @@ final class PopulatePublicationCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $input = [
-            'pmid' => (int) ((array) $input->getArgument('pmid'))[0],
-        ];
+        $pmid = (int) ((array) $input->getArgument('pmid'))[0];
 
-        $payload = ($this->domain)($input);
+        $result = $this->service->populate($pmid);
 
-        return ($this->responder)($output, $payload);
+        return $this->responder->write($output, $result);
     }
 }

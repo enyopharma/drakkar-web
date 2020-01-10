@@ -13,31 +13,17 @@ use Psr\Container\ContainerInterface;
 return function (ContainerInterface $container) {
     $collector = $container->get(FastRoute\RouteCollector::class);
 
-    $routes = (require __DIR__ . '/../routes.php')();
+    $routes = (require __DIR__ . '/../routes.php')($container);
 
-    foreach ($routes as $endpoint => $route) {
+    foreach ($routes as $endpoint => $handler) {
         $parts = (array) preg_split('/\s+/', $endpoint);
 
         if (count($parts) != 2) {
             throw new LogicException(sprintf('invalid endpoint \'%s\'', $endpoint));
         }
 
-        if (! key_exists('action', $route)) {
-            throw new LogicException(sprintf('missing action for endpoint \'%s\'', $endpoint));
-        }
-
         $method = (string) array_shift($parts);
         $path = (string) array_shift($parts);
-        $action = $route['action'];
-        $responder = $route['responder'] ?? App\Http\Responders\JsonResponder::class;
-
-        $handler = new App\Http\Handlers\LazyRequestHandler(function () use ($container, $action, $responder) {
-            return new App\Http\Handlers\Endpoint(
-                new App\Http\Input\HttpInput,
-                $container->get($action),
-                $container->get($responder)
-            );
-        });
 
         $collector->addRoute($method, $path, $handler);
     }

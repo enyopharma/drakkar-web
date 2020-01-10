@@ -1,5 +1,6 @@
 parameters:
     inferPrivatePropertyTypeFromConstructor: true
+    checkGenericClassInNonGenericObjectType: false
     checkMissingIterableValueType: false
     reportUnmatchedIgnoredErrors: false
     ignoreErrors:

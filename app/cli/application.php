@@ -13,5 +13,28 @@ use Symfony\Component\Console\Application;
  * @return Symfony\Component\Console\Application
  */
 return function (ContainerInterface $container): Application {
-    return new Application;
+    $application = new Application;
+
+    $responder = new App\Cli\Responders\PublicationMetadataResponder;
+
+    $application->add(new App\Cli\Commands\CreateHHRunCommand(
+        $container->get(PDO::class)
+    ));
+
+    $application->add(new App\Cli\Commands\CreateVHRunCommand(
+        $container->get(PDO::class)
+    ));
+
+    $application->add(new App\Cli\Commands\PopulateRunCommand(
+        $container->get(PDO::class),
+        $container->get(Domain\Services\PublicationMetadataService::class),
+        $responder
+    ));
+
+    $application->add(new App\Cli\Commands\PopulatePublicationCommand(
+        $container->get(Domain\Services\PublicationMetadataService::class),
+        $responder
+    ));
+
+    return $application;
 };

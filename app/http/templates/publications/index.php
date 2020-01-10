@@ -76,7 +76,6 @@
     <?= $this->empty($state) ?>
 </p>
 <?php else: ?>
-<?php ['total' => $total, 'page' => $page, 'limit' => $limit] = $pagination ?>
 <?php $this->insert('pagination/nav', [
     'pagination' => $this->pagination($total, $page, $limit),
     'url' => function (int $page) use ($run, $state, $limit) {

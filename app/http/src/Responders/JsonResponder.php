@@ -8,13 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
-use Domain\Payloads\InputNotValid;
-use Domain\Payloads\DomainConflict;
-use Domain\Payloads\RuntimeFailure;
-use Domain\Payloads\ResourceNotFound;
-use Domain\Payloads\DomainPayloadInterface;
-
-final class JsonResponder implements HttpResponderInterface
+final class JsonResponder
 {
     private $factory;
 
@@ -23,40 +17,41 @@ final class JsonResponder implements HttpResponderInterface
         $this->factory = $factory;
     }
 
-    public function __invoke(ServerRequestInterface $request, DomainPayloadInterface $payload): ResponseInterface
+    public function success(array $data = []): ResponseInterface
     {
-        if ($payload instanceof ResourceNotFound) {
-            return $this->response(404, $payload);
-        }
-
-        if ($payload instanceof DomainConflict) {
-            return $this->response(409, $payload);
-        }
-
-        if ($payload instanceof InputNotValid) {
-            return $this->response(422, $payload);
-        }
-
-        if ($payload instanceof RuntimeFailure) {
-            return $this->response(500, $payload);
-        }
-
-        return $this->response(200, $payload);
+        return $this->response(200, $data);
     }
 
-    private function response(int $code, DomainPayloadInterface $payload): ResponseInterface
+    public function errors(string ...$errors): ResponseInterface
     {
-        $data = [
+        return $this->response(422, [], ['errors' => $errors]);
+    }
+
+    public function conflict(string $reason): ResponseInterface
+    {
+        return $this->response(409, [], ['reason' => $reason]);
+    }
+
+    public function notFound(ServerRequestInterface $request): ResponseInterface
+    {
+        return $this->response(404);
+    }
+
+    public function response(int $code, array $data = [], array $meta = []): ResponseInterface
+    {
+        $body = json_encode([
             'code' => $code,
             'success' => $code >= 200 && $code < 300,
-            'data' => $payload->data(),
-        ] + $payload->meta();
+            'data' => $data,
+        ] + $meta);
+
+        if ($body === false) {
+            throw new \Exception(json_last_error_msg());
+        }
 
         $response = $this->factory
             ->createResponse($code)
             ->withHeader('content-type', 'application/json');
-
-        $body = ($tmp = json_encode($data)) === false ? '' : $tmp;
 
         $response->getBody()->write($body);
 

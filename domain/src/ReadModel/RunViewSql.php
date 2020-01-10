@@ -84,14 +84,14 @@ final class RunViewSql implements RunViewInterface
             $nbs[$row['run_id']][$row['state']] = $row['nb'];
         }
 
-        $runs = $sth->fetchAll();
+        if ($runs = $sth->fetchAll()) {
+            usort($runs, function (array $a, array $b) {
+                return strnatcmp($b['name'], $a['name']);
+            });
 
-        usort($runs, function (array $a, array $b) {
-            return strnatcmp($b['name'], $a['name']);
-        });
-
-        foreach ($runs as $run) {
-            yield $this->formatted($run, $nbs);
+            foreach ($runs as $run) {
+                yield $this->formatted($run, $nbs);
+            }
         }
     }
 

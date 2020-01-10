@@ -47,7 +47,6 @@
     There is no descriptions associated with this publication.
 </p>
 <?php else: ?>
-<?php ['total' => $total, 'page' => $page, 'limit' => $limit] = $pagination ?>
 <?php $this->insert('pagination/nav', [
     'pagination' => $this->pagination($total, $page, $limit),
     'url' => function (int $page) use ($publication, $limit) {
