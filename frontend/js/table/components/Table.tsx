@@ -8,7 +8,7 @@ import { Description } from '../types'
 import { MappingModal } from './MappingModal'
 
 type Props = {
-    descriptions: Description[],
+    descriptions: Description[]
 }
 
 const StatelessTable: React.FC<Props> = ({ descriptions }) => {
@@ -81,6 +81,7 @@ const StatelessTable: React.FC<Props> = ({ descriptions }) => {
             <table className="table">
                 <thead>
                     <tr>
+                        <th className="text-center">Stable id</th>
                         <th className="text-center">Method</th>
                         <th className="text-center">Interactor 1</th>
                         <th className="text-center">Interactor 2</th>
@@ -94,6 +95,9 @@ const StatelessTable: React.FC<Props> = ({ descriptions }) => {
                 <tbody>
                     {descriptions.map((description, i) => (
                         <tr key={i} className={deleted[i] ? 'table-danger' : ''}>
+                            <td className="text-center">
+                                {description.stable_id}
+                            </td>
                             <td className="text-center">
                                 {description.method.psimi_id}
                             </td>

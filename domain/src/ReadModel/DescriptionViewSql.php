@@ -17,7 +17,7 @@ final class DescriptionViewSql implements DescriptionViewInterface
     {
         return Query::instance($this->pdo)
             ->select('a.run_id, a.pmid')
-            ->select('d.id, d.created_at, d.deleted_at')
+            ->select('d.id, d.stable_id, d.created_at, d.deleted_at')
             ->select('m.psimi_id')
             ->select('i1.name AS name1, i1.start AS start1, i1.stop AS stop1, i1.mapping AS mapping1')
             ->select('i2.name AS name2, i2.start AS start2, i2.stop AS stop2, i2.mapping AS mapping2')
@@ -93,6 +93,7 @@ final class DescriptionViewSql implements DescriptionViewInterface
             'run_id' => $description['run_id'],
             'pmid' => $description['pmid'],
             'id' => $description['id'],
+            'stable_id' => $description['stable_id'],
             'method' => [
                 'psimi_id' => $description['psimi_id'],
             ],

@@ -3,11 +3,11 @@ import React from 'react'
 import { ProteinType } from '../types'
 
 type Props = {
-    type: ProteinType,
-    start: number,
-    stop: number,
-    length: number,
-    active?: boolean,
+    type: ProteinType
+    start: number
+    stop: number
+    length: number
+    active?: boolean
 }
 
 export const SequenceImg: React.FC<Props> = ({ type, start, stop, length, active = true }) => {

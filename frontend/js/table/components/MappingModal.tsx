@@ -7,8 +7,8 @@ import { Description, Protein } from '../types'
 import { Mapping } from './Mapping'
 
 type Props = {
-    description: Description,
-    close: () => void,
+    description: Description
+    close: () => void
 }
 
 export const MappingModal: React.FC<Props> = ({ description, close }) => {
