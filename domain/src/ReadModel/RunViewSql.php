@@ -102,10 +102,10 @@ final class RunViewSql implements RunViewInterface
             'name' => $run['name'],
             'created_at' => $run['created_at'],
             'nbs' => [
-                \Domain\Association::PENDING => $nbs[$run['id']][\Domain\Association::PENDING] ?? 0,
-                \Domain\Association::SELECTED => $nbs[$run['id']][\Domain\Association::SELECTED] ?? 0,
-                \Domain\Association::DISCARDED => $nbs[$run['id']][\Domain\Association::DISCARDED] ?? 0,
-                \Domain\Association::CURATED => $nbs[$run['id']][\Domain\Association::CURATED] ?? 0,
+                \Domain\Publication::PENDING => $nbs[$run['id']][\Domain\Publication::PENDING] ?? 0,
+                \Domain\Publication::SELECTED => $nbs[$run['id']][\Domain\Publication::SELECTED] ?? 0,
+                \Domain\Publication::DISCARDED => $nbs[$run['id']][\Domain\Publication::DISCARDED] ?? 0,
+                \Domain\Publication::CURATED => $nbs[$run['id']][\Domain\Publication::CURATED] ?? 0,
             ],
         ];
     }
