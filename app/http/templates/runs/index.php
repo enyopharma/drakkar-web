@@ -40,11 +40,9 @@
                 </ul>
             </div>
         </div>
+        <?= $this->insert('publications/search/form') ?>
     </div>
 </div>
-
-<h2>Search publication</h2>
-<?= $this->insert('publications/search/form') ?>
 
 <h2>Curation runs</h2>
 <?php if (count($runs) == 0): ?>

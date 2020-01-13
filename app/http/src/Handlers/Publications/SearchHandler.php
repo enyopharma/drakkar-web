@@ -8,7 +8,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use Domain\ReadModel\RunViewInterface;
 use Domain\ReadModel\PublicationViewInterface;
 
 use App\Http\Responders\HtmlResponder;
@@ -27,7 +26,6 @@ final class SearchHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        // get input.
         $params = (array) $request->getQueryParams();
 
         $pmid = (int) $params['pmid'];

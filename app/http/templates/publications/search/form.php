@@ -9,7 +9,7 @@
                 placeholder="PMID"
             />
         </div>
-        <div class="col-2">
+        <div class="col-4">
             <button type="submit" class="btn btn-block btn-primary">
                 Search publication
             </button>
