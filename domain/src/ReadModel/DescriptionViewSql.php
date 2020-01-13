@@ -90,9 +90,9 @@ final class DescriptionViewSql implements DescriptionViewInterface
     private function formatted(array $description): array
     {
         return [
-            'run_id' => $description['run_id'],
-            'pmid' => $description['pmid'],
             'id' => $description['id'],
+            'pmid' => $description['pmid'],
+            'run_id' => $description['run_id'],
             'stable_id' => $description['stable_id'],
             'method' => [
                 'psimi_id' => $description['psimi_id'],

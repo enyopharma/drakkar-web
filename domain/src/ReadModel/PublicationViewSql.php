@@ -75,7 +75,6 @@ final class PublicationViewSql implements PublicationViewInterface
     public function search(int $pmid): Statement
     {
         $search_publication_sth = $this->selectPublicationsQuery()
-            ->where('r.deleted_at IS NULL')
             ->where('p.pmid = ?')
             ->prepare();
 

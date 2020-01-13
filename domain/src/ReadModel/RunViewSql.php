@@ -18,8 +18,7 @@ final class RunViewSql implements RunViewInterface
         return Query::instance($this->pdo)
             ->select('id, type, name, created_at')
             ->from('runs')
-            ->where('populated IS TRUE')
-            ->where('deleted_at IS NULL');
+            ->where('populated IS TRUE');
     }
 
     public function id(int $id): Statement

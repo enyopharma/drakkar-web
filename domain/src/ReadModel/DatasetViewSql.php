@@ -39,7 +39,6 @@ final class DatasetViewSql implements DatasetViewInterface
             ->where('p1.id = i1.protein_id')
             ->where('p2.id = i2.protein_id')
             ->where('a.state = \'curated\'')
-            ->where('r.deleted_at IS NULL')
             ->where('d.deleted_at IS NULL')
             ->orderby('d.created_at DESC, d.id DESC')
             ->prepare();
