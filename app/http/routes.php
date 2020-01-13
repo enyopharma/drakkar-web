@@ -71,8 +71,8 @@ return function (ContainerInterface $container): array {
 
         'DELETE /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}' => new LazyRequestHandler(function () use ($container) {
             return new App\Http\Handlers\Descriptions\DeleteHandler(
-                $container->get(PDO::class),
-                $container->get(App\Http\Responders\JsonResponder::class)
+                $container->get(App\Http\Responders\JsonResponder::class),
+                $container->get(Domain\Services\DeleteDescriptionService::class)
             );
         }),
 
