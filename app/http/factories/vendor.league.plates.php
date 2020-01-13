@@ -26,10 +26,10 @@ return [
 
     'league.plates.data' => function ($container) {
         return [
-            'pending' => Domain\Association::PENDING,
-            'selected' => Domain\Association::SELECTED,
-            'discarded' => Domain\Association::DISCARDED,
-            'curated' => Domain\Association::CURATED,
+            'pending' => Domain\Publication::PENDING,
+            'selected' => Domain\Publication::SELECTED,
+            'discarded' => Domain\Publication::DISCARDED,
+            'curated' => Domain\Publication::CURATED,
         ];
     },
 

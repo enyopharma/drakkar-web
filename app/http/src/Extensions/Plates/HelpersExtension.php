@@ -13,7 +13,7 @@ final class HelpersExtension implements ExtensionInterface
      * @var array
      */
     private $map = [
-        \Domain\Association::PENDING => [
+        \Domain\Publication::PENDING => [
             'header' => 'Pending publication',
             'empty' => 'There is no pending publication.',
             'classes' => [
@@ -21,7 +21,7 @@ final class HelpersExtension implements ExtensionInterface
                 'badge' => 'badge-warning',
             ],
         ],
-        \Domain\Association::SELECTED => [
+        \Domain\Publication::SELECTED => [
             'header' => 'Selected publication',
             'empty' => 'There is no selected publication.',
             'classes' => [
@@ -29,7 +29,7 @@ final class HelpersExtension implements ExtensionInterface
                 'badge' => 'badge-primary',
             ],
         ],
-        \Domain\Association::DISCARDED => [
+        \Domain\Publication::DISCARDED => [
             'header' => 'Discarded publication',
             'empty' => 'There is no discarded publication.',
             'classes' => [
@@ -37,7 +37,7 @@ final class HelpersExtension implements ExtensionInterface
                 'badge' => 'badge-danger',
             ],
         ],
-        \Domain\Association::CURATED => [
+        \Domain\Publication::CURATED => [
             'header' => 'Curated publication',
             'empty' => 'There is no curated publication.',
             'classes' => [

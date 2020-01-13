@@ -35,7 +35,7 @@ final class IndexHandler implements RequestHandlerInterface
 
         $params = (array) $request->getQueryParams();
 
-        $state = (string) ($params['state'] ?? \Domain\Association::PENDING);
+        $state = (string) ($params['state'] ?? \Domain\Publication::PENDING);
         $page = (int) ($params['page'] ?? 1);
         $limit = (int) ($params['limit'] ?? 20);
 
