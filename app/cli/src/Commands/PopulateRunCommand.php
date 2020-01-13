@@ -82,7 +82,7 @@ SQL;
         while ($publication = $select_publications_sth->fetch()) {
             $result = $this->action->populate($publication['pmid']);
 
-            $this->responder->write($output, $result);
+            $this->responder->write($output, $publication['pmid'], $result);
 
             if (! $result->isSuccess()) {
                 $errors++;

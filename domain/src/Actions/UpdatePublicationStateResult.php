@@ -12,30 +12,24 @@ final class UpdatePublicationStateResult
 
     private $state;
 
-    private $run_id;
-
-    private $pmid;
-
-    public static function success(int $run_id, int $pmid): self
+    public static function success(): self
     {
-        return new self(self::SUCCESS, $run_id, $pmid);
+        return new self(self::SUCCESS);
     }
 
-    public static function notFound(int $run_id, int $pmid): self
+    public static function notFound(): self
     {
-        return new self(self::NOT_FOUND, $run_id, $pmid);
+        return new self(self::NOT_FOUND);
     }
 
-    public static function notValid(int $run_id, int $pmid): self
+    public static function notValid(): self
     {
-        return new self(self::NOT_VALID, $run_id, $pmid);
+        return new self(self::NOT_VALID);
     }
 
-    private function __construct(int $state, int $run_id, int $pmid)
+    private function __construct(int $state)
     {
         $this->state = $state;
-        $this->run_id = $run_id;
-        $this->pmid = $pmid;
     }
 
     public function isSuccess(): bool
@@ -60,6 +54,6 @@ final class UpdatePublicationStateResult
             throw new \InvalidArgumentException('alternative must be a callable');
         }
 
-        return $alternative($this->run_id, $this->pmid);
+        return $alternative();
     }
 }

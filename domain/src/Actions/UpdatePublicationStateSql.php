@@ -22,7 +22,7 @@ SQL;
     public function update(int $run_id, int $pmid, string $state, string $annotation): UpdatePublicationStateResult
     {
         if (! in_array($state, \Domain\Publication::STATES)) {
-            return UpdatePublicationStateResult::notValid($run_id, $pmid);
+            return UpdatePublicationStateResult::notValid();
         }
 
         $update_publication_sth = $this->pdo->prepare(self::UPDATE_PUBLICATION_SQL);
@@ -30,7 +30,7 @@ SQL;
         $update_publication_sth->execute([$state, $annotation, $run_id, $pmid]);
 
         return $update_publication_sth->rowCount() == 1
-            ? UpdatePublicationStateResult::success($run_id, $pmid)
-            : UpdatePublicationStateResult::notFound($run_id, $pmid);
+            ? UpdatePublicationStateResult::success()
+            : UpdatePublicationStateResult::notFound();
     }
 }

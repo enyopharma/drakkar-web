@@ -61,11 +61,11 @@ SQL;
         $select_publication_sth->execute([$pmid]);
 
         if (! $publication = $select_publication_sth->fetch()) {
-            return PopulatePublicationResult::notFound($pmid);
+            return PopulatePublicationResult::notFound();
         }
 
         if ($publication['populated']) {
-            return PopulatePublicationResult::alreadyPopulated($pmid);
+            return PopulatePublicationResult::alreadyPopulated();
         }
 
         // download the metadata.
@@ -74,7 +74,7 @@ SQL;
         }
 
         catch (InfrastructureException $e) {
-            return PopulatePublicationResult::parsingError($pmid, $e->getMessage());
+            return PopulatePublicationResult::parsingError($e->getMessage());
         }
 
         // update publication.
@@ -95,6 +95,6 @@ SQL;
         $this->pdo->commit();
 
         // success !
-        return PopulatePublicationResult::success($pmid);
+        return PopulatePublicationResult::success();
     }
 }

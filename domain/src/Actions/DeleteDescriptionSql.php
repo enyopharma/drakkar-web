@@ -24,7 +24,7 @@ SQL;
         $delete_description_sth->execute([$id]);
 
         return $delete_description_sth->rowCount() == 1
-            ? DeleteDescriptionResult::success($id)
-            : DeleteDescriptionResult::notFound($id);
+            ? DeleteDescriptionResult::success()
+            : DeleteDescriptionResult::notFound();
     }
 }

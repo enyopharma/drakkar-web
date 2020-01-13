@@ -11,22 +11,19 @@ final class DeleteDescriptionResult
 
     private $state;
 
-    private $id;
-
-    public static function success(int $id): self
+    public static function success(): self
     {
-        return new self(self::SUCCESS, $id);
+        return new self(self::SUCCESS);
     }
 
-    public static function notFound(int $id): self
+    public static function notFound(): self
     {
-        return new self(self::NOT_FOUND, $id);
+        return new self(self::NOT_FOUND);
     }
 
-    private function __construct(int $state, int $id)
+    private function __construct(int $state)
     {
         $this->state = $state;
-        $this->id = $id;
     }
 
     public function isSuccess(): bool
@@ -51,6 +48,6 @@ final class DeleteDescriptionResult
             throw new \InvalidArgumentException('alternative must be a callable');
         }
 
-        return $alternative($this->id);
+        return $alternative();
     }
 }

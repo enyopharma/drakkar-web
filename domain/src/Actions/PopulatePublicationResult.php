@@ -13,34 +13,31 @@ final class PopulatePublicationResult
 
     private $state;
 
-    private $pmid;
-
     private $message;
 
-    public static function success(int $pmid): self
+    public static function success(): self
     {
-        return new self(self::SUCCESS, $pmid);
+        return new self(self::SUCCESS);
     }
 
-    public static function notFound(int $pmid): self
+    public static function notFound(): self
     {
-        return new self(self::NOT_FOUND, $pmid);
+        return new self(self::NOT_FOUND);
     }
 
-    public static function alreadyPopulated(int $pmid): self
+    public static function alreadyPopulated(): self
     {
-        return new self(self::ALREADY_POPULATED, $pmid);
+        return new self(self::ALREADY_POPULATED);
     }
 
-    public static function parsingError(int $pmid, string $message): self
+    public static function parsingError(string $message): self
     {
-        return new self(self::PARSING_ERROR, $pmid, $message);
+        return new self(self::PARSING_ERROR, $message);
     }
 
-    private function __construct(int $state, int $pmid, string $message = '')
+    private function __construct(int $state, string $message = '')
     {
         $this->state = $state;
-        $this->pmid = $pmid;
         $this->message = $message;
     }
 
@@ -66,6 +63,6 @@ final class PopulatePublicationResult
             throw new \InvalidArgumentException('alternative must be a callable');
         }
 
-        return $alternative($this->pmid, $this->message);
+        return $alternative($this->message);
     }
 }

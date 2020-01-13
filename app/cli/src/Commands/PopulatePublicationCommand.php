@@ -42,6 +42,6 @@ final class PopulatePublicationCommand extends Command
 
         $result = $this->action->populate($pmid);
 
-        return $this->responder->write($output, $result);
+        return $this->responder->write($output, $pmid, $result);
     }
 }
