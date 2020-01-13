@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain;
 
-final class Publication implements ResourceInterface
+final class Publication
 {
     const PENDING = 'pending';
     const SELECTED = 'selected';
@@ -17,18 +17,4 @@ final class Publication implements ResourceInterface
         self::DISCARDED,
         self::CURATED,
     ];
-
-    private $pmid;
-
-    public function __construct(int $pmid)
-    {
-        $this->pmid = $pmid;
-    }
-
-    public function id(): array
-    {
-        return [
-            'pmid' => $this->pmid,
-        ];
-    }
 }

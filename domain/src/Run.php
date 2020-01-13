@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Domain;
 
-final class Run implements ResourceInterface
+final class Run
 {
     const HH = 'hh';
     const VH = 'vh';
@@ -13,18 +13,4 @@ final class Run implements ResourceInterface
         self::HH,
         self::VH,
     ];
-
-    private $id;
-
-    public function __construct(int $id)
-    {
-        $this->id = $id;
-    }
-
-    public function id(): array
-    {
-        return [
-            'id' => $this->id,
-        ];
-    }
 }
