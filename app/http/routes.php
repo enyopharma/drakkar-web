@@ -76,6 +76,13 @@ return function (ContainerInterface $container): array {
             );
         }),
 
+        'GET /publications' => new LazyRequestHandler(function () use ($container) {
+            return new App\Http\Handlers\Publications\SearchHandler(
+                $container->get(App\Http\Responders\HtmlResponder::class),
+                $container->get(Domain\ReadModel\PublicationViewInterface::class)
+            );
+        }),
+
         'GET /dataset/{type:hh|vh}' => new LazyRequestHandler(function () use ($container) {
             return new App\Http\Handlers\Dataset\DownloadHandler(
                 $container->get(App\Http\Responders\FileResponder::class),

@@ -1,12 +1,5 @@
 <?php $this->layout('layout'); ?>
 
-<?php $this->push('scripts'); ?>
-<script type="text/javascript" src="<?= $this->asset('search.js') ?>"></script>
-<script type="text/javascript">
-    search.form('#search', <?= $run['id'] ?>);
-</script>
-<?php $this->end(); ?>
-
 <div class="page-header">
     <h1>
         <a href="<?= $this->url('runs.index') ?>">Drakkar</a>
@@ -14,21 +7,6 @@
         Run <?= $run['name'] ?>
     </h1>
 </div>
-
-<h2>Search publications</h2>
-
-<form id="search" action="#">
-    <div class="row">
-        <div class="col-4">
-            <input type="text" class="pmid form-control" placeholder="PMID" />
-        </div>
-        <div class="col-2">
-            <button type="submit" class="btn btn-block btn-primary">
-                Search publication
-            </button>
-        </div>
-    </div>
-</form>
 
 <h2 id="publications">
     <?= $this->header($state) ?>

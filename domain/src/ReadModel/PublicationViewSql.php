@@ -13,24 +13,29 @@ final class PublicationViewSql implements PublicationViewInterface
         $this->pdo = $pdo;
     }
 
-    private function selectPublicationsQuery(): Query
+    private function countPublicationQuery(): Query
     {
         return Query::instance($this->pdo)
-            ->select('a.run_id, p.pmid, a.state, a.annotation, p.metadata')
-            ->from('publications AS p, associations AS a')
-            ->where('p.pmid = a.pmid')
-            ->where('a.run_id = ?');
-    }
-
-    public function count(int $run_id, string $state): int
-    {
-        $count_publications_sth = Query::instance($this->pdo)
             ->select('COUNT(*)')
             ->from('publications AS p, associations AS a')
             ->where('p.pmid = a.pmid')
             ->where('a.run_id = ?')
-            ->where('a.state = ?')
-            ->prepare();
+            ->where('a.state = ?');
+    }
+
+    private function selectPublicationsQuery(): Query
+    {
+        return Query::instance($this->pdo)
+            ->select('r.type, r.id AS run_id, r.name AS run_name')
+            ->select('p.pmid, a.state, a.annotation, p.metadata')
+            ->from('runs AS r, publications AS p, associations AS a')
+            ->where('r.id = a.run_id')
+            ->where('p.pmid = a.pmid');
+    }
+
+    public function count(int $run_id, string $state): int
+    {
+        $count_publications_sth = $this->countPublicationQuery()->prepare();
 
         $count_publications_sth->execute([$run_id, $state]);
 
@@ -40,6 +45,7 @@ final class PublicationViewSql implements PublicationViewInterface
     public function pmid(int $run_id, int $pmid): Statement
     {
         $select_publication_sth = $this->selectPublicationsQuery()
+            ->where('r.id = ?')
             ->where('p.pmid = ?')
             ->prepare();
 
@@ -53,6 +59,7 @@ final class PublicationViewSql implements PublicationViewInterface
     public function all(int $run_id, string $state, int $limit, int $offset): Statement
     {
         $select_publications_sth = $this->selectPublicationsQuery()
+            ->where('r.id = ?')
             ->where('a.state = ?')
             ->orderby('a.updated_at ASC, a.id ASC')
             ->sliced()
@@ -62,6 +69,20 @@ final class PublicationViewSql implements PublicationViewInterface
 
         return new Statement(
             $this->generator($select_publications_sth)
+        );
+    }
+
+    public function search(int $pmid): Statement
+    {
+        $search_publication_sth = $this->selectPublicationsQuery()
+            ->where('r.deleted_at IS NULL')
+            ->where('p.pmid = ?')
+            ->prepare();
+
+        $search_publication_sth->execute([$pmid]);
+
+        return new Statement(
+            $this->generator($search_publication_sth)
         );
     }
 
@@ -86,6 +107,7 @@ final class PublicationViewSql implements PublicationViewInterface
         $raw = [
             'run_id' => $publication['run_id'],
             'pmid' => $publication['pmid'],
+            'type' => $publication['type'],
             'state' => $publication['state'],
             'title' => '',
             'journal' => '',
@@ -97,6 +119,10 @@ final class PublicationViewSql implements PublicationViewInterface
             'selected' => $publication['state'] == \Domain\Association::SELECTED,
             'discarded' => $publication['state'] == \Domain\Association::DISCARDED,
             'curated' => $publication['state'] == \Domain\Association::CURATED,
+            'run' => [
+                'id' => $publication['run_id'],
+                'name' => $publication['run_name'],
+            ],
         ];
 
         try {

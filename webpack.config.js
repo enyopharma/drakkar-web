@@ -10,7 +10,6 @@ module.exports = (env, argv) => {
             app: './frontend/js/app.js',
             form: './frontend/js/form/index.ts',
             table: './frontend/js/table/index.ts',
-            search: './frontend/js/search/index.js',
         },
         watch: argv.mode == 'development',
         devtool: argv.mode == 'development' ? 'inline-source-map' : false,

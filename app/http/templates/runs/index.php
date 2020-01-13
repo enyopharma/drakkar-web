@@ -5,6 +5,7 @@
         <small class="d-none d-md-inline">Lets sail toward the vinland!</small>
     </h1>
 </div>
+
 <div class="row">
     <div class="col">
         <a href="<?= $this->url('dataset', ['type' => Domain\Run::HH]) ?>" class="btn btn-primary btn-lg btn-block">
@@ -17,6 +18,7 @@
         </a>
     </div>
 </div>
+
 <div class="row">
     <div class="col-4">
         <img src="<?= 'img/viking.png' ?>" class="img-fluid" style="width: 140px; opacity: 0.8;">
@@ -40,6 +42,9 @@
         </div>
     </div>
 </div>
+
+<h2>Search publication</h2>
+<?= $this->insert('publications/search/form') ?>
 
 <h2>Curation runs</h2>
 <?php if (count($runs) == 0): ?>

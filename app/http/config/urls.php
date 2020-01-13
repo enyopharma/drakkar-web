@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 return [
-    'runs.index' => function (array $data) {
+    'runs.index' => function () {
         return '/';
     },
     'runs.publications.index' => function (array $data) {
@@ -20,6 +20,9 @@ return [
     },
     'runs.publications.descriptions.edit' => function (array $data) {
         return sprintf('/runs/%s/publications/%s/descriptions/%s/edit', $data['run_id'], $data['pmid'], $data['id']);
+    },
+    'publications.index' => function () {
+        return '/publications';
     },
     'dataset' => function (array $data) {
         return sprintf('/dataset/%s', $data['type']);
