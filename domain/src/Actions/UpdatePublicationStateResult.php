@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Domain\Services;
+namespace Domain\Actions;
 
 final class UpdatePublicationStateResult
 {

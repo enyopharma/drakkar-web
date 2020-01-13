@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Domain\Services;
+namespace Domain\Actions;
 
-final class UpdatePublicationStateService
+final class UpdatePublicationStateSql implements UpdatePublicationStateInterface
 {
     const UPDATE_PUBLICATION_SQL = <<<SQL
         UPDATE associations

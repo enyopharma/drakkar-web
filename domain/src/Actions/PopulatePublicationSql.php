@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Domain\Services;
+namespace Domain\Actions;
 
-use Domain\Publication;
 use Infrastructure\Efetch;
 use Infrastructure\InfrastructureException;
 
-final class PopulatePublicationService
+final class PopulatePublicationSql implements PopulatePublicationInterface
 {
     const SELECT_RUNS_SQL = <<<SQL
         SELECT r.*

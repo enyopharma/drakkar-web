@@ -32,7 +32,7 @@ return function (ContainerInterface $container): array {
         'PUT /runs/{run_id:\d+}/publications/{pmid:\d+}' => new LazyRequestHandler(function () use ($container) {
             return new App\Http\Handlers\Publications\UpdateHandler(
                 $container->get(App\Http\Responders\HtmlResponder::class),
-                $container->get(Domain\Services\UpdatePublicationStateService::class)
+                $container->get(Domain\Actions\UpdatePublicationStateInterface::class)
             );
         }),
 
@@ -65,14 +65,14 @@ return function (ContainerInterface $container): array {
         'POST /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions' => new LazyRequestHandler(function () use ($container) {
             return new App\Http\Handlers\Descriptions\StoreHandler(
                 $container->get(App\Http\Responders\JsonResponder::class),
-                $container->get(Domain\Services\StoreDescriptionService::class)
+                $container->get(Domain\Actions\StoreDescriptionInterface::class)
             );
         }),
 
         'DELETE /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}' => new LazyRequestHandler(function () use ($container) {
             return new App\Http\Handlers\Descriptions\DeleteHandler(
                 $container->get(App\Http\Responders\JsonResponder::class),
-                $container->get(Domain\Services\DeleteDescriptionService::class)
+                $container->get(Domain\Actions\DeleteDescriptionInterface::class)
             );
         }),
 

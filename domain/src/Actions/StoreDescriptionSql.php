@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace Domain\Services;
+namespace Domain\Actions;
 
 use Quanta\Validation\ErrorInterface;
 
 use Domain\Input\DescriptionInput;
 
-final class StoreDescriptionService
+final class StoreDescriptionSql implements StoreDescriptionInterface
 {
     const SELECT_ASSOCIATION_SQL = <<<SQL
         SELECT r.type, a.id

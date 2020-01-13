@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Domain\Services;
+namespace Domain\Actions;
 
-final class DeleteDescriptionService
+final class DeleteDescriptionSql implements DeleteDescriptionInterface
 {
     const DELETE_DESCRIPTION_SQL = <<<SQL
         UPDATE descriptions SET deleted_at = NOW() WHERE id = ?

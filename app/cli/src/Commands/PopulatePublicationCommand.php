@@ -9,20 +9,20 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Domain\Services\PopulatePublicationService;
+use Domain\Actions\PopulatePublicationInterface;
 use App\Cli\Responders\PopulatePublicationResponder;
 
 final class PopulatePublicationCommand extends Command
 {
     protected static $defaultName = 'publications:populate';
 
-    private $service;
+    private $action;
 
     private $responder;
 
-    public function __construct(PopulatePublicationService $service, PopulatePublicationResponder $responder)
+    public function __construct(PopulatePublicationInterface $action, PopulatePublicationResponder $responder)
     {
-        $this->service = $service;
+        $this->action = $action;
         $this->responder = $responder;
 
         parent::__construct();
@@ -40,7 +40,7 @@ final class PopulatePublicationCommand extends Command
     {
         $pmid = (int) ((array) $input->getArgument('pmid'))[0];
 
-        $result = $this->service->populate($pmid);
+        $result = $this->action->populate($pmid);
 
         return $this->responder->write($output, $result);
     }

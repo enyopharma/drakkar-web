@@ -27,12 +27,12 @@ return function (ContainerInterface $container): Application {
 
     $application->add(new App\Cli\Commands\PopulateRunCommand(
         $container->get(PDO::class),
-        $container->get(Domain\Services\PopulatePublicationService::class),
+        $container->get(Domain\Actions\PopulatePublicationInterface::class),
         $responder
     ));
 
     $application->add(new App\Cli\Commands\PopulatePublicationCommand(
-        $container->get(Domain\Services\PopulatePublicationService::class),
+        $container->get(Domain\Actions\PopulatePublicationInterface::class),
         $responder
     ));
 

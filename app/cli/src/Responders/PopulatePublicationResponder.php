@@ -6,7 +6,7 @@ namespace App\Cli\Responders;
 
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Domain\Services\PopulatePublicationResult;
+use Domain\Actions\PopulatePublicationResult;
 
 final class PopulatePublicationResponder
 {

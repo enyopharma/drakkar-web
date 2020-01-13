@@ -8,8 +8,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use Domain\Services\StoreDescriptionResult;
-use Domain\Services\StoreDescriptionService;
+use Domain\Actions\StoreDescriptionResult;
+use Domain\Actions\StoreDescriptionInterface;
 
 use App\Http\Responders\JsonResponder;
 
@@ -17,12 +17,12 @@ final class StoreHandler implements RequestHandlerInterface
 {
     private $responder;
 
-    private $service;
+    private $action;
 
-    public function __construct(JsonResponder $responder, StoreDescriptionService $service)
+    public function __construct(JsonResponder $responder, StoreDescriptionInterface $action)
     {
         $this->responder = $responder;
-        $this->service = $service;
+        $this->action = $action;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -32,7 +32,7 @@ final class StoreHandler implements RequestHandlerInterface
 
         $input = (array) $request->getParsedBody();
 
-        return $this->service->store($run_id, $pmid, $input)->match([
+        return $this->action->store($run_id, $pmid, $input)->match([
             StoreDescriptionResult::SUCCESS => function ($description) {
                 return $this->responder->success($description);
             },

@@ -8,8 +8,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use Domain\Services\UpdatePublicationStateResult;
-use Domain\Services\UpdatePublicationStateService;
+use Domain\Actions\UpdatePublicationStateResult;
+use Domain\Actions\UpdatePublicationStateInterface;
 
 use App\Http\Responders\HtmlResponder;
 
@@ -17,12 +17,12 @@ final class UpdateHandler implements RequestHandlerInterface
 {
     private $responder;
 
-    private $service;
+    private $action;
 
-    public function __construct(HtmlResponder $responder, UpdatePublicationStateService $service)
+    public function __construct(HtmlResponder $responder, UpdatePublicationStateInterface $action)
     {
         $this->responder = $responder;
-        $this->service = $service;
+        $this->action = $action;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -36,7 +36,7 @@ final class UpdateHandler implements RequestHandlerInterface
         $annotation = (string) ($params['annotation'] ?? '');
         $url = (string) ($params['_source'] ?? '');
 
-        return $this->service->update($run_id, $pmid, $state, $annotation)->match([
+        return $this->action->update($run_id, $pmid, $state, $annotation)->match([
             UpdatePublicationStateResult::SUCCESS => function () use ($url) {
                 return $this->responder->location($url);
             },

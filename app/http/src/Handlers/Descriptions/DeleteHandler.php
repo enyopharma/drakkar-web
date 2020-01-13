@@ -8,8 +8,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use Domain\Services\DeleteDescriptionResult;
-use Domain\Services\DeleteDescriptionService;
+use Domain\Actions\DeleteDescriptionResult;
+use Domain\Actions\DeleteDescriptionInterface;
 
 use App\Http\Responders\JsonResponder;
 
@@ -17,19 +17,19 @@ final class DeleteHandler implements RequestHandlerInterface
 {
     private $responder;
 
-    private $service;
+    private $action;
 
-    public function __construct(JsonResponder $responder, DeleteDescriptionService $service)
+    public function __construct(JsonResponder $responder, DeleteDescriptionInterface $action)
     {
         $this->responder = $responder;
-        $this->service = $service;
+        $this->action = $action;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $id = (int) $request->getAttribute('id');
 
-        return $this->service->delete($id)->match([
+        return $this->action->delete($id)->match([
             DeleteDescriptionResult::SUCCESS => function () {
                 return $this->responder->success();
             },
