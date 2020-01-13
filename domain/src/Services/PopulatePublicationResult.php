@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Domain\Services;
 
-use Domain\Publication;
-use Infrastructure\Efetch;
-
 final class PopulatePublicationResult
 {
     const SUCCESS = 0;
