@@ -8,7 +8,7 @@ use Domain\Publication;
 use Infrastructure\Efetch;
 use Infrastructure\InfrastructureException;
 
-final class PublicationMetadataService
+final class PopulatePublicationService
 {
     const SELECT_RUNS_SQL = <<<SQL
         SELECT r.*
@@ -49,7 +49,7 @@ SQL;
         $this->efetch = $efetch;
     }
 
-    public function populate(int $pmid): PublicationMetadataResult
+    public function populate(int $pmid): PopulatePublicationResult
     {
         // prepare the queries.
         $select_runs_sth = $this->pdo->prepare(self::SELECT_RUNS_SQL);
@@ -62,11 +62,11 @@ SQL;
         $select_publication_sth->execute([$pmid]);
 
         if (! $publication = $select_publication_sth->fetch()) {
-            return PublicationMetadataResult::notFound($pmid);
+            return PopulatePublicationResult::notFound($pmid);
         }
 
         if ($publication['populated']) {
-            return PublicationMetadataResult::alreadyPopulated($pmid);
+            return PopulatePublicationResult::alreadyPopulated($pmid);
         }
 
         // download the metadata.
@@ -75,7 +75,7 @@ SQL;
         }
 
         catch (InfrastructureException $e) {
-            return PublicationMetadataResult::parsingError($pmid, $e->getMessage());
+            return PopulatePublicationResult::parsingError($pmid, $e->getMessage());
         }
 
         // update publication.
@@ -96,6 +96,6 @@ SQL;
         $this->pdo->commit();
 
         // success !
-        return PublicationMetadataResult::success($pmid);
+        return PopulatePublicationResult::success($pmid);
     }
 }

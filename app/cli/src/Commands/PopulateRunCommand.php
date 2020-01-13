@@ -9,8 +9,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Domain\Services\PublicationMetadataService;
-use App\Cli\Responders\PublicationMetadataResponder;
+use Domain\Services\PopulatePublicationService;
+use App\Cli\Responders\PopulatePublicationResponder;
 
 final class PopulateRunCommand extends Command
 {
@@ -37,7 +37,7 @@ SQL;
 
     private $responder;
 
-    public function __construct(\PDO $pdo, PublicationMetadataService $service, PublicationMetadataResponder $responder)
+    public function __construct(\PDO $pdo, PopulatePublicationService $service, PopulatePublicationResponder $responder)
     {
         $this->pdo = $pdo;
         $this->service = $service;

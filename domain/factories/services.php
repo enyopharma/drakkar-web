@@ -3,11 +3,11 @@
 declare(strict_types=1);
 
 use Domain\Services\DeleteDescriptionService;
-use Domain\Services\PublicationMetadataService;
+use Domain\Services\PopulatePublicationService;
 
 return [
-    PublicationMetadataService::class => function ($container) {
-        return new PublicationMetadataService(
+    PopulatePublicationService::class => function ($container) {
+        return new PopulatePublicationService(
             $container->get(PDO::class),
             $container->get(Infrastructure\Efetch::class)
         );

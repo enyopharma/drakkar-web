@@ -7,7 +7,7 @@ namespace Domain\Services;
 use Domain\Publication;
 use Infrastructure\Efetch;
 
-final class PublicationMetadataResult
+final class PopulatePublicationResult
 {
     const SUCCESS = 0;
     const NOT_FOUND = 1;

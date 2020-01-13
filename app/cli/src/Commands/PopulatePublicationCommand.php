@@ -9,8 +9,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Domain\Services\PublicationMetadataService;
-use App\Cli\Responders\PublicationMetadataResponder;
+use Domain\Services\PopulatePublicationService;
+use App\Cli\Responders\PopulatePublicationResponder;
 
 final class PopulatePublicationCommand extends Command
 {
@@ -20,7 +20,7 @@ final class PopulatePublicationCommand extends Command
 
     private $responder;
 
-    public function __construct(PublicationMetadataService $service, PublicationMetadataResponder $responder)
+    public function __construct(PopulatePublicationService $service, PopulatePublicationResponder $responder)
     {
         $this->service = $service;
         $this->responder = $responder;
