@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Domain\Services\StoreDescriptionService;
 use Domain\Services\DeleteDescriptionService;
 use Domain\Services\PopulatePublicationService;
 use Domain\Services\UpdatePublicationStateService;
@@ -16,6 +17,12 @@ return [
 
     UpdatePublicationStateService::class => function ($container) {
         return new UpdatePublicationStateService(
+            $container->get(PDO::class)
+        );
+    },
+
+    StoreDescriptionService::class => function ($container) {
+        return new StoreDescriptionService(
             $container->get(PDO::class)
         );
     },

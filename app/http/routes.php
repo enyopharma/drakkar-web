@@ -64,8 +64,8 @@ return function (ContainerInterface $container): array {
 
         'POST /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions' => new LazyRequestHandler(function () use ($container) {
             return new App\Http\Handlers\Descriptions\StoreHandler(
-                $container->get(PDO::class),
-                $container->get(App\Http\Responders\JsonResponder::class)
+                $container->get(App\Http\Responders\JsonResponder::class),
+                $container->get(Domain\Services\StoreDescriptionService::class)
             );
         }),
 
