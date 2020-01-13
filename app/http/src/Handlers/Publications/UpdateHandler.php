@@ -8,24 +8,21 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+use Domain\Services\UpdatePublicationStateResult;
+use Domain\Services\UpdatePublicationStateService;
+
 use App\Http\Responders\HtmlResponder;
 
 final class UpdateHandler implements RequestHandlerInterface
 {
-    const UPDATE_PUBLICATION_SQL = <<<SQL
-        UPDATE associations
-        SET state = ?, annotation = ?, updated_at = NOW()
-        WHERE run_id = ? AND pmid = ?
-SQL;
-
-    private $pdo;
-
     private $responder;
 
-    public function __construct(\PDO $pdo, HtmlResponder $responder)
+    private $service;
+
+    public function __construct(HtmlResponder $responder, UpdatePublicationStateService $service)
     {
-        $this->pdo = $pdo;
         $this->responder = $responder;
+        $this->service = $service;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -39,12 +36,16 @@ SQL;
         $annotation = (string) ($params['annotation'] ?? '');
         $url = (string) ($params['_source'] ?? '');
 
-        $update_publication_sth = $this->pdo->prepare(self::UPDATE_PUBLICATION_SQL);
-
-        $update_publication_sth->execute([$state, $annotation, $run_id, $pmid]);
-
-        return $update_publication_sth->rowCount() == 1
-            ? $this->responder->location($url)
-            : $this->responder->notFound($request);
+        return $this->service->update($run_id, $pmid, $state, $annotation)->match([
+            UpdatePublicationStateResult::SUCCESS => function () use ($url) {
+                return $this->responder->location($url);
+            },
+            UpdatePublicationStateResult::NOT_FOUND => function () use ($request) {
+                return $this->responder->notFound($request);
+            },
+            UpdatePublicationStateResult::NOT_VALID => function () use ($request) {
+                return $this->responder->notFound($request);
+            },
+        ]);
     }
 }

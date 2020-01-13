@@ -4,12 +4,19 @@ declare(strict_types=1);
 
 use Domain\Services\DeleteDescriptionService;
 use Domain\Services\PopulatePublicationService;
+use Domain\Services\UpdatePublicationStateService;
 
 return [
     PopulatePublicationService::class => function ($container) {
         return new PopulatePublicationService(
             $container->get(PDO::class),
             $container->get(Infrastructure\Efetch::class)
+        );
+    },
+
+    UpdatePublicationStateService::class => function ($container) {
+        return new UpdatePublicationStateService(
+            $container->get(PDO::class)
         );
     },
 

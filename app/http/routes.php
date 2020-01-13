@@ -31,8 +31,8 @@ return function (ContainerInterface $container): array {
 
         'PUT /runs/{run_id:\d+}/publications/{pmid:\d+}' => new LazyRequestHandler(function () use ($container) {
             return new App\Http\Handlers\Publications\UpdateHandler(
-                $container->get(PDO::class),
-                $container->get(App\Http\Responders\HtmlResponder::class)
+                $container->get(App\Http\Responders\HtmlResponder::class),
+                $container->get(Domain\Services\UpdatePublicationStateService::class)
             );
         }),
 
