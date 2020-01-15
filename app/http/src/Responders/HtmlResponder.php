@@ -34,10 +34,7 @@ final class HtmlResponder
 
     public function notFound(ServerRequestInterface $request): ResponseInterface
     {
-        return $this->template(404, '_errors/404', [
-            'method' => $request->getMethod(),
-            'url' => $request->getUri(),
-        ]);
+        return $this->factory->createResponse(404);
     }
 
     public function route(string $name, array $params = [], array $query = [], string $fragment = ''): ResponseInterface

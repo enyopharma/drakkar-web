@@ -8,28 +8,23 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use Domain\ReadModel\ProteinViewInterface;
-
 use App\Http\Responders\JsonResponder;
 
 final class ShowHandler implements RequestHandlerInterface
 {
     private $responder;
 
-    private $proteins;
-
-    public function __construct(JsonResponder $responder, ProteinViewInterface $proteins)
+    public function __construct(JsonResponder $responder)
     {
         $this->responder = $responder;
-        $this->proteins = $proteins;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $accession = (string) $request->getAttribute('accession');
+        $protein = $request->getAttribute('protein');
 
-        return ($protein = $this->proteins->accession($accession)->fetch())
-            ? $this->responder->success($protein)
-            : $this->responder->notFound($request);
+        if (is_null($protein)) throw new \LogicException;
+
+        return $this->responder->success($protein);
     }
 }

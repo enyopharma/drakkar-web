@@ -8,7 +8,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use Domain\ReadModel\RunViewInterface;
 use Domain\ReadModel\PublicationViewInterface;
 
 use App\Http\Responders\HtmlResponder;
@@ -17,21 +16,18 @@ final class IndexHandler implements RequestHandlerInterface
 {
     private $responder;
 
-    private $runs;
-
     private $publications;
 
-    public function __construct(HtmlResponder $responder, RunViewInterface $runs, PublicationViewInterface $publications)
+    public function __construct(HtmlResponder $responder, PublicationViewInterface $publications)
     {
         $this->responder = $responder;
-        $this->runs = $runs;
         $this->publications = $publications;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         // get input.
-        $run_id = (int) $request->getAttribute('run_id');
+        $run = $request->getAttribute('run');
 
         $params = (array) $request->getQueryParams();
 
@@ -39,30 +35,27 @@ final class IndexHandler implements RequestHandlerInterface
         $page = (int) ($params['page'] ?? 1);
         $limit = (int) ($params['limit'] ?? 20);
 
-        // get the run.
-        $select_run_sth = $this->runs->id($run_id);
-
-        if (! $run = $select_run_sth->fetch()) {
-            return $this->responder->notFound($request);
-        }
-
         // get the publications.
+        if (is_null($run)) throw new \LogicException;
+
         $offset = ($page - 1) * $limit;
         $total = $this->publications->count($run['id'], $state);
 
         if ($limit < 0) {
-            return $this->outOfRangeResponse($run_id, $state, 1, 20);
+            return $this->outOfRangeResponse($run['id'], $state, 1, 20);
         }
 
         if ($page < 1) {
-            return $this->outOfRangeResponse($run_id, $state, 1, $limit);
+            return $this->outOfRangeResponse($run['id'], $state, 1, $limit);
         }
 
         if ($offset > 0 && $offset > $total) {
-            return $this->outOfRangeResponse($run_id, $state, (int) ceil($total/$limit), $limit);
+            return $this->outOfRangeResponse($run['id'], $state, (int) ceil($total/$limit), $limit);
         }
 
-        $publications = $this->publications->all($run_id, $state, $limit, $offset)->fetchAll();
+        $publications = $this->publications
+            ->all($run['id'], $state, $limit, $offset)
+            ->fetchAll();
 
         // success!
         return $this->responder->success('publications/index', [

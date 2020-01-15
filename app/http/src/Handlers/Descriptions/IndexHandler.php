@@ -8,8 +8,6 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use Domain\ReadModel\RunViewInterface;
-use Domain\ReadModel\PublicationViewInterface;
 use Domain\ReadModel\DescriptionViewInterface;
 
 use App\Http\Responders\HtmlResponder;
@@ -18,67 +16,46 @@ final class IndexHandler implements RequestHandlerInterface
 {
     private $responder;
 
-    private $runs;
-
-    private $publications;
-
     private $descriptions;
 
-    public function __construct(
-        HtmlResponder $responder,
-        RunViewInterface $runs,
-        PublicationViewInterface $publications,
-        DescriptionViewInterface $descriptions
-    ) {
+    public function __construct(HtmlResponder $responder, DescriptionViewInterface $descriptions)
+    {
         $this->responder = $responder;
-        $this->runs = $runs;
-        $this->publications = $publications;
         $this->descriptions = $descriptions;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         // get input.
-        $run_id = (int) $request->getAttribute('run_id');
-        $pmid = (int) $request->getAttribute('pmid');
+        $run = $request->getAttribute('run');
+        $publication = $request->getAttribute('publication');
 
         $params = (array) $request->getQueryParams();
 
         $page = (int) ($params['page'] ?? 1);
         $limit = (int) ($params['limit'] ?? 20);
 
-        // get the run.
-        $select_run_sth = $this->runs->id($run_id);
-
-        if (! $run = $select_run_sth->fetch()) {
-            return $this->responder->notFound($request);
-        }
-
-        // get the publication.
-        $select_publication_sth = $this->publications->pmid($run_id, $pmid);
-
-        if (! $publication = $select_publication_sth->fetch()) {
-            return $this->responder->notFound($request);
-        }
-
         // get the descriptions.
+        if (is_null($run) || is_null($publication)) throw new \LogicException;
+
         $offset = ($page - 1) * $limit;
-        $total = $this->descriptions->count($run_id, $pmid);
+        $total = $this->descriptions->count($run['id'], $publication['pmid']);
 
         if ($limit < 0) {
-            return $this->outOfRangeResponse($run_id, $pmid, 1, 20);
+            return $this->outOfRangeResponse($run['id'], $publication['pmid'], 1, 20);
         }
 
         if ($page < 1) {
-            return $this->outOfRangeResponse($run_id, $pmid, 1, $limit);
+            return $this->outOfRangeResponse($run['id'], $publication['pmid'], 1, $limit);
         }
 
         if ($offset > 0 && $offset > $total) {
-            return $this->outOfRangeResponse($run_id, $pmid, (int) ceil($total/$limit), $limit);
+            return $this->outOfRangeResponse($run['id'], $publication['pmid'], (int) ceil($total/$limit), $limit);
         }
 
-        // get the descriptions.
-        $descriptions = $this->descriptions->all($run_id, $pmid, $limit, $offset)->fetchAll();
+        $descriptions = $this->descriptions
+            ->all($run['id'], $publication['pmid'], $limit, $offset)
+            ->fetchAll();
 
         // success!
         return $this->responder->success('descriptions/index', [

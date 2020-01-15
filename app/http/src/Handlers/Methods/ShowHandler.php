@@ -8,28 +8,23 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use Domain\ReadModel\MethodViewInterface;
-
 use App\Http\Responders\JsonResponder;
 
 final class ShowHandler implements RequestHandlerInterface
 {
     private $responder;
 
-    private $methods;
-
-    public function __construct(JsonResponder $responder, MethodViewInterface $methods)
+    public function __construct(JsonResponder $responder)
     {
         $this->responder = $responder;
-        $this->methods = $methods;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $psimi_id = (string) $request->getAttribute('psimi_id');
+        $method = $request->getAttribute('method');
 
-        return ($method = $this->methods->psimiId($psimi_id)->fetch())
-            ? $this->responder->success($method)
-            : $this->responder->notFound($request);
+        if (is_null($method)) throw new \LogicException;
+
+        return $this->responder->success($method);
     }
 }
