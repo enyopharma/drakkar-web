@@ -41,11 +41,6 @@ return function (ContainerInterface $container): RequestHandlerInterface {
         (new Middlewares\MethodOverride)->parsedBodyParameter('_method'),
 
         /**
-         * Parse json body.
-         */
-        new Middlewares\JsonPayload,
-
-        /**
          * Router.
          */
         new Quanta\Http\RoutingMiddleware($router),
