@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Responders;
 
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
 use League\Plates\Engine;
@@ -32,30 +31,48 @@ final class HtmlResponder
         return $this->template(200, $path, $data);
     }
 
-    public function notFound(ServerRequestInterface $request): ResponseInterface
+    public function temporary(string $urlOrName, array $params = [], array $query = [], string $fragment = ''): ResponseInterface
     {
-        return $this->factory->createResponse(404);
+        return $this->redirect(302, $urlOrName, $params, $query, $fragment);
     }
 
-    public function route(string $name, array $params = [], array $query = [], string $fragment = ''): ResponseInterface
+    public function permanent(string $urlOrName, array $params = [], array $query = [], string $fragment = ''): ResponseInterface
     {
-        $url = $this->url->generate($name, $params, $query, $fragment);
-
-        return $this->location($url);
+        return $this->redirect(301, $urlOrName, $params, $query, $fragment);
     }
 
-    public function location(string $url): ResponseInterface
+    public function notFound(): ResponseInterface
     {
-        return $this->factory->createResponse(302)->withHeader('location', $url);
+        return $this->response(404);
     }
 
-    public function template(int $code, string $path, array $data = []): ResponseInterface
+    public function template(int $code, string $path, array $data): ResponseInterface
     {
-        $body = $this->engine->render($path, $data);
+        $contents = $this->engine->render($path, $data);
 
-        $response = $this->factory->createResponse($code)->withHeader('content-type', 'text/html');
+        return $this->response($code, $contents);
+    }
 
-        $response->getBody()->write($body);
+    public function redirect(int $code, string $urlOrName, array $params = [], array $query = [], string $fragment = ''): ResponseInterface
+    {
+        if ($code != 301 && $code != 302) {
+            throw new \InvalidArgumentException('code must be 301 or 302');
+        }
+
+        $url = $this->url->isDefined($urlOrName)
+            ? $this->url->generate($urlOrName, $params, $query, $fragment)
+            : $urlOrName;
+
+        return $this->response($code)->withHeader('location', $url);
+    }
+
+    public function response(int $code, string $contents = ''): ResponseInterface
+    {
+        $response = $this->factory
+            ->createResponse($code)
+            ->withHeader('content-type', 'text/html');
+
+        $response->getBody()->write($contents);
 
         return $response;
     }

@@ -74,6 +74,6 @@ final class IndexHandler implements RequestHandlerInterface
 
         $query = ['page' => $page, 'limit' => $limit];
 
-        return $this->responder->route('runs.publications.descriptions.index', $params, $query, 'descriptions');
+        return $this->responder->temporary('runs.publications.descriptions.index', $params, $query, 'descriptions');
     }
 }

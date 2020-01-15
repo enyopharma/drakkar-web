@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Responders;
 
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
 final class JsonResponder
@@ -32,20 +31,20 @@ final class JsonResponder
         return $this->response(409, [], ['reason' => $reason]);
     }
 
-    public function notFound(ServerRequestInterface $request): ResponseInterface
+    public function notFound(): ResponseInterface
     {
         return $this->response(404);
     }
 
     public function response(int $code, array $data = [], array $meta = []): ResponseInterface
     {
-        $body = json_encode([
+        $contents = json_encode([
             'code' => $code,
             'success' => $code >= 200 && $code < 300,
             'data' => $data,
         ] + $meta);
 
-        if ($body === false) {
+        if ($contents === false) {
             throw new \Exception(json_last_error_msg());
         }
 
@@ -53,7 +52,7 @@ final class JsonResponder
             ->createResponse($code)
             ->withHeader('content-type', 'application/json');
 
-        $response->getBody()->write($body);
+        $response->getBody()->write($contents);
 
         return $response;
     }

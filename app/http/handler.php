@@ -36,6 +36,18 @@ return function (ContainerInterface $container): RequestHandlerInterface {
         new Middlewares\Whoops,
 
         /**
+         *  Not found html body.
+         */
+        new App\Http\Middleware\NotFoundHtmlBodyMiddleware(
+            $container->get(League\Plates\Engine::class)
+        ),
+
+        /**
+         *  Not found json body.
+         */
+        new App\Http\Middleware\NotFoundJsonBodyMiddleware,
+
+        /**
          * Override the post method
          */
         (new Middlewares\MethodOverride)->parsedBodyParameter('_method'),

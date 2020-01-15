@@ -33,8 +33,8 @@ final class DeleteHandler implements RequestHandlerInterface
             DeleteDescriptionResult::SUCCESS => function () {
                 return $this->responder->success();
             },
-            DeleteDescriptionResult::NOT_FOUND => function () use ($request) {
-                return $this->responder->notFound($request);
+            DeleteDescriptionResult::NOT_FOUND => function () {
+                return $this->responder->notFound();
             },
         ]);
     }

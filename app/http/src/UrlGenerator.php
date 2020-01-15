@@ -13,6 +13,11 @@ final class UrlGenerator
         $this->map = $map;
     }
 
+    public function isDefined(string $name): bool
+    {
+        return array_key_exists($name, $this->map);
+    }
+
     public function generate(string $name, array $data = [], array $query = [], string $fragment = ''): string
     {
         $path = $this->map[$name]($data);

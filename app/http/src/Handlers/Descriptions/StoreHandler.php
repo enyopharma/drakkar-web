@@ -39,8 +39,8 @@ final class StoreHandler implements RequestHandlerInterface
             StoreDescriptionResult::INPUT_NOT_VALID => function ($_, ...$errors) {
                 return $this->responder->errors(...$errors);
             },
-            StoreDescriptionResult::ASSOCIATION_NOT_FOUND => function () use ($request) {
-                return $this->responder->notFound($request);
+            StoreDescriptionResult::ASSOCIATION_NOT_FOUND => function () {
+                return $this->responder->notFound();
             },
             StoreDescriptionResult::DESCRIPTION_ALREADY_EXISTS => function () {
                 return $this->responder->conflict('Description already exists');

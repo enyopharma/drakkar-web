@@ -34,17 +34,17 @@ final class UpdateHandler implements RequestHandlerInterface
 
         $state = (string) ($params['state'] ?? '');
         $annotation = (string) ($params['annotation'] ?? '');
-        $url = (string) ($params['_source'] ?? '');
+        $source = (string) ($params['_source'] ?? '');
 
         return $this->action->update($run_id, $pmid, $state, $annotation)->match([
-            UpdatePublicationStateResult::SUCCESS => function () use ($url) {
-                return $this->responder->location($url);
+            UpdatePublicationStateResult::SUCCESS => function () use ($source) {
+                return $this->responder->temporary($source);
             },
-            UpdatePublicationStateResult::NOT_FOUND => function () use ($request) {
-                return $this->responder->notFound($request);
+            UpdatePublicationStateResult::NOT_FOUND => function () {
+                return $this->responder->notFound();
             },
-            UpdatePublicationStateResult::NOT_VALID => function () use ($request) {
-                return $this->responder->notFound($request);
+            UpdatePublicationStateResult::NOT_VALID => function () {
+                return $this->responder->notFound();
             },
         ]);
     }
