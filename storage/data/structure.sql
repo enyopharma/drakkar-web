@@ -307,7 +307,7 @@ CREATE TABLE public.runs (
     name text NOT NULL,
     populated boolean DEFAULT false NOT NULL,
     created_at timestamp(0) without time zone DEFAULT now() NOT NULL,
-    deleted_at timestamp(0) without time zone,
+    info text DEFAULT ''::text NOT NULL,
     CONSTRAINT runs_type_check CHECK (((type)::text = ANY (ARRAY[('hh'::character varying)::text, ('vh'::character varying)::text])))
 );
 
