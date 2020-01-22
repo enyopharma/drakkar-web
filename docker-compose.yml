@@ -36,7 +36,6 @@ services:
             - .:/opt:rw
         networks:
             - default
-            - sso
     worker:
         image: enyopharma/alignment:7.2
         user: ${UID}:${GID}
@@ -49,6 +48,4 @@ services:
         image: redis
 networks:
     proxy:
-        external: true
-    sso:
         external: true
