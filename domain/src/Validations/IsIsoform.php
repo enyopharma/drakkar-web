@@ -77,7 +77,7 @@ final class IsIsoform
         }
 
         $subject = $data['is_canonical']
-            ? substr($data['sequence'], $this->start, (int) ($this->stop - $this->start + 1))
+            ? substr($data['sequence'], $this->start - 1, (int) ($this->stop - $this->start + 1))
             : $data['sequence'];
 
         $isOccurrence = new IsOccurrence($subject, $this->query);
