@@ -27,7 +27,7 @@ final class DatasetViewSql implements DatasetViewInterface
         AND p2.id = i2.protein_id
         AND a.state = 'curated'
         AND d.deleted_at IS NULL
-        AND d.created_at DESC, d.id DESC
+        ORDER BY d.created_at DESC, d.id DESC
 SQL;
 
     public function __construct(\PDO $pdo)

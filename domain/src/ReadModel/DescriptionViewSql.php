@@ -23,29 +23,26 @@ final class DescriptionViewSql implements DescriptionViewInterface
 SQL;
 
     const SELECT_DESCRIPTION_SQL = <<<SQL
-        SELECT
-            d.id, d.stable_id, d.created_at, d.deleted_at,
+        SELECT d.id, d.stable_id, d.created_at, d.deleted_at,
             m.psimi_id,
             i1.name AS name1, i1.start AS start1, i1.stop AS stop1, i1.mapping AS mapping1,
             i2.name AS name2, i2.start AS start2, i2.stop AS stop2, i2.mapping AS mapping2,
             p1.accession AS accession1,
             p2.accession AS accession2
-        FROM
-            associations AS a,
+        FROM associations AS a,
             descriptions AS d,
             methods AS m,
             interactors AS i1, interactors AS i2,
             proteins AS p1, proteins AS p2
-        WHERE
-            a.id = d.association_id AND
-            m.id = d.method_id AND
-            i1.id = d.interactor1_id AND
-            i2.id = d.interactor2_id AND
-            p1.id = i1.protein_id AND
-            p2.id = i2.protein_id AND
-            a.run_id = ? AND
-            a.pmid = ? AND
-            d.id = ?
+        WHERE a.id = d.association_id
+        AND m.id = d.method_id
+        AND i1.id = d.interactor1_id
+        AND i2.id = d.interactor2_id
+        AND p1.id = i1.protein_id
+        AND p2.id = i2.protein_id
+        AND a.run_id = ?
+        AND a.pmid = ?
+        AND d.id = ?
 SQL;
 
     const SELECT_DESCRIPTIONS_SQL = <<<SQL

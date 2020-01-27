@@ -9,10 +9,8 @@ final class ProteinViewSql implements ProteinViewInterface
     private $pdo;
 
     const SELECT_PROTEIN_SQL = <<<SQL
-        SELECT
-            p.id, p.type, p.accession, tn.name AS taxon, p.name, p.description, s.sequence
-        FROM
-            proteins AS p, sequences AS s, taxon AS t, taxon_name AS tn
+        SELECT p.id, p.type, p.accession, tn.name AS taxon, p.name, p.description, s.sequence
+        FROM proteins AS p, sequences AS s, taxon AS t, taxon_name AS tn
         WHERE
             p.id = s.protein_id AND
             s.is_canonical IS TRUE AND
@@ -23,16 +21,13 @@ final class ProteinViewSql implements ProteinViewInterface
 SQL;
 
     const SELECT_PROTEINS_SQL = <<<SQL
-        SELECT
-            p.id, p.type, p.accession, tn.name AS taxon, p.name, p.description
-        FROM
-            proteins AS p, taxon AS t, taxon_name AS tn
-        WHERE
-            %s AND
-            p.type = ? AND
-            p.taxon_id = t.ncbi_taxon_id AND
-            t.taxon_id = tn.taxon_id AND
-            tn.name_class = 'scientific name'
+        SELECT p.id, p.type, p.accession, tn.name AS taxon, p.name, p.description
+        FROM proteins AS p, taxon AS t, taxon_name AS tn
+        WHERE %s
+        AND p.type = ?
+        AND p.taxon_id = t.ncbi_taxon_id
+        AND t.taxon_id = tn.taxon_id
+        AND tn.name_class = 'scientific name'
         LIMIT ?
 SQL;
 
