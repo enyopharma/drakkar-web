@@ -90,7 +90,7 @@
                 </span>
             </td>
             <td class="text-center">
-                <a href="<?= $this->url('runs.publications.index', ['run_id' => $run['id']]) ?>">
+                <a href="<?= $this->url('runs.publications.index', $run['url']) ?>">
                     Publications
                 </a>
             </td>

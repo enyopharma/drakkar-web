@@ -10,6 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
+use Domain\ReadModel\ProteinInterface;
 use Domain\ReadModel\ProteinViewInterface;
 
 final class FetchProteinMiddleware implements MiddlewareInterface
@@ -34,7 +35,7 @@ final class FetchProteinMiddleware implements MiddlewareInterface
             return $this->factory->createResponse(404);
         }
 
-        $request = $request->withAttribute('protein', $protein);
+        $request = $request->withAttribute(ProteinInterface::class, $protein);
 
         return $handler->handle($request);
     }

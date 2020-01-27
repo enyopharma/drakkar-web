@@ -8,120 +8,151 @@ final class DescriptionViewSql implements DescriptionViewInterface
 {
     private $pdo;
 
-    public function __construct(\PDO $pdo)
+    private $run_id;
+
+    private $pmid;
+
+    private $data;
+
+    const COUNT_DESCRIPTIONS_SQL = <<<SQL
+        SELECT COUNT(*)
+        FROM associations AS a, descriptions AS d
+        WHERE a.id = d.association_id
+        AND a.run_id = ?
+        AND a.pmid = ?
+SQL;
+
+    const SELECT_DESCRIPTION_SQL = <<<SQL
+        SELECT
+            d.id, d.stable_id, d.created_at, d.deleted_at,
+            m.psimi_id,
+            i1.name AS name1, i1.start AS start1, i1.stop AS stop1, i1.mapping AS mapping1,
+            i2.name AS name2, i2.start AS start2, i2.stop AS stop2, i2.mapping AS mapping2,
+            p1.accession AS accession1,
+            p2.accession AS accession2
+        FROM
+            associations AS a,
+            descriptions AS d,
+            methods AS m,
+            interactors AS i1, interactors AS i2,
+            proteins AS p1, proteins AS p2
+        WHERE
+            a.id = d.association_id AND
+            m.id = d.method_id AND
+            i1.id = d.interactor1_id AND
+            i2.id = d.interactor2_id AND
+            p1.id = i1.protein_id AND
+            p2.id = i2.protein_id AND
+            a.run_id = ? AND
+            a.pmid = ? AND
+            d.id = ?
+SQL;
+
+    const SELECT_DESCRIPTIONS_SQL = <<<SQL
+        SELECT
+            d.id, d.stable_id, d.created_at, d.deleted_at,
+            m.psimi_id,
+            i1.name AS name1, i1.start AS start1, i1.stop AS stop1, i1.mapping AS mapping1,
+            i2.name AS name2, i2.start AS start2, i2.stop AS stop2, i2.mapping AS mapping2,
+            p1.accession AS accession1,
+            p2.accession AS accession2
+        FROM
+            associations AS a,
+            descriptions AS d,
+            methods AS m,
+            interactors AS i1, interactors AS i2,
+            proteins AS p1, proteins AS p2
+        WHERE
+            a.id = d.association_id AND
+            m.id = d.method_id AND
+            i1.id = d.interactor1_id AND
+            i2.id = d.interactor2_id AND
+            p1.id = i1.protein_id AND
+            p2.id = i2.protein_id AND
+            a.run_id = ? AND
+            a.pmid = ?
+        ORDER BY
+            d.created_at DESC, d.id DESC
+        LIMIT ? OFFSET ?
+SQL;
+
+    public function __construct(\PDO $pdo, int $run_id, int $pmid, array $data = [])
     {
         $this->pdo = $pdo;
+        $this->run_id = $run_id;
+        $this->pmid = $pmid;
+        $this->data = $data;
     }
 
-    private function selectDescriptionsQuery(): Query
+    public function count(): int
     {
-        return Query::instance($this->pdo)
-            ->select('a.run_id, a.pmid')
-            ->select('d.id, d.stable_id, d.created_at, d.deleted_at')
-            ->select('m.psimi_id')
-            ->select('i1.name AS name1, i1.start AS start1, i1.stop AS stop1, i1.mapping AS mapping1')
-            ->select('i2.name AS name2, i2.start AS start2, i2.stop AS stop2, i2.mapping AS mapping2')
-            ->select('p1.type AS type1, p1.accession AS accession1')
-            ->select('p2.type AS type2, p2.accession AS accession2')
-            ->from('associations AS a')
-            ->from('descriptions AS d')
-            ->from('methods AS m')
-            ->from('interactors AS i1, interactors AS i2')
-            ->from('proteins AS p1, proteins AS p2')
-            ->where('a.id = d.association_id')
-            ->where('m.id = d.method_id')
-            ->where('i1.id = d.interactor1_id')
-            ->where('i2.id = d.interactor2_id')
-            ->where('p1.id = i1.protein_id')
-            ->where('p2.id = i2.protein_id')
-            ->where('a.run_id = ?')
-            ->where('a.pmid = ?');
+        $count_descriptions_sth = $this->pdo->prepare(self::COUNT_DESCRIPTIONS_SQL);
+
+        $count_descriptions_sth->execute([$this->run_id, $this->pmid]);
+
+        return $count_descriptions_sth->fetch(\PDO::FETCH_COLUMN) ?? 0;
     }
 
-    public function count(int $run_id, int $pmid): int
+    public function id(int $id): Statement
     {
-        $count_descriptions_sth = Query::instance($this->pdo)
-            ->select('COUNT(*)')
-            ->from('associations AS a, descriptions AS d')
-            ->where('a.id = d.association_id')
-            ->where('a.run_id = ?')
-            ->where('a.pmid = ?')
-            ->prepare();
+        $select_description_sth = $this->pdo->prepare(self::SELECT_DESCRIPTION_SQL);
 
-        $count_descriptions_sth->execute([$run_id, $pmid]);
+        $select_description_sth->execute([$this->run_id, $this->pmid, $id]);
 
-        return ($nb = $count_descriptions_sth->fetchColumn()) ? (int) $nb : 0;
+        return Statement::from($this->generator($select_description_sth));
     }
 
-    public function id(int $run_id, int $pmid, int $id): Statement
+    public function all(int $limit, int $offset): Statement
     {
-        $select_description_sth = $this->selectDescriptionsQuery()
-            ->where('d.id = ?')
-            ->prepare();
+        $select_descriptions_sth = $this->pdo->prepare(self::SELECT_DESCRIPTIONS_SQL);
 
-        $select_description_sth->execute([$run_id, $pmid, $id]);
+        $select_descriptions_sth->execute([$this->run_id, $this->pmid, $limit, $offset]);
 
-        return new Statement(
-            $this->generator($select_description_sth)
-        );
-    }
-
-    public function all(int $run_id, int $pmid, int $limit, int $offset): Statement
-    {
-        $select_descriptions_sth = $this->selectDescriptionsQuery()
-            ->orderby('d.created_at DESC, d.id DESC')
-            ->sliced()
-            ->prepare();
-
-        $select_descriptions_sth->execute([$run_id, $pmid, $limit, $offset]);
-
-        return new Statement(
-            $this->generator($select_descriptions_sth)
-        );
+        return Statement::from($this->generator($select_descriptions_sth));
     }
 
     private function generator(\PDOStatement $sth): \Generator
     {
-        while ($description = $sth->fetch()) {
-            yield $this->formatted($description);
+        while ($row = $sth->fetch()) {
+            $description = [
+                'stable_id' => $row['stable_id'],
+                'method' => [
+                    'psimi_id' => $row['psimi_id'],
+                ],
+                'interactor1' => [
+                    'protein' => [
+                        'accession' => $row['accession1'],
+                    ],
+                    'name' => $row['name1'],
+                    'start' => $row['start1'],
+                    'stop' => $row['stop1'],
+                    'mapping' => is_null($row['mapping1']) ? [] : json_decode($row['mapping1'], true),
+                ],
+                'interactor2' => [
+                    'protein' => [
+                        'accession' => $row['accession2'],
+                    ],
+                    'name' => $row['name2'],
+                    'start' => $row['start2'],
+                    'stop' => $row['stop2'],
+                    'mapping' => is_null($row['mapping2']) ? [] : json_decode($row['mapping2'], true),
+                ],
+                'created_at' => $this->date($row['created_at']),
+                'deleted_at' => $this->date($row['deleted_at']),
+                'deleted' => ! is_null($row['deleted_at']),
+            ];
+
+            yield new DescriptionSql(
+                $this->pdo,
+                $this->run_id,
+                $this->pmid,
+                $row['id'],
+                $description + $this->data
+            );
         }
     }
 
-    private function formatted(array $description): array
-    {
-        return [
-            'id' => $description['id'],
-            'pmid' => $description['pmid'],
-            'run_id' => $description['run_id'],
-            'stable_id' => $description['stable_id'],
-            'method' => [
-                'psimi_id' => $description['psimi_id'],
-            ],
-            'interactor1' => [
-                'protein' => [
-                    'accession' => $description['accession1'],
-                ],
-                'name' => $description['name1'],
-                'start' => $description['start1'],
-                'stop' => $description['stop1'],
-                'mapping' => json_decode($description['mapping1'], true),
-            ],
-            'interactor2' => [
-                'protein' => [
-                    'accession' => $description['accession2'],
-                ],
-                'name' => $description['name2'],
-                'start' => $description['start2'],
-                'stop' => $description['stop2'],
-                'mapping' => json_decode($description['mapping2'], true),
-            ],
-            'created_at' => $this->date($description['created_at']),
-            'deleted_at' => $this->date($description['deleted_at']),
-            'deleted' => ! is_null($description['deleted_at']),
-        ];
-    }
-
-    private function date(?string $date): string
+    private function date(string $date = null): string
     {
         if (is_null($date)) return '-';
 

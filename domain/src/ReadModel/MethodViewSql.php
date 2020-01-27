@@ -8,29 +8,31 @@ final class MethodViewSql implements MethodViewInterface
 {
     private $pdo;
 
+    const SELECT_METHOD_SQL = <<<SQL
+        SELECT id, psimi_id, name
+        FROM methods
+        WHERE psimi_id = ?
+SQL;
+
+    const SELECT_METHODS_SQL = <<<SQL
+        SELECT id, psimi_id, name
+        FROM methods
+        WHERE %s
+        LIMIT ?
+SQL;
+
     public function __construct(\PDO $pdo)
     {
         $this->pdo = $pdo;
     }
 
-    private function selectMethodsQuery(): Query
-    {
-        return Query::instance($this->pdo)
-            ->select('psimi_id, name')
-            ->from('methods');
-    }
-
     public function psimiId(string $psimi_id): Statement
     {
-        $select_method_sth = $this->selectMethodsQuery()
-            ->where('psimi_id = ?')
-            ->prepare();
+        $select_method_sth = $this->pdo->prepare(self::SELECT_METHOD_SQL);
 
         $select_method_sth->execute([$psimi_id]);
 
-        return new Statement(
-            $this->generator($select_method_sth)
-        );
+        return Statement::from($this->generator($select_method_sth));
     }
 
     public function search(string $query, int $limit): Statement
@@ -39,20 +41,28 @@ final class MethodViewSql implements MethodViewInterface
             return '%' . trim($q) . '%';
         }, array_filter(explode('+', $query)));
 
-        $select_methods_sth = $this->selectMethodsQuery()
-            ->where(...array_pad([], count($qs), 'search ILIKE ?'))
-            ->sliced()
-            ->prepare();
+        if (count($qs) == 0) {
+            return Statement::from([]);
+        }
 
-        $select_methods_sth->execute(array_merge($qs, [$limit, 0]));
+        $where = implode(' AND ', array_pad([], count($qs), 'search ILIKE ?'));
 
-        return new Statement(
-            $this->generator($select_methods_sth)
-        );
+        $select_methods_sth = $this->pdo->prepare(sprintf(self::SELECT_METHODS_SQL, $where));
+
+        $select_methods_sth->execute([...$qs, $limit]);
+
+        return Statement::from($this->generator($select_methods_sth));
     }
 
     private function generator(\PDOStatement $sth): \Generator
     {
-        yield from (array) $sth->fetchAll();
+        while ($row = $sth->fetch()) {
+            yield new MethodSql(
+                $this->pdo,
+                $row['id'],
+                $row['psimi_id'],
+                $row
+            );
+        }
     }
 }

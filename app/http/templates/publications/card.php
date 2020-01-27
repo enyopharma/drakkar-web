@@ -1,10 +1,10 @@
 <div id="publication-<?= $publication['pmid'] ?>" class="card">
     <h3 class="card-header">
         Ref:
-        <a href="<?= $this->url('runs.publications.index', $publication) ?>">
-            <?= $publication['type'] ?> - <?= $publication['run']['name'] ?></a>
+        <a href="<?= $this->url('runs.publications.index', $publication['run']['url']) ?>">
+            <?= $publication['run']['type'] ?> - <?= $publication['run']['name'] ?></a>
         /
-        <a href="<?= $this->url('runs.publications.descriptions.index', $publication) ?>"><?= $publication['pmid'] ?></a>
+        <a href="<?= $this->url('runs.publications.descriptions.index', $publication['url']) ?>"><?= $publication['pmid'] ?></a>
         <span class="float-right badge <?= $this->badgeclass($publication['state']) ?>">
             <?= $publication['state'] ?>
         </span>
@@ -15,7 +15,7 @@
             <strong>[<?= $publication['journal'] ?>]</strong>
             <?php endif; ?>
             <?php if ($publication['title'] != ''): ?>
-            <a href="<?= $this->url('runs.publications.descriptions.index', $publication) ?>">
+            <a href="<?= $this->url('runs.publications.descriptions.index', $publication['url']) ?>">
                 <?= $this->highlighted($publication['title'], $publication['keywords']) ?></a>
             <?php endif; ?>
         </h4>
@@ -51,7 +51,7 @@
     <div class="card-footer">
         <form
             method="POST"
-            action="<?= $this->url('runs.publications.update', $publication) ?>"
+            action="<?= $this->url('runs.publications.update', $publication['url']) ?>"
         >
             <div class="row">
                 <div class="col">

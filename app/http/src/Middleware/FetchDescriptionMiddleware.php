@@ -10,33 +10,42 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
-use Domain\ReadModel\DescriptionViewInterface;
+use Domain\ReadModel\RunInterface;
+use Domain\ReadModel\PublicationInterface;
+use Domain\ReadModel\DescriptionInterface;
 
 final class FetchDescriptionMiddleware implements MiddlewareInterface
 {
     private $factory;
 
-    private $descriptions;
-
-    public function __construct(ResponseFactoryInterface $factory, DescriptionViewInterface $descriptions)
+    public function __construct(ResponseFactoryInterface $factory)
     {
         $this->factory = $factory;
-        $this->descriptions = $descriptions;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $run_id = (int) $request->getAttribute('run_id');
-        $pmid = (int) $request->getAttribute('pmid');
+        $run = $request->getAttribute(RunInterface::class);
+
+        if (! $run instanceof RunInterface) {
+            throw new \LogicException;
+        }
+
+        $publication = $request->getAttribute(PublicationInterface::class);
+
+        if (! $publication instanceof PublicationInterface) {
+            throw new \LogicException;
+        }
+
         $id = (int) $request->getAttribute('id');
 
-        $select_description_sth = $this->descriptions->id($run_id, $pmid, $id);
+        $select_description_sth = $publication->descriptions()->id($id);
 
         if (! $description = $select_description_sth->fetch()) {
             return $this->factory->createResponse(404);
         }
 
-        $request = $request->withAttribute('description', $description);
+        $request = $request->withAttribute(DescriptionInterface::class, $description);
 
         return $handler->handle($request);
     }

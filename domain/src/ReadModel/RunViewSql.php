@@ -8,72 +8,53 @@ final class RunViewSql implements RunViewInterface
 {
     private $pdo;
 
+    const SELECT_RUN_SQL = <<<SQL
+        SELECT id, type, name, created_at
+        FROM runs
+        WHERE populated IS TRUE
+        AND id = ?
+SQL;
+
+    const SELECT_RUNS_SQL = <<<SQL
+        SELECT id, type, name, created_at
+        FROM runs
+        WHERE populated IS TRUE
+SQL;
+
+    const COUNT_PUBLICATIONS_SQL = <<<SQL
+        SELECT run_id, state, COUNT(*) AS nb
+        FROM associations
+        GROUP BY run_id, state
+SQL;
+
     public function __construct(\PDO $pdo)
     {
         $this->pdo = $pdo;
     }
 
-    private function selectRunsQuery(): Query
-    {
-        return Query::instance($this->pdo)
-            ->select('id, type, name, created_at')
-            ->from('runs')
-            ->where('populated IS TRUE');
-    }
-
     public function id(int $id): Statement
     {
-        $select_run_sth = $this->selectRunsQuery()
-            ->where('id = ?')
-            ->prepare();
+        $select_run_sth = $this->pdo->prepare(self::SELECT_RUN_SQL);
 
         $select_run_sth->execute([$id]);
 
-        return new Statement(
-            $this->first($select_run_sth)
-        );
+        return Statement::from($this->generator($select_run_sth));
     }
 
     public function all(): Statement
     {
-        $select_runs_sth = $this->selectRunsQuery()->prepare();
+        $nbs = $this->eagerLoadedNbPublications();
+
+        $select_runs_sth = $this->pdo->prepare(self::SELECT_RUNS_SQL);
 
         $select_runs_sth->execute();
 
-        return new Statement(
-            $this->generator($select_runs_sth)
-        );
+        return Statement::from($this->generator($select_runs_sth, $nbs));
     }
 
-    private function first(\PDOStatement $sth): \Generator
+    private function eagerLoadedNbPublications(): array
     {
-        if ($run = $sth->fetch()) {
-            $count_publications_sth = Query::instance($this->pdo)
-                ->select('run_id, state, COUNT(*) AS nb')
-                ->from('associations')
-                ->groupby('run_id, state')
-                ->where('run_id = ?')
-                ->prepare();
-
-            $nbs = [];
-
-            $count_publications_sth->execute([$run['id']]);
-
-            while ($row = $count_publications_sth->fetch()) {
-                $nbs[$row['run_id']][$row['state']] = $row['nb'];
-            }
-
-            yield $this->formatted($run, $nbs);
-        }
-    }
-
-    private function generator(\PDOStatement $sth): \Generator
-    {
-        $count_publications_sth = Query::instance($this->pdo)
-            ->select('run_id, state, COUNT(*) AS nb')
-            ->from('associations')
-            ->groupby('run_id, state')
-            ->prepare();
+        $count_publications_sth = $this->pdo->prepare(self::COUNT_PUBLICATIONS_SQL);
 
         $count_publications_sth->execute();
 
@@ -83,30 +64,26 @@ final class RunViewSql implements RunViewInterface
             $nbs[$row['run_id']][$row['state']] = $row['nb'];
         }
 
-        if ($runs = $sth->fetchAll()) {
-            usort($runs, function (array $a, array $b) {
-                return strnatcmp($b['name'], $a['name']);
-            });
-
-            foreach ($runs as $run) {
-                yield $this->formatted($run, $nbs);
-            }
-        }
+        return $nbs;
     }
 
-    private function formatted(array $run, array $nbs): array
+    private function generator(\PDOStatement $sth, array $nbs = []): \Generator
     {
-        return [
-            'id' => $run['id'],
-            'type' => $run['type'],
-            'name' => $run['name'],
-            'created_at' => $run['created_at'],
-            'nbs' => [
-                \Domain\Publication::PENDING => $nbs[$run['id']][\Domain\Publication::PENDING] ?? 0,
-                \Domain\Publication::SELECTED => $nbs[$run['id']][\Domain\Publication::SELECTED] ?? 0,
-                \Domain\Publication::DISCARDED => $nbs[$run['id']][\Domain\Publication::DISCARDED] ?? 0,
-                \Domain\Publication::CURATED => $nbs[$run['id']][\Domain\Publication::CURATED] ?? 0,
-            ],
-        ];
+        while ($row = $sth->fetch()) {
+            $nbs = [
+                \Domain\Publication::PENDING => $nbs[$row['id']][\Domain\Publication::PENDING] ?? 0,
+                \Domain\Publication::SELECTED => $nbs[$row['id']][\Domain\Publication::SELECTED] ?? 0,
+                \Domain\Publication::DISCARDED => $nbs[$row['id']][\Domain\Publication::DISCARDED] ?? 0,
+                \Domain\Publication::CURATED => $nbs[$row['id']][\Domain\Publication::CURATED] ?? 0,
+            ];
+
+            yield new RunSql(
+                $this->pdo,
+                $row['id'],
+                $row['type'],
+                $row['name'],
+                $row + ['nbs' => $nbs]
+            );
+        }
     }
 }

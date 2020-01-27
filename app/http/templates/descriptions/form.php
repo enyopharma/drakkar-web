@@ -20,10 +20,10 @@
         <a href="<?= $this->url('runs.index') ?>">
             Drakkar</a>
         &gt;
-        <a href="<?= $this->url('runs.publications.index', $publication) ?>">
+        <a href="<?= $this->url('runs.publications.index', $run['url']) ?>">
             <?= $run['type'] ?> - <?= $run['name'] ?></a>
         &gt;
-        <a href="<?= $this->url('runs.publications.descriptions.index', $publication) ?>">
+        <a href="<?= $this->url('runs.publications.descriptions.index', $publication['url']) ?>">
             <?= $publication['pmid'] ?></a>
         &gt;
         new description

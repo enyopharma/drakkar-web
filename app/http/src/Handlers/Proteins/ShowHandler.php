@@ -8,6 +8,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+use Domain\ReadModel\ProteinInterface;
+
 use App\Http\Responders\JsonResponder;
 
 final class ShowHandler implements RequestHandlerInterface
@@ -21,10 +23,18 @@ final class ShowHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $protein = $request->getAttribute('protein');
+        $protein = $request->getAttribute(ProteinInterface::class);
 
-        if (is_null($protein)) throw new \LogicException;
+        if (! $protein instanceof ProteinInterface) {
+            throw new \LogicException;
+        }
 
-        return $this->responder->success($protein);
+        $protein = $protein
+            ->withIsoforms()
+            ->withDomains()
+            ->withChains()
+            ->withMatures();
+
+        return $this->responder->success($protein->data());
     }
 }

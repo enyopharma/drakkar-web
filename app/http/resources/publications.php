@@ -22,8 +22,7 @@ return function (ContainerInterface $container): array {
         'GET /runs/{run_id:\d+}/publications' => function () use ($container) {
             return Quanta\Http\RequestHandler::queue(
                 new App\Http\Handlers\Publications\IndexHandler(
-                    $container->get(App\Http\Responders\HtmlResponder::class),
-                    $container->get(Domain\ReadModel\PublicationViewInterface::class)
+                    $container->get(App\Http\Responders\HtmlResponder::class)
                 ),
                 new App\Http\Middleware\FetchRunMiddleware(
                     $container->get(Psr\Http\Message\ResponseFactoryInterface::class),

@@ -8,227 +8,49 @@ final class PublicationViewSql implements PublicationViewInterface
 {
     private $pdo;
 
+    const SELECT_PROTEINS_SQL = <<<SQL
+        SELECT r.id AS run_id, r.type AS run_type, r.name AS run_name,
+            p.pmid, a.state, a.annotation, p.metadata
+        FROM runs AS r, associations AS a, publications AS p
+        WHERE r.id = a.run_id
+        AND p.pmid = a.pmid
+        AND p.pmid = ?
+SQL;
+
     public function __construct(\PDO $pdo)
     {
         $this->pdo = $pdo;
     }
 
-    private function countPublicationQuery(): Query
-    {
-        return Query::instance($this->pdo)
-            ->select('COUNT(*)')
-            ->from('publications AS p, associations AS a')
-            ->where('p.pmid = a.pmid')
-            ->where('a.run_id = ?')
-            ->where('a.state = ?');
-    }
-
-    private function selectPublicationsQuery(): Query
-    {
-        return Query::instance($this->pdo)
-            ->select('r.type, r.id AS run_id, r.name AS run_name')
-            ->select('p.pmid, a.state, a.annotation, p.metadata')
-            ->from('runs AS r, publications AS p, associations AS a')
-            ->where('r.id = a.run_id')
-            ->where('p.pmid = a.pmid');
-    }
-
-    public function count(int $run_id, string $state): int
-    {
-        $count_publications_sth = $this->countPublicationQuery()->prepare();
-
-        $count_publications_sth->execute([$run_id, $state]);
-
-        return ($nb = $count_publications_sth->fetchColumn()) ? (int) $nb : 0;
-    }
-
-    public function pmid(int $run_id, int $pmid): Statement
-    {
-        $select_publication_sth = $this->selectPublicationsQuery()
-            ->where('r.id = ?')
-            ->where('p.pmid = ?')
-            ->prepare();
-
-        $select_publication_sth->execute([$run_id, $pmid]);
-
-        return new Statement(
-            $this->generator($select_publication_sth)
-        );
-    }
-
-    public function all(int $run_id, string $state, int $limit, int $offset): Statement
-    {
-        $select_publications_sth = $this->selectPublicationsQuery()
-            ->where('r.id = ?')
-            ->where('a.state = ?')
-            ->orderby('a.updated_at ASC, a.id ASC')
-            ->sliced()
-            ->prepare();
-
-        $select_publications_sth->execute([$run_id, $state, $limit, $offset]);
-
-        return new Statement(
-            $this->generator($select_publications_sth)
-        );
-    }
-
     public function search(int $pmid): Statement
     {
-        $search_publication_sth = $this->selectPublicationsQuery()
-            ->where('p.pmid = ?')
-            ->prepare();
+        $select_publications_sth = $this->pdo->prepare(self::SELECT_PROTEINS_SQL);
 
-        $search_publication_sth->execute([$pmid]);
+        $select_publications_sth->execute([$pmid]);
 
-        return new Statement(
-            $this->generator($search_publication_sth)
-        );
+        return Statement::from($this->generator($select_publications_sth));
     }
 
     private function generator(\PDOStatement $sth): \Generator
     {
-        $select_keywords_sth = Query::instance($this->pdo)
-            ->select('*')
-            ->from('keywords')
-            ->prepare();
+        while ($row = $sth->fetch()) {
+            $run = [
+                'id' => $row['run_id'],
+                'type' => $row['run_type'],
+                'name' => $row['run_name'],
+                'url' => [
+                    'run_id' => $row['run_id'],
+                ],
+            ];
 
-        $select_keywords_sth->execute();
-
-        $keywords = (array) $select_keywords_sth->fetchAll();
-
-        while ($publication = $sth->fetch()) {
-            yield $this->formatted($keywords, $publication);
+            yield new PublicationSql(
+                $this->pdo,
+                $row['run_id'],
+                $row['pmid'],
+                $row['state'],
+                $row['metadata'],
+                $row + ['run' => $run]
+            );
         }
-    }
-
-    private function formatted(array $keywords, array $publication): array
-    {
-        $raw = [
-            'run_id' => $publication['run_id'],
-            'pmid' => $publication['pmid'],
-            'type' => $publication['type'],
-            'state' => $publication['state'],
-            'title' => '',
-            'journal' => '',
-            'abstract' => ['Unknown format'],
-            'authors' => [],
-            'annotation' => $publication['annotation'],
-            'keywords' => $keywords,
-            'pending' => $publication['state'] == \Domain\Publication::PENDING,
-            'selected' => $publication['state'] == \Domain\Publication::SELECTED,
-            'discarded' => $publication['state'] == \Domain\Publication::DISCARDED,
-            'curated' => $publication['state'] == \Domain\Publication::CURATED,
-            'run' => [
-                'id' => $publication['run_id'],
-                'name' => $publication['run_name'],
-            ],
-        ];
-
-        try {
-            $metadata = ! is_null($publication['metadata'])
-                ? json_decode($publication['metadata'], true)
-                : [];
-
-            if (key_exists('PubmedArticle', $metadata)) {
-                return array_merge($raw, $this->article($metadata['PubmedArticle']['MedlineCitation']));
-            }
-
-            if (key_exists('PubmedBookArticle', $metadata)) {
-                return array_merge($raw, $this->book($metadata['PubmedBookArticle']['BookDocument']));
-            }
-
-            return $raw;
-        }
-
-        catch (\Throwable $e) {
-            return $raw;
-        }
-    }
-
-    private function article(array $metadata): array
-    {
-        return [
-            'title' => $this->title($metadata['Article']['ArticleTitle'] ?? ''),
-            'journal' => $this->journal($metadata['Article']['Journal']['Title'] ?? ''),
-            'abstract' => $this->abstract($metadata['Article']['Abstract'] ?? $metadata['OtherAbstract'] ?? []),
-            'authors' => $this->authors($metadata['Article']['AuthorList'] ?? []),
-        ];
-    }
-
-    private function book(array $metadata): array
-    {
-        return [
-            'title' => $this->title($metadata['ArticleTitle'] ?? ''),
-            'journal' => $this->journal($metadata['Book']['BookTitle'] ?? ''),
-            'abstract' => $this->abstract($metadata['Abstract']),
-            'authors' => $this->authors($metadata['AuthorList']),
-        ];
-    }
-
-    /**
-     * @param mixed $title
-     */
-    private function title($title): string
-    {
-        return is_string($title) ? $title : '';
-    }
-
-    /**
-     * @param mixed $journal
-     */
-    private function journal($journal): string
-    {
-        return is_string($journal) ? $journal : '';
-    }
-
-    private function abstract(array $abstract): array
-    {
-        $text = $abstract['AbstractText'] ?? null;
-
-        if (is_string($text)) {
-            return [$text];
-        }
-
-        if (is_array($text)) {
-            return array_filter($text, 'is_string');
-        }
-
-        return ['No abstract'];
-    }
-
-    private function authors(array $list): array
-    {
-        $authors = $list['Author'] ?? [];
-
-        if (count($authors) == 0) {
-            return ['No author'];
-        }
-
-        if (key_exists('CollectiveName', $authors)) {
-            return [$authors['CollectiveName']];
-        }
-
-        try {
-            return array_map(function (array $author) {
-                return $this->author($author);
-            }, $authors);
-        }
-
-        catch (\TypeError $e) {
-            return [$this->author($authors)];
-        }
-    }
-
-    private function author(array $author): string
-    {
-        if (key_exists('LastName', $author) && key_exists('Initials', $author)) {
-            return sprintf('%s %s', $author['LastName'], $author['Initials']);
-        }
-
-        if (key_exists('CollectiveName', $author)) {
-            return $author['CollectiveName'];
-        }
-
-        return '';
     }
 }

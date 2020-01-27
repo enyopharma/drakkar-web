@@ -15,16 +15,14 @@ return function (ContainerInterface $container): array {
         'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions' => function () use ($container) {
             return Quanta\Http\RequestHandler::queue(
                 new App\Http\Handlers\Descriptions\IndexHandler(
-                    $container->get(App\Http\Responders\HtmlResponder::class),
-                    $container->get(Domain\ReadModel\DescriptionViewInterface::class)
+                    $container->get(App\Http\Responders\HtmlResponder::class)
                 ),
                 new App\Http\Middleware\FetchRunMiddleware(
                     $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
                     $container->get(Domain\ReadModel\RunViewInterface::class)
                 ),
                 new App\Http\Middleware\FetchPublicationMiddleware(
-                    $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-                    $container->get(Domain\ReadModel\PublicationViewInterface::class)
+                    $container->get(Psr\Http\Message\ResponseFactoryInterface::class)
                 )
             );
         },
@@ -39,8 +37,7 @@ return function (ContainerInterface $container): array {
                     $container->get(Domain\ReadModel\RunViewInterface::class)
                 ),
                 new App\Http\Middleware\FetchPublicationMiddleware(
-                    $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-                    $container->get(Domain\ReadModel\PublicationViewInterface::class)
+                    $container->get(Psr\Http\Message\ResponseFactoryInterface::class)
                 )
             );
         },
@@ -55,12 +52,10 @@ return function (ContainerInterface $container): array {
                     $container->get(Domain\ReadModel\RunViewInterface::class)
                 ),
                 new App\Http\Middleware\FetchPublicationMiddleware(
-                    $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-                    $container->get(Domain\ReadModel\PublicationViewInterface::class)
+                    $container->get(Psr\Http\Message\ResponseFactoryInterface::class)
                 ),
                 new App\Http\Middleware\FetchDescriptionMiddleware(
-                    $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-                    $container->get(Domain\ReadModel\DescriptionViewInterface::class)
+                    $container->get(Psr\Http\Message\ResponseFactoryInterface::class)
                 )
             );
         },

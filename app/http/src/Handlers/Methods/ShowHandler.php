@@ -8,6 +8,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+use Domain\ReadModel\MethodInterface;
+
 use App\Http\Responders\JsonResponder;
 
 final class ShowHandler implements RequestHandlerInterface
@@ -21,10 +23,12 @@ final class ShowHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $method = $request->getAttribute('method');
+        $method = $request->getAttribute(MethodInterface::class);
 
-        if (is_null($method)) throw new \LogicException;
+        if (! $method instanceof MethodInterface) {
+            throw new \LogicException;
+        }
 
-        return $this->responder->success($method);
+        return $this->responder->success($method->data());
     }
 }

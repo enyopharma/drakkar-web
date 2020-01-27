@@ -10,32 +10,35 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
-use Domain\ReadModel\PublicationViewInterface;
+use Domain\ReadModel\RunInterface;
+use Domain\ReadModel\PublicationInterface;
 
 final class FetchPublicationMiddleware implements MiddlewareInterface
 {
     private $factory;
 
-    private $publications;
-
-    public function __construct(ResponseFactoryInterface $factory, PublicationViewInterface $publications)
+    public function __construct(ResponseFactoryInterface $factory)
     {
         $this->factory = $factory;
-        $this->publications = $publications;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $run_id = (int) $request->getAttribute('run_id');
+        $run = $request->getAttribute(RunInterface::class);
+
+        if (! $run instanceof RunInterface) {
+            throw new \LogicException;
+        }
+
         $pmid = (int) $request->getAttribute('pmid');
 
-        $select_publication_sth = $this->publications->pmid($run_id, $pmid);
+        $select_publication_sth = $run->publications()->pmid($pmid);
 
         if (! $publication = $select_publication_sth->fetch()) {
             return $this->factory->createResponse(404);
         }
 
-        $request = $request->withAttribute('publication', $publication);
+        $request = $request->withAttribute(PublicationInterface::class, $publication);
 
         return $handler->handle($request);
     }

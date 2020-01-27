@@ -6,41 +6,83 @@ namespace Domain\ReadModel;
 
 final class Statement implements \IteratorAggregate
 {
+    /**
+     * @var int
+     */
     private $i;
 
-    private $generator;
+    /**
+     * @var \Iterator<\Domain\ReadModel\EntityInterface>
+     */
+    private $iterator;
 
-    public function __construct(\Generator $generator)
+    /**
+     * @param iterable<\Domain\ReadModel\EntityInterface> $iterable
+     * @return \Domain\ReadModel\Statement
+     */
+    public static function from(iterable $iterable): self
     {
-        $this->i = 0;
-        $this->generator = $generator;
+        if (is_array($iterable)) {
+            return new self(new \ArrayIterator($iterable));
+        }
+
+        if ($iterable instanceof \IteratorAggregate) {
+            return new self(new \IteratorIterator($iterable));
+        }
+
+        if ($iterable instanceof \Iterator) {
+            return new self($iterable);
+        }
+
+        throw new \LogicException;
     }
 
     /**
-     * @return array|false
+     * @param \Iterator<\Domain\ReadModel\EntityInterface> $iterator
+     */
+    private function __construct(\Iterator $iterator)
+    {
+        $this->i = 0;
+        $this->iterator = $iterator;
+    }
+
+    /**
+     * @return \Domain\ReadModel\EntityInterface|false
      */
     public function fetch()
     {
         $this->i == 0
-            ? $this->generator->rewind()
-            : $this->generator->next();
+            ? $this->iterator->rewind()
+            : $this->iterator->next();
 
-        if ($this->generator->valid()) {
+        if ($this->iterator->valid()) {
             $this->i++;
 
-            return $this->generator->current();
+            return $this->iterator->current();
         }
 
         return false;
     }
 
+    /**
+     * @return array
+     */
     public function fetchAll(): array
     {
-        return iterator_to_array($this->generator);
+        $results = [];
+
+        while ($result = $this->fetch()) {
+            $results[] = $result->data();
+        };
+
+        return $results;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getIterator()
     {
-        return $this->generator;
+        return $this->iterator;
     }
 }

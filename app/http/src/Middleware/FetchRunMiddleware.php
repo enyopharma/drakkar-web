@@ -10,6 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
+use Domain\ReadModel\RunInterface;
 use Domain\ReadModel\RunViewInterface;
 
 final class FetchRunMiddleware implements MiddlewareInterface
@@ -34,7 +35,7 @@ final class FetchRunMiddleware implements MiddlewareInterface
             return $this->factory->createResponse(404);
         }
 
-        $request = $request->withAttribute('run', $run);
+        $request = $request->withAttribute(RunInterface::class, $run);
 
         return $handler->handle($request);
     }

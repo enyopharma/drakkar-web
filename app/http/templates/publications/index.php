@@ -17,7 +17,7 @@
         <li class="nav-item">
             <a
                 class="nav-link <?= $this->textclass($pending) ?> <?= $state == $pending ? 'active' : '' ?>"
-                href="<?= $this->url('runs.publications.index', ['run_id' => $run['id']], ['state' => $pending], 'publications') ?>"
+                href="<?= $this->url('runs.publications.index', $run['url'], ['state' => $pending], 'publications') ?>"
             >
                 Pending (<?= $run['nbs'][$pending] ?>)
             </a>
@@ -25,7 +25,7 @@
         <li class="nav-item">
             <a
                 class="nav-link <?= $this->textclass($selected) ?> <?= $state == $selected ? 'active' : '' ?>"
-                href="<?= $this->url('runs.publications.index', ['run_id' => $run['id']], ['state' => $selected], 'publications') ?>"
+                href="<?= $this->url('runs.publications.index', $run['url'], ['state' => $selected], 'publications') ?>"
             >
                 Selected (<?= $run['nbs'][$selected] ?>)
             </a>
@@ -33,7 +33,7 @@
         <li class="nav-item">
             <a
                 class="nav-link <?= $this->textclass($discarded) ?> <?= $state == $discarded ? 'active' : '' ?>"
-                href="<?= $this->url('runs.publications.index', ['run_id' => $run['id']], ['state' => $discarded], 'publications') ?>"
+                href="<?= $this->url('runs.publications.index', $run['url'], ['state' => $discarded], 'publications') ?>"
             >
                 Discarded (<?= $run['nbs'][$discarded] ?>)
             </a>
@@ -41,7 +41,7 @@
         <li class="nav-item">
             <a
                 class="nav-link <?= $this->textclass($curated) ?> <?= $state == $curated ? 'active' : '' ?>"
-                href="<?= $this->url('runs.publications.index', ['run_id' => $run['id']], ['state' => $curated], 'publications') ?>"
+                href="<?= $this->url('runs.publications.index', $run['url'], ['state' => $curated], 'publications') ?>"
             >
                 Curated (<?= $run['nbs'][$curated] ?>)
             </a>
@@ -57,9 +57,8 @@
 <?php $this->insert('pagination/nav', [
     'pagination' => $this->pagination($total, $page, $limit),
     'url' => function (int $page) use ($run, $state, $limit) {
-        return $this->url(
-            'runs.publications.index',
-            ['run_id' => $run['id']],
+        return $this->url('runs.publications.index',
+            $run['url'],
             ['state' => $state, 'page' => $page, 'limit' => $limit],
             'publications'
         );
@@ -67,9 +66,8 @@
 ]) ?>
 <?php $this->insert('publications/deck', [
     'publications' => $publications,
-    'source' => $this->url(
-        'runs.publications.index',
-        ['run_id' => $run['id']],
+    'source' => $this->url('runs.publications.index',
+        $run['url'],
         ['state' => $state, 'limit' => $limit],
         'publications'
     ),
@@ -77,9 +75,8 @@
 <?php $this->insert('pagination/nav', [
     'pagination' => $this->pagination($total, $page, $limit),
     'url' => function (int $page) use ($run, $state, $limit) {
-        return $this->url(
-            'runs.publications.index',
-            ['run_id' => $run['id']],
+        return $this->url('runs.publications.index',
+            $run['url'],
             ['state' => $state, 'page' => $page, 'limit' => $limit],
             'publications'
         );

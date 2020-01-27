@@ -8,7 +8,8 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use Domain\ReadModel\DescriptionViewInterface;
+use Domain\ReadModel\RunInterface;
+use Domain\ReadModel\PublicationInterface;
 
 use App\Http\Responders\HtmlResponder;
 
@@ -16,64 +17,68 @@ final class IndexHandler implements RequestHandlerInterface
 {
     private $responder;
 
-    private $descriptions;
-
-    public function __construct(HtmlResponder $responder, DescriptionViewInterface $descriptions)
+    public function __construct(HtmlResponder $responder)
     {
         $this->responder = $responder;
-        $this->descriptions = $descriptions;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        // get input.
-        $run = $request->getAttribute('run');
-        $publication = $request->getAttribute('publication');
+        // get parent run.
+        $run = $request->getAttribute(RunInterface::class);
 
+        if (! $run instanceof RunInterface) {
+            throw new \LogicException;
+        }
+
+        // get parent publication.
+        $publication = $request->getAttribute(PublicationInterface::class);
+
+        if (! $publication instanceof PublicationInterface) {
+            throw new \LogicException;
+        }
+
+        // get input.
         $params = (array) $request->getQueryParams();
 
         $page = (int) ($params['page'] ?? 1);
         $limit = (int) ($params['limit'] ?? 20);
 
         // get the descriptions.
-        if (is_null($run) || is_null($publication)) throw new \LogicException;
+        $descriptions = $publication->descriptions();
 
         $offset = ($page - 1) * $limit;
-        $total = $this->descriptions->count($run['id'], $publication['pmid']);
+        $total = $descriptions->count();
 
         if ($limit < 0) {
-            return $this->outOfRangeResponse($run['id'], $publication['pmid'], 1, 20);
+            return $this->outOfRangeResponse($publication, 1, 20);
         }
 
         if ($page < 1) {
-            return $this->outOfRangeResponse($run['id'], $publication['pmid'], 1, $limit);
+            return $this->outOfRangeResponse($publication, 1, $limit);
         }
 
         if ($offset > 0 && $offset > $total) {
-            return $this->outOfRangeResponse($run['id'], $publication['pmid'], (int) ceil($total/$limit), $limit);
+            return $this->outOfRangeResponse($publication, (int) ceil($total/$limit), $limit);
         }
-
-        $descriptions = $this->descriptions
-            ->all($run['id'], $publication['pmid'], $limit, $offset)
-            ->fetchAll();
 
         // success!
         return $this->responder->success('descriptions/index', [
-            'run' => $run,
-            'publication' => $publication,
-            'descriptions' => $descriptions,
+            'run' => $run->data(),
+            'publication' => $publication->data(),
+            'descriptions' => $descriptions->all($limit, $offset)->fetchAll(),
             'page' => $page,
             'total' => $total,
             'limit' => $limit,
         ]);
     }
 
-    private function outOfRangeResponse(int $run_id, int $pmid, int $page, int $limit): ResponseInterface
+    private function outOfRangeResponse(PublicationInterface $publication, int $page, int $limit): ResponseInterface
     {
-        $params = ['run_id' => $run_id, 'pmid' => $pmid];
+        $data = $publication->data();
 
         $query = ['page' => $page, 'limit' => $limit];
 
-        return $this->responder->temporary('runs.publications.descriptions.index', $params, $query, 'descriptions');
+        return $this->responder->temporary('runs.publications.descriptions.index', $data['url'], $query, 'descriptions');
     }
 }

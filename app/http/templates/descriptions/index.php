@@ -14,7 +14,7 @@
         <a href="<?= $this->url('runs.index') ?>">
             Drakkar</a>
         &gt;
-        <a href="<?= $this->url('runs.publications.index', $publication) ?>">
+        <a href="<?= $this->url('runs.publications.index', $run['url']) ?>">
             <?= $run['type'] ?> - <?= $run['name'] ?></a>
         &gt;
         <?= $publication['pmid'] ?>
@@ -23,7 +23,7 @@
 
 <?= $this->insert('publications/card', [
     'publication' => $publication,
-    'source' => $this->url('runs.publications.descriptions.index', $publication)
+    'source' => $this->url('runs.publications.descriptions.index', $publication['url'])
 ]) ?>
 
 <h2 id="descriptions">
@@ -32,7 +32,7 @@
 
 <?php if ($publication['state'] == $selected): ?>
 <p>
-    <a href="<?= $this->url('runs.publications.descriptions.create', $publication) ?>">
+    <a href="<?= $this->url('runs.publications.descriptions.create', $publication['url']) ?>">
         Add new descriptions.
     </a>
 </p>
@@ -52,7 +52,7 @@
     'url' => function (int $page) use ($publication, $limit) {
         return $this->url(
             'runs.publications.descriptions.index',
-            $publication,
+            $publication['url'],
             ['page' => $page, 'limit' => $limit],
             'descriptions'
         );
@@ -68,7 +68,7 @@
     'url' => function (int $page) use ($publication, $limit) {
         return $this->url(
             'runs.publications.descriptions.index',
-            $publication,
+            $publication['url'],
             ['page' => $page, 'limit' => $limit],
             'descriptions'
         );

@@ -10,6 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
+use Domain\ReadModel\MethodInterface;
 use Domain\ReadModel\MethodViewInterface;
 
 final class FetchMethodMiddleware implements MiddlewareInterface
@@ -34,7 +35,7 @@ final class FetchMethodMiddleware implements MiddlewareInterface
             return $this->factory->createResponse(404);
         }
 
-        $request = $request->withAttribute('method', $method);
+        $request = $request->withAttribute(MethodInterface::class, $method);
 
         return $handler->handle($request);
     }

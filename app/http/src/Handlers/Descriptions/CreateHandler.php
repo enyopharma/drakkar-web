@@ -8,6 +8,9 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+use Domain\ReadModel\RunInterface;
+use Domain\ReadModel\PublicationInterface;
+
 use App\Http\Responders\HtmlResponder;
 
 final class CreateHandler implements RequestHandlerInterface
@@ -21,14 +24,21 @@ final class CreateHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $run = $request->getAttribute('run');
-        $publication = $request->getAttribute('publication');
+        $run = $request->getAttribute(RunInterface::class);
 
-        if (is_null($run) || is_null($publication)) throw new \LogicException;
+        if (! $run instanceof RunInterface) {
+            throw new \LogicException;
+        }
+
+        $publication = $request->getAttribute(PublicationInterface::class);
+
+        if (! $publication instanceof PublicationInterface) {
+            throw new \LogicException;
+        }
 
         return $this->responder->success('descriptions/form', [
-            'run' => $run,
-            'publication' => $publication,
+            'run' => $run->data(),
+            'publication' => $publication->data(),
             'description' => [],
         ]);
     }

@@ -2,13 +2,11 @@
 
 declare(strict_types=1);
 
-use Domain\ReadModel\ViewRepository;
 use Domain\ReadModel\RunViewInterface;
 use Domain\ReadModel\MethodViewInterface;
 use Domain\ReadModel\ProteinViewInterface;
 use Domain\ReadModel\DatasetViewInterface;
 use Domain\ReadModel\PublicationViewInterface;
-use Domain\ReadModel\DescriptionViewInterface;
 
 return [
     RunViewInterface::class => function ($container) {
@@ -29,20 +27,14 @@ return [
         );
     },
 
-    DatasetViewInterface::class => function ($container) {
-        return new Domain\ReadModel\DatasetViewSql(
-            $container->get(PDO::class)
-        );
-    },
-
     PublicationViewInterface::class => function ($container) {
         return new Domain\ReadModel\PublicationViewSql(
             $container->get(PDO::class)
         );
     },
 
-    DescriptionViewInterface::class => function ($container) {
-        return new Domain\ReadModel\DescriptionViewSql(
+    DatasetViewInterface::class => function ($container) {
+        return new Domain\ReadModel\DatasetViewSql(
             $container->get(PDO::class)
         );
     },
