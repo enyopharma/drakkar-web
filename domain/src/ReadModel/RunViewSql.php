@@ -70,19 +70,17 @@ SQL;
     private function generator(\PDOStatement $sth, array $nbs = []): \Generator
     {
         while ($row = $sth->fetch()) {
-            $nbs = [
-                \Domain\Publication::PENDING => $nbs[$row['id']][\Domain\Publication::PENDING] ?? 0,
-                \Domain\Publication::SELECTED => $nbs[$row['id']][\Domain\Publication::SELECTED] ?? 0,
-                \Domain\Publication::DISCARDED => $nbs[$row['id']][\Domain\Publication::DISCARDED] ?? 0,
-                \Domain\Publication::CURATED => $nbs[$row['id']][\Domain\Publication::CURATED] ?? 0,
-            ];
-
             yield new RunSql(
                 $this->pdo,
                 $row['id'],
                 $row['type'],
                 $row['name'],
-                $row + ['nbs' => $nbs]
+                $row + ['nbs' => [
+                    \Domain\Publication::PENDING => $nbs[$row['id']][\Domain\Publication::PENDING] ?? 0,
+                    \Domain\Publication::SELECTED => $nbs[$row['id']][\Domain\Publication::SELECTED] ?? 0,
+                    \Domain\Publication::DISCARDED => $nbs[$row['id']][\Domain\Publication::DISCARDED] ?? 0,
+                    \Domain\Publication::CURATED => $nbs[$row['id']][\Domain\Publication::CURATED] ?? 0,
+                ]]
             );
         }
     }

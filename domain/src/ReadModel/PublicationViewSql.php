@@ -34,22 +34,20 @@ SQL;
     private function generator(\PDOStatement $sth): \Generator
     {
         while ($row = $sth->fetch()) {
-            $run = [
-                'id' => $row['run_id'],
-                'type' => $row['run_type'],
-                'name' => $row['run_name'],
-                'url' => [
-                    'run_id' => $row['run_id'],
-                ],
-            ];
-
             yield new PublicationSql(
                 $this->pdo,
                 $row['run_id'],
                 $row['pmid'],
                 $row['state'],
                 $row['metadata'],
-                $row + ['run' => $run]
+                $row + ['run' => [
+                    'id' => $row['run_id'],
+                    'type' => $row['run_type'],
+                    'name' => $row['run_name'],
+                    'url' => [
+                        'run_id' => $row['run_id'],
+                    ],
+                ]]
             );
         }
     }
