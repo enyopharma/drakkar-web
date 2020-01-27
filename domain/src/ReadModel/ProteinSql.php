@@ -71,6 +71,11 @@ SQL;
         return $data + $this->data;
     }
 
+    public function jsonSerialize(): array
+    {
+        return $this->data();
+    }
+
     public function withIsoforms(): self
     {
         $select_isoforms_sth = $this->pdo->prepare(self::SELECT_ISOFORMS_SQL);

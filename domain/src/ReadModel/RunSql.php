@@ -47,6 +47,11 @@ SQL;
         ];
     }
 
+    public function jsonSerialize(): array
+    {
+        return $this->data();
+    }
+
     public function withNbPublications(): self
     {
         $count_publications_sth = $this->pdo->prepare(self::COUNT_PUBLICATIONS_SQL);
