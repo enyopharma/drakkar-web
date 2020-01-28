@@ -1,3 +1,4 @@
+<?php $metadata = $this->metadata($publication['metadata']); ?>
 <div id="publication-<?= $publication['pmid'] ?>" class="card">
     <h3 class="card-header">
         Ref:
@@ -11,21 +12,21 @@
     </h3>
     <div class="card-body">
         <h4 class="card-title">
-            <?php if ($publication['journal'] != ''): ?>
-            <strong>[<?= $publication['journal'] ?>]</strong>
+            <?php if ($metadata['journal'] != ''): ?>
+            <strong>[<?= $metadata['journal'] ?>]</strong>
             <?php endif; ?>
-            <?php if ($publication['title'] != ''): ?>
+            <?php if ($metadata['title'] != ''): ?>
             <a href="<?= $this->url('runs.publications.descriptions.index', $publication['url']) ?>">
-                <?= $this->highlighted($publication['title'], $publication['keywords']) ?></a>
+                <?= $this->highlight($metadata['title']) ?></a>
             <?php endif; ?>
         </h4>
-        <?php foreach ($publication['abstract'] as $abstract): ?>
+        <?php foreach ($metadata['abstract'] as $abstract): ?>
         <p class="card-text">
-            <?= $this->highlighted($abstract, $publication['keywords']) ?>
+            <?= $this->highlight($abstract) ?>
         </p>
         <?php endforeach; ?>
         <p class="card-text text-muted">
-            &mdash;&nbsp;<?= implode(', ', $publication['authors']) ?>
+            &mdash;&nbsp;<?= implode(', ', $metadata['authors']) ?>
         </p>
         <div class="row">
             <div class="col-2 offset-8">
