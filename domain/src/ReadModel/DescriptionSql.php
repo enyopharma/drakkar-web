@@ -33,9 +33,4 @@ final class DescriptionSql implements DescriptionInterface
             'run_id' => $this->run_id,
         ] + $this->data;
     }
-
-    public function jsonSerialize(): array
-    {
-        return $this->data();
-    }
 }

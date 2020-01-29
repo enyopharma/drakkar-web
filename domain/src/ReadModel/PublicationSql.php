@@ -48,11 +48,6 @@ final class PublicationSql implements PublicationInterface
         ];
     }
 
-    public function jsonSerialize(): array
-    {
-        return $this->data();
-    }
-
     public function descriptions(): DescriptionViewInterface
     {
         return new DescriptionViewSql($this->pdo, $this->run_id, $this->pmid);

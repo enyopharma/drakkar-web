@@ -17,7 +17,7 @@ final class FileResponder
         $this->factory = $factory;
     }
 
-    public function text(StreamInterface $stream, string $filename = ''): ResponseInterface
+    public function text(string $filename, StreamInterface $stream): ResponseInterface
     {
         return $this->factory
             ->createResponse(200)

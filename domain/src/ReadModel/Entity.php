@@ -17,9 +17,4 @@ final class Entity implements EntityInterface
     {
         return $this->data;
     }
-
-    public function jsonSerialize(): array
-    {
-        return $this->data();
-    }
 }

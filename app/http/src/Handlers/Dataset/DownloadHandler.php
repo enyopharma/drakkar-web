@@ -8,9 +8,11 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+use GuzzleHttp\Psr7;
+
+use Domain\ReadModel\Statement;
 use Domain\ReadModel\DatasetViewInterface;
 
-use App\Http\Streams\IteratorStream;
 use App\Http\Responders\FileResponder;
 
 final class DownloadHandler implements RequestHandlerInterface
@@ -31,9 +33,17 @@ final class DownloadHandler implements RequestHandlerInterface
 
         $dataset = $this->dataset->all($type);
 
-        $stream = IteratorStream::json($dataset);
         $filename = sprintf('vinland-%s-%s', $type, date('Y-m-d'));
 
-        return $this->responder->text($stream, $filename);
+        $stream = Psr7\stream_for($this->generator($dataset));
+
+        return $this->responder->text($filename, $stream);
+    }
+
+    private function generator(Statement $sth): \Generator
+    {
+        while ($description = $sth->fetch()) {
+            yield json_encode($description->data()) . "\n";
+        }
     }
 }

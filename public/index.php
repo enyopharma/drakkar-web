@@ -40,10 +40,7 @@ $handler = (require __DIR__ . '/../app/http/handler.php')($container);
  */
 use function Http\Response\send;
 
-$factory = new Nyholm\Psr7\Factory\Psr17Factory;
-$creator = new Nyholm\Psr7Server\ServerRequestCreator($factory, $factory, $factory, $factory);
-
-$request = $creator->fromGlobals();
+$request = GuzzleHttp\Psr7\ServerRequest::fromGlobals();
 
 $response = $handler->handle($request);
 

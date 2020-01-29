@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Domain\ReadModel;
 
+/**
+ * @implements \IteratorAggregate<\Domain\ReadModel\EntityInterface>
+ */
 final class Statement implements \IteratorAggregate
 {
     /**
@@ -65,17 +68,17 @@ final class Statement implements \IteratorAggregate
     }
 
     /**
-     * @return array
+     * @return array[]
      */
     public function fetchAll(): array
     {
-        $results = [];
+        $data = [];
 
-        while ($result = $this->fetch()) {
-            $results[] = $result->data();
-        };
+        while ($entity = $this->fetch()) {
+            $data[] = $entity->data();
+        }
 
-        return $results;
+        return $data;
     }
 
     /**

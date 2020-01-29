@@ -30,9 +30,4 @@ final class MethodSql implements MethodInterface
 
         return $data + $this->data;
     }
-
-    public function jsonSerialize(): array
-    {
-        return $this->data();
-    }
 }
