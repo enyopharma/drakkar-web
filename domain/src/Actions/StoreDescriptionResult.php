@@ -7,10 +7,8 @@ namespace Domain\Actions;
 final class StoreDescriptionResult
 {
     const SUCCESS = 0;
-    const INPUT_NOT_VALID = 1;
-    const ASSOCIATION_NOT_FOUND = 2;
-    const DESCRIPTION_ALREADY_EXISTS = 3;
-    const STABLE_ID_FAILURE = 4;
+    const DESCRIPTION_ALREADY_EXISTS = 1;
+    const STABLE_ID_FAILURE = 2;
 
     private $state;
 
@@ -21,16 +19,6 @@ final class StoreDescriptionResult
     public static function success(array $description): self
     {
         return new self(self::SUCCESS, $description);
-    }
-
-    public static function inputNotValid(string ...$errors): self
-    {
-        return new self(self::INPUT_NOT_VALID, [], ...$errors);
-    }
-
-    public static function associationNotFound(): self
-    {
-        return new self(self::ASSOCIATION_NOT_FOUND);
     }
 
     public static function descriptionAlreadyExists(): self
@@ -62,8 +50,6 @@ final class StoreDescriptionResult
     {
         $all = [
             self::SUCCESS,
-            self::INPUT_NOT_VALID,
-            self::ASSOCIATION_NOT_FOUND,
             self::DESCRIPTION_ALREADY_EXISTS,
             self::STABLE_ID_FAILURE,
         ];

@@ -9,26 +9,33 @@ use Quanta\Validation\Success;
 use Quanta\Validation\InputInterface;
 
 use Domain\Validations\DataSource;
+use Domain\Validations\Association;
 use Domain\Validations\IsDescription;
 
 final class DescriptionInput
 {
+    private $association;
+
     private $data;
 
-    public static function from(\PDO $pdo, string $type, array $data): InputInterface
+    public static function from(\PDO $pdo, Association $association, array $data): InputInterface
     {
-        $source = new DataSource($pdo);
-        $isDescription = new IsDescription($source, $type);
-        $factory = fn (array $data) => new Success(new self($data));
+        $validate = new IsDescription($association, new DataSource($pdo));
 
-        $validate = new Bound($isDescription, $factory);
-
-        return $validate($data);
+        return $validate($data)->bind(function (array $data) use ($association) {
+            return new Success(new self($association, $data));
+        });
     }
 
-    private function __construct(array $data)
+    private function __construct(Association $association, array $data)
     {
+        $this->association = $association;
         $this->data = $data;
+    }
+
+    public function association(): Association
+    {
+        return $this->association;
     }
 
     public function method(): array

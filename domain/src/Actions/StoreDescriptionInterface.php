@@ -10,5 +10,5 @@ use Domain\Input\DescriptionInput;
 
 interface StoreDescriptionInterface
 {
-    public function store(int $run_id, int $pmid, array $input): StoreDescriptionResult;
+    public function store(DescriptionInput $input): StoreDescriptionResult;
 }

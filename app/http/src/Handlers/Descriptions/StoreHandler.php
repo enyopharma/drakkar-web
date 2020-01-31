@@ -11,6 +11,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use Domain\Actions\StoreDescriptionResult;
 use Domain\Actions\StoreDescriptionInterface;
 
+use Domain\Input\DescriptionInput;
+
 use App\Http\Responders\JsonResponder;
 
 final class StoreHandler implements RequestHandlerInterface
@@ -27,20 +29,17 @@ final class StoreHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $run_id = (int) $request->getAttribute('run_id');
-        $pmid = (int) $request->getAttribute('pmid');
+        // get the description input.
+        $input = $request->getAttribute(DescriptionInput::class);
 
-        $input = (array) $request->getParsedBody();
+        if (! $input instanceof DescriptionInput) {
+            throw new \LogicException;
+        }
 
-        return $this->action->store($run_id, $pmid, $input)->match([
+        // store the description.
+        return $this->action->store($input)->match([
             StoreDescriptionResult::SUCCESS => function ($description) {
                 return $this->responder->success($description);
-            },
-            StoreDescriptionResult::INPUT_NOT_VALID => function ($_, ...$errors) {
-                return $this->responder->errors(...$errors);
-            },
-            StoreDescriptionResult::ASSOCIATION_NOT_FOUND => function () {
-                return $this->responder->notFound();
             },
             StoreDescriptionResult::DESCRIPTION_ALREADY_EXISTS => function () {
                 return $this->responder->conflict('Description already exists');

@@ -10,36 +10,24 @@ use Quanta\Validation\Merged;
 use Quanta\Validation\InputInterface;
 use Quanta\Validation\Rules\OfType;
 
-use Domain\Run;
-use Domain\Protein;
-
 final class IsDescription
 {
+    private $association;
+
     private $source;
 
-    private $type;
-
-    public function __construct(DataSource $source, string $type)
+    public function __construct(Association $association, DataSource $source)
     {
-        if (! in_array($type, [Run::HH, Run::VH])) {
-            throw new \InvalidArgumentException(
-                sprintf('type must be either %s or %s, %s given', Run::HH, Run::VH, $type)
-            );
-        }
-
+        $this->association = $association;
         $this->source = $source;
-        $this->type = $type;
     }
 
     public function __invoke(array $data): InputInterface
     {
-        $type1 = Protein::H;
-        $type2 = $this->type == Run::HH ? Protein::H : Protein::V;
-
         $isArr = new Is(new OfType('array'));
         $isMethod = new IsMethod($this->source);
-        $isInteractor1 = new IsInteractor($this->source, $type1);
-        $isInteractor2 = new IsInteractor($this->source, $type2);
+        $isInteractor1 = new IsInteractor($this->source, $this->association->type1());
+        $isInteractor2 = new IsInteractor($this->source, $this->association->type2());
 
         $validate = new Merged(
             Field::required('method', $isArr, $isMethod),

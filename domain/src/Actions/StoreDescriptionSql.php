@@ -4,20 +4,10 @@ declare(strict_types=1);
 
 namespace Domain\Actions;
 
-use Quanta\Validation\ErrorInterface;
-
 use Domain\Input\DescriptionInput;
 
 final class StoreDescriptionSql implements StoreDescriptionInterface
 {
-    const SELECT_ASSOCIATION_SQL = <<<SQL
-        SELECT r.type, a.id
-        FROM runs AS r, associations AS a
-        WHERE r.id = a.run_id
-        AND a.run_id = ?
-        AND a.pmid = ?
-    SQL;
-
     const SELECT_METHOD_SQL = <<<SQL
         SELECT * FROM methods WHERE psimi_id = ?
     SQL;
@@ -58,29 +48,10 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
         $this->pdo = $pdo;
     }
 
-    public function store(int $run_id, int $pmid, array $input): StoreDescriptionResult
-    {
-        $select_association_sth = $this->pdo->prepare(self::SELECT_ASSOCIATION_SQL);
-
-        $select_association_sth->execute([$run_id, $pmid]);
-
-        if (! $association = $select_association_sth->fetch()) {
-            return StoreDescriptionResult::associationNotFound();
-        }
-
-        return DescriptionInput::from($this->pdo, $association['type'], $input)->extract(
-            function ($input) use ($association) {
-                return $this->success($association['id'], $input);
-            },
-            function (...$errors) {
-                return $this->failure(...$errors);
-            },
-        );
-    }
-
-    private function success(int $association_id, DescriptionInput $input): StoreDescriptionResult
+    public function store(DescriptionInput $input): StoreDescriptionResult
     {
         // exctract data from the input.
+        $association = $input->association();
         $method = $input->method();
         $interactor1 = $input->interactor1();
         $interactor2 = $input->interactor2();
@@ -104,7 +75,7 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
 
         // ensure description does not exists (both directions).
         $select_description_sth->execute([
-            $association_id,
+            $association->id(),
             $method['id'],
             $protein1['id'],
             $protein2['id'],
@@ -117,7 +88,7 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
         }
 
         $select_description_sth->execute([
-            $association_id,
+            $association->id(),
             $method['id'],
             $protein2['id'],
             $protein1['id'],
@@ -160,7 +131,7 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
                 $tries++;
 
                 $inserted = $insert_description_sth->execute([
-                    $association_id,
+                    $association->id(),
                     $method['id'],
                     $interactor1['id'],
                     $interactor2['id'],
@@ -183,17 +154,5 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
         $description['id'] = (int) $this->pdo->lastInsertId();
 
         return StoreDescriptionResult::success($description);
-    }
-
-    private function failure(ErrorInterface ...$errors): StoreDescriptionResult
-    {
-        $messages = array_map([$this, 'message'], $errors);
-
-        return StoreDescriptionResult::inputNotValid(...$messages);
-    }
-
-    private function message(ErrorInterface $error): string
-    {
-        return '[descriptions]' . $error->name() . ' => ' . $error->message();
     }
 }

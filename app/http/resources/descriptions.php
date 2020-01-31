@@ -61,9 +61,15 @@ return function (ContainerInterface $container): array {
         },
 
         'POST /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions' => function () use ($container) {
-            return new App\Http\Handlers\Descriptions\StoreHandler(
-                $container->get(App\Http\Responders\JsonResponder::class),
-                $container->get(Domain\Actions\StoreDescriptionInterface::class)
+            return Quanta\Http\RequestHandler::queue(
+                new App\Http\Handlers\Descriptions\StoreHandler(
+                    $container->get(App\Http\Responders\JsonResponder::class),
+                    $container->get(Domain\Actions\StoreDescriptionInterface::class)
+                ),
+                new App\Http\Middleware\ValidateDescriptionMiddleware(
+                    $container->get(App\Http\Responders\JsonResponder::class),
+                    $container->get(PDO::class)
+                )
             );
         },
 
