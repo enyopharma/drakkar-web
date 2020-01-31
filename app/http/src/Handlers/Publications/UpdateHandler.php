@@ -30,7 +30,7 @@ final class UpdateHandler implements RequestHandlerInterface
         $run_id = (int) $request->getAttribute('run_id');
         $pmid = (int) $request->getAttribute('pmid');
 
-        $params = $request->getParsedBody();
+        $params = (array) $request->getParsedBody();
 
         $state = (string) ($params['state'] ?? '');
         $annotation = (string) ($params['annotation'] ?? '');
