@@ -100,6 +100,96 @@ CREATE TABLE public.descriptions (
 
 
 --
+-- Name: interactors; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.interactors (
+    id integer NOT NULL,
+    protein_id integer NOT NULL,
+    name character varying(32) NOT NULL,
+    start integer NOT NULL,
+    stop integer NOT NULL,
+    mapping json NOT NULL
+);
+
+
+--
+-- Name: methods; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.methods (
+    id integer NOT NULL,
+    psimi_id character varying(7) NOT NULL,
+    name character varying(255) NOT NULL,
+    search text
+);
+
+
+--
+-- Name: proteins; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.proteins (
+    id integer NOT NULL,
+    type character(1) NOT NULL,
+    taxon_id integer NOT NULL,
+    accession character varying(10) NOT NULL,
+    name character varying(255) NOT NULL,
+    description text NOT NULL,
+    search text,
+    CONSTRAINT proteins_type_check CHECK (((type)::text = ANY (ARRAY[('h'::character varying)::text, ('v'::character varying)::text])))
+);
+
+
+--
+-- Name: runs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.runs (
+    id integer NOT NULL,
+    type character(2) NOT NULL,
+    name text NOT NULL,
+    populated boolean DEFAULT false NOT NULL,
+    created_at timestamp(0) without time zone DEFAULT now() NOT NULL,
+    info text DEFAULT ''::text NOT NULL,
+    CONSTRAINT runs_type_check CHECK (((type)::text = ANY (ARRAY[('hh'::character varying)::text, ('vh'::character varying)::text])))
+);
+
+
+--
+-- Name: descriptions_details; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.descriptions_details AS
+ SELECT r.type,
+    r.name AS run,
+    a.state,
+    d.stable_id,
+    a.pmid,
+    m.psimi_id,
+    p1.accession AS accession1,
+    i1.name AS name1,
+    i1.start AS start1,
+    i1.stop AS stop1,
+    i1.mapping AS mapping1,
+    p2.accession AS accession2,
+    i2.name AS name2,
+    i2.start AS start2,
+    i2.stop AS stop2,
+    i2.mapping AS mapping2,
+    d.created_at
+   FROM public.runs r,
+    public.associations a,
+    public.descriptions d,
+    public.methods m,
+    public.interactors i1,
+    public.proteins p1,
+    public.interactors i2,
+    public.proteins p2
+  WHERE ((r.id = a.run_id) AND (a.id = d.association_id) AND (m.id = d.method_id) AND (i1.id = d.interactor1_id) AND (i2.id = d.interactor2_id) AND (p1.id = i1.protein_id) AND (p2.id = i2.protein_id) AND (d.deleted_at IS NULL));
+
+
+--
 -- Name: descriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -154,20 +244,6 @@ ALTER SEQUENCE public.features_id_seq OWNED BY public.features.id;
 
 
 --
--- Name: interactors; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.interactors (
-    id integer NOT NULL,
-    protein_id integer NOT NULL,
-    name character varying(32) NOT NULL,
-    start integer NOT NULL,
-    stop integer NOT NULL,
-    mapping json NOT NULL
-);
-
-
---
 -- Name: interactors_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -219,18 +295,6 @@ ALTER SEQUENCE public.keywords_id_seq OWNED BY public.keywords.id;
 
 
 --
--- Name: methods; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.methods (
-    id integer NOT NULL,
-    psimi_id character varying(7) NOT NULL,
-    name character varying(255) NOT NULL,
-    search text
-);
-
-
---
 -- Name: methods_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -248,22 +312,6 @@ CREATE SEQUENCE public.methods_id_seq
 --
 
 ALTER SEQUENCE public.methods_id_seq OWNED BY public.methods.id;
-
-
---
--- Name: proteins; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.proteins (
-    id integer NOT NULL,
-    type character(1) NOT NULL,
-    taxon_id integer NOT NULL,
-    accession character varying(10) NOT NULL,
-    name character varying(255) NOT NULL,
-    description text NOT NULL,
-    search text,
-    CONSTRAINT proteins_type_check CHECK (((type)::text = ANY (ARRAY[('h'::character varying)::text, ('v'::character varying)::text])))
-);
 
 
 --
@@ -294,21 +342,6 @@ CREATE TABLE public.publications (
     pmid bigint NOT NULL,
     populated boolean DEFAULT false,
     metadata jsonb
-);
-
-
---
--- Name: runs; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.runs (
-    id integer NOT NULL,
-    type character(2) NOT NULL,
-    name text NOT NULL,
-    populated boolean DEFAULT false NOT NULL,
-    created_at timestamp(0) without time zone DEFAULT now() NOT NULL,
-    info text DEFAULT ''::text NOT NULL,
-    CONSTRAINT runs_type_check CHECK (((type)::text = ANY (ARRAY[('hh'::character varying)::text, ('vh'::character varying)::text])))
 );
 
 
