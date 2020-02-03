@@ -157,6 +157,33 @@ CREATE TABLE public.runs (
 
 
 --
+-- Name: taxon; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.taxon (
+    taxon_id integer NOT NULL,
+    ncbi_taxon_id integer,
+    parent_taxon_id integer,
+    node_rank character varying(32),
+    genetic_code smallint,
+    mito_genetic_code smallint,
+    left_value integer,
+    right_value integer
+);
+
+
+--
+-- Name: taxon_name; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.taxon_name (
+    taxon_id integer NOT NULL,
+    name character varying(255) NOT NULL,
+    name_class character varying(32) NOT NULL
+);
+
+
+--
 -- Name: descriptions_details; Type: VIEW; Schema: public; Owner: -
 --
 
@@ -171,11 +198,13 @@ CREATE VIEW public.descriptions_details AS
     i1.name AS name1,
     i1.start AS start1,
     i1.stop AS stop1,
-    i1.mapping AS mapping1,
     p2.accession AS accession2,
     i2.name AS name2,
     i2.start AS start2,
     i2.stop AS stop2,
+    t.ncbi_taxon_id,
+    tn.name AS taxon,
+    i1.mapping AS mapping1,
     i2.mapping AS mapping2,
     d.created_at
    FROM public.runs r,
@@ -185,8 +214,10 @@ CREATE VIEW public.descriptions_details AS
     public.interactors i1,
     public.proteins p1,
     public.interactors i2,
-    public.proteins p2
-  WHERE ((r.id = a.run_id) AND (a.id = d.association_id) AND (m.id = d.method_id) AND (i1.id = d.interactor1_id) AND (i2.id = d.interactor2_id) AND (p1.id = i1.protein_id) AND (p2.id = i2.protein_id) AND (d.deleted_at IS NULL));
+    public.proteins p2,
+    public.taxon t,
+    public.taxon_name tn
+  WHERE ((r.id = a.run_id) AND (a.id = d.association_id) AND (m.id = d.method_id) AND (i1.id = d.interactor1_id) AND (i2.id = d.interactor2_id) AND (p1.id = i1.protein_id) AND (p2.id = i2.protein_id) AND (t.ncbi_taxon_id = p2.taxon_id) AND (t.taxon_id = tn.taxon_id) AND ((tn.name_class)::text = 'scientific name'::text) AND (d.deleted_at IS NULL));
 
 
 --
@@ -396,33 +427,6 @@ CREATE SEQUENCE public.sequences_id_seq
 --
 
 ALTER SEQUENCE public.sequences_id_seq OWNED BY public.sequences.id;
-
-
---
--- Name: taxon; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.taxon (
-    taxon_id integer NOT NULL,
-    ncbi_taxon_id integer,
-    parent_taxon_id integer,
-    node_rank character varying(32),
-    genetic_code smallint,
-    mito_genetic_code smallint,
-    left_value integer,
-    right_value integer
-);
-
-
---
--- Name: taxon_name; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.taxon_name (
-    taxon_id integer NOT NULL,
-    name character varying(255) NOT NULL,
-    name_class character varying(32) NOT NULL
-);
 
 
 --
