@@ -13,6 +13,12 @@ services:
             - traefik.frontend.rule=Host:${APP_HOST}
         depends_on:
             - app
+            - socket
+    app:
+        build: .
+        user: ${UID}:${GID}
+        volumes:
+            - .:/opt:rw
     socket:
         image: node:12.2.0
         command: ["node", "/opt/socket/server.js"]
@@ -22,11 +28,6 @@ services:
             - 80
         depends_on:
             - redis
-    app:
-        build: .
-        user: ${UID}:${GID}
-        volumes:
-            - .:/opt:rw
     worker:
         image: enyopharma/alignment:7.2
         user: ${UID}:${GID}
