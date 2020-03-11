@@ -20,7 +20,7 @@ services:
         volumes:
             - .:/opt:rw
     socket:
-        image: node:12.2.0
+        image: node:12
         command: ["node", "/opt/socket/server.js"]
         volumes:
             - .:/opt:ro
