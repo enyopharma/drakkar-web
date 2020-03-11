@@ -18,24 +18,15 @@ services:
         command: ["node", "/opt/socket/server.js"]
         volumes:
             - .:/opt:ro
-        networks:
-            - default
-            - proxy
         expose:
             - 80
         depends_on:
             - redis
-        labels:
-            - traefik.enable=true
-            - traefik.frontend.entryPoints=socket
-            - traefik.frontend.rule=Host:${APP_HOST}
     app:
         build: .
         user: ${UID}:${GID}
         volumes:
             - .:/opt:rw
-        networks:
-            - default
     worker:
         image: enyopharma/alignment:7.2
         user: ${UID}:${GID}

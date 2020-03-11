@@ -67,7 +67,7 @@ export const alignment = async (query: string, sequences: Sequences): Promise<Al
     const id = uuid()
 
     return new Promise((resolve, reject) => {
-        const socket = new WebSocket(`ws://${window.location.host}:3000`, 'app')
+        const socket = new WebSocket(`ws://${window.location.host}/socket`, 'app')
 
         socket.onopen = () => socket.send(JSON.stringify({
             channel: 'echo',
