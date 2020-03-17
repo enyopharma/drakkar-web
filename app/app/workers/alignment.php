@@ -10,7 +10,9 @@ require __DIR__ . '/../../vendor/autoload.php';
 /**
  * Complete the env with local values.
  */
-(new Symfony\Component\Dotenv\Dotenv(false))->load(__DIR__ . '/../../.env');
+if (file_exists(__DIR__ . '/../../.env')) {
+    (new Symfony\Component\Dotenv\Dotenv(false))->load(__DIR__ . '/../../.env');
+}
 
 /**
  * Build the container.

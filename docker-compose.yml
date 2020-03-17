@@ -1,42 +1,38 @@
 version: '3'
 services:
     front:
-        image: nginx
-        volumes:
-            - ./default.conf:/etc/nginx/conf.d/default.conf:ro
-            - .:/opt:ro
-        networks:
-            - default
-            - proxy
-        labels:
-            - traefik.http.routers.drakkar.rule=Host(`${APP_HOST}`)
+        build: .
         depends_on:
             - app
             - socket
     app:
-        build: .
-        user: ${UID}:${GID}
-        volumes:
-            - .:/opt:rw
+        build: ./app
+        environment:
+            - APP_HOST=${APP_HOST}
+            - SSO_HOST=${SSO_HOST}
+            - DB_HOSTNAME=${DB_HOSTNAME}
+            - DB_DATABASE=${DB_DATABASE}
+            - DB_USERNAME=${DB_USERNAME}
+            - DB_PASSWORD=${DB_PASSWORD}
+            - DB_PORT=${DB_PORT}
+            - REDIS_SCHEME=${REDIS_SCHEME}
+            - REDIS_HOST=${REDIS_HOST}
+            - REDIS_PORT=${REDIS_PORT}
     socket:
-        image: node:12
-        command: ["node", "/opt/socket/server.js"]
-        volumes:
-            - .:/opt:ro
-        expose:
-            - 80
+        build: ./socket
         depends_on:
             - redis
-    worker:
-        image: enyopharma/alignment:7.2
-        user: ${UID}:${GID}
-        volumes:
-            - ./process/alignment.conf:/etc/process.conf:ro
-            - .:/opt:rw
+        environment:
+            - REDIS_SCHEME=${REDIS_SCHEME}
+            - REDIS_HOST=${REDIS_HOST}
+            - REDIS_PORT=${REDIS_PORT}
+    alignment:
+        build: workers/alignment
         depends_on:
             - redis
+        environment:
+            - REDIS_SCHEME=${REDIS_SCHEME}
+            - REDIS_HOST=${REDIS_HOST}
+            - REDIS_PORT=${REDIS_PORT}
     redis:
         image: redis
-networks:
-    proxy:
-        external: true

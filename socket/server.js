@@ -1,25 +1,24 @@
+var Redis = require('ioredis');
+var Http = require('http');
+var WebSocket = require('websocket');
 
-// start a web server.
-var http = require('http');
+// connect to redis
+var redis = new Redis({ host: 'redis' });
 
-var server = http.createServer(function (request, response) {
+// create webserver
+var server = Http.createServer(function (request, response) {
     response.writeHead(404);
     response.end();
 });
 
-server.listen(80, function () {});
+// let the server listen on port 80
+server.listen(80, function () { });
 
-// listen to every redis pubsub channels.
-var Redis = require('ioredis');
+// listen to every redis pubsub event
+redis.psubscribe('*', function (err, count) { });
 
-var redis = new Redis({ host: 'redis' });
-
-redis.psubscribe('*', function (err, count) {});
-
-// start a socket server using the web server.
-var WebSocketServer = require('websocket').server;
-
-var ws = new WebSocketServer({
+// setup websocket server.
+var ws = new WebSocket.server({
     httpServer: server,
     autoAcceptConnections: false,
 });

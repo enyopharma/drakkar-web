@@ -1,0 +1,7 @@
+{
+  "license": "MIT",
+  "dependencies": {
+    "ioredis": "^4.16.0",
+    "websocket": "^1.0.31"
+  }
+}
