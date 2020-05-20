@@ -1,0 +1,58 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Psr\Container\ContainerInterface;
+
+use Symfony\Component\Console\Application;
+
+/**
+ * Set up the autoloader.
+ */
+require __DIR__ . '/vendor/autoload.php';
+
+/**
+ * Complete the env with local values.
+ */
+(new Symfony\Component\Dotenv\Dotenv(false))->load(__DIR__ . '/../.env');
+
+/**
+ * Get a PDO client.
+ */
+$pdo = new PDO(
+    vsprintf('pgsql:host=%s;port=%s;dbname=%s', [
+        $_ENV['DB_HOSTNAME'] ?? 'localhost',
+        $_ENV['DB_PORT'] ?? '5432',
+        $_ENV['DB_DATABASE'] ?? 'database',
+    ]),
+    $_ENV['DB_USERNAME'] ?? 'username',
+    $_ENV['DB_PASSWORD'] ?? 'password',
+    [
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+    ]
+);
+
+/**
+ * Build the application and run it.
+ */
+$application = new Application;
+
+$responder = new Cli\Responders\PopulatePublicationResponder;
+
+$application->add(new Cli\Commands\CreateHHRunCommand($pdo));
+
+$application->add(new Cli\Commands\CreateVHRunCommand($pdo));
+
+$application->add(new Cli\Commands\PopulateRunCommand($pdo,
+    new Cli\Actions\PopulatePublicationSql($pdo, new Cli\Efetch),
+    new Cli\Responders\PopulatePublicationResponder,
+));
+
+$application->add(new Cli\Commands\PopulatePublicationCommand(
+    new Cli\Actions\PopulatePublicationSql($pdo, new Cli\Efetch),
+    new Cli\Responders\PopulatePublicationResponder,
+));
+
+$application->run();

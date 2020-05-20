@@ -10,32 +10,20 @@ require __DIR__ . '/../vendor/autoload.php';
 /**
  * Complete the env with local values when exists.
  */
-if (file_exists(__DIR__ . '/../.env')) {
-    (new Symfony\Component\Dotenv\Dotenv(false))->load(__DIR__ . '/../.env');
+if (file_exists($envfile = __DIR__ . '/../.env')) {
+    (new Symfony\Component\Dotenv\Dotenv(false))->load($envfile);
 }
 
 /**
- * Get the env and debug mod from the env var.
+ * Set the app debug state and env.
  */
-$env = $_ENV['APP_ENV'] ?? 'development';
-$debug = filter_var($_ENV['APP_DEBUG'] ?? true, FILTER_VALIDATE_BOOLEAN);
-
-/**
- * Get the container.
- */
-$container = (require __DIR__ . '/../app/http/container.php')($env, $debug);
-
-/**
- * Run the boot scripts.
- */
-foreach ((array) glob(__DIR__ . '/../app/http/boot/*.php') as $boot) {
-    (require $boot)($container);
-}
+$_ENV['APP_ENV'] = $_ENV['APP_ENV'] ?? 'production';
+$_ENV['APP_DEBUG'] = filter_var($_ENV['APP_DEBUG'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
 /**
  * Get the http request handler.
  */
-$handler = (require __DIR__ . '/../app/http/handler.php')($container);
+$app = require __DIR__ . '/../app/app.php';
 
 /**
  * Run the application.
@@ -44,6 +32,6 @@ use function Http\Response\send;
 
 $request = GuzzleHttp\Psr7\ServerRequest::fromGlobals();
 
-$response = $handler->handle($request);
+$response = $app->handle($request);
 
 send($response);

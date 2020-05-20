@@ -1,15 +1,13 @@
 version: '3'
 services:
-    front:
-        build: .
+    frontend:
+        build: ./frontend
         depends_on:
             - app
             - socket
     app:
         build: ./app
         environment:
-            - APP_HOST=${APP_HOST}
-            - SSO_HOST=${SSO_HOST}
             - DB_HOSTNAME=${DB_HOSTNAME}
             - DB_DATABASE=${DB_DATABASE}
             - DB_USERNAME=${DB_USERNAME}
@@ -27,7 +25,7 @@ services:
             - REDIS_HOST=${REDIS_HOST}
             - REDIS_PORT=${REDIS_PORT}
     alignment:
-        build: workers/alignment
+        build: ./workers/alignment
         depends_on:
             - redis
         environment:

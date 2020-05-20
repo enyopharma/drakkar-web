@@ -1,12 +1,7 @@
 parameters:
-    inferPrivatePropertyTypeFromConstructor: true
-    checkGenericClassInNonGenericObjectType: false
     checkMissingIterableValueType: false
-    reportUnmatchedIgnoredErrors: false
     ignoreErrors:
-        - message: '#League\\Plates\\Engine::registerFunction\(\) expects League\\Plates\\callback#'
-          path: %currentWorkingDirectory%/app/http/src/Extensions/Plates
-        - message: '#Undefined variable: \$#'
-          path: %currentWorkingDirectory%/app/http/templates
-        - message: '#Using \$this outside a class\.#'
-          path: %currentWorkingDirectory%/app/http/templates
+        -
+            message: '#League\\Plates\\callback#'
+            path: 'app/Extensions/Plates/*'
+    reportUnmatchedIgnoredErrors: false

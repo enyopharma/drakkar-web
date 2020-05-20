@@ -34,19 +34,14 @@
         "quanta/http-dispatcher": "^0.4.0",
         "quanta/http-routing": "^0.2.0",
         "quanta/validation": "^0.4.0",
-        "symfony/console": "^4.2",
-        "symfony/dotenv": "^4.3",
-        "symfony/process": "^4.3"
+        "symfony/dotenv": "^4.3"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^0.12.25"
     },
     "autoload": {
         "psr-4": {
-            "App\\Cli\\": "app/cli/src",
-            "App\\Http\\": "app/http/src",
-            "Domain\\": "domain/src",
-            "Infrastructure\\": "infrastructure/src"
+            "App\\": "app"
         }
-    },
-    "require-dev": {
-        "phpstan/phpstan": "^0.12.4"
     }
 }

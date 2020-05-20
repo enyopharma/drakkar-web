@@ -1,18 +1,21 @@
 version: '3'
 services:
     front:
-        ports:
-            - 80:80
         volumes:
             - app:/var/www/html:ro
+        networks:
+            - default
+            - proxy
+        labels:
+            - traefik.http.routers.drakkar.rule=Host(`${APP_HOST}`)
     app:
         volumes:
             - app:/var/www/html:rw
         environment:
             - APP_ENV=production
             - APP_DEBUG=false
-    alignment:
-        volumes:
-            - app:/opt:rw
 volumes:
     app:
+networks:
+    proxy:
+        external: true
