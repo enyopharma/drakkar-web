@@ -8,40 +8,44 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\ReadModel\RunInterface;
-
+use App\ReadModel\RunViewInterface;
+use App\ReadModel\AssociationViewInterface;
 use App\Responders\HtmlResponder;
 
 final class IndexHandler implements RequestHandlerInterface
 {
     private HtmlResponder $responder;
 
-    public function __construct(HtmlResponder $responder)
+    private RunViewInterface $runs;
+
+    private AssociationViewInterface $associations;
+
+    public function __construct(HtmlResponder $responder, RunViewInterface $runs, AssociationViewInterface $associations)
     {
         $this->responder = $responder;
+        $this->runs = $runs;
+        $this->associations = $associations;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        // get the parent run.
-        $run = $request->getAttribute(RunInterface::class);
+        // parse request.
+        $run_id = (int) $request->getAttribute('run_id');
 
-        if (! $run instanceof RunInterface) {
-            throw new \LogicException;
-        }
-
-        // get input.
         $params = (array) $request->getQueryParams();
 
         $state = (string) ($params['state'] ?? 'pending');
         $page = (int) ($params['page'] ?? 1);
         $limit = (int) ($params['limit'] ?? 20);
 
-        // get the publications.
-        $publications = $run->publications();
+        // get the run.
+        if (!$run = $this->runs->id($run_id, 'nbs')->fetch()) {
+            return $this->responder->notFound();
+        }
 
+        // get the publications.
+        $total = $run['nbs'][$state];
         $offset = ($page - 1) * $limit;
-        $total = $publications->count($state);
 
         if ($limit < 0) {
             return $this->outOfRangeResponse($run, $state, 1, 20);
@@ -57,8 +61,8 @@ final class IndexHandler implements RequestHandlerInterface
 
         // success!
         return $this->responder->success('publications/index', [
-            'run' => $run->withNbPublications()->data(),
-            'publications' => $publications->all($state, $limit, $offset)->fetchAll(),
+            'run' => $run,
+            'publications' => $this->associations->all($run_id, $state, $limit, $offset)->fetchAll(),
             'state' => $state,
             'page' => $page,
             'limit' => $limit,
@@ -66,12 +70,10 @@ final class IndexHandler implements RequestHandlerInterface
         ]);
     }
 
-    private function outOfRangeResponse(RunInterface $run, string $state, int $page, int $limit): ResponseInterface
+    private function outOfRangeResponse(array $run, string $state, int $page, int $limit): ResponseInterface
     {
-        $data = $run->data();
-
         $query = ['state' => $state, 'page' => $page, 'limit' => $limit];
 
-        return $this->responder->temporary('runs.publications.index', $data['url'], $query, 'publications');
+        return $this->responder->temporary('runs.publications.index', $run, $query, 'publications');
     }
 }

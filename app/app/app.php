@@ -63,6 +63,11 @@ return Quanta\Http\Dispatcher::queue(
     (new Middlewares\MethodOverride)->parsedBodyParameter('_method'),
 
     /**
+     * Parse json payload.
+     */
+    new Middlewares\JsonPayload,
+
+    /**
      * Router.
      */
     new Quanta\Http\RoutingMiddleware($router),

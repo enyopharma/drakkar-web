@@ -5,22 +5,22 @@ declare(strict_types=1);
 namespace App\ReadModel;
 
 /**
- * @implements \IteratorAggregate<\App\ReadModel\EntityInterface>
+ * @implements \IteratorAggregate<array>
  */
 final class Statement implements \IteratorAggregate
 {
     /**
      * @var int
      */
-    private $i;
+    private int $i;
 
     /**
-     * @var \Iterator<\App\ReadModel\EntityInterface>
+     * @var \Iterator<array>
      */
-    private $iterator;
+    private \Iterator $iterator;
 
     /**
-     * @param iterable<\App\ReadModel\EntityInterface> $iterable
+     * @param iterable<array> $iterable
      * @return \App\ReadModel\Statement
      */
     public static function from(iterable $iterable): self
@@ -29,19 +29,15 @@ final class Statement implements \IteratorAggregate
             return new self(new \ArrayIterator($iterable));
         }
 
-        if ($iterable instanceof \IteratorAggregate) {
-            return new self(new \IteratorIterator($iterable));
-        }
-
         if ($iterable instanceof \Iterator) {
             return new self($iterable);
         }
 
-        throw new \LogicException;
+        return new self(new \IteratorIterator($iterable));
     }
 
     /**
-     * @param \Iterator<\App\ReadModel\EntityInterface> $iterator
+     * @param \Iterator<array> $iterator
      */
     private function __construct(\Iterator $iterator)
     {
@@ -50,7 +46,7 @@ final class Statement implements \IteratorAggregate
     }
 
     /**
-     * @return \App\ReadModel\EntityInterface|false
+     * @return array|false
      */
     public function fetch()
     {
@@ -72,13 +68,7 @@ final class Statement implements \IteratorAggregate
      */
     public function fetchAll(): array
     {
-        $data = [];
-
-        while ($entity = $this->fetch()) {
-            $data[] = $entity->data();
-        }
-
-        return $data;
+        return iterator_to_array($this->iterator);
     }
 
     /**

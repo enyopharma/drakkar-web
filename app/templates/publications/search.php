@@ -25,7 +25,7 @@
     <?= count($publications) == 1 ? '1 publication' : count($publications) . ' publications' ?> found for pmid <?= $pmid ?>
 </p>
 <?php foreach ($publications as $publication): ?>
-<?php $this->insert('publications/card', ['publication' => $publication, 'source' => $this->url('publications.index', [], [
+<?php $this->insert('publications/card', ['run' => $publication['run'], 'publication' => $publication, 'source' => $this->url('publications.index', [], [
     'pmid' => $publication['pmid'],
 ])]) ?>
 <?php endforeach; ?>

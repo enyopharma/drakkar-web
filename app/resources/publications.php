@@ -20,14 +20,10 @@ return function (ContainerInterface $container): array {
         },
 
         'GET /runs/{run_id:\d+}/publications' => function () use ($container) {
-            return Quanta\Http\RequestHandler::queue(
-                new App\Handlers\Publications\IndexHandler(
-                    $container->get(App\Responders\HtmlResponder::class)
-                ),
-                new App\Middleware\FetchRunMiddleware(
-                    $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-                    $container->get(App\ReadModel\RunViewInterface::class)
-                )
+            return new App\Handlers\Publications\IndexHandler(
+                $container->get(App\Responders\HtmlResponder::class),
+                $container->get(App\ReadModel\RunViewInterface::class),
+                $container->get(App\ReadModel\AssociationViewInterface::class),
             );
         },
 

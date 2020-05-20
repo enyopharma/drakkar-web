@@ -27,7 +27,7 @@ final class IndexHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         return $this->responder->success('runs/index', [
-            'runs' => $this->runs->all()->fetchAll(),
+            'runs' => $this->runs->all('nbs')->fetchAll(),
         ]);
     }
 }

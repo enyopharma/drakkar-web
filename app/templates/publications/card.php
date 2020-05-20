@@ -2,10 +2,10 @@
 <div id="publication-<?= $publication['pmid'] ?>" class="card">
     <h3 class="card-header">
         Ref:
-        <a href="<?= $this->url('runs.publications.index', $publication['run']['url']) ?>">
-            <?= $publication['run']['type'] ?> - <?= $publication['run']['name'] ?></a>
+        <a href="<?= $this->url('runs.publications.index', $run) ?>">
+            <?= $run['type'] ?> - <?= $run['name'] ?></a>
         /
-        <a href="<?= $this->url('runs.publications.descriptions.index', $publication['url']) ?>"><?= $publication['pmid'] ?></a>
+        <a href="<?= $this->url('runs.publications.descriptions.index', $publication) ?>"><?= $publication['pmid'] ?></a>
         <span class="float-right badge <?= $this->badgeclass($publication['state']) ?>">
             <?= $publication['state'] ?>
         </span>
@@ -16,7 +16,7 @@
             <strong>[<?= $metadata['journal'] ?>]</strong>
             <?php endif; ?>
             <?php if ($metadata['title'] != ''): ?>
-            <a href="<?= $this->url('runs.publications.descriptions.index', $publication['url']) ?>">
+            <a href="<?= $this->url('runs.publications.descriptions.index', $publication) ?>">
                 <?= $this->highlight($metadata['title']) ?></a>
             <?php endif; ?>
         </h4>
@@ -52,7 +52,7 @@
     <div class="card-footer">
         <form
             method="POST"
-            action="<?= $this->url('runs.publications.update', $publication['url']) ?>"
+            action="<?= $this->url('runs.publications.update', $publication) ?>"
         >
             <div class="row">
                 <div class="col">
@@ -70,7 +70,7 @@
                     <button
                         type="submit"
                         name="state"
-                        value="<?= $selected ?>"
+                        value="selected"
                         class="btn btn-sm btn-block btn-primary"
                     >
                         Select
@@ -80,7 +80,7 @@
                     <button
                         type="submit"
                         name="state"
-                        value="<?= $discarded ?>"
+                        value="discarded"
                         class="btn btn-sm btn-block btn-danger"
                     >
                         Discard
@@ -90,7 +90,7 @@
                     <button
                         type="submit"
                         name="state"
-                        value="<?= $curated ?>"
+                        value="curated"
                         class="btn btn-sm btn-block btn-success"
                     >
                         Curated

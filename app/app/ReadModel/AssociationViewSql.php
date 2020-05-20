@@ -8,80 +8,46 @@ final class AssociationViewSql implements AssociationViewInterface
 {
     private \PDO $pdo;
 
-    private int $run_id;
-
-    private array $data;
-
-    const COUNT_PUBLICATIONS_SQL = <<<SQL
-        SELECT COUNT(*)
-        FROM associations
-        WHERE run_id = ?
-        AND state = ?
-SQL;
-
-    const SELECT_PUBLICATION_SQL = <<<SQL
-        SELECT p.pmid, a.state, a.annotation, p.metadata
-        FROM associations AS a, publications AS p
-        WHERE p.pmid = a.pmid
+    const SELECT_ASSOCIATION_SQL = <<<SQL
+        SELECT r.type, a.run_id, p.pmid, a.state, a.annotation, p.metadata
+        FROM runs AS r, associations AS a, publications AS p
+        WHERE r.id = a.run_id
+        AND p.pmid = a.pmid
         AND a.run_id = ?
         AND a.pmid = ?
-SQL;
+    SQL;
 
-    const SELECT_PUBLICATIONS_SQL = <<<SQL
-        SELECT p.pmid, a.state, a.annotation, p.metadata
-        FROM associations AS a, publications AS p
-        WHERE p.pmid = a.pmid
+    const SELECT_ASSOCIATIONS_SQL = <<<SQL
+        SELECT r.type, a.run_id, p.pmid, a.state, a.annotation, p.metadata
+        FROM runs AS r, associations AS a, publications AS p
+        WHERE r.id = a.run_id
+        AND p.pmid = a.pmid
         AND a.run_id = ?
         AND a.state = ?
         ORDER BY a.updated_at ASC, a.id ASC
         LIMIT ? OFFSET ?
-SQL;
+    SQL;
 
-    public function __construct(\PDO $pdo, int $run_id, array $data = [])
+    public function __construct(\PDO $pdo)
     {
         $this->pdo = $pdo;
-        $this->run_id = $run_id;
-        $this->data = $data;
     }
 
-    public function count(string $state): int
+    public function pmid(int $run_id, int $pmid): Statement
     {
-        $count_publications_sth = $this->pdo->prepare(self::COUNT_PUBLICATIONS_SQL);
+        $select_association_sth = $this->pdo->prepare(self::SELECT_ASSOCIATION_SQL);
 
-        $count_publications_sth->execute([$this->run_id, $state]);
+        $select_association_sth->execute([$run_id, $pmid]);
 
-        return $count_publications_sth->fetch(\PDO::FETCH_COLUMN) ?? 0;
+        return Statement::from($select_association_sth);
     }
 
-    public function pmid(int $pmid): Statement
+    public function all(int $run_id, string $state, int $limit, int $offset): Statement
     {
-        $select_publication_sth = $this->pdo->prepare(self::SELECT_PUBLICATION_SQL);
+        $select_associations_sth = $this->pdo->prepare(self::SELECT_ASSOCIATIONS_SQL);
 
-        $select_publication_sth->execute([$this->run_id, $pmid]);
+        $select_associations_sth->execute([$run_id, $state, $limit, $offset]);
 
-        return Statement::from($this->generator($select_publication_sth));
-    }
-
-    public function all(string $state, int $limit, int $offset): Statement
-    {
-        $select_publications_sth = $this->pdo->prepare(self::SELECT_PUBLICATIONS_SQL);
-
-        $select_publications_sth->execute([$this->run_id, $state, $limit, $offset]);
-
-        return Statement::from($this->generator($select_publications_sth));
-    }
-
-    private function generator(\PDOStatement $sth): \Generator
-    {
-        while ($row = $sth->fetch()) {
-            yield new PublicationSql(
-                $this->pdo,
-                $this->run_id,
-                $row['pmid'],
-                $row['state'],
-                $row['metadata'],
-                $row + $this->data
-            );
-        }
+        return Statement::from($select_associations_sth);
     }
 }

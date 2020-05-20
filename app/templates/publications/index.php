@@ -16,34 +16,34 @@
     <ul class="nav nav-tabs nav-fill">
         <li class="nav-item">
             <a
-                class="nav-link <?= $this->textclass($pending) ?> <?= $state == $pending ? 'active' : '' ?>"
-                href="<?= $this->url('runs.publications.index', $run['url'], ['state' => $pending], 'publications') ?>"
+                class="nav-link <?= $this->textclass('pending') ?> <?= $state == 'pending' ? 'active' : '' ?>"
+                href="<?= $this->url('runs.publications.index', $run, ['state' => 'pending'], 'publications') ?>"
             >
-                Pending (<?= $run['nbs'][$pending] ?>)
+                Pending (<?= $run['nbs']['pending'] ?>)
             </a>
         </li>
         <li class="nav-item">
             <a
-                class="nav-link <?= $this->textclass($selected) ?> <?= $state == $selected ? 'active' : '' ?>"
-                href="<?= $this->url('runs.publications.index', $run['url'], ['state' => $selected], 'publications') ?>"
+                class="nav-link <?= $this->textclass('selected') ?> <?= $state == 'selected' ? 'active' : '' ?>"
+                href="<?= $this->url('runs.publications.index', $run, ['state' => 'selected'], 'publications') ?>"
             >
-                Selected (<?= $run['nbs'][$selected] ?>)
+                Selected (<?= $run['nbs']['selected'] ?>)
             </a>
         </li>
         <li class="nav-item">
             <a
-                class="nav-link <?= $this->textclass($discarded) ?> <?= $state == $discarded ? 'active' : '' ?>"
-                href="<?= $this->url('runs.publications.index', $run['url'], ['state' => $discarded], 'publications') ?>"
+                class="nav-link <?= $this->textclass('discarded') ?> <?= $state == 'discarded' ? 'active' : '' ?>"
+                href="<?= $this->url('runs.publications.index', $run, ['state' => 'discarded'], 'publications') ?>"
             >
-                Discarded (<?= $run['nbs'][$discarded] ?>)
+                Discarded (<?= $run['nbs']['discarded'] ?>)
             </a>
         </li>
         <li class="nav-item">
             <a
-                class="nav-link <?= $this->textclass($curated) ?> <?= $state == $curated ? 'active' : '' ?>"
-                href="<?= $this->url('runs.publications.index', $run['url'], ['state' => $curated], 'publications') ?>"
+                class="nav-link <?= $this->textclass('curated') ?> <?= $state == 'curated' ? 'active' : '' ?>"
+                href="<?= $this->url('runs.publications.index', $run, ['state' => 'curated'], 'publications') ?>"
             >
-                Curated (<?= $run['nbs'][$curated] ?>)
+                Curated (<?= $run['nbs']['curated'] ?>)
             </a>
         </li>
     </ul>
@@ -56,30 +56,23 @@
 <?php else: ?>
 <?php $this->insert('pagination/nav', [
     'pagination' => $this->pagination($total, $page, $limit),
-    'url' => function (int $page) use ($run, $state, $limit) {
-        return $this->url('runs.publications.index',
-            $run['url'],
-            ['state' => $state, 'page' => $page, 'limit' => $limit],
-            'publications'
-        );
-    },
+    'url' => fn (int $page) => $this->url('runs.publications.index',
+        $run,
+        ['state' => $state, 'page' => $page, 'limit' => $limit],
+        'publications',
+    ),
 ]) ?>
 <?php $this->insert('publications/deck', [
+    'run' => $run,
     'publications' => $publications,
-    'source' => $this->url('runs.publications.index',
-        $run['url'],
-        ['state' => $state, 'limit' => $limit],
-        'publications'
-    ),
+    'source' => $this->url('runs.publications.index', $run, ['state' => $state, 'limit' => $limit], 'publications'),
 ]) ?>
 <?php $this->insert('pagination/nav', [
     'pagination' => $this->pagination($total, $page, $limit),
-    'url' => function (int $page) use ($run, $state, $limit) {
-        return $this->url('runs.publications.index',
-            $run['url'],
-            ['state' => $state, 'page' => $page, 'limit' => $limit],
-            'publications'
-        );
-    },
+    'url' => fn (int $page) => $this->url('runs.publications.index',
+        $run,
+        ['state' => $state, 'page' => $page, 'limit' => $limit],
+        'publications',
+    ),
 ]) ?>
 <?php endif ?>

@@ -6,7 +6,7 @@ namespace App\ReadModel;
 
 interface RunViewInterface
 {
-    public function id(int $id): Statement;
+    public function id(int $id, string ...$with): Statement;
 
-    public function all(): Statement;
+    public function all(string ...$with): Statement;
 }

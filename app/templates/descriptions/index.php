@@ -14,7 +14,7 @@
         <a href="<?= $this->url('runs.index') ?>">
             Drakkar</a>
         &gt;
-        <a href="<?= $this->url('runs.publications.index', $run['url']) ?>">
+        <a href="<?= $this->url('runs.publications.index', $run) ?>">
             <?= $run['type'] ?> - <?= $run['name'] ?></a>
         &gt;
         <?= $publication['pmid'] ?>
@@ -22,17 +22,18 @@
 </div>
 
 <?= $this->insert('publications/card', [
+    'run' => $run,
     'publication' => $publication,
-    'source' => $this->url('runs.publications.descriptions.index', $publication['url'])
+    'source' => $this->url('runs.publications.descriptions.index', $publication)
 ]) ?>
 
 <h2 id="descriptions">
     Descriptions associated with this publication
 </h2>
 
-<?php if ($publication['state'] == $selected): ?>
+<?php if ($publication['state'] == 'selected'): ?>
 <p>
-    <a href="<?= $this->url('runs.publications.descriptions.create', $publication['url']) ?>">
+    <a href="<?= $this->url('runs.publications.descriptions.create', $publication) ?>">
         Add new descriptions.
     </a>
 </p>
@@ -49,14 +50,11 @@
 <?php else: ?>
 <?php $this->insert('pagination/nav', [
     'pagination' => $this->pagination($total, $page, $limit),
-    'url' => function (int $page) use ($publication, $limit) {
-        return $this->url(
-            'runs.publications.descriptions.index',
-            $publication['url'],
-            ['page' => $page, 'limit' => $limit],
-            'descriptions'
-        );
-    },
+    'url' => fn (int $page) => $this->url('runs.publications.descriptions.index',
+        $publication,
+        ['page' => $page, 'limit' => $limit],
+        'descriptions'
+    ),
 ]) ?>
 <div class="row">
     <div class="col">
@@ -65,13 +63,10 @@
 </div>
 <?php $this->insert('pagination/nav', [
     'pagination' => $this->pagination($total, $page, $limit),
-    'url' => function (int $page) use ($publication, $limit) {
-        return $this->url(
-            'runs.publications.descriptions.index',
-            $publication['url'],
-            ['page' => $page, 'limit' => $limit],
-            'descriptions'
-        );
-    },
+    'url' => fn (int $page) => $this->url('runs.publications.descriptions.index',
+        $publication,
+        ['page' => $page, 'limit' => $limit],
+        'descriptions'
+    ),
 ]) ?>
 <?php endif ?>

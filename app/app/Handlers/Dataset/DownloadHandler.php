@@ -46,7 +46,7 @@ final class DownloadHandler implements RequestHandlerInterface
     private function generator(Statement $sth): \Generator
     {
         while ($description = $sth->fetch()) {
-            yield json_encode($description->data()) . "\n";
+            yield json_encode($description) . "\n";
         }
     }
 }

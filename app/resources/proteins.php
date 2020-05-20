@@ -17,14 +17,9 @@ return function (ContainerInterface $container): array {
             $container->get(App\ReadModel\ProteinViewInterface::class),
         ),
 
-        'GET /proteins/{accession}' => fn () => Quanta\Http\RequestHandler::queue(
-            new App\Handlers\Proteins\ShowHandler(
-                $container->get(App\Responders\JsonResponder::class),
-            ),
-            new App\Middleware\FetchProteinMiddleware(
-                $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-                $container->get(App\ReadModel\ProteinViewInterface::class),
-            ),
+        'GET /proteins/{accession}' => fn () => new App\Handlers\Proteins\ShowHandler(
+            $container->get(App\Responders\JsonResponder::class),
+            $container->get(App\ReadModel\ProteinViewInterface::class),
         ),
     ];
 };

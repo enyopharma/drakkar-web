@@ -17,14 +17,9 @@ return function (ContainerInterface $container): array {
             $container->get(App\ReadModel\MethodViewInterface::class),
         ),
 
-        'GET /methods/{psimi_id}' => fn () => Quanta\Http\RequestHandler::queue(
-            new App\Handlers\Methods\ShowHandler(
-                $container->get(App\Responders\JsonResponder::class),
-            ),
-            new App\Middleware\FetchMethodMiddleware(
-                $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-                $container->get(App\ReadModel\MethodViewInterface::class),
-            ),
+        'GET /methods/{psimi_id}' => fn () => new App\Handlers\Methods\ShowHandler(
+            $container->get(App\Responders\JsonResponder::class),
+            $container->get(App\ReadModel\MethodViewInterface::class),
         ),
     ];
 };

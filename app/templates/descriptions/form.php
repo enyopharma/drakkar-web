@@ -1,6 +1,6 @@
 <?php $this->layout('layout'); ?>
 
-<?php if ($publication['state'] == $selected): ?>
+<?php if ($publication['state'] == 'selected'): ?>
 <?php $this->push('scripts'); ?>
 <script type="text/javascript" src="<?= $this->asset('form.js') ?>"></script>
 <script type="text/javascript">
@@ -20,10 +20,10 @@
         <a href="<?= $this->url('runs.index') ?>">
             Drakkar</a>
         &gt;
-        <a href="<?= $this->url('runs.publications.index', $run['url']) ?>">
+        <a href="<?= $this->url('runs.publications.index', $run) ?>">
             <?= $run['type'] ?> - <?= $run['name'] ?></a>
         &gt;
-        <a href="<?= $this->url('runs.publications.descriptions.index', $publication['url']) ?>">
+        <a href="<?= $this->url('runs.publications.descriptions.index', $publication) ?>">
             <?= $publication['pmid'] ?></a>
         &gt;
         new description
@@ -31,13 +31,14 @@
 </div>
 
 <?= $this->insert('publications/card', [
+    'run' => $run,
     'publication' => $publication,
     'source' => count($description) == 0
         ? $this->url('runs.publications.descriptions.create', $publication)
         : $this->url('runs.publications.descriptions.edit', $description)
 ]) ?>
 
-<?php if ($publication['state'] == $selected): ?>
+<?php if ($publication['state'] == 'selected'): ?>
 <div id="description-form"></div>
 <?php else: ?>
 <p class="card-text text-warning">

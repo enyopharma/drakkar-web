@@ -8,19 +8,13 @@ final class DescriptionViewSql implements DescriptionViewInterface
 {
     private \PDO $pdo;
 
-    private int $run_id;
-
-    private int $pmid;
-
-    private array $data;
-
     const COUNT_DESCRIPTIONS_SQL = <<<SQL
         SELECT COUNT(*)
         FROM associations AS a, descriptions AS d
         WHERE a.id = d.association_id
         AND a.run_id = ?
         AND a.pmid = ?
-SQL;
+    SQL;
 
     const SELECT_DESCRIPTION_SQL = <<<SQL
         SELECT d.id, d.stable_id, d.created_at, d.deleted_at,
@@ -43,7 +37,7 @@ SQL;
         AND a.run_id = ?
         AND a.pmid = ?
         AND d.id = ?
-SQL;
+    SQL;
 
     const SELECT_DESCRIPTIONS_SQL = <<<SQL
         SELECT
@@ -71,39 +65,36 @@ SQL;
         ORDER BY
             d.created_at DESC, d.id DESC
         LIMIT ? OFFSET ?
-SQL;
+    SQL;
 
-    public function __construct(\PDO $pdo, int $run_id, int $pmid, array $data = [])
+    public function __construct(\PDO $pdo)
     {
         $this->pdo = $pdo;
-        $this->run_id = $run_id;
-        $this->pmid = $pmid;
-        $this->data = $data;
     }
 
-    public function count(): int
+    public function count(int $run_id, int $pmid): int
     {
         $count_descriptions_sth = $this->pdo->prepare(self::COUNT_DESCRIPTIONS_SQL);
 
-        $count_descriptions_sth->execute([$this->run_id, $this->pmid]);
+        $count_descriptions_sth->execute([$run_id, $pmid]);
 
         return $count_descriptions_sth->fetch(\PDO::FETCH_COLUMN) ?? 0;
     }
 
-    public function id(int $id): Statement
+    public function id(int $run_id, int $pmid, int $id): Statement
     {
         $select_description_sth = $this->pdo->prepare(self::SELECT_DESCRIPTION_SQL);
 
-        $select_description_sth->execute([$this->run_id, $this->pmid, $id]);
+        $select_description_sth->execute([$run_id, $pmid, $id]);
 
         return Statement::from($this->generator($select_description_sth));
     }
 
-    public function all(int $limit, int $offset): Statement
+    public function all(int $run_id, int $pmid, int $limit, int $offset): Statement
     {
         $select_descriptions_sth = $this->pdo->prepare(self::SELECT_DESCRIPTIONS_SQL);
 
-        $select_descriptions_sth->execute([$this->run_id, $this->pmid, $limit, $offset]);
+        $select_descriptions_sth->execute([$run_id, $pmid, $limit, $offset]);
 
         return Statement::from($this->generator($select_descriptions_sth));
     }
@@ -111,7 +102,7 @@ SQL;
     private function generator(\PDOStatement $sth): \Generator
     {
         while ($row = $sth->fetch()) {
-            $description = [
+            yield [
                 'stable_id' => $row['stable_id'],
                 'method' => [
                     'psimi_id' => $row['psimi_id'],
@@ -138,14 +129,6 @@ SQL;
                 'deleted_at' => $this->date($row['deleted_at']),
                 'deleted' => ! is_null($row['deleted_at']),
             ];
-
-            yield new DescriptionSql(
-                $this->pdo,
-                $this->run_id,
-                $this->pmid,
-                $row['id'],
-                $description + $this->data
-            );
         }
     }
 

@@ -47,7 +47,7 @@ SQL;
     private function generator(\PDOStatement $sth): \Generator
     {
         while ($row = $sth->fetch()) {
-            yield new Entity([
+            yield [
                 'type' => $row['type'],
                 'stable_id' => $row['stable_id'],
                 'publication' => [
@@ -74,7 +74,7 @@ SQL;
                     'stop' => $row['stop2'],
                     'mapping' => json_decode($row['mapping2'], true),
                 ],
-            ]);
+            ];
         }
     }
 }

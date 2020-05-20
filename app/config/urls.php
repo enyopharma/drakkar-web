@@ -5,7 +5,7 @@ declare(strict_types=1);
 return [
     'runs.index' => fn () => '/',
     'runs.publications.index' => fn (array $data) => vsprintf('/runs/%s/publications', [
-        $data['run_id'],
+        $data['id'],
     ]),
     'runs.publications.update' => fn (array $data) => vsprintf('/runs/%s/publications/%s', [
         $data['run_id'],

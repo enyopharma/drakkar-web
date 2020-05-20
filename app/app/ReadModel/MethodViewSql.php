@@ -12,14 +12,14 @@ final class MethodViewSql implements MethodViewInterface
         SELECT id, psimi_id, name
         FROM methods
         WHERE psimi_id = ?
-SQL;
+    SQL;
 
     const SELECT_METHODS_SQL = <<<SQL
         SELECT id, psimi_id, name
         FROM methods
         WHERE %s
         LIMIT ?
-SQL;
+    SQL;
 
     public function __construct(\PDO $pdo)
     {
@@ -32,14 +32,14 @@ SQL;
 
         $select_method_sth->execute([$psimi_id]);
 
-        return Statement::from($this->generator($select_method_sth));
+        return Statement::from($select_method_sth);
     }
 
     public function search(string $query, int $limit): Statement
     {
-        $qs = array_map(function ($q) {
-            return '%' . trim($q) . '%';
-        }, array_filter(explode('+', $query)));
+        $qs = explode('+', $query);
+        $qs = array_filter($qs);
+        $qs = array_map(fn ($q) => '%' . trim($q) . '%', $qs);
 
         if (count($qs) == 0) {
             return Statement::from([]);
@@ -51,18 +51,6 @@ SQL;
 
         $select_methods_sth->execute([...$qs, $limit]);
 
-        return Statement::from($this->generator($select_methods_sth));
-    }
-
-    private function generator(\PDOStatement $sth): \Generator
-    {
-        while ($row = $sth->fetch()) {
-            yield new MethodSql(
-                $this->pdo,
-                $row['id'],
-                $row['psimi_id'],
-                $row
-            );
-        }
+        return Statement::from($select_methods_sth);
     }
 }

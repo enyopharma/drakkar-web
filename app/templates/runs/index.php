@@ -73,24 +73,24 @@
                 <?= $this->e($run['created_at']) ?>
             </td>
             <td class="text-center">
-                <span class="<?= $this->textclass($pending) ?>">
-                    <?= $this->e($run['nbs'][$pending]) ?>
+                <span class="<?= $this->textclass('pending') ?>">
+                    <?= $this->e($run['nbs']['pending']) ?>
                 </span>
                 -
-                <span class="<?= $this->textclass($selected) ?>">
-                    <?= $this->e($run['nbs'][$selected]) ?>
+                <span class="<?= $this->textclass('selected') ?>">
+                    <?= $this->e($run['nbs']['selected']) ?>
                 </span>
                 -
-                <span class="<?= $this->textclass($discarded) ?>">
-                    <?= $this->e($run['nbs'][$discarded]) ?>
+                <span class="<?= $this->textclass('discarded') ?>">
+                    <?= $this->e($run['nbs']['discarded']) ?>
                 </span>
                 -
-                <span class="<?= $this->textclass($curated) ?>">
-                    <?= $this->e($run['nbs'][$curated]) ?>
+                <span class="<?= $this->textclass('curated') ?>">
+                    <?= $this->e($run['nbs']['curated']) ?>
                 </span>
             </td>
             <td class="text-center">
-                <a href="<?= $this->url('runs.publications.index', $run['url']) ?>">
+                <a href="<?= $this->url('runs.publications.index', $run) ?>">
                     Publications
                 </a>
             </td>

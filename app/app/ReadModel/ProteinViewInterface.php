@@ -6,7 +6,7 @@ namespace App\ReadModel;
 
 interface ProteinViewInterface
 {
-    public function accession(string $accession): Statement;
+    public function accession(string $accession, string ...$with): Statement;
 
     public function search(string $type, string $query, int $limit): Statement;
 }

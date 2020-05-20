@@ -9,36 +9,47 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use App\ReadModel\RunInterface;
-use App\ReadModel\PublicationInterface;
-
+use App\ReadModel\RunViewInterface;
+use App\ReadModel\AssociationViewInterface;
 use App\Responders\HtmlResponder;
 
 final class CreateHandler implements RequestHandlerInterface
 {
     private HtmlResponder $responder;
 
-    public function __construct(HtmlResponder $responder)
-    {
+    private RunViewInterface $runs;
+
+    private AssociationViewInterface $associations;
+
+    public function __construct(
+        HtmlResponder $responder,
+        RunViewInterface $runs,
+        AssociationViewInterface $associations
+    ) {
         $this->responder = $responder;
+        $this->runs = $runs;
+        $this->associations = $associations;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $run = $request->getAttribute(RunInterface::class);
+        // parse request.
+        $run_id = (int) $request->getAttribute('run_id');
+        $pmid = (int) $request->getAttribute('pmid');
 
-        if (! $run instanceof RunInterface) {
-            throw new \LogicException;
+        // get the run.
+        if (!$run = $this->runs->id($run_id)->fetch()) {
+            return $this->responder->notFound();
         }
 
-        $publication = $request->getAttribute(PublicationInterface::class);
-
-        if (! $publication instanceof PublicationInterface) {
-            throw new \LogicException;
+        // get the publication.
+        if (!$publication = $this->associations->pmid($run_id, $pmid)->fetch()) {
+            return $this->responder->notFound();
         }
 
         return $this->responder->success('descriptions/form', [
-            'run' => $run->data(),
-            'publication' => $publication->data(),
+            'run' => $run,
+            'publication' => $publication,
             'description' => [],
         ]);
     }

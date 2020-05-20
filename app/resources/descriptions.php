@@ -12,46 +12,24 @@ use Psr\Container\ContainerInterface;
  */
 return function (ContainerInterface $container): array {
     return [
-        'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions' => fn () => Quanta\Http\RequestHandler::queue(
-            new App\Handlers\Descriptions\IndexHandler(
-                $container->get(App\Responders\HtmlResponder::class),
-            ),
-            new App\Middleware\FetchRunMiddleware(
-                $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-                $container->get(App\ReadModel\RunViewInterface::class),
-            ),
-            new App\Middleware\FetchPublicationMiddleware(
-                $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-            ),
+        'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions' => fn () => new App\Handlers\Descriptions\IndexHandler(
+            $container->get(App\Responders\HtmlResponder::class),
+            $container->get(App\ReadModel\RunViewInterface::class),
+            $container->get(App\ReadModel\AssociationViewInterface::class),
+            $container->get(App\ReadModel\DescriptionViewInterface::class),
         ),
 
-        'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/create' => fn () => Quanta\Http\RequestHandler::queue(
-            new App\Handlers\Descriptions\CreateHandler(
-                $container->get(App\Responders\HtmlResponder::class),
-            ),
-            new App\Middleware\FetchRunMiddleware(
-                $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-                $container->get(App\ReadModel\RunViewInterface::class),
-            ),
-            new App\Middleware\FetchPublicationMiddleware(
-                $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-            ),
+        'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/create' => fn () => new App\Handlers\Descriptions\CreateHandler(
+            $container->get(App\Responders\HtmlResponder::class),
+            $container->get(App\ReadModel\RunViewInterface::class),
+            $container->get(App\ReadModel\AssociationViewInterface::class),
         ),
 
-        'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/edit' => fn () => Quanta\Http\RequestHandler::queue(
-            new App\Handlers\Descriptions\EditHandler(
-                $container->get(App\Responders\HtmlResponder::class),
-            ),
-            new App\Middleware\FetchRunMiddleware(
-                $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-                $container->get(App\ReadModel\RunViewInterface::class),
-            ),
-            new App\Middleware\FetchPublicationMiddleware(
-                $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-            ),
-            new App\Middleware\FetchDescriptionMiddleware(
-                $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-            ),
+        'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/edit' => fn () => new App\Handlers\Descriptions\EditHandler(
+            $container->get(App\Responders\HtmlResponder::class),
+            $container->get(App\ReadModel\RunViewInterface::class),
+            $container->get(App\ReadModel\AssociationViewInterface::class),
+            $container->get(App\ReadModel\DescriptionViewInterface::class),
         ),
 
         'POST /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions' => fn () => Quanta\Http\RequestHandler::queue(

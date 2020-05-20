@@ -19,10 +19,7 @@ return function (ContainerInterface $container): array {
         $definitions = (require $path)($container);
 
         foreach ($definitions as $route => $factory) {
-            $routes[$route] = Quanta\Http\RequestHandler::queue(
-                new App\Handlers\LazyRequestHandler($factory),
-                new Middlewares\JsonPayload,
-            );
+            $routes[$route] = new App\Handlers\LazyRequestHandler($factory);
         }
     }
 

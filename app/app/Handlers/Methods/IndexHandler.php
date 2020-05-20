@@ -9,7 +9,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use App\ReadModel\MethodViewInterface;
-
 use App\Responders\JsonResponder;
 
 final class IndexHandler implements RequestHandlerInterface
