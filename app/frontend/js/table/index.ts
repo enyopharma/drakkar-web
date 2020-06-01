@@ -2,7 +2,7 @@ import { render } from 'react-dom'
 
 import { Description } from './types'
 
-import { Table } from './components/Table'
+import { App } from './components/App'
 
 declare global {
     interface Window { descriptions: any; }
@@ -10,6 +10,6 @@ declare global {
 
 window.descriptions = {
     table: (container: string, descriptions: Description[]) => {
-        render(Table(descriptions), document.getElementById(container))
+        render(App(descriptions), document.getElementById(container))
     }
 }
