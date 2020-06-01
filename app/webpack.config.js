@@ -7,9 +7,9 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin")
 module.exports = (env, argv) => {
     return {
         entry: {
-            app: './frontend/js/app.js',
-            form: './frontend/js/form/index.ts',
-            table: './frontend/js/table/index.ts',
+            app: './assets/js/app.js',
+            form: './assets/js/form/index.ts',
+            table: './assets/js/table/index.ts',
         },
         watch: argv.mode == 'development',
         devtool: argv.mode == 'development' ? 'inline-source-map' : false,
