@@ -29,7 +29,7 @@ export const Table: React.FC<Props> = ({ descriptions }) => {
     }
 
     const confirmDeletion = () => {
-        if (!deleting) return
+        if (deleting === null) return
 
         const { id, pmid, run_id } = descriptions[deleting]
 
@@ -45,8 +45,8 @@ export const Table: React.FC<Props> = ({ descriptions }) => {
 
     return (
         <React.Fragment>
-            {selected && <MappingModal description={selected} close={hideMapping} />}
-            {deleting && <DeleteModal pmid={descriptions[deleting].pmid} cancel={cancelDeletion} confirm={confirmDeletion} />}
+            {selected !== null && <MappingModal description={selected} close={hideMapping} />}
+            {deleting !== null && <DeleteModal pmid={descriptions[deleting].pmid} cancel={cancelDeletion} confirm={confirmDeletion} />}
             <table className="table">
                 <thead>
                     <tr>
