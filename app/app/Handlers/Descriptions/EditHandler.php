@@ -41,7 +41,7 @@ final class EditHandler implements RequestHandlerInterface
         // parse request.
         $run_id = (int) $request->getAttribute('run_id');
         $pmid = (int) $request->getAttribute('pmid');
-        $description_id = (int) $request->getAttribute('description_id');
+        $id = (int) $request->getAttribute('id');
 
         // get the run.
         if (!$run = $this->runs->id($run_id)->fetch()) {
@@ -54,7 +54,7 @@ final class EditHandler implements RequestHandlerInterface
         }
 
         // get the description.
-        if (!$description = $this->descriptions->id($run_id, $pmid, $description_id)->fetch()) {
+        if (!$description = $this->descriptions->id($run_id, $pmid, $id)->fetch()) {
             return $this->responder->notFound();
         }
 
