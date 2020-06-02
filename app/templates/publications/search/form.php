@@ -1,4 +1,4 @@
-<form method="GET" action="<?= $url->generate('publications.index') ?>">
+<form method="GET" action="<?= $this->url('publications.index') ?>">
     <div class="row">
         <div class="col">
             <input

@@ -8,9 +8,9 @@ return [
     Engine::class => function ($container) {
         $engine = new Engine(__DIR__ . '/../templates', 'php');
 
-        $engine->addData([
-            'url' => $container->get(App\Helpers\UrlGenerator::class),
-        ]);
+        $generator = $container->get(App\Helpers\UrlGenerator::class);
+
+        $engine->registerFunction('url', [$generator, 'generate']);
 
         $engine->loadExtension(
             new App\Extensions\Plates\AssetsExtension(

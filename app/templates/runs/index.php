@@ -8,12 +8,12 @@
 
 <div class="row">
     <div class="col">
-        <a href="<?= $url->generate('dataset', ['type' => 'hh']) ?>" class="btn btn-primary btn-lg btn-block">
+        <a href="<?= $this->url('dataset', ['type' => 'hh']) ?>" class="btn btn-primary btn-lg btn-block">
             Download current HH dataset
         </a>
     </div>
     <div class="col">
-        <a href="<?= $url->generate('dataset', ['type' => 'vh']) ?>" class="btn btn-primary btn-lg btn-block">
+        <a href="<?= $this->url('dataset', ['type' => 'vh']) ?>" class="btn btn-primary btn-lg btn-block">
             Download current VH dataset
         </a>
     </div>
@@ -90,7 +90,7 @@
                 </span>
             </td>
             <td class="text-center">
-                <a href="<?= $url->generate('runs.publications.index', $run) ?>">
+                <a href="<?= $this->url('runs.publications.index', $run) ?>">
                     Publications
                 </a>
             </td>

@@ -2,7 +2,7 @@
 
 <div class="page-header">
     <h1>
-        <a href="<?= $url->generate('runs.index') ?>">Drakkar</a>
+        <a href="<?= $this->url('runs.index') ?>">Drakkar</a>
         &gt;
         Publications
     </h1>
@@ -28,7 +28,7 @@
 <?php $this->insert('publications/card', [
     'run' => $publication['run'],
     'publication' => $publication,
-    'source' => $url->generate('publications.index', [], [
+    'source' => $this->url('publications.index', [], [
         'pmid' => $publication['pmid'],
     ]),
 ]) ?>
