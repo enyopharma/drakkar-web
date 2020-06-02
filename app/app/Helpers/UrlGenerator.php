@@ -13,17 +13,24 @@ final class UrlGenerator
         $this->map = $map;
     }
 
-    public function isDefined(string $name): bool
-    {
-        return array_key_exists($name, $this->map);
-    }
-
     public function generate(string $name, array $data = [], array $query = [], string $fragment = ''): string
     {
-        $path = $this->map[$name]($data);
+        if (!array_key_exists($name, $this->map)) {
+            throw new \UnexpectedValueException(
+                sprintf('No route names \'%s\'', $name)
+            );
+        }
 
-        $url = count($query) == 0 ? $path : $path . '?' . http_build_query($query);
+        $url = $this->map[$name]($data);
 
-        return strlen($fragment) == 0 ? $url : $url . '#' . $fragment;
+        if (count($query) > 0) {
+            $url.= '?' . http_build_query($query, '', '&amp;');
+        }
+
+        if (strlen($fragment) > 0) {
+            $url.= '#' . $fragment;
+        }
+
+        return $url;
     }
 }

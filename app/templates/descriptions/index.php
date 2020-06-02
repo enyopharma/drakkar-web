@@ -11,10 +11,10 @@
 
 <div class="page-header">
     <h1>
-        <a href="<?= $this->url('runs.index') ?>">
+        <a href="<?= $url->generate('runs.index') ?>">
             Drakkar</a>
         &gt;
-        <a href="<?= $this->url('runs.publications.index', $run) ?>">
+        <a href="<?= $url->generate('runs.publications.index', $run) ?>">
             <?= $run['type'] ?> - <?= $run['name'] ?></a>
         &gt;
         <?= $publication['pmid'] ?>
@@ -24,7 +24,7 @@
 <?= $this->insert('publications/card', [
     'run' => $run,
     'publication' => $publication,
-    'source' => $this->url('runs.publications.descriptions.index', $publication)
+    'source' => $url->generate('runs.publications.descriptions.index', $publication)
 ]) ?>
 
 <h2 id="descriptions">
@@ -33,7 +33,7 @@
 
 <?php if ($publication['state'] == 'selected'): ?>
 <p>
-    <a href="<?= $this->url('runs.publications.descriptions.create', $publication) ?>">
+    <a href="<?= $url->generate('runs.publications.descriptions.create', $publication) ?>">
         Add new descriptions.
     </a>
 </p>
@@ -50,7 +50,7 @@
 <?php else: ?>
 <?php $this->insert('pagination/nav', [
     'pagination' => $this->pagination($total, $page, $limit),
-    'url' => fn (int $page) => $this->url('runs.publications.descriptions.index',
+    'url' => fn (int $page) => $url->generate('runs.publications.descriptions.index',
         $publication,
         ['page' => $page, 'limit' => $limit],
         'descriptions'
@@ -63,7 +63,7 @@
 </div>
 <?php $this->insert('pagination/nav', [
     'pagination' => $this->pagination($total, $page, $limit),
-    'url' => fn (int $page) => $this->url('runs.publications.descriptions.index',
+    'url' => fn (int $page) => $url->generate('runs.publications.descriptions.index',
         $publication,
         ['page' => $page, 'limit' => $limit],
         'descriptions'

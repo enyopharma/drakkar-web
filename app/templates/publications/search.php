@@ -2,7 +2,7 @@
 
 <div class="page-header">
     <h1>
-        <a href="<?= $this->url('runs.index') ?>">Drakkar</a>
+        <a href="<?= $url->generate('runs.index') ?>">Drakkar</a>
         &gt;
         Publications
     </h1>
@@ -25,8 +25,12 @@
     <?= count($publications) == 1 ? '1 publication' : count($publications) . ' publications' ?> found for pmid <?= $pmid ?>
 </p>
 <?php foreach ($publications as $publication): ?>
-<?php $this->insert('publications/card', ['run' => $publication['run'], 'publication' => $publication, 'source' => $this->url('publications.index', [], [
-    'pmid' => $publication['pmid'],
-])]) ?>
+<?php $this->insert('publications/card', [
+    'run' => $publication['run'],
+    'publication' => $publication,
+    'source' => $url->generate('publications.index', [], [
+        'pmid' => $publication['pmid'],
+    ]),
+]) ?>
 <?php endforeach; ?>
 <?php endif; ?>

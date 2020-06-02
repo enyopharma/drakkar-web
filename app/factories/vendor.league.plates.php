@@ -8,6 +8,10 @@ return [
     Engine::class => function ($container) {
         $engine = new Engine(__DIR__ . '/../templates', 'php');
 
+        $engine->addData([
+            'url' => $container->get(App\Helpers\UrlGenerator::class),
+        ]);
+
         $engine->loadExtension(
             new App\Extensions\Plates\AssetsExtension(
                 __DIR__ . '/../public/build/manifest.json',
@@ -30,12 +34,6 @@ return [
 
         $engine->loadExtension(
             new App\Extensions\Plates\PaginationExtension,
-        );
-
-        $engine->loadExtension(
-            new App\Extensions\Plates\UrlExtension(
-                $container->get(App\Helpers\UrlGenerator::class),
-            ),
         );
 
         return $engine;

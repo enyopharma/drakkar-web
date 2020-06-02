@@ -6,6 +6,6 @@ use App\Helpers\UrlGenerator;
 
 return [
     UrlGenerator::class => fn () => new UrlGenerator(
-        require __DIR__ . '/../config/urls.php',
+        require __DIR__ . '/../app/urls.php',
     ),
 ];

@@ -17,13 +17,13 @@
 
 <div class="page-header">
     <h1>
-        <a href="<?= $this->url('runs.index') ?>">
+        <a href="<?= $url->generate('runs.index') ?>">
             Drakkar</a>
         &gt;
-        <a href="<?= $this->url('runs.publications.index', $run) ?>">
+        <a href="<?= $url->generate('runs.publications.index', $run) ?>">
             <?= $run['type'] ?> - <?= $run['name'] ?></a>
         &gt;
-        <a href="<?= $this->url('runs.publications.descriptions.index', $publication) ?>">
+        <a href="<?= $url->generate('runs.publications.descriptions.index', $publication) ?>">
             <?= $publication['pmid'] ?></a>
         &gt;
         new description
@@ -34,8 +34,8 @@
     'run' => $run,
     'publication' => $publication,
     'source' => count($description) == 0
-        ? $this->url('runs.publications.descriptions.create', $publication)
-        : $this->url('runs.publications.descriptions.edit', $description)
+        ? $url->generate('runs.publications.descriptions.create', $publication)
+        : $url->generate('runs.publications.descriptions.edit', $description)
 ]) ?>
 
 <?php if ($publication['state'] == 'selected'): ?>
