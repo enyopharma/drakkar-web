@@ -12,8 +12,8 @@
 <div id="publication-<?= $publication['pmid'] ?>" class="card">
     <h3 class="card-header">
         Ref:
-        <a href="<?= $this->url('runs.publications.index', $publication['run']) ?>">
-            <?= $publication['run']['type'] ?> - <?= $publication['run']['name'] ?></a>
+        <a href="<?= $this->url('runs.publications.index', $run) ?>">
+            <?= $run['type'] ?> - <?= $run['name'] ?></a>
         /
         <a href="<?= $this->url('runs.publications.descriptions.index', $publication) ?>"><?= $publication['pmid'] ?></a>
         <span class="float-right badge <?= $classes[$publication['state']] ?>">

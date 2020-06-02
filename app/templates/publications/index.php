@@ -83,12 +83,15 @@
 </p>
 <?php else: ?>
 <?= $this->pagination($total, $page, $limit, $url) ?>
-<?php $this->insert('publications/deck', [
-    'publications' => $publications,
+<?php foreach($publications as $publication): ?>
+<?php $this->insert('publications/card', [
+    'run' => $run,
+    'publication' => $publication,
     'source' => $this->url('runs.publications.index', $run,
         ['state' => $state, 'limit' => $limit],
         'publications',
     ),
 ]) ?>
+<?php endforeach ?>
 <?= $this->pagination($total, $page, $limit, $url) ?>
 <?php endif ?>

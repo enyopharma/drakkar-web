@@ -24,8 +24,11 @@
 <p>
     <?= count($publications) == 1 ? '1 publication' : count($publications) . ' publications' ?> found for pmid <?= $pmid ?>
 </p>
-<?php $this->insert('publications/deck', [
-    'publications' => $publications,
+<?php foreach($publications as $publication): ?>
+<?php $this->insert('publications/card', [
+    'run' => $publication['run'],
+    'publication' => $publication,
     'source' => $this->url('publications.index', [], ['pmid' => $pmid]),
 ]) ?>
-<?php endif; ?>
+<?php endforeach ?>
+<?php endif ?>

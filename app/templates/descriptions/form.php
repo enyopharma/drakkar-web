@@ -17,8 +17,7 @@
 
 <div class="page-header">
     <h1>
-        <a href="<?= $this->url('runs.index') ?>">
-            Drakkar</a>
+        <a href="<?= $this->url('runs.index') ?>">Drakkar</a>
         &gt;
         <a href="<?= $this->url('runs.publications.index', $run) ?>">
             <?= $run['type'] ?> - <?= $run['name'] ?></a>

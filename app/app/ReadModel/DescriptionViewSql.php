@@ -105,12 +105,6 @@ final class DescriptionViewSql implements DescriptionViewInterface
         while ($row = $sth->fetch()) {
             yield [
                 'stable_id' => $row['stable_id'],
-                'run' => [
-                    'id' => $row['run_id'],
-                ],
-                'publication' => [
-                    'pmid' => $row['pmid'],
-                ],
                 'id' => $row['id'],
                 'pmid' => $row['pmid'],
                 'run_id' => $row['run_id'],
