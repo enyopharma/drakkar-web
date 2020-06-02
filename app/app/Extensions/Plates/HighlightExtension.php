@@ -15,7 +15,7 @@ final class HighlightExtension implements ExtensionInterface
 
     const SELECT_KEYWORDS_SQL = <<<SQL
         SELECT * FROM keywords
-SQL;
+    SQL;
 
     public function __construct(\PDO $pdo)
     {
@@ -24,10 +24,10 @@ SQL;
 
     public function register(Engine $engine): void
     {
-        $engine->registerFunction('highlight', \Closure::fromCallable([$this, 'highlight']));
+        $engine->registerFunction('highlight', [$this, 'highlight']);
     }
 
-    private function highlight(string $str): string
+    public function highlight(string $str): string
     {
         $keywords = $this->keywords();
 

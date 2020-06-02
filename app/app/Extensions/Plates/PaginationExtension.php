@@ -2,21 +2,23 @@
 
 declare(strict_types=1);
 
-namespace App\Widgets;
+namespace App\Extensions\Plates;
 
 use League\Plates\Engine;
+use League\Plates\Extension\ExtensionInterface;
 
-final class PaginationWidget
+final class PaginationExtension implements ExtensionInterface
 {
     private Engine $engine;
 
-    public function __construct(Engine $engine)
+    public function register(Engine $engine)
     {
         $this->engine = $engine;
-        $n = $n;
+
+        $engine->registerFunction('pagination', [$this, 'pagination']);
     }
 
-    public function render(int $total, int $current, int $limit, callable $url, int $n = 10): string
+    public function pagination(int $total, int $current, int $limit, callable $url, int $n = 10): string
     {
         $max = (int) ceil($total/$limit);
 

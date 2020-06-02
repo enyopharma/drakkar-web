@@ -10,26 +10,24 @@ return [
 
         $generator = $container->get(App\Routing\UrlGenerator::class);
 
-        $pagination = new App\Widgets\PaginationWidget($engine);
+        $assets = new App\Extensions\Plates\AssetsExtension(
+            __DIR__ . '/../public/build/manifest.json',
+        );
+
+        $pagination = new App\Extensions\Plates\PaginationExtension;
+
+        $metadata = new App\Extensions\Plates\MetadataExtension;
+
+        $highlight = new App\Extensions\Plates\HighlightExtension(
+            $container->get(\PDO::class),
+        );
 
         $engine->registerFunction('url', [$generator, 'generate']);
-        $engine->registerFunction('pagination', [$pagination, 'render']);
 
-        $engine->loadExtension(
-            new App\Extensions\Plates\AssetsExtension(
-                __DIR__ . '/../public/build/manifest.json',
-            )
-        );
-
-        $engine->loadExtension(
-            new App\Extensions\Plates\MetadataExtension,
-        );
-
-        $engine->loadExtension(
-            new App\Extensions\Plates\HighlightExtension(
-                $container->get(\PDO::class),
-            ),
-        );
+        $engine->loadExtension($assets);
+        $engine->loadExtension($pagination);
+        $engine->loadExtension($metadata);
+        $engine->loadExtension($highlight);
 
         return $engine;
     },

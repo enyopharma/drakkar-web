@@ -11,10 +11,10 @@ final class MetadataExtension implements ExtensionInterface
 {
     public function register(Engine $engine): void
     {
-        $engine->registerFunction('metadata', \Closure::fromCallable([$this, 'metadata']));
+        $engine->registerFunction('metadata', [$this, 'metadata']);
     }
 
-    private function metadata(string $metadata = null): array
+    public function metadata(string $metadata = null): array
     {
         $default = [
             'title' => '',
