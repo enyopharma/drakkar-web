@@ -10,7 +10,7 @@ return [
     HtmlResponder::class => fn ($container) => new HtmlResponder(
         $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
         $container->get(League\Plates\Engine::class),
-        $container->get(App\Helpers\UrlGenerator::class),
+        $container->get(App\Routing\UrlGenerator::class),
     ),
 
     JsonResponder::class => fn ($container) => new JsonResponder(

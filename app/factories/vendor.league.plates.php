@@ -8,7 +8,7 @@ return [
     Engine::class => function ($container) {
         $engine = new Engine(__DIR__ . '/../templates', 'php');
 
-        $generator = $container->get(App\Helpers\UrlGenerator::class);
+        $generator = $container->get(App\Routing\UrlGenerator::class);
 
         $pagination = new App\Widgets\PaginationWidget($engine);
 

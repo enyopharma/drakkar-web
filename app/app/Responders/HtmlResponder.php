@@ -9,7 +9,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 
 use League\Plates\Engine;
 
-use App\Helpers\UrlGenerator;
+use App\Routing\UrlGenerator;
 
 final class HtmlResponder
 {
