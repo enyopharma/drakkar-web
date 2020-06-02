@@ -73,19 +73,19 @@
                 <?= $this->e($run['created_at']) ?>
             </td>
             <td class="text-center">
-                <span class="<?= $this->textclass('pending') ?>">
+                <span class="text-warning">
                     <?= $this->e($run['nbs']['pending']) ?>
                 </span>
                 -
-                <span class="<?= $this->textclass('selected') ?>">
+                <span class="text-primary">
                     <?= $this->e($run['nbs']['selected']) ?>
                 </span>
                 -
-                <span class="<?= $this->textclass('discarded') ?>">
+                <span class="text-danger">
                     <?= $this->e($run['nbs']['discarded']) ?>
                 </span>
                 -
-                <span class="<?= $this->textclass('curated') ?>">
+                <span class="text-success">
                     <?= $this->e($run['nbs']['curated']) ?>
                 </span>
             </td>

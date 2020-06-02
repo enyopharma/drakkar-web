@@ -1,4 +1,14 @@
+<?php
+    $classes = [
+        'pending' => 'badge-warning',
+        'selected' => 'badge-primary',
+        'discarded' => 'badge-danger',
+        'curated' => 'badge-success',
+    ];
+?>
+
 <?php $metadata = $this->metadata($publication['metadata']); ?>
+
 <div id="publication-<?= $publication['pmid'] ?>" class="card">
     <h3 class="card-header">
         Ref:
@@ -6,7 +16,7 @@
             <?= $run['type'] ?> - <?= $run['name'] ?></a>
         /
         <a href="<?= $this->url('runs.publications.descriptions.index', $publication) ?>"><?= $publication['pmid'] ?></a>
-        <span class="float-right badge <?= $this->badgeclass($publication['state']) ?>">
+        <span class="float-right badge <?= $classes[$publication['state']] ?>">
             <?= $publication['state'] ?>
         </span>
     </h3>

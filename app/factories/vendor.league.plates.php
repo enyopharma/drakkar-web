@@ -19,10 +19,6 @@ return [
         );
 
         $engine->loadExtension(
-            new App\Extensions\Plates\HelpersExtension,
-        );
-
-        $engine->loadExtension(
             new App\Extensions\Plates\MetadataExtension,
         );
 
