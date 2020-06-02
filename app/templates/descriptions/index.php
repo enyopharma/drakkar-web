@@ -1,3 +1,11 @@
+<?php
+    $url = fn (int $page) => $this->url('runs.publications.descriptions.index',
+        $publication,
+        ['page' => $page, 'limit' => $limit],
+        'descriptions',
+    );
+?>
+
 <?php $this->layout('layout'); ?>
 
 <?php if (count($descriptions) > 0): ?>
@@ -48,25 +56,11 @@
     There is no descriptions associated with this publication.
 </p>
 <?php else: ?>
-<?php $this->insert('pagination/nav', [
-    'pagination' => $this->pagination($total, $page, $limit),
-    'url' => fn (int $page) => $this->url('runs.publications.descriptions.index',
-        $publication,
-        ['page' => $page, 'limit' => $limit],
-        'descriptions'
-    ),
-]) ?>
+<?= $this->pagination($total, $page, $limit, $url); ?>
 <div class="row">
     <div class="col">
         <div id="descriptions-table"></div>
     </div>
 </div>
-<?php $this->insert('pagination/nav', [
-    'pagination' => $this->pagination($total, $page, $limit),
-    'url' => fn (int $page) => $this->url('runs.publications.descriptions.index',
-        $publication,
-        ['page' => $page, 'limit' => $limit],
-        'descriptions'
-    ),
-]) ?>
+<?= $this->pagination($total, $page, $limit, $url); ?>
 <?php endif ?>

@@ -2,27 +2,30 @@
 
 declare(strict_types=1);
 
-namespace App\Extensions\Plates;
+namespace App\Widgets;
 
 use League\Plates\Engine;
-use League\Plates\Extension\ExtensionInterface;
 
-final class PaginationExtension implements ExtensionInterface
+final class PaginationWidget
 {
-    public function register(Engine $engine): void
+    private Engine $engine;
+
+    public function __construct(Engine $engine)
     {
-        $engine->registerFunction('pagination', \Closure::fromCallable([$this, 'pagination']));
+        $this->engine = $engine;
+        $n = $n;
     }
 
-    private function pagination(int $total, int $current, int $limit, int $n = 10): array
+    public function render(int $total, int $current, int $limit, callable $url, int $n = 10): string
     {
         $max = (int) ceil($total/$limit);
 
-        return [
+        return $this->engine->render('pagination/nav', [
             'prev' => ['active' => false, 'enabled' => $current > 1, 'page' => $current - 1],
             'links' => $this->links($max, $current, $n),
             'next' => ['active' => false, 'enabled' => $current < $max, 'page' => $current + 1],
-        ];
+            'url' => $url,
+        ]);
     }
 
     private function links(int $max, int $current, int $n): array

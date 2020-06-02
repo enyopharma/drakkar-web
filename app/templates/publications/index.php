@@ -19,6 +19,13 @@
     ];
 ?>
 
+<?php
+    $url = fn (int $page) => $this->url('runs.publications.index', $run,
+        ['state' => $state, 'page' => $page, 'limit' => $limit],
+        'publications',
+    );
+?>
+
 <?php $this->layout('layout'); ?>
 
 <div class="page-header">
@@ -75,13 +82,7 @@
     <?= $helpers[$state]['empty'] ?>
 </p>
 <?php else: ?>
-<?php $this->insert('pagination/nav', [
-    'pagination' => $this->pagination($total, $page, $limit),
-    'url' => fn (int $page) => $this->url('runs.publications.index', $run,
-        ['state' => $state, 'page' => $page, 'limit' => $limit],
-        'publications',
-    ),
-]) ?>
+<?= $this->pagination($total, $page, $limit, $url) ?>
 <?php $this->insert('publications/deck', [
     'publications' => $publications,
     'source' => $this->url('runs.publications.index', $run,
@@ -89,11 +90,5 @@
         'publications',
     ),
 ]) ?>
-<?php $this->insert('pagination/nav', [
-    'pagination' => $this->pagination($total, $page, $limit),
-    'url' => fn (int $page) => $this->url('runs.publications.index', $run,
-        ['state' => $state, 'page' => $page, 'limit' => $limit],
-        'publications',
-    ),
-]) ?>
+<?= $this->pagination($total, $page, $limit, $url) ?>
 <?php endif ?>

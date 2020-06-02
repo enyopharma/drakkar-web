@@ -10,7 +10,10 @@ return [
 
         $generator = $container->get(App\Helpers\UrlGenerator::class);
 
+        $pagination = new App\Widgets\PaginationWidget($engine);
+
         $engine->registerFunction('url', [$generator, 'generate']);
+        $engine->registerFunction('pagination', [$pagination, 'render']);
 
         $engine->loadExtension(
             new App\Extensions\Plates\AssetsExtension(
@@ -26,10 +29,6 @@ return [
             new App\Extensions\Plates\HighlightExtension(
                 $container->get(\PDO::class),
             ),
-        );
-
-        $engine->loadExtension(
-            new App\Extensions\Plates\PaginationExtension,
         );
 
         return $engine;
