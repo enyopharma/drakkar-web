@@ -8,7 +8,7 @@ final class PublicationViewSql implements PublicationViewInterface
 {
     private \PDO $pdo;
 
-    const SELECT_PROTEINS_SQL = <<<SQL
+    const SELECT_PUBLICATIONS_SQL = <<<SQL
         SELECT r.id AS run_id, r.type AS run_type, r.name AS run_name, p.pmid, a.state, a.annotation, p.metadata
         FROM runs AS r, associations AS a, publications AS p
         WHERE r.id = a.run_id
@@ -23,7 +23,7 @@ final class PublicationViewSql implements PublicationViewInterface
 
     public function search(int $pmid): Statement
     {
-        $select_publications_sth = $this->pdo->prepare(self::SELECT_PROTEINS_SQL);
+        $select_publications_sth = $this->pdo->prepare(self::SELECT_PUBLICATIONS_SQL);
 
         $select_publications_sth->execute([$pmid]);
 

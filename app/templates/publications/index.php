@@ -83,7 +83,6 @@
     ),
 ]) ?>
 <?php $this->insert('publications/deck', [
-    'run' => $run,
     'publications' => $publications,
     'source' => $this->url('runs.publications.index', $run,
         ['state' => $state, 'limit' => $limit],
