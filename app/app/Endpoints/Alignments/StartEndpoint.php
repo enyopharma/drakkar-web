@@ -2,29 +2,25 @@
 
 declare(strict_types=1);
 
-namespace App\Handlers\Alignments;
+namespace App\Endpoints\Alignments;
 
-use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 use Predis\Client;
 
-use App\Responders\JsonResponder;
-
-final class StartHandler implements RequestHandlerInterface
+final class StartEndpoint
 {
     private Client $client;
 
-    private JsonResponder $responder;
-
-    public function __construct(Client $client, JsonResponder $responder)
+    public function __construct(Client $client)
     {
         $this->client = $client;
-        $this->responder = $responder;
     }
 
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    /**
+     * @return array
+     */
+    public function __invoke(ServerRequestInterface $request)
     {
         $params = (array) $request->getParsedBody();
 
@@ -40,6 +36,6 @@ final class StartHandler implements RequestHandlerInterface
 
         $this->client->rpush('default', [$payload]);
 
-        return $this->responder->success();
+        return [];
     }
 }

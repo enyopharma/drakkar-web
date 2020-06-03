@@ -15,11 +15,11 @@ return function (ContainerInterface $container) {
 
     $routes = (require __DIR__ . '/../app/routes.php')($container);
 
-    foreach ($routes as $endpoint => $handler) {
-        $parts = (array) preg_split('/\s+/', $endpoint);
+    foreach ($routes as $route => $handler) {
+        $parts = (array) preg_split('/\s+/', $route);
 
         if (count($parts) != 2) {
-            throw new LogicException(sprintf('invalid endpoint \'%s\'', $endpoint));
+            throw new LogicException(sprintf('invalid route \'%s\'', $route));
         }
 
         $method = (string) array_shift($parts);

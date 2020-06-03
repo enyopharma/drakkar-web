@@ -2,21 +2,23 @@
 
 declare(strict_types=1);
 
-namespace App\Handlers\Descriptions;
+namespace App\Endpoints\Descriptions;
 
-use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+use League\Plates\Engine;
+
+use App\Routing\UrlGenerator;
 use App\ReadModel\RunInterface;
 use App\ReadModel\RunViewInterface;
 use App\ReadModel\AssociationViewInterface;
 use App\ReadModel\DescriptionViewInterface;
-use App\Responders\HtmlResponder;
 
-final class IndexHandler implements RequestHandlerInterface
+final class IndexEndpoint
 {
-    private HtmlResponder $responder;
+    private Engine $engine;
+
+    private UrlGenerator $generator;
 
     private RunViewInterface $runs;
 
@@ -25,18 +27,23 @@ final class IndexHandler implements RequestHandlerInterface
     private DescriptionViewInterface $descriptions;
 
     public function __construct(
-        HtmlResponder $responder,
+        Engine $engine,
+        UrlGenerator $generator,
         RunViewInterface $runs,
         AssociationViewInterface $associations,
         DescriptionViewInterface $descriptions
     ) {
-        $this->responder = $responder;
+        $this->engine = $engine;
+        $this->generator = $generator;
         $this->runs = $runs;
         $this->associations = $associations;
         $this->descriptions = $descriptions;
     }
 
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    /**
+     * @return \Psr\Http\Message\ResponseInterface|string|false
+     */
+    public function __invoke(ServerRequestInterface $request, callable $responder)
     {
         // parse request.
         $run_id = (int) $request->getAttribute('run_id');
@@ -49,12 +56,12 @@ final class IndexHandler implements RequestHandlerInterface
 
         // get the run.
         if (!$run = $this->runs->id($run_id)->fetch()) {
-            return $this->responder->notFound();
+            return false;
         }
 
         // get the publication.
         if (!$publication = $this->associations->pmid($run_id, $pmid)->fetch()) {
-            return $this->responder->notFound();
+            return false;
         }
 
         // get the descriptions.
@@ -62,19 +69,19 @@ final class IndexHandler implements RequestHandlerInterface
         $offset = ($page - 1) * $limit;
 
         if ($limit < 0) {
-            return $this->outOfRangeResponse($publication, 1, 20);
+            return $responder(302, $this->outOfRangeUrl($publication, 1, 20));
         }
 
         if ($page < 1) {
-            return $this->outOfRangeResponse($publication, 1, $limit);
+            return $responder(302, $this->outOfRangeUrl($publication, 1, $limit));
         }
 
         if ($offset > 0 && $offset > $total) {
-            return $this->outOfRangeResponse($publication, (int) ceil($total/$limit), $limit);
+            return $responder(302, $this->outOfRangeUrl($publication, (int) ceil($total/$limit), $limit));
         }
 
         // success!
-        return $this->responder->success('descriptions/index', [
+        return $this->engine->render('descriptions/index', [
             'run' => $run,
             'publication' => $publication,
             'descriptions' => $this->descriptions->all($run_id, $pmid, $limit, $offset)->fetchAll(),
@@ -84,10 +91,10 @@ final class IndexHandler implements RequestHandlerInterface
         ]);
     }
 
-    private function outOfRangeResponse(array $publication, int $page, int $limit): ResponseInterface
+    private function outOfRangeUrl(array $publication, int $page, int $limit): string
     {
         $query = ['page' => $page, 'limit' => $limit];
 
-        return $this->responder->temporary('runs.publications.descriptions.index', $publication, $query, 'descriptions');
+        return $this->generator->generate('runs.publications.descriptions.index', $publication, $query, 'descriptions');
     }
 }

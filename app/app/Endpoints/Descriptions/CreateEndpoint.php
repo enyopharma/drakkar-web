@@ -2,36 +2,37 @@
 
 declare(strict_types=1);
 
-namespace App\Handlers\Descriptions;
+namespace App\Endpoints\Descriptions;
 
-use Psr\Http\Server\RequestHandlerInterface;
-use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\ReadModel\RunInterface;
+use League\Plates\Engine;
+
 use App\ReadModel\RunViewInterface;
 use App\ReadModel\AssociationViewInterface;
-use App\Responders\HtmlResponder;
 
-final class CreateHandler implements RequestHandlerInterface
+final class CreateEndpoint
 {
-    private HtmlResponder $responder;
+    private Engine $engine;
 
     private RunViewInterface $runs;
 
     private AssociationViewInterface $associations;
 
     public function __construct(
-        HtmlResponder $responder,
+        Engine $engine,
         RunViewInterface $runs,
         AssociationViewInterface $associations
     ) {
-        $this->responder = $responder;
+        $this->engine = $engine;
         $this->runs = $runs;
         $this->associations = $associations;
     }
 
-    public function handle(ServerRequestInterface $request): ResponseInterface
+    /**
+     * @return string|false
+     */
+    public function __invoke(ServerRequestInterface $request)
     {
         // parse request.
         $run_id = (int) $request->getAttribute('run_id');
@@ -39,15 +40,15 @@ final class CreateHandler implements RequestHandlerInterface
 
         // get the run.
         if (!$run = $this->runs->id($run_id)->fetch()) {
-            return $this->responder->notFound();
+            return false;
         }
 
         // get the publication.
         if (!$publication = $this->associations->pmid($run_id, $pmid)->fetch()) {
-            return $this->responder->notFound();
+            return false;
         }
 
-        return $this->responder->success('descriptions/form', [
+        return $this->engine->render('descriptions/form', [
             'run' => $run,
             'publication' => $publication,
             'description' => [],

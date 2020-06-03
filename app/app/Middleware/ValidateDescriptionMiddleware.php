@@ -13,14 +13,13 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Quanta\Validation\ErrorInterface;
 
 use App\Input\DescriptionInput;
-use App\Responders\JsonResponder;
 use App\Validations\Association;
 
 final class ValidateDescriptionMiddleware implements MiddlewareInterface
 {
-    private JsonResponder $responder;
-
     private \PDO $pdo;
+
+    private ResponseFactoryInterface $factory;
 
     const SELECT_ASSOCIATION_SQL = <<<SQL
         SELECT a.id, r.type
@@ -28,12 +27,12 @@ final class ValidateDescriptionMiddleware implements MiddlewareInterface
         WHERE r.id = a.run_id
         AND a.run_id = ?
         AND a.pmid = ?
-SQL;
+    SQL;
 
-    public function __construct(JsonResponder $responder, \PDO $pdo)
+    public function __construct(\PDO $pdo, ResponseFactoryInterface $factory)
     {
-        $this->responder = $responder;
         $this->pdo = $pdo;
+        $this->factory = $factory;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -50,20 +49,16 @@ SQL;
 
         $select_association_sth->execute([$run_id, $pmid]);
 
-        if (! $association = $select_association_sth->fetch()) {
-            return $this->responder->notFound();
+        if (!$association = $select_association_sth->fetch()) {
+            return $this->factory->createResponse(404);
         }
 
         $association = new Association($association['id'], $association['type']);
 
         // validate the input.
         return DescriptionInput::from($this->pdo, $association, $data)->extract(
-            function (DescriptionInput $input) use ($request, $handler) {
-                return $this->success($request, $handler, $input);
-            },
-            function (ErrorInterface ...$errors) {
-                return $this->failure(...$errors);
-            }
+            fn ($input) => $this->success($request, $handler, $input),
+            fn (...$errors) => $this->failure(...$errors),
         );
     }
 
@@ -76,7 +71,20 @@ SQL;
 
     private function failure(ErrorInterface ...$errors): ResponseInterface
     {
-        return $this->responder->errors(...array_map([$this, 'message'], $errors));
+        $contents = json_encode([
+            'code' => 422,
+            'success' => false,
+            'errors' => array_map([$this, 'message'], $errors),
+            'data' => [],
+        ], JSON_THROW_ON_ERROR);
+
+        $response = $this->factory
+            ->createResponse(422)
+            ->withHeader('content-type', 'application/json');
+
+        $response->getBody()->write($contents);
+
+        return $response;
     }
 
     private function message(ErrorInterface $error): string

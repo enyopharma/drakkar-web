@@ -3,5 +3,5 @@ parameters:
     ignoreErrors:
         -
             message: '#League\\Plates\\callback#'
-            path: 'app/Extensions/Plates/*'
+            path: '*'
     reportUnmatchedIgnoredErrors: false

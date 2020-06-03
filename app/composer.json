@@ -32,6 +32,8 @@
         "psr/http-server-middleware": "^1.0",
         "quanta/container": "^0.3.0",
         "quanta/http-dispatcher": "^0.4.0",
+        "quanta/http-endpoint": "^0.1.0",
+        "quanta/http-responder": "^0.1.0",
         "quanta/http-routing": "^0.2.0",
         "quanta/validation": "^0.4.0",
         "symfony/dotenv": "^4.3"
