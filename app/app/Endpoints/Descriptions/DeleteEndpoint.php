@@ -23,9 +23,11 @@ final class DeleteEndpoint
      */
     public function __invoke(ServerRequestInterface $request)
     {
+        $run_id = (int) $request->getAttribute('run_id');
+        $pmid = (int) $request->getAttribute('pmid');
         $id = (int) $request->getAttribute('id');
 
-        return $this->action->delete($id)->match([
+        return $this->action->delete($run_id, $pmid, $id)->match([
             DeleteDescriptionResult::SUCCESS => fn () => [],
             DeleteDescriptionResult::NOT_FOUND => fn () => false,
         ]);

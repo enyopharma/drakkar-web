@@ -10,7 +10,7 @@ final class UpdatePublicationStateSql implements UpdatePublicationStateInterface
         UPDATE associations
         SET state = ?, annotation = ?, updated_at = NOW()
         WHERE run_id = ? AND pmid = ?
-SQL;
+    SQL;
 
     private \PDO $pdo;
 
@@ -21,7 +21,7 @@ SQL;
 
     public function update(int $run_id, int $pmid, string $state, string $annotation): UpdatePublicationStateResult
     {
-        if (! in_array($state, ['selected', 'discarded', 'curated'])) {
+        if (!in_array($state, ['selected', 'discarded', 'curated'])) {
             return UpdatePublicationStateResult::notValid();
         }
 

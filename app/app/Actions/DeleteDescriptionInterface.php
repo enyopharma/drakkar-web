@@ -6,5 +6,5 @@ namespace App\Actions;
 
 interface DeleteDescriptionInterface
 {
-    public function delete(int $id): DeleteDescriptionResult;
+    public function delete(int $run_id, int $pmid, int $id): DeleteDescriptionResult;
 }
