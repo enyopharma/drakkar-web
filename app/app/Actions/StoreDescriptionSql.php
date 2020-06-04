@@ -51,10 +51,12 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
     public function store(DescriptionInput $input): StoreDescriptionResult
     {
         // exctract data from the input.
-        $association = $input->association();
-        $method = $input->method();
-        $interactor1 = $input->interactor1();
-        $interactor2 = $input->interactor2();
+        $data = $input->data();
+
+        $association = $data['association'];
+        $method = $data['method'];
+        $interactor1 = $data['interactor1'];
+        $interactor2 = $data['interactor2'];
 
         // prepare the queries.
         $select_method_sth = $this->pdo->prepare(self::SELECT_METHOD_SQL);
@@ -75,7 +77,7 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
 
         // ensure description does not exists (both directions).
         $select_description_sth->execute([
-            $association->id(),
+            $association['id'],
             $method['id'],
             $protein1['id'],
             $protein2['id'],
@@ -88,7 +90,7 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
         }
 
         $select_description_sth->execute([
-            $association->id(),
+            $association['id'],
             $method['id'],
             $protein2['id'],
             $protein1['id'],
@@ -131,7 +133,7 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
                 $tries++;
 
                 $inserted = $insert_description_sth->execute([
-                    $association->id(),
+                    $association['id'],
                     $method['id'],
                     $interactor1['id'],
                     $interactor2['id'],

@@ -10,10 +10,12 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
-use Quanta\Validation\ErrorInterface;
+use Quanta\Validation\Error;
+use Quanta\Validation\InvalidDataException;
 
+use App\Input\DataSource;
+use App\Input\Association;
 use App\Input\DescriptionInput;
-use App\Validations\Association;
 
 final class ValidateDescriptionMiddleware implements MiddlewareInterface
 {
@@ -55,21 +57,24 @@ final class ValidateDescriptionMiddleware implements MiddlewareInterface
 
         $association = new Association($association['id'], $association['type']);
 
-        // validate the input.
-        return DescriptionInput::from($this->pdo, $association, $data)->extract(
-            fn ($input) => $this->success($request, $handler, $input),
-            fn (...$errors) => $this->failure(...$errors),
-        );
+        // get the factory.
+        $factory = DescriptionInput::factory(new DataSource($this->pdo), $association);
+
+        // try to produce a description input.
+        try {
+            $input = $factory($data);
+
+            $request = $request->withAttribute(DescriptionInput::class, $input);
+
+            return $handler->handle($request);
+        }
+
+        catch (InvalidDataException $e) {
+            return $this->failure(...$e->errors());
+        }
     }
 
-    private function success(ServerRequestInterface $request, RequestHandlerInterface $handler, DescriptionInput $input): ResponseInterface
-    {
-        $request = $request->withAttribute(DescriptionInput::class, $input);
-
-        return $handler->handle($request);
-    }
-
-    private function failure(ErrorInterface ...$errors): ResponseInterface
+    private function failure(Error ...$errors): ResponseInterface
     {
         $contents = json_encode([
             'code' => 422,
@@ -87,9 +92,10 @@ final class ValidateDescriptionMiddleware implements MiddlewareInterface
         return $response;
     }
 
-    private function message(ErrorInterface $error): string
+    private function message(Error $error): string
     {
-        $name = $error->name();
+        $name = array_map(fn ($key) => '[' . $key . ']', $error->keys());
+        $name = implode('', $name);
 
         return $name == ''
             ? $error->message()

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "731434e7b61f4bfe799fcf1a22037dd5",
+    "content-hash": "85f99194e7b0896850e2d7c206a19fe6",
     "packages": [
         {
             "name": "filp/whoops",
@@ -1225,20 +1225,20 @@
         },
         {
             "name": "quanta/validation",
-            "version": "0.4.0",
+            "version": "0.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quantaphp/validation.git",
-                "reference": "96398eb7a64377574862dcd772d8cea91430941d"
+                "reference": "6d230e0bb923c7b4383342d6b7d063c5ea516a45"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/validation/zipball/96398eb7a64377574862dcd772d8cea91430941d",
-                "reference": "96398eb7a64377574862dcd772d8cea91430941d",
+                "url": "https://api.github.com/repos/quantaphp/validation/zipball/6d230e0bb923c7b4383342d6b7d063c5ea516a45",
+                "reference": "6d230e0bb923c7b4383342d6b7d063c5ea516a45",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.4"
+                "php": "^7.4"
             },
             "require-dev": {
                 "eloquent/phony-kahlan": "^2.0",
@@ -1248,7 +1248,7 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Quanta\\Validation\\": "src"
+                    "Quanta\\": "src"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -1267,7 +1267,7 @@
                 "input",
                 "validation"
             ],
-            "time": "2019-12-09T13:57:28+00:00"
+            "time": "2020-06-04T12:47:53+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -1311,16 +1311,16 @@
         },
         {
             "name": "symfony/dotenv",
-            "version": "v4.4.8",
+            "version": "v4.4.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dotenv.git",
-                "reference": "a78e698cfb8aca8ef6814639eb5ffc17180a4326"
+                "reference": "24d734ab97c7fb8b4fa10c64ee0c344f2badfcf0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dotenv/zipball/a78e698cfb8aca8ef6814639eb5ffc17180a4326",
-                "reference": "a78e698cfb8aca8ef6814639eb5ffc17180a4326",
+                "url": "https://api.github.com/repos/symfony/dotenv/zipball/24d734ab97c7fb8b4fa10c64ee0c344f2badfcf0",
+                "reference": "24d734ab97c7fb8b4fa10c64ee0c344f2badfcf0",
                 "shasum": ""
             },
             "require": {
@@ -1364,7 +1364,7 @@
                 "env",
                 "environment"
             ],
-            "time": "2020-03-27T16:54:36+00:00"
+            "time": "2020-05-26T09:42:42+00:00"
         }
     ],
     "packages-dev": [

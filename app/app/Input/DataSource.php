@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Validations;
+namespace App\Input;
 
 final class DataSource
 {
@@ -18,7 +18,7 @@ final class DataSource
         AND p.accession = ?
     SQL;
 
-    const SELECT_SEQUENCE_SQL = <<<SQL
+    const SELECT_ISOFORM_SQL = <<<SQL
         SELECT p.accession AS protein, s.accession, s.sequence, s.is_canonical
         FROM proteins AS p, sequences AS s
         WHERE p.id = s.protein_id
@@ -56,7 +56,7 @@ final class DataSource
 
     private array $proteins;
 
-    private array $sequences;
+    private array $isoforms;
 
     private array $names;
 
@@ -68,7 +68,7 @@ final class DataSource
         $this->sths = [];
         $this->methods = [];
         $this->proteins = [];
-        $this->sequences = [];
+        $this->isoforms = [];
         $this->names = [];
         $this->coordinates = [];
     }
@@ -77,7 +77,7 @@ final class DataSource
     {
         $key = md5($sql);
 
-        if (! key_exists($key, $this->sths)) {
+        if (!key_exists($key, $this->sths)) {
             $this->sths[$key] = $this->pdo->prepare($sql);
         }
 
@@ -89,7 +89,7 @@ final class DataSource
      */
     public function method(string $psimi_id)
     {
-        if (! key_exists($psimi_id, $this->methods)) {
+        if (!key_exists($psimi_id, $this->methods)) {
             $select_method_sth = $this->prepare(self::SELECT_METHOD_SQL);
 
             $select_method_sth->execute([$psimi_id]);
@@ -105,7 +105,7 @@ final class DataSource
      */
     public function protein(string $accession)
     {
-        if (! key_exists($accession, $this->proteins)) {
+        if (!key_exists($accession, $this->proteins)) {
             $select_protein_sth = $this->prepare(self::SELECT_PROTEIN_SQL);
 
             $select_protein_sth->execute([$accession]);
@@ -119,17 +119,17 @@ final class DataSource
     /**
      * @return mixed[]|false
      */
-    public function sequence(string $accession)
+    public function isoform(string $accession)
     {
-        if (! key_exists($accession, $this->sequences)) {
-            $select_sequence_sth = $this->prepare(self::SELECT_SEQUENCE_SQL);
+        if (!key_exists($accession, $this->isoforms)) {
+            $select_isoform_sth = $this->prepare(self::SELECT_ISOFORM_SQL);
 
-            $select_sequence_sth->execute([$accession]);
+            $select_isoform_sth->execute([$accession]);
 
-            $this->sequences[$accession] = $select_sequence_sth->fetch();
+            $this->isoforms[$accession] = $select_isoform_sth->fetch();
         }
 
-        return $this->sequences[$accession];
+        return $this->isoforms[$accession];
     }
 
     /**
@@ -139,7 +139,7 @@ final class DataSource
     {
         $key = implode('.', [$accession, $start, $stop]);
 
-        if (! key_exists($key, $this->names)) {
+        if (!key_exists($key, $this->names)) {
             $select_interactor_sth = $this->prepare(self::SELECT_INTERACTOR_NAME_SQL);
 
             $select_interactor_sth->execute([$accession, $start, $stop]);
@@ -157,7 +157,7 @@ final class DataSource
     {
         $key = implode('.', [$accession, $name]);
 
-        if (! key_exists($key, $this->coordinates)) {
+        if (!key_exists($key, $this->coordinates)) {
             $select_interactor_sth = $this->prepare(self::SELECT_INTERACTOR_COORDINATES_SQL);
 
             $select_interactor_sth->execute([$accession, $name]);
