@@ -11,7 +11,7 @@ final class PaginationExtension implements ExtensionInterface
 {
     private Engine $engine;
 
-    public function register(Engine $engine)
+    public function register(Engine $engine): void
     {
         $this->engine = $engine;
 
