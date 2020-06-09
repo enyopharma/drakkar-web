@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "85f99194e7b0896850e2d7c206a19fe6",
+    "content-hash": "73904844410e23f0419d2373966a9daf",
     "packages": [
         {
             "name": "filp/whoops",
@@ -933,70 +933,27 @@
             "time": "2020-03-23T09:12:05+00:00"
         },
         {
-            "name": "quanta/array-type-check",
-            "version": "0.3.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/quantaphp/array-type-check.git",
-                "reference": "17a233857d6d77c4143677a5a523eaa4ea7c89cc"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/array-type-check/zipball/17a233857d6d77c4143677a5a523eaa4ea7c89cc",
-                "reference": "17a233857d6d77c4143677a5a523eaa4ea7c89cc",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=7.0"
-            },
-            "require-dev": {
-                "eloquent/phony-kahlan": "^2.0",
-                "kahlan/kahlan": "^4.0",
-                "phpstan/phpstan": "^0.11.2"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Quanta\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "pmall",
-                    "email": "pierre.mallinjoud@gmail.com"
-                }
-            ],
-            "description": "PHP associative array type check",
-            "homepage": "https://github.com/quantaphp/array-type-check",
-            "time": "2019-07-16T10:56:56+00:00"
-        },
-        {
             "name": "quanta/container",
-            "version": "0.3.2",
+            "version": "0.4.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quantaphp/container.git",
-                "reference": "6b4158bc57e20e41860875908211507cfa113cd5"
+                "reference": "82ef56b2c2c3b7238054bc5adc2b98b13c494064"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/container/zipball/6b4158bc57e20e41860875908211507cfa113cd5",
-                "reference": "6b4158bc57e20e41860875908211507cfa113cd5",
+                "url": "https://api.github.com/repos/quantaphp/container/zipball/82ef56b2c2c3b7238054bc5adc2b98b13c494064",
+                "reference": "82ef56b2c2c3b7238054bc5adc2b98b13c494064",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.0",
-                "psr/container": "^1.0",
-                "quanta/array-type-check": "^0.3"
+                "php": "^7.0",
+                "psr/container": "^1.0"
             },
             "require-dev": {
-                "eloquent/phony-kahlan": "^2.0",
-                "kahlan/kahlan": "^4.0",
-                "phpstan/phpstan": "^0.10.8"
+                "eloquent/phony-kahlan": "^3.0",
+                "kahlan/kahlan": "^4.7",
+                "phpstan/phpstan": "^0.12.27"
             },
             "type": "library",
             "autoload": {
@@ -1021,7 +978,7 @@
                 "container",
                 "dependency-injection"
             ],
-            "time": "2019-07-16T11:22:30+00:00"
+            "time": "2020-06-09T15:54:37+00:00"
         },
         {
             "name": "quanta/http-dispatcher",

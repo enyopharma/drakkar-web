@@ -19,7 +19,9 @@ return function (string $env, bool $debug): ContainerInterface {
 
     $files = (array) glob(__DIR__ . '/../factories/*.php');
 
-    return new Quanta\Container(array_reduce($files, function ($factories, $file) {
+    $factories = array_reduce($files, function ($factories, $file) {
         return array_merge($factories, require $file);
-    }, $defaults));
+    }, $defaults);
+
+    return Quanta\Container::from($factories);
 };
