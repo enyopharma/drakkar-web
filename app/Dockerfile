@@ -12,7 +12,7 @@ WORKDIR /var/www/html
 COPY package.json package-lock.json ./
 RUN npm ci && npm audit fix
 COPY webpack.config.js tsconfig.json ./
-COPY frontend ./frontend
+COPY assets ./assets
 RUN npm run prod
 
 # Stage 3 - copy the artifacts and start php-fpm
