@@ -8,11 +8,13 @@ return [
     Engine::class => function ($container) {
         $engine = new Engine(__DIR__ . '/../templates', 'php');
 
-        $generator = $container->get(App\Routing\UrlGenerator::class);
-
-        $assets = new App\Extensions\Plates\AssetsExtension(
-            __DIR__ . '/../public/build/manifest.json',
+        $package = new Symfony\Component\Asset\Package(
+            new Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy(
+                __DIR__ . '/../public/build/manifest.json',
+            )
         );
+
+        $generator = $container->get(App\Routing\UrlGenerator::class);
 
         $pagination = new App\Extensions\Plates\PaginationExtension;
 
@@ -22,9 +24,9 @@ return [
             $container->get(\PDO::class),
         );
 
+        $engine->registerFunction('asset', [$package, 'getUrl']);
         $engine->registerFunction('url', [$generator, 'generate']);
 
-        $engine->loadExtension($assets);
         $engine->loadExtension($pagination);
         $engine->loadExtension($metadata);
         $engine->loadExtension($highlight);

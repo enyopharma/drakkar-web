@@ -36,6 +36,7 @@
         "quanta/http-responder": "^0.1",
         "quanta/http-routing": "^0.2",
         "quanta/validation": "^0.6",
+        "symfony/asset": "^5.1",
         "symfony/dotenv": "^4.3"
     },
     "require-dev": {
