@@ -2,7 +2,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "webpack --mode=development",
-    "prod": "webpack --mode=production"
+    "prod": "webpack --mode=production",
+    "watch": "webpack --mode=development --watch"
   },
   "devDependencies": {
     "@babel/core": "^7.10.2",

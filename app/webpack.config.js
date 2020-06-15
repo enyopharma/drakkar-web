@@ -11,7 +11,6 @@ module.exports = (env, argv) => {
             form: './assets/js/form/index.ts',
             table: './assets/js/table/index.ts',
         },
-        watch: argv.mode == 'development',
         devtool: argv.mode == 'development' ? 'inline-source-map' : false,
         output: {
             filename: '[name].[contenthash].js',
