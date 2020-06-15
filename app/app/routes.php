@@ -7,8 +7,7 @@ use Psr\Container\ContainerInterface;
 use Quanta\Http\Endpoint;
 use Quanta\Http\Responder;
 use Quanta\Http\RequestHandler;
-
-use App\Routing\LazyRequestHandler;
+use Quanta\Http\LazyRequestHandler;
 
 use App\Endpoints\Runs;
 use App\Endpoints\Dataset;

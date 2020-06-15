@@ -8,16 +8,16 @@
     "packages": [
         {
             "name": "filp/whoops",
-            "version": "2.7.2",
+            "version": "2.7.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filp/whoops.git",
-                "reference": "17d0d3f266c8f925ebd035cd36f83cf802b47d4a"
+                "reference": "5d5fe9bb3d656b514d455645b3addc5f7ba7714d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filp/whoops/zipball/17d0d3f266c8f925ebd035cd36f83cf802b47d4a",
-                "reference": "17d0d3f266c8f925ebd035cd36f83cf802b47d4a",
+                "url": "https://api.github.com/repos/filp/whoops/zipball/5d5fe9bb3d656b514d455645b3addc5f7ba7714d",
+                "reference": "5d5fe9bb3d656b514d455645b3addc5f7ba7714d",
                 "shasum": ""
             },
             "require": {
@@ -65,7 +65,7 @@
                 "throwable",
                 "whoops"
             ],
-            "time": "2020-05-05T12:28:07+00:00"
+            "time": "2020-06-14T09:00:00+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
@@ -982,16 +982,16 @@
         },
         {
             "name": "quanta/http-dispatcher",
-            "version": "0.4.2",
+            "version": "0.4.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quantaphp/http-dispatcher.git",
-                "reference": "51d146618b1a37979156969976ad6f2d19d2c8fc"
+                "reference": "126006c9e2b620885da31f00950a327a46cfeea7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/http-dispatcher/zipball/51d146618b1a37979156969976ad6f2d19d2c8fc",
-                "reference": "51d146618b1a37979156969976ad6f2d19d2c8fc",
+                "url": "https://api.github.com/repos/quantaphp/http-dispatcher/zipball/126006c9e2b620885da31f00950a327a46cfeea7",
+                "reference": "126006c9e2b620885da31f00950a327a46cfeea7",
                 "shasum": ""
             },
             "require": {
@@ -1001,9 +1001,9 @@
                 "psr/http-server-middleware": "^1.0"
             },
             "require-dev": {
-                "eloquent/phony-kahlan": "^2.0",
-                "kahlan/kahlan": "^4.5",
-                "phpstan/phpstan": "^0.12.3"
+                "eloquent/phony-kahlan": "^3.0",
+                "kahlan/kahlan": "^4.7",
+                "phpstan/phpstan": "^0.12.28"
             },
             "type": "library",
             "autoload": {
@@ -1029,7 +1029,7 @@
                 "psr-15",
                 "request-handler"
             ],
-            "time": "2020-01-14T15:24:04+00:00"
+            "time": "2020-06-12T15:37:14+00:00"
         },
         {
             "name": "quanta/http-endpoint",
@@ -1268,7 +1268,7 @@
         },
         {
             "name": "symfony/dotenv",
-            "version": "v4.4.9",
+            "version": "v4.4.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dotenv.git",
@@ -1327,16 +1327,16 @@
     "packages-dev": [
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.27",
+            "version": "0.12.29",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "2abbd3253e38a258137f647f4e5fdbcb13142c3e"
+                "reference": "9771daaf6b95c6313b908d0bcdee0afcd51f838a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/2abbd3253e38a258137f647f4e5fdbcb13142c3e",
-                "reference": "2abbd3253e38a258137f647f4e5fdbcb13142c3e",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/9771daaf6b95c6313b908d0bcdee0afcd51f838a",
+                "reference": "9771daaf6b95c6313b908d0bcdee0afcd51f838a",
                 "shasum": ""
             },
             "require": {
@@ -1365,7 +1365,7 @@
                 "MIT"
             ],
             "description": "PHPStan - PHP Static Analysis Tool",
-            "time": "2020-06-08T21:28:12+00:00"
+            "time": "2020-06-14T14:10:59+00:00"
         }
     ],
     "aliases": [],
