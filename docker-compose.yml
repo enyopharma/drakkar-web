@@ -8,6 +8,8 @@ services:
     app:
         build: ./app
         environment:
+            - APP_ENV=development
+            - APP_DEBUG=true
             - DB_HOSTNAME=${DB_HOSTNAME}
             - DB_DATABASE=${DB_DATABASE}
             - DB_USERNAME=${DB_USERNAME}
