@@ -2,11 +2,16 @@
 
 declare(strict_types=1);
 
+use App\Actions\StoreRunInterface;
 use App\Actions\StoreDescriptionInterface;
 use App\Actions\DeleteDescriptionInterface;
 use App\Actions\UpdatePublicationStateInterface;
 
 return [
+    StoreRunInterface::class => fn ($container) => new App\Actions\StoreRunSql(
+        $container->get(PDO::class),
+    ),
+
     UpdatePublicationStateInterface::class => fn ($container) => new App\Actions\UpdatePublicationStateSql(
         $container->get(PDO::class),
     ),

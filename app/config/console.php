@@ -13,13 +13,14 @@ $container = (require __DIR__ . '/container.php')('cli', true);
 $application = new Symfony\Component\Console\Application;;
 
 $pdo = $container->get(PDO::class);
+$store_run_action = $container->get(App\Actions\StoreRunInterface::class);
 
 $efetch = new App\Services\Efetch;
 $responder = new App\Commands\PopulatePublicationResponder;
 
-$application->add(new App\Commands\CreateHHRunCommand($pdo));
+$application->add(new App\Commands\CreateHHRunCommand($store_run_action));
 
-$application->add(new App\Commands\CreateVHRunCommand($pdo));
+$application->add(new App\Commands\CreateVHRunCommand($store_run_action));
 
 $application->add(new App\Commands\PopulateRunCommand($pdo,
     new App\Actions\PopulatePublicationSql($pdo, $efetch),
