@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use App\Actions\PopulatePublicationResult;
 use App\Actions\PopulatePublicationInterface;
 
 final class PopulatePublicationCommand extends Command
@@ -17,12 +18,9 @@ final class PopulatePublicationCommand extends Command
 
     private PopulatePublicationInterface $action;
 
-    private PopulatePublicationResponder $responder;
-
-    public function __construct(PopulatePublicationInterface $action, PopulatePublicationResponder $responder)
+    public function __construct(PopulatePublicationInterface $action)
     {
         $this->action = $action;
-        $this->responder = $responder;
 
         parent::__construct();
     }
@@ -39,8 +37,47 @@ final class PopulatePublicationCommand extends Command
     {
         $pmid = (int) ((array) $input->getArgument('pmid'))[0];
 
-        $result = $this->action->populate($pmid);
+        return $this->action->populate($pmid)->match([
+            PopulatePublicationResult::SUCCESS => fn () => $this->successOutput($output, $pmid),
+            PopulatePublicationResult::ALREADY_POPULATED => fn () => $this->alreadyPopulatedOutput($output, $pmid),
+            PopulatePublicationResult::NOT_FOUND => fn () => $this->notFoundOutput($output, $pmid),
+            PopulatePublicationResult::PARSING_ERROR => fn ($message) => $this->parsingErrorOutput($output, $pmid, $message),
+        ]);
+    }
 
-        return $this->responder->write($output, $pmid, $result);
+    private function successOutput(OutputInterface $output, int $pmid): int
+    {
+        $output->writeln(
+            sprintf('<info>Metadata of publication with [\'pmid\' => %s] successfully updated.</info>', $pmid)
+        );
+
+        return 0;
+    }
+
+    private function alreadyPopulatedOutput(OutputInterface $output, int $pmid): int
+    {
+        $output->writeln(
+            sprintf('<info>Metadata of publication with [\'pmid\' => %s] already populated</info>', $pmid)
+        );
+
+        return 1;
+    }
+
+    private function notFoundOutput(OutputInterface $output, int $pmid): int
+    {
+        $output->writeln(
+            sprintf('<error>No publication with [\'pmid\' => %s]</error>', $pmid)
+        );
+
+        return 1;
+    }
+
+    private function parsingErrorOutput(OutputInterface $output, int $pmid, string $message): int
+    {
+        $output->writeln(
+            sprintf('<error>Failed to retrieve metadata of publication with [\'pmid\' => %s] - %s</error>', $pmid, $message)
+        );
+
+        return 1;
     }
 }

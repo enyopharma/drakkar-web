@@ -5,42 +5,23 @@ declare(strict_types=1);
 namespace App\Commands;
 
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use App\Actions\PopulatePublicationInterface;
+use App\Actions\PopulateRunResult;
+use App\Actions\PopulateRunInterface;
 
 final class PopulateRunCommand extends Command
 {
-    const SELECT_RUN_SQL = <<<SQL
-        SELECT * FROM runs WHERE id = ?
-    SQL;
-
-    const SELECT_PUBLICATIONS_SQL = <<<SQL
-        SELECT p.*
-        FROM publications AS p, associations AS a
-        WHERE p.pmid = a.pmid AND a.run_id = ?
-        AND p.populated IS FALSE
-    SQL;
-
-    const UPDATE_RUN_SQL = <<<SQL
-        UPDATE runs SET populated = TRUE WHERE id = ?
-    SQL;
-
     protected static $defaultName = 'runs:populate';
 
-    private \PDO $pdo;
+    private PopulateRunInterface $action;
 
-    private PopulatePublicationInterface $action;
-
-    private PopulatePublicationResponder $responder;
-
-    public function __construct(\PDO $pdo, PopulatePublicationInterface $action, PopulatePublicationResponder $responder)
+    public function __construct(PopulateRunInterface $action)
     {
-        $this->pdo = $pdo;
         $this->action = $action;
-        $this->responder = $responder;
 
         parent::__construct();
     }
@@ -57,50 +38,42 @@ final class PopulateRunCommand extends Command
     {
         $id = (int) ((array) $input->getArgument('id'))[0];
 
-        // prepare the queries.
-        $select_run_sth = $this->pdo->prepare(self::SELECT_RUN_SQL);
-        $select_publications_sth = $this->pdo->prepare(self::SELECT_PUBLICATIONS_SQL);
-        $update_run_sth = $this->pdo->prepare(self::UPDATE_RUN_SQL);
+        // get the populate publication command.
+        $command = $this->command('publication:populate');
 
-        // select the curation run.
-        $select_run_sth->execute([$id]);
+        // create the populate publication callable.
+        $populate = function (int $pmid) use ($command, $output): bool {
+            return $command->run(new ArrayInput(['pmid' => $pmid]), $output) === 0;
+        };
 
-        if (!$run = $select_run_sth->fetch()) {
-            return $this->runNotFoundOutput($output, $id);
-        }
-
-        if ($run['populated']) {
-            return $this->runalreadyPopulatedOutput($output, $run);
-        }
-
-        // populate the run publications.
-        $errors = 0;
-
-        $select_publications_sth->execute([$run['id']]);
-
-        while ($publication = $select_publications_sth->fetch()) {
-            $result = $this->action->populate($publication['pmid']);
-
-            $this->responder->write($output, $publication['pmid'], $result);
-
-            if (!$result->isSuccess()) {
-                $errors++;
-            }
-        }
-
-        // write a failure when there is errors.
-        if ($errors > 0) {
-            return $this->failureOutput($output, $run);
-        }
-
-        // update the run to ensure it is in populated state (ex = all publications already populated)
-        $update_run_sth->execute([$id]);
-
-        // success !
-        return $this->successOutput($output, $run);
+        // execute the action and produce a response.
+        return $this->action->populate($id, $populate)->match([
+            PopulateRunResult::SUCCESS => fn ($name) => $this->successOutput($output, $name),
+            PopulateRunResult::NOT_FOUND => fn () => $this->notfoundOutput($output, $id),
+            PopulateRunResult::ALREADY_POPULATED => fn ($name) => $this->alreadyPopulatedOutput($output, $name),
+            PopulateRunResult::FAILURE => fn ($name) => $this->failureOutput($output, $name),
+        ]);
     }
 
-    private function runNotfoundOutput(OutputInterface $output, int $id): int
+    private function command(string $name): Command
+    {
+        if ($application = $this->getApplication()) {
+            return $application->find($name);
+        }
+
+        throw new \Exception('no application');
+    }
+
+    private function successOutput(OutputInterface $output, array $run): int
+    {
+        $output->writeln(
+            sprintf('<info>Metadata of curation run \'%s\' publications successfully updated.</info>', $run['name'])
+        );
+
+        return 0;
+    }
+
+    private function notfoundOutput(OutputInterface $output, int $id): int
     {
         $output->writeln(
             sprintf('<error>No run with [\'id\' => %s]</error>', $id)
@@ -109,7 +82,7 @@ final class PopulateRunCommand extends Command
         return 1;
     }
 
-    private function runalreadyPopulatedOutput(OutputInterface $output, array $run): int
+    private function alreadyPopulatedOutput(OutputInterface $output, array $run): int
     {
         $output->writeln(
             sprintf('<info>Metadata of curation run \'%s\' publications are already populated</info>', $run['name'])
@@ -125,14 +98,5 @@ final class PopulateRunCommand extends Command
         );
 
         return 1;
-    }
-
-    private function successOutput(OutputInterface $output, array $run): int
-    {
-        $output->writeln(
-            sprintf('<info>Metadata of curation run \'%s\' publications successfully updated.</info>', $run['name'])
-        );
-
-        return 0;
     }
 }
