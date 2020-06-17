@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Cli\Actions;
+namespace App\Actions;
 
-use Cli\Efetch;
-use Cli\ParsingException;
+use App\Services\Efetch;
+use App\Services\ParsingException;
 
 final class PopulatePublicationSql implements PopulatePublicationInterface
 {
@@ -14,11 +14,11 @@ final class PopulatePublicationSql implements PopulatePublicationInterface
         FROM runs AS r, associations AS a
         WHERE r.id = a.run_id
         AND a.pmid = ?
-SQL;
+    SQL;
 
     const SELECT_PUBLICATION_SQL = <<<SQL
         SELECT * FROM publications WHERE pmid = ?
-SQL;
+    SQL;
 
     const COUNT_NOT_POPULATED_SQL = <<<SQL
         SELECT COUNT(*)
@@ -26,21 +26,21 @@ SQL;
         WHERE p.pmid = a.pmid
         AND a.run_id = ?
         AND p.populated IS FALSE
-SQL;
+    SQL;
 
     const UPDATE_RUN_SQL = <<<SQL
         UPDATE runs SET populated = TRUE WHERE id = ?
-SQL;
+    SQL;
 
     const UPDATE_PUBLICATION_SQL = <<<SQL
         UPDATE publications
         SET populated = TRUE, metadata = ?
         WHERE pmid = ?
-SQL;
+    SQL;
 
-    private $pdo;
+    private \PDO $pdo;
 
-    private $efetch;
+    private Efetch $efetch;
 
     public function __construct(\PDO $pdo, Efetch $efetch)
     {

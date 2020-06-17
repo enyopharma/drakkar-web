@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Cli;
+namespace App\Services;
 
 final class ParsingException extends \Exception
 {

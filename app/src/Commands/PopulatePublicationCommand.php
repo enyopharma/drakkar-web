@@ -2,23 +2,22 @@
 
 declare(strict_types=1);
 
-namespace Cli\Commands;
+namespace App\Commands;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Cli\Actions\PopulatePublicationInterface;
-use Cli\Responders\PopulatePublicationResponder;
+use App\Actions\PopulatePublicationInterface;
 
 final class PopulatePublicationCommand extends Command
 {
     protected static $defaultName = 'publications:populate';
 
-    private $action;
+    private PopulatePublicationInterface $action;
 
-    private $responder;
+    private PopulatePublicationResponder $responder;
 
     public function __construct(PopulatePublicationInterface $action, PopulatePublicationResponder $responder)
     {
@@ -36,7 +35,7 @@ final class PopulatePublicationCommand extends Command
             ->addArgument('pmid', InputArgument::REQUIRED, 'The pmid of the publication.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $pmid = (int) ((array) $input->getArgument('pmid'))[0];
 

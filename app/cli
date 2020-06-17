@@ -1,0 +1,26 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+/**
+ * Set up the autoloader.
+ */
+require __DIR__ . '/vendor/autoload.php';
+
+/**
+ * Complete the env with local values.
+ */
+if (file_exists($envfile = __DIR__ . '/../.env')) {
+    (new Symfony\Component\Dotenv\Dotenv)->load($envfile);
+}
+
+/**
+ * Get the console application.
+ */
+$application = require __DIR__ . '/config/console.php';
+
+/**
+ * Run the application.
+ */
+$application->run();

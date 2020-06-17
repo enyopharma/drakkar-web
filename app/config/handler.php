@@ -16,7 +16,7 @@ $container = (require __DIR__ . '/container.php')($env, $debug);
 /**
  * Run the boot scripts.
  */
-foreach ((array) glob(__DIR__ . '/../boot/*.php') as $boot) {
+foreach ((array) glob(__DIR__ . '/boot/*.php') as $boot) {
     (require $boot)($container);
 }
 

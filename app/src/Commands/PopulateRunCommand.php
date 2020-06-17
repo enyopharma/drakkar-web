@@ -2,40 +2,39 @@
 
 declare(strict_types=1);
 
-namespace Cli\Commands;
+namespace App\Commands;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Cli\Actions\PopulatePublicationInterface;
-use Cli\Responders\PopulatePublicationResponder;
+use App\Actions\PopulatePublicationInterface;
 
 final class PopulateRunCommand extends Command
 {
     const SELECT_RUN_SQL = <<<SQL
         SELECT * FROM runs WHERE id = ?
-SQL;
+    SQL;
 
     const SELECT_PUBLICATIONS_SQL = <<<SQL
         SELECT p.*
         FROM publications AS p, associations AS a
         WHERE p.pmid = a.pmid AND a.run_id = ?
         AND p.populated IS FALSE
-SQL;
+    SQL;
 
     const UPDATE_RUN_SQL = <<<SQL
         UPDATE runs SET populated = TRUE WHERE id = ?
-SQL;
+    SQL;
 
     protected static $defaultName = 'runs:populate';
 
-    private $pdo;
+    private \PDO $pdo;
 
-    private $action;
+    private PopulatePublicationInterface $action;
 
-    private $responder;
+    private PopulatePublicationResponder $responder;
 
     public function __construct(\PDO $pdo, PopulatePublicationInterface $action, PopulatePublicationResponder $responder)
     {
@@ -54,7 +53,7 @@ SQL;
             ->addArgument('id', InputArgument::REQUIRED, 'The id of the curation run.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $id = (int) ((array) $input->getArgument('id'))[0];
 
@@ -66,7 +65,7 @@ SQL;
         // select the curation run.
         $select_run_sth->execute([$id]);
 
-        if (! $run = $select_run_sth->fetch()) {
+        if (!$run = $select_run_sth->fetch()) {
             return $this->runNotFoundOutput($output, $id);
         }
 
@@ -84,7 +83,7 @@ SQL;
 
             $this->responder->write($output, $publication['pmid'], $result);
 
-            if (! $result->isSuccess()) {
+            if (!$result->isSuccess()) {
                 $errors++;
             }
         }
@@ -98,43 +97,39 @@ SQL;
         return $this->successOutput($output, $run);
     }
 
-    /**
-     * @return mixed
-     */
-    private function runNotfoundOutput(OutputInterface $output, int $id)
+    private function runNotfoundOutput(OutputInterface $output, int $id): int
     {
-        return $output->writeln(
+        $output->writeln(
             sprintf('<error>No run with [\'id\' => %s]</error>', $id)
         );
+
+        return 1;
     }
 
-    /**
-     * @return mixed
-     */
-    private function runalreadyPopulatedOutput(OutputInterface $output, array $run)
+    private function runalreadyPopulatedOutput(OutputInterface $output, array $run): int
     {
-        return $output->writeln(
+        $output->writeln(
             sprintf('<info>Metadata of curation run \'%s\' publications are already populated</info>', $run['name'])
         );
+
+        return 1;
     }
 
-    /**
-     * @return mixed
-     */
-    private function failureOutput(OutputInterface $output, array $run)
+    private function failureOutput(OutputInterface $output, array $run): int
     {
-        return $output->writeln(
+        $output->writeln(
             sprintf('<error>Failed to retrieve metadata of run \'%s\' publications</error>', $run['name'])
         );
+
+        return 1;
     }
 
-    /**
-     * @return mixed
-     */
-    private function successOutput(OutputInterface $output, array $run)
+    private function successOutput(OutputInterface $output, array $run): int
     {
-        return $output->writeln(
+        $output->writeln(
             sprintf('<info>Metadata of curation run \'%s\' publications successfully updated.</info>', $run['name'])
         );
+
+        return 0;
     }
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Cli\Commands;
+namespace App\Commands;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -13,19 +13,23 @@ abstract class AbstractCreateRunCommand extends Command
 {
     const INSERT_RUN_SQL = <<<SQL
         INSERT INTO runs (type, name) VALUES (?, ?)
-SQL;
+    SQL;
 
     const INSERT_PUBLICATION_SQL = <<<SQL
         INSERT INTO publications (pmid) VALUES (?)
-SQL;
+    SQL;
 
     const INSERT_ASSOCIATION_SQL = <<<SQL
         INSERT INTO associations (run_id, pmid) VALUES (?, ?)
-SQL;
+    SQL;
+
+    const SELECT_RUN_SQL = <<<SQL
+        SELECT * FROM runs WHERE  name = ?
+    SQL;
 
     const SELECT_PUBLICATION_SQL = <<<SQL
         SELECT * FROM publications WHERE pmid = ?
-SQL;
+    SQL;
 
     const SELECT_PUBLICATIONS_SQL = <<<SQL
         SELECT r.id AS run_id, r.type AS run_type, r.name AS run_name, a.pmid
@@ -33,15 +37,15 @@ SQL;
         WHERE r.id = a.run_id
         AND r.type = ?
         AND a.pmid IN(%s)
-SQL;
+    SQL;
 
-    private $pdo;
+    private \PDO $pdo;
 
-    private $type;
+    private string $type;
 
     public function __construct(\PDO $pdo, string $type)
     {
-        if (! in_array($type, ['hh', 'vh'])) {
+        if (!in_array($type, ['hh', 'vh'])) {
             throw new \InvalidArgumentException(
                 sprintf('\'%s\' is not a valid curation run type.', $type)
             );
@@ -61,7 +65,7 @@ SQL;
             ->addArgument('name', InputArgument::REQUIRED, 'The name of the curation run.');
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output)
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $type = $this->type;
         $name = $input->getArgument('name');
@@ -82,12 +86,20 @@ SQL;
         $insert_run_sth = $this->pdo->prepare(self::INSERT_RUN_SQL);
         $insert_publication_sth = $this->pdo->prepare(self::INSERT_PUBLICATION_SQL);
         $insert_association_sth = $this->pdo->prepare(self::INSERT_ASSOCIATION_SQL);
+        $select_run_sth = $this->pdo->prepare(self::SELECT_RUN_SQL);
         $select_publication_sth = $this->pdo->prepare(self::SELECT_PUBLICATION_SQL);
         $select_publications_sth = $this->pdo->prepare(
             vsprintf(self::SELECT_PUBLICATIONS_SQL, [
                 implode(', ', array_pad([], count($pmids), '?')),
             ])
         );
+
+        // return an error when a run with the same name already exist.
+        $select_run_sth->execute([$name]);
+
+        if ($run = $select_run_sth->fetch()) {
+            return $this->runAlreadyExistsOutput($output, $run);
+        }
 
         // return an error when any publication is already associated with a
         // publication curation run of the same type.
@@ -107,7 +119,7 @@ SQL;
         foreach ($pmids as $pmid) {
             $select_publication_sth->execute([$pmid]);
 
-            if (! $select_publication_sth->fetch()) {
+            if (!$select_publication_sth->fetch()) {
                 $insert_publication_sth->execute([$pmid]);
             }
 
@@ -132,7 +144,7 @@ SQL;
 
                 if (empty($line)) continue;
 
-                if (! preg_match('/^[0-9]+$/', $line)) {
+                if (!preg_match('/^[0-9]+$/', $line)) {
                     throw new \UnexpectedValueException(
                         vsprintf('Value \'%s\' from stdin is not a valid PMID', [
                             strlen($line) > 10 ? substr($line, 0, 10) . '...' : $line,
@@ -155,28 +167,32 @@ SQL;
         return array_keys($pmids);
     }
 
-    /**
-     * @return mixed
-     */
-    private function invalidPmidOutput(OutputInterface $output, string $message)
+    private function invalidPmidOutput(OutputInterface $output, string $message): int
     {
-        return $output->writeln(sprintf('<error>%s</error>', $message));
+        $output->writeln(sprintf('<error>%s</error>', $message));
+
+        return 1;
     }
 
-    /**
-     * @return mixed
-     */
-    private function noPmidOutput(OutputInterface $output)
+    private function noPmidOutput(OutputInterface $output): int
     {
-        return $output->writeln('<error>At least one pmid is required.</error>');
+        $output->writeln('<error>At least one pmid is required.</error>');
+
+        return 1;
     }
 
-    /**
-     * @return mixed
-     */
-    private function associationAlreadyExistsOutput(OutputInterface $output, array $publication)
+    private function runAlreadyExistsOutput(OutputInterface $output, array $run): int
     {
-        return $output->writeln(
+        $output->writeln(
+            sprintf('<error>Run with name \'%s\' already exists</error>', $run['name']),
+        );
+
+        return 1;
+    }
+
+    private function associationAlreadyExistsOutput(OutputInterface $output, array $publication): int
+    {
+        $output->writeln(
             vsprintf('<error>Publication with PMID %s is already associated with %s curation run %s (\'%s\')</error>', [
                 $publication['pmid'],
                 $publication['run_type'],
@@ -184,15 +200,16 @@ SQL;
                 $publication['run_name'],
             ])
         );
+
+        return 1;
     }
 
-    /**
-     * @return mixed
-     */
-    private function successOutput(OutputInterface $output, array $run)
+    private function successOutput(OutputInterface $output, array $run): int
     {
-        return $output->writeln(
+        $output->writeln(
             sprintf('<info>Curation run created with [\'id\' => %s].</info>', $run['id'])
         );
+
+        return 0;
     }
 }

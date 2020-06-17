@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Cli\Actions;
+namespace App\Actions;
 
 final class PopulatePublicationResult
 {
@@ -11,9 +11,9 @@ final class PopulatePublicationResult
     const ALREADY_POPULATED = 2;
     const PARSING_ERROR = 3;
 
-    private $state;
+    private int $state;
 
-    private $message;
+    private string $message;
 
     public static function success(): self
     {

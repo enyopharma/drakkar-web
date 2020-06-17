@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Cli\Commands;
+namespace App\Commands;
 
 final class CreateHHRunCommand extends AbstractCreateRunCommand
 {

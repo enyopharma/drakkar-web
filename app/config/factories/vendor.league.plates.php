@@ -6,11 +6,11 @@ use League\Plates\Engine;
 
 return [
     Engine::class => function ($container) {
-        $engine = new Engine(__DIR__ . '/../templates', 'php');
+        $engine = new Engine(__DIR__ . '/../../resources/templates', 'php');
 
         $package = new Symfony\Component\Asset\Package(
             new Symfony\Component\Asset\VersionStrategy\JsonManifestVersionStrategy(
-                __DIR__ . '/../public/build/manifest.json',
+                __DIR__ . '/../../public/build/manifest.json',
             )
         );
 

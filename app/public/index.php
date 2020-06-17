@@ -10,8 +10,8 @@ require __DIR__ . '/../vendor/autoload.php';
 /**
  * Complete the env with local values when exists.
  */
-if (file_exists($envfile = __DIR__ . '/../.env')) {
-    (new Symfony\Component\Dotenv\Dotenv(false))->load($envfile);
+if (file_exists($envfile = __DIR__ . '/../../.env')) {
+    (new Symfony\Component\Dotenv\Dotenv)->load($envfile);
 }
 
 /**
@@ -23,7 +23,7 @@ $_ENV['APP_DEBUG'] = filter_var($_ENV['APP_DEBUG'] ?? false, FILTER_VALIDATE_BOO
 /**
  * Get the http request handler.
  */
-$app = require __DIR__ . '/../app/app.php';
+$handler = require __DIR__ . '/../config/handler.php';
 
 /**
  * Run the application.
@@ -32,6 +32,6 @@ use function Http\Response\send;
 
 $request = GuzzleHttp\Psr7\ServerRequest::fromGlobals();
 
-$response = $app->handle($request);
+$response = $handler->handle($request);
 
 send($response);
