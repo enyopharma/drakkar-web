@@ -29,9 +29,9 @@ final class StoreRunResult
         return new self(self::NO_PMID);
     }
 
-    public static function runAlreadyExists(int $run_id): self
+    public static function runAlreadyExists(int $run_id, string $run_name): self
     {
-        return new self(self::RUN_ALREADY_EXISTS, $run_id);
+        return new self(self::RUN_ALREADY_EXISTS, $run_id, $run_name);
     }
 
     public static function associationAlreadyExists(int $run_id, string $run_name, int $pmid): self

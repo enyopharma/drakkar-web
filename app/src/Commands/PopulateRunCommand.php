@@ -10,14 +10,16 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use App\Actions\PopulateRunResult;
 use App\Actions\PopulateRunInterface;
+use App\Actions\PopulateRunResult as Result;
 
 final class PopulateRunCommand extends Command
 {
     protected static $defaultName = 'runs:populate';
 
     private PopulateRunInterface $action;
+
+    private ?OutputInterface $output = null;
 
     public function __construct(PopulateRunInterface $action)
     {
@@ -36,6 +38,8 @@ final class PopulateRunCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->output = $output;
+
         $id = (int) ((array) $input->getArgument('id'))[0];
 
         // get the populate publication command.
@@ -48,53 +52,53 @@ final class PopulateRunCommand extends Command
 
         // execute the action and produce a response.
         return $this->action->populate($id, $populate)->match([
-            PopulateRunResult::SUCCESS => fn ($name) => $this->successOutput($output, $name),
-            PopulateRunResult::NOT_FOUND => fn () => $this->notfoundOutput($output, $id),
-            PopulateRunResult::ALREADY_POPULATED => fn ($name) => $this->alreadyPopulatedOutput($output, $name),
-            PopulateRunResult::FAILURE => fn ($name) => $this->failureOutput($output, $name),
+            Result::SUCCESS => fn ($name) => $this->success($name),
+            Result::NOT_FOUND => fn () => $this->notfound($id),
+            Result::ALREADY_POPULATED => fn ($name) => $this->alreadyPopulated($name),
+            Result::FAILURE => fn ($name) => $this->failure($name),
         ]);
     }
 
-    private function command(string $name): Command
+    private function command(string $cmd): Command
     {
         if ($application = $this->getApplication()) {
-            return $application->find($name);
+            return $application->find($cmd);
         }
 
         throw new \Exception('no application');
     }
 
-    private function successOutput(OutputInterface $output, array $run): int
+    private function success(string $name): int
     {
-        $output->writeln(
-            sprintf('<info>Metadata of curation run \'%s\' publications successfully updated.</info>', $run['name'])
+        $this->output && $this->output->writeln(
+            sprintf('<info>Metadata of curation run \'%s\' publications successfully updated.</info>', $name)
         );
 
         return 0;
     }
 
-    private function notfoundOutput(OutputInterface $output, int $id): int
+    private function notfound(int $id): int
     {
-        $output->writeln(
+        $this->output && $this->output->writeln(
             sprintf('<error>No run with [\'id\' => %s]</error>', $id)
         );
 
         return 1;
     }
 
-    private function alreadyPopulatedOutput(OutputInterface $output, array $run): int
+    private function alreadyPopulated(string $name): int
     {
-        $output->writeln(
-            sprintf('<info>Metadata of curation run \'%s\' publications are already populated</info>', $run['name'])
+        $this->output && $this->output->writeln(
+            sprintf('<info>Metadata of curation run \'%s\' publications are already populated</info>', $name)
         );
 
         return 1;
     }
 
-    private function failureOutput(OutputInterface $output, array $run): int
+    private function failure(string $name): int
     {
-        $output->writeln(
-            sprintf('<error>Failed to retrieve metadata of run \'%s\' publications</error>', $run['name'])
+        $this->output && $this->output->writeln(
+            sprintf('<error>Failed to retrieve metadata of run \'%s\' publications</error>', $name)
         );
 
         return 1;
