@@ -31,7 +31,7 @@ final class DatasetViewSql implements DatasetViewInterface
         AND a.state = ?
         AND d.deleted_at IS NULL
         ORDER BY d.created_at DESC, d.id DESC
-SQL;
+    SQL;
 
     public function __construct(\PDO $pdo)
     {
