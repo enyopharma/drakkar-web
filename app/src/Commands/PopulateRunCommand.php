@@ -93,6 +93,9 @@ final class PopulateRunCommand extends Command
             return $this->failureOutput($output, $run);
         }
 
+        // update the run to ensure it is in populated state (ex = all publications already populated)
+        $update_run_sth->execute([$id]);
+
         // success !
         return $this->successOutput($output, $run);
     }
