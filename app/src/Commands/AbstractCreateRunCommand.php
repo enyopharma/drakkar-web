@@ -11,6 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use App\Actions\StoreRunResult;
 use App\Actions\StoreRunInterface;
+use App\Assertions\RunType;
 
 abstract class AbstractCreateRunCommand extends Command
 {
@@ -20,11 +21,7 @@ abstract class AbstractCreateRunCommand extends Command
 
     public function __construct(StoreRunInterface $action, string $type)
     {
-        if (!in_array($type, ['hh', 'vh'])) {
-            throw new \InvalidArgumentException(
-                sprintf('\'%s\' is not a valid curation run type.', $type)
-            );
-        }
+        RunType::argument($type);
 
         $this->action = $action;
         $this->type = $type;

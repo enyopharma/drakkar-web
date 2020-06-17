@@ -1,18 +1,18 @@
 <?php
     $helpers = [
-        'pending' => [
+        App\Assertions\PublicationState::PENDING => [
             'header' => 'Pending publications',
             'empty' => 'There is no pending publication.',
         ],
-        'selected' => [
+        App\Assertions\PublicationState::SELECTED => [
             'header' => 'Selected publications',
             'empty' => 'There is no selected publication.',
         ],
-        'discarded' => [
+        App\Assertions\PublicationState::DISCARDED => [
             'header' => 'Discarded publications',
             'empty' => 'There is no discarded publication.',
         ],
-        'curated' => [
+        App\Assertions\PublicationState::CURATED => [
             'header' => 'Curated publications',
             'empty' => 'There is no curated publication.',
         ],
@@ -44,34 +44,34 @@
     <ul class="nav nav-tabs nav-fill">
         <li class="nav-item">
             <a
-                class="nav-link text-warning <?= $state == 'pending' ? 'active' : '' ?>"
-                href="<?= $this->url('runs.publications.index', $run, ['state' => 'pending'], 'publications') ?>"
+                class="nav-link text-warning <?= $state == App\Assertions\PublicationState::PENDING ? 'active' : '' ?>"
+                href="<?= $this->url('runs.publications.index', $run, ['state' => App\Assertions\PublicationState::PENDING], 'publications') ?>"
             >
-                Pending (<?= $run['nbs']['pending'] ?>)
+                Pending (<?= $run['nbs'][App\Assertions\PublicationState::PENDING] ?>)
             </a>
         </li>
         <li class="nav-item">
             <a
-                class="nav-link text-primary <?= $state == 'selected' ? 'active' : '' ?>"
-                href="<?= $this->url('runs.publications.index', $run, ['state' => 'selected'], 'publications') ?>"
+                class="nav-link text-primary <?= $state == App\Assertions\PublicationState::SELECTED ? 'active' : '' ?>"
+                href="<?= $this->url('runs.publications.index', $run, ['state' => App\Assertions\PublicationState::SELECTED], 'publications') ?>"
             >
-                Selected (<?= $run['nbs']['selected'] ?>)
+                Selected (<?= $run['nbs'][App\Assertions\PublicationState::SELECTED] ?>)
             </a>
         </li>
         <li class="nav-item">
             <a
-                class="nav-link text-danger <?= $state == 'discarded' ? 'active' : '' ?>"
-                href="<?= $this->url('runs.publications.index', $run, ['state' => 'discarded'], 'publications') ?>"
+                class="nav-link text-danger <?= $state == App\Assertions\PublicationState::DISCARDED ? 'active' : '' ?>"
+                href="<?= $this->url('runs.publications.index', $run, ['state' => App\Assertions\PublicationState::DISCARDED], 'publications') ?>"
             >
-                Discarded (<?= $run['nbs']['discarded'] ?>)
+                Discarded (<?= $run['nbs'][App\Assertions\PublicationState::DISCARDED] ?>)
             </a>
         </li>
         <li class="nav-item">
             <a
-                class="nav-link text-success <?= $state == 'curated' ? 'active' : '' ?>"
-                href="<?= $this->url('runs.publications.index', $run, ['state' => 'curated'], 'publications') ?>"
+                class="nav-link text-success <?= $state == App\Assertions\PublicationState::CURATED ? 'active' : '' ?>"
+                href="<?= $this->url('runs.publications.index', $run, ['state' => App\Assertions\PublicationState::CURATED], 'publications') ?>"
             >
-                Curated (<?= $run['nbs']['curated'] ?>)
+                Curated (<?= $run['nbs'][App\Assertions\PublicationState::CURATED] ?>)
             </a>
         </li>
     </ul>

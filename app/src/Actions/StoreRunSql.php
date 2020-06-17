@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
+use App\Assertions\RunType;
+
 final class StoreRunSql implements StoreRunInterface
 {
     const INSERT_RUN_SQL = <<<SQL
@@ -44,11 +46,7 @@ final class StoreRunSql implements StoreRunInterface
     public function store(string $type, string $name, int ...$pmids): StoreRunResult
     {
         // ensure the type is valid.
-        if (!in_array($type, ['hh', 'vh'])) {
-            throw new \InvalidArgumentException(
-                sprintf('\'%s\' is not a valid curation run type.', $type)
-            );
-        }
+        RunType::argument($type);
 
         // ensure there is at least one pmid.
         if (count($pmids) == 0) {

@@ -15,6 +15,8 @@ use Quanta\Validation\Rules\NotEmpty;
 use Quanta\Validation\Rules\Matching;
 use Quanta\Validation\Rules\GreaterThanEqual;
 
+use App\Assertions\ProteinType;
+
 final class InteractorInput
 {
     const NAME_PATTERN = '/^[^\s]+$/';
@@ -143,7 +145,7 @@ final class InteractorInput
             $errors[] = new Error('start must be less than stop');
         }
 
-        if ($data['type'] == 'h' && ($this->start > 1 || $this->stop < $length)) {
+        if ($data['type'] == ProteinType::H && ($this->start > 1 || $this->stop < $length)) {
             $errors[] = new Error('human interactor must be full length');
         }
 

@@ -1,9 +1,9 @@
 <?php
     $classes = [
-        'pending' => 'badge-warning',
-        'selected' => 'badge-primary',
-        'discarded' => 'badge-danger',
-        'curated' => 'badge-success',
+        App\Assertions\PublicationState::PENDING => 'badge-warning',
+        App\Assertions\PublicationState::SELECTED => 'badge-primary',
+        App\Assertions\PublicationState::DISCARDED => 'badge-danger',
+        App\Assertions\PublicationState::CURATED => 'badge-success',
     ];
 ?>
 
@@ -80,7 +80,7 @@
                     <button
                         type="submit"
                         name="state"
-                        value="selected"
+                        value="<?= App\Assertions\PublicationState::SELECTED ?>"
                         class="btn btn-sm btn-block btn-primary"
                     >
                         Select
@@ -90,7 +90,7 @@
                     <button
                         type="submit"
                         name="state"
-                        value="discarded"
+                        value="<?= App\Assertions\PublicationState::DISCARDED ?>"
                         class="btn btn-sm btn-block btn-danger"
                     >
                         Discard
@@ -100,7 +100,7 @@
                     <button
                         type="submit"
                         name="state"
-                        value="curated"
+                        value="<?= App\Assertions\PublicationState::CURATED ?>"
                         class="btn btn-sm btn-block btn-success"
                     >
                         Curated

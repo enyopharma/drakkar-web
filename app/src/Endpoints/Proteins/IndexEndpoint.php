@@ -7,6 +7,7 @@ namespace App\Endpoints\Proteins;
 use Psr\Http\Message\ServerRequestInterface;
 
 use App\ReadModel\ProteinViewInterface;
+use App\Assertions\ProteinType;
 
 final class IndexEndpoint
 {
@@ -18,7 +19,7 @@ final class IndexEndpoint
     }
 
     /**
-     * @return array
+     * @return array|false
      */
     public function __invoke(ServerRequestInterface $request)
     {
@@ -27,6 +28,10 @@ final class IndexEndpoint
         $type = (string) ($params['type'] ?? '');
         $query = (string) ($params['query'] ?? '');
         $limit = (int) ($params['limit'] ?? 5);
+
+        if (!ProteinType::isValid($type)) {
+            return false;
+        }
 
         return $this->proteins->search($type, $query, $limit)->fetchAll();
     }

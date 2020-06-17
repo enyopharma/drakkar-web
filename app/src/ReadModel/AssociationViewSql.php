@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\ReadModel;
 
+use App\Assertions\PublicationState;
+
 final class AssociationViewSql implements AssociationViewInterface
 {
     private \PDO $pdo;
@@ -42,6 +44,8 @@ final class AssociationViewSql implements AssociationViewInterface
 
     public function all(int $run_id, string $state, int $limit, int $offset): Statement
     {
+        PublicationState::argument($state);
+
         $select_associations_sth = $this->pdo->prepare(self::SELECT_ASSOCIATIONS_SQL);
 
         $select_associations_sth->execute([$run_id, $state, $limit, $offset]);

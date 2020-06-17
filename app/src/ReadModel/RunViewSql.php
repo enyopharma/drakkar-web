@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\ReadModel;
 
+use App\Assertions\PublicationState;
+
 final class RunViewSql implements RunViewInterface
 {
     private \PDO $pdo;
@@ -42,10 +44,10 @@ final class RunViewSql implements RunViewInterface
         }
 
         if (in_array('nbs', $with)) {
-            $run['nbs']['pending'] = $this->nb($run['id'], 'pending');
-            $run['nbs']['selected'] = $this->nb($run['id'], 'selected');
-            $run['nbs']['discarded'] = $this->nb($run['id'], 'discarded');
-            $run['nbs']['curated'] = $this->nb($run['id'], 'curated');
+            $run['nbs'][PublicationState::PENDING] = $this->nb($run['id'], PublicationState::PENDING);
+            $run['nbs'][PublicationState::SELECTED] = $this->nb($run['id'], PublicationState::SELECTED);
+            $run['nbs'][PublicationState::DISCARDED] = $this->nb($run['id'], PublicationState::DISCARDED);
+            $run['nbs'][PublicationState::CURATED] = $this->nb($run['id'], PublicationState::CURATED);
         }
 
         return Statement::from([$run]);
@@ -90,10 +92,10 @@ final class RunViewSql implements RunViewInterface
     {
         while ($row = $sth->fetch()) {
             yield $row + ['nbs' => [
-                'pending' => $nbs[$row['id']]['pending'] ?? 0,
-                'selected' => $nbs[$row['id']]['selected'] ?? 0,
-                'discarded' => $nbs[$row['id']]['discarded'] ?? 0,
-                'curated' => $nbs[$row['id']]['curated'] ?? 0,
+                PublicationState::PENDING => $nbs[$row['id']][PublicationState::PENDING] ?? 0,
+                PublicationState::SELECTED => $nbs[$row['id']][PublicationState::SELECTED] ?? 0,
+                PublicationState::DISCARDED => $nbs[$row['id']][PublicationState::DISCARDED] ?? 0,
+                PublicationState::CURATED => $nbs[$row['id']][PublicationState::CURATED] ?? 0,
             ]];
         }
     }

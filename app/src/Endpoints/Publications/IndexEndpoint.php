@@ -11,6 +11,7 @@ use League\Plates\Engine;
 use App\Routing\UrlGenerator;
 use App\ReadModel\RunViewInterface;
 use App\ReadModel\AssociationViewInterface;
+use App\Assertions\PublicationState;
 
 final class IndexEndpoint
 {
@@ -40,12 +41,17 @@ final class IndexEndpoint
 
         $params = (array) $request->getQueryParams();
 
-        $state = (string) ($params['state'] ?? 'pending');
+        $state = (string) ($params['state'] ?? PublicationState::PENDING);
         $page = (int) ($params['page'] ?? 1);
         $limit = (int) ($params['limit'] ?? 20);
 
         // get the run.
         if (!$run = $this->runs->id($run_id, 'nbs')->fetch()) {
+            return false;
+        }
+
+        // validate the publication state.
+        if (!PublicationState::isValid($state)) {
             return false;
         }
 

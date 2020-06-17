@@ -1,6 +1,6 @@
 <?php $this->layout('layout'); ?>
 
-<?php if ($publication['state'] == 'selected'): ?>
+<?php if ($publication['state'] == App\Assertions\PublicationState::SELECTED): ?>
 <?php $this->push('scripts'); ?>
 <script type="text/javascript" src="<?= $this->asset('form.js') ?>"></script>
 <script type="text/javascript">
@@ -37,7 +37,7 @@
         : $this->url('runs.publications.descriptions.edit', $description)
 ]) ?>
 
-<?php if ($publication['state'] == 'selected'): ?>
+<?php if ($publication['state'] == App\Assertions\PublicationState::SELECTED): ?>
 <div id="description-form"></div>
 <?php else: ?>
 <p class="card-text text-warning">

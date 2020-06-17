@@ -38,7 +38,7 @@
     Descriptions associated with this publication
 </h2>
 
-<?php if ($publication['state'] == 'selected'): ?>
+<?php if ($publication['state'] == App\Assertions\PublicationState::SELECTED): ?>
 <p>
     <a href="<?= $this->url('runs.publications.descriptions.create', $publication) ?>">
         Add new descriptions.

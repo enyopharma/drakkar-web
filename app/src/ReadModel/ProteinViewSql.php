@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\ReadModel;
 
+use App\Assertions\ProteinType;
+
 final class ProteinViewSql implements ProteinViewInterface
 {
     private \PDO $pdo;
@@ -102,6 +104,8 @@ final class ProteinViewSql implements ProteinViewInterface
 
     public function search(string $type, string $query, int $limit): Statement
     {
+        ProteinType::argument($type);
+
         $qs = explode('+', $query);
         $qs = array_filter($qs);
         $qs = array_map(fn ($q) => '%' . trim($q) . '%', $qs);

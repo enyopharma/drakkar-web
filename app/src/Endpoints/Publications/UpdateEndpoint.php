@@ -8,6 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 use App\Actions\UpdatePublicationStateResult;
 use App\Actions\UpdatePublicationStateInterface;
+use App\Assertions\PublicationState;
 
 final class UpdateEndpoint
 {
@@ -32,10 +33,13 @@ final class UpdateEndpoint
         $annotation = (string) ($params['annotation'] ?? '');
         $source = (string) ($params['_source'] ?? '');
 
+        if (!PublicationState::isValid($state)) {
+            return false;
+        }
+
         return $this->action->update($run_id, $pmid, $state, $annotation)->match([
             UpdatePublicationStateResult::SUCCESS => fn () => $responder(302, $source),
             UpdatePublicationStateResult::NOT_FOUND => fn () => false,
-            UpdatePublicationStateResult::NOT_VALID => fn () => false,
         ]);
     }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
+use App\Assertions\PublicationState;
+
 final class UpdatePublicationStateSql implements UpdatePublicationStateInterface
 {
     const UPDATE_PUBLICATION_SQL = <<<SQL
@@ -21,9 +23,7 @@ final class UpdatePublicationStateSql implements UpdatePublicationStateInterface
 
     public function update(int $run_id, int $pmid, string $state, string $annotation): UpdatePublicationStateResult
     {
-        if (!in_array($state, ['selected', 'discarded', 'curated'])) {
-            return UpdatePublicationStateResult::notValid();
-        }
+        PublicationState::argument($state);
 
         $update_publication_sth = $this->pdo->prepare(self::UPDATE_PUBLICATION_SQL);
 

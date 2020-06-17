@@ -8,7 +8,6 @@ final class UpdatePublicationStateResult
 {
     const SUCCESS = 0;
     const NOT_FOUND = 1;
-    const NOT_VALID = 2;
 
     private int $state;
 
@@ -20,11 +19,6 @@ final class UpdatePublicationStateResult
     public static function notFound(): self
     {
         return new self(self::NOT_FOUND);
-    }
-
-    public static function notValid(): self
-    {
-        return new self(self::NOT_VALID);
     }
 
     private function __construct(int $state)
@@ -42,7 +36,7 @@ final class UpdatePublicationStateResult
      */
     public function match(array $alternatives)
     {
-        $all = [self::SUCCESS, self::NOT_FOUND, self::NOT_VALID];
+        $all = [self::SUCCESS, self::NOT_FOUND];
 
         $keys = array_keys($alternatives);
 

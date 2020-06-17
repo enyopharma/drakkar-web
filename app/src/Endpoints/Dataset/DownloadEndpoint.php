@@ -9,6 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use GuzzleHttp\Psr7;
 
 use App\ReadModel\DatasetViewInterface;
+use App\Assertions\RunType;
 
 final class DownloadEndpoint
 {
@@ -20,11 +21,15 @@ final class DownloadEndpoint
     }
 
     /**
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return \Psr\Http\Message\ResponseInterface|false
      */
     public function __invoke(ServerRequestInterface $request, callable $responder)
     {
         $type = $request->getAttribute('type');
+
+        if (!RunType::isValid($type)) {
+            return false;
+        }
 
         $dataset = $this->dataset->all($type);
 

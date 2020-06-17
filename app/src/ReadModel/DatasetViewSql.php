@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\ReadModel;
 
+use App\Assertions\RunType;
+use App\Assertions\PublicationState;
+
 final class DatasetViewSql implements DatasetViewInterface
 {
     private \PDO $pdo;
@@ -25,7 +28,7 @@ final class DatasetViewSql implements DatasetViewInterface
         AND i2.id = d.interactor2_id
         AND p1.id = i1.protein_id
         AND p2.id = i2.protein_id
-        AND a.state = 'curated'
+        AND a.state = ?
         AND d.deleted_at IS NULL
         ORDER BY d.created_at DESC, d.id DESC
 SQL;
@@ -37,9 +40,11 @@ SQL;
 
     public function all(string $type): Statement
     {
+        RunType::argument($type);
+
         $select_descriptions_sth = $this->pdo->prepare(self::SELECT_DESCRIPTIONS_SQL);
 
-        $select_descriptions_sth->execute([$type]);
+        $select_descriptions_sth->execute([$type, PublicationState::CURATED]);
 
         return Statement::from($this->generator($select_descriptions_sth));
     }

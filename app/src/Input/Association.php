@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Input;
 
+use App\Assertions\RunType;
+use App\Assertions\ProteinType;
+
 final class Association
 {
     private int $id;
@@ -12,6 +15,8 @@ final class Association
 
     public function __construct(int $id, string $type)
     {
+        RunType::argument($type);
+
         $this->id = $id;
         $this->type = $type;
     }
@@ -23,11 +28,13 @@ final class Association
 
     public function type1(): string
     {
-        return 'h';
+        return ProteinType::H;
     }
 
     public function type2(): string
     {
-        return $this->type == 'hh' ? 'h' : 'v';
+        return $this->type == RunType::HH
+            ? ProteinType::H
+            : ProteinType::V;
     }
 }
