@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 use Psr\Container\ContainerInterface;
 
-use Quanta\Http\Endpoint;
-use Quanta\Http\Responder;
-use Quanta\Http\RequestHandler;
-use Quanta\Http\LazyRequestHandler;
-
 use App\Endpoints\Runs;
 use App\Endpoints\Dataset;
 use App\Endpoints\Methods;
@@ -24,16 +19,11 @@ use App\Endpoints\Descriptions;
  * @return array[]
  */
 return function (ContainerInterface $container): array {
-    $lazy = fn (callable $f) => new LazyRequestHandler($f);
-
     $factory = $container->get(Psr\Http\Message\ResponseFactoryInterface::class);
 
-    $responder = new Responder($factory);
+    $endpoint = Quanta\Http\EndpointFactory::default($factory);
 
-    $endpoint = fn (callable $f) => new Endpoint($responder, $f, 'data', [
-        'code' => 200,
-        'success' => true,
-    ]);
+    $lazy = fn (callable $f) => new Quanta\Http\LazyRequestHandler($f);
 
     return array_map($lazy, [
         'GET /' => fn () => $endpoint(new Runs\IndexEndpoint(
@@ -78,7 +68,7 @@ return function (ContainerInterface $container): array {
             $container->get(App\ReadModel\DescriptionViewInterface::class),
         )),
 
-        'POST /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions' => fn () => RequestHandler::queue(
+        'POST /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions' => fn () => Quanta\Http\RequestHandler::queue(
             $endpoint(new Descriptions\StoreEndpoint(
                 $container->get(App\Actions\StoreDescriptionInterface::class),
             )),
