@@ -20,6 +20,12 @@ final class UrlGenerator
 
     public function generate(string $name, array $data = [], array $query = [], string $fragment = ''): string
     {
+        if (!array_key_exists($name, $this->map)) {
+            throw new \UnexpectedValueException(
+                sprintf('no url named \'%s\'', $name)
+            );
+        }
+
         $url = $this->map[$name]($data);
 
         if (count($query) > 0) {

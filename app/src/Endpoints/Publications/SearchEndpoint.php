@@ -29,7 +29,7 @@ final class SearchEndpoint
     {
         $params = (array) $request->getQueryParams();
 
-        $pmid = (int) $params['pmid'];
+        $pmid = (int) trim($params['pmid'] ?? '');
 
         $publications = $this->publications->search($pmid)->fetchAll();
 

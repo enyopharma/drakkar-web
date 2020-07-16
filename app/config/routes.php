@@ -36,6 +36,12 @@ return function (ContainerInterface $container): array {
             $container->get(App\ReadModel\PublicationViewInterface::class),
         )),
 
+        'GET /descriptions' => fn () => $endpoint(new Descriptions\SearchEndpoint(
+            $container->get(App\Routing\UrlGenerator::class),
+            $container->get(League\Plates\Engine::class),
+            $container->get(App\ReadModel\DescriptionViewInterface::class),
+        )),
+
         'GET /runs/{run_id:\d+}/publications' => fn () => $endpoint(new Publications\IndexEndpoint(
             $container->get(League\Plates\Engine::class),
             $container->get(App\Routing\UrlGenerator::class),

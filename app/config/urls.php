@@ -40,5 +40,7 @@ return [
 
     'publications.index' => fn () => '/publications',
 
+    'descriptions.index' => fn () => '/descriptions',
+
     'dataset' => fn (array $data) => sprintf('/dataset/%s', $data['type']),
 ];

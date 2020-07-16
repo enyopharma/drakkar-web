@@ -46,7 +46,18 @@
                 </ul>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col offset-4">
         <?= $this->insert('publications/search/form') ?>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col offset-4">
+        <?= $this->insert('descriptions/search/form') ?>
     </div>
 </div>
 
