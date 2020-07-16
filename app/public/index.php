@@ -10,7 +10,7 @@ require __DIR__ . '/../vendor/autoload.php';
 /**
  * Complete the env with local values when exists.
  */
-if (file_exists($envfile = __DIR__ . '/../../.env')) {
+if (file_exists($envfile = __DIR__ . '/../.env')) {
     (new Symfony\Component\Dotenv\Dotenv)->load($envfile);
 }
 

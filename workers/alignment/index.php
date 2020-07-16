@@ -13,7 +13,7 @@ require __DIR__ . '/vendor/autoload.php';
 /**
  * Complete the env with local values.
  */
-if (file_exists($envfile = __DIR__ . '/../.env')) {
+if (file_exists($envfile = __DIR__ . '/.env')) {
     (new Dotenv(false))->load($envfile);
 }
 
