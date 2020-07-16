@@ -41,7 +41,7 @@ final class SearchEndpoint
             return $this->engine->render('descriptions/search', ['stable_id' => $stable_id]);
         }
 
-        $url = $this->url->generate('runs.publications.descriptions.edit', $description);
+        $url = $this->url->generate('runs.publications.descriptions.show', $description);
 
         return $responder(302, $url);
     }
