@@ -14,9 +14,8 @@
         <a href="<?= $this->url('runs.publications.index', $run) ?>">
             <?= $run['type'] ?> - <?= $run['name'] ?></a>
         &gt;
-        <a href="<?= $publication['pmid'] ?>">
-            <?= $publication['pmid'] ?>
-        </a>
+        <a href="<?= $this->url('runs.publications.descriptions.index', $publication) ?>">
+            <?= $publication['pmid'] ?></a>
         &gt;
         <?= $description['stable_id'] ?>
     </h1>
