@@ -15,7 +15,7 @@ final class RunViewSql implements RunViewInterface
     SQL;
 
     const SELECT_RUNS_SQL = <<<SQL
-        SELECT * FROM runs WHERE populated IS TRUE
+        SELECT * FROM runs WHERE populated IS TRUE ORDER BY id DESC
     SQL;
 
     const COUNT_PUBLICATIONS_SQL = <<<SQL
