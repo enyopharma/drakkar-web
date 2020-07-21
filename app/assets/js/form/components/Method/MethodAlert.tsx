@@ -7,13 +7,11 @@ type Props = {
     unselect: () => void,
 }
 
-export const MethodAlert: React.FC<Props> = ({ method, unselect }) => {
-    return (
-        <div className="alert alert-info">
-            <strong>{method.psimi_id}</strong> - {method.name}
-            <button type="button" className="close" onClick={e => unselect()}>
-                <span>&times;</span>
-            </button>
-        </div>
-    )
-}
+export const MethodAlert: React.FC<Props> = ({ method, unselect }) => (
+    <div className="alert alert-info">
+        <strong>{method.psimi_id}</strong> - {method.name}
+        <button type="button" className="close" onClick={e => unselect()}>
+            <span>&times;</span>
+        </button>
+    </div>
+)

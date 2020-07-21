@@ -1,12 +1,14 @@
 import React from 'react'
 
-import { InteractorI, Protein, Sequences, Alignment } from '../../src/types'
+import { InteractorI, Sequences, Alignment } from '../../src/types'
 
 import { MappingSection } from './MappingSection'
 
+import { proteins as api } from '../../src/api'
+
 type Props = {
     i: InteractorI,
-    protein: Protein | null,
+    accession: string | null,
     name: string,
     start: number | null,
     stop: number | null,
@@ -19,14 +21,20 @@ type Props = {
     cancel: () => void,
 }
 
-export const MappingFieldset: React.FC<Props> = ({ protein, start, stop, ...props }) => {
-    return (
+export const MappingFieldset: React.FC<Props> = ({ accession, start, stop, ...props }) => (
+    <React.Suspense fallback={null}>
         <fieldset>
             <legend>Mapping</legend>
-            {protein == null || start == null || stop == null
+            {accession == null || start == null || stop == null
                 ? <p>Please select a sequence first.</p>
-                : <MappingSection {...props} protein={protein} start={start} stop={stop} />
+                : <MappingSectionLoader accession={accession} start={start} stop={stop} {...props} />
             }
         </fieldset>
-    )
+    </React.Suspense>
+)
+
+const MappingSectionLoader: React.FC<Props & { accession: string, start: number, stop: number }> = ({ accession, ...props }) => {
+    const protein = api.select(accession).read()
+
+    return <MappingSection protein={protein} {...props} />
 }

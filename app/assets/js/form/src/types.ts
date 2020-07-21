@@ -1,3 +1,17 @@
+export type AppState = {
+    interactor1: InteractorUI,
+    interactor2: InteractorUI,
+    description: Description,
+    saving: boolean,
+    feedback: Feedback | null
+}
+
+export type InteractorUI = {
+    editing: boolean,
+    processing: boolean,
+    alignment: Alignment | null,
+}
+
 export type DescriptionType = 'hh' | 'vh'
 
 export type Description = {

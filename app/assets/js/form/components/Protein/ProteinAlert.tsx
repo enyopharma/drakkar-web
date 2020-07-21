@@ -4,7 +4,7 @@ import { ProteinType, Protein } from '../../src/types'
 
 type Props = {
     protein: Protein,
-    enabled: boolean,
+    processing: boolean,
     unselect: () => void,
 }
 
@@ -13,7 +13,7 @@ const classes: Record<ProteinType, string> = {
     'v': 'alert alert-danger',
 }
 
-export const ProteinAlert: React.FC<Props> = ({ protein, enabled, unselect }) => {
+export const ProteinAlert: React.FC<Props> = ({ protein, processing, unselect }) => {
     return (
         <div className={classes[protein.type]}>
             <strong>{protein.accession}</strong> - {[
@@ -21,7 +21,7 @@ export const ProteinAlert: React.FC<Props> = ({ protein, enabled, unselect }) =>
                 protein.name,
                 protein.description,
             ].join(' - ')}
-            <button type="button" className="close" onClick={e => unselect()} disabled={!enabled}>
+            <button type="button" className="close" onClick={e => unselect()} disabled={processing}>
                 <span>&times;</span>
             </button>
         </div>

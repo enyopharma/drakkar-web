@@ -1,34 +1,38 @@
 import React from 'react'
 
-import { ProteinType, Protein } from '../../src/types'
+import { ProteinType } from '../../src/types'
 
 import { ProteinAlert } from './ProteinAlert'
 import { ProteinSearchField } from './ProteinSearchField'
 
+import { proteins as api } from '../../src/api'
+
 type Props = {
     type: ProteinType,
-    protein: Protein | null,
-    query: string,
-    enabled: boolean,
-    update: (query: string) => void,
+    accession: string | null,
+    processing: boolean,
     select: (accession: string) => void,
     unselect: () => void,
 }
 
-export const ProteinFieldset: React.FC<Props> = ({ protein, enabled, ...props }) => {
-    return (
+export const ProteinFieldset: React.FC<Props> = ({ accession, ...props }) => (
+    <React.Suspense fallback={null}>
         <fieldset>
-            <legend>
-                Protein
-            </legend>
+            <legend>Protein</legend>
             <div className="row">
                 <div className="col">
-                    {protein == null
+                    {accession == null
                         ? <ProteinSearchField {...props} />
-                        : <ProteinAlert {...props} protein={protein} enabled={enabled} />
+                        : <ProteinAlertLoader accession={accession} {...props} />
                     }
                 </div>
             </div>
         </fieldset>
-    )
+    </React.Suspense>
+)
+
+const ProteinAlertLoader: React.FC<Props & { accession: string }> = ({ accession, ...props }) => {
+    const protein = api.select(accession).read()
+
+    return <ProteinAlert protein={protein} {...props} />
 }

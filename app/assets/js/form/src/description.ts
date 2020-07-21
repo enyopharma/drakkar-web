@@ -1,6 +1,6 @@
-import { AppActionTypes, AppAction } from '../actions'
-import { InteractorAction, isInteractorAction } from '../actions'
-import { Description, InteractorI, Interactor, Alignment } from '../types'
+import { AppActionTypes, AppAction } from './actions'
+import { InteractorAction, isInteractorAction } from './actions'
+import { Description, InteractorI, Interactor, Alignment } from './types'
 
 export const description = (state: Description, action: AppAction): Description => {
     return {
@@ -72,9 +72,7 @@ const name = (state: string, action: InteractorAction): string => {
 const start = (state: number | null, action: InteractorAction): number | null => {
     switch (action.type) {
         case AppActionTypes.SELECT_PROTEIN:
-            return action.protein.type == 'h' || action.protein.matures.length == 0
-                ? 1
-                : null
+            return action.protein.type == 'h' || action.protein.matures.length == 0 ? 1 : null
         case AppActionTypes.UNSELECT_PROTEIN:
             return null
         case AppActionTypes.UPDATE_MATURE:

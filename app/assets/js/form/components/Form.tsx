@@ -5,9 +5,9 @@ import { AppProps } from '../src/props'
 import { InteractorI } from '../src/types'
 
 import { ResetModal } from './ResetModal'
-import { MethodSection } from './MethodSection'
 import { InteractorNav } from './InteractorNav'
 import { InteractorSection } from './InteractorSection'
+import { MethodFieldset } from './Method/MethodFieldset'
 
 export const Form: React.FC<AppProps> = ({ type, savable, resetable, saving, feedback, actions, ...props }) => {
     const [tab, setTab] = useState<InteractorI>(1)
@@ -22,7 +22,7 @@ export const Form: React.FC<AppProps> = ({ type, savable, resetable, saving, fee
             <div id="form-top" className="card">
                 <h3 className="card-header">Add a new {type} description</h3>
                 <div className="card-body">
-                    <MethodSection {...props.method} {...actions.method} />
+                    <MethodFieldset {...props.method} {...actions.method} />
                 </div>
                 <div className="card-header py-0">
                     <InteractorNav type={type} current={tab} update={setTab} />

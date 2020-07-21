@@ -1,32 +1,33 @@
 import React from 'react'
 
-import { Method } from '../../src/types'
-
 import { MethodAlert } from './MethodAlert'
 import { MethodSearchField } from './MethodSearchField'
 
+import { methods as api } from '../../src/api'
+
 type Props = {
-    method: Method | null,
-    query: string,
-    update: (query: string) => void,
+    psimi_id: string | null,
     select: (psimi_id: string) => void,
     unselect: () => void,
 }
 
-export const MethodFieldset: React.FC<Props> = ({ method, ...props }) => {
-    return (
+export const MethodFieldset: React.FC<Props> = ({ psimi_id, select, unselect }) => (
+    <React.Suspense fallback={null}>
         <fieldset>
-            <legend>
-                Method
-            </legend>
+            <legend>Method</legend>
             <div className="row">
                 <div className="col">
-                    {method == null
-                        ? <MethodSearchField {...props} />
-                        : <MethodAlert {...props} method={method} />
-                    }
+                    {psimi_id == null
+                        ? <MethodSearchField select={select} />
+                        : <MethodAlertLoader psimi_id={psimi_id} unselect={unselect} />}
                 </div>
             </div>
         </fieldset>
-    )
+    </React.Suspense>
+)
+
+const MethodAlertLoader: React.FC<{ psimi_id: string, unselect: () => void }> = ({ psimi_id, ...props }) => {
+    const method = api.select(psimi_id).read()
+
+    return <MethodAlert method={method} {...props} />
 }

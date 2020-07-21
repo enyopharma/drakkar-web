@@ -3,15 +3,13 @@ import React from 'react'
 import { InteractorProps } from '../src/props'
 
 import { ProteinFieldset } from './Protein/ProteinFieldset'
-import { MappingFieldset } from './Mapping/MappingFieldset'
 import { SequenceFieldset } from './Sequence/SequenceFieldset'
+import { MappingFieldset } from './Mapping/MappingFieldset'
 
-export const InteractorSection: React.FC<InteractorProps> = ({ actions, ...props }) => {
-    return (
-        <React.Fragment>
-            <ProteinFieldset {...props} {...actions.protein} enabled={!props.processing} />
-            <SequenceFieldset {...props} {...actions.sequence} />
-            <MappingFieldset {...props} {...actions.mapping} />
-        </React.Fragment>
-    )
-}
+export const InteractorSection: React.FC<InteractorProps> = ({ ...props }) => (
+    <React.Fragment>
+        <ProteinFieldset {...props} {...props.actions.protein} />
+        <SequenceFieldset {...props} {...props.actions.sequence} />
+        <MappingFieldset {...props} {...props.actions.mapping} />
+    </React.Fragment>
+)

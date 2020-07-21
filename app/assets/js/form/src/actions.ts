@@ -1,13 +1,9 @@
 import { Method, InteractorI, Protein, Mature, Alignment } from './types'
 
 export enum AppActionTypes {
-    SHOW_FORM,
-    INIT_METHOD,
-    UPDATE_METHOD_QUERY,
     SELECT_METHOD,
     UNSELECT_METHOD,
     INIT_PROTEIN,
-    UPDATE_PROTEIN_QUERY,
     SELECT_PROTEIN,
     UNSELECT_PROTEIN,
     EDIT_MATURE,
@@ -24,9 +20,6 @@ export enum AppActionTypes {
 }
 
 export type AppAction =
-    | ShowFormAction
-    | InitMethodAction
-    | UpdateMethodQueryAction
     | SelectMethodAction
     | UnselectMethodAction
     | InteractorAction
@@ -35,8 +28,6 @@ export type AppAction =
     | ResetFormAction
 
 export type InteractorAction =
-    | InitProteinAction
-    | UpdateProteinQueryAction
     | SelectProteinAction
     | UnselectProteinAction
     | EditMatureAction
@@ -52,20 +43,6 @@ export const isInteractorAction = (action: AppAction): action is InteractorActio
     return (action as InteractorAction).i !== undefined
 }
 
-type ShowFormAction = {
-    type: typeof AppActionTypes.SHOW_FORM,
-}
-
-type InitMethodAction = {
-    type: typeof AppActionTypes.INIT_METHOD,
-    method: Method | null,
-}
-
-type UpdateMethodQueryAction = {
-    type: typeof AppActionTypes.UPDATE_METHOD_QUERY,
-    query: string,
-}
-
 type SelectMethodAction = {
     type: typeof AppActionTypes.SELECT_METHOD,
     method: Method,
@@ -73,18 +50,6 @@ type SelectMethodAction = {
 
 type UnselectMethodAction = {
     type: typeof AppActionTypes.UNSELECT_METHOD,
-}
-
-type InitProteinAction = {
-    i: InteractorI,
-    type: typeof AppActionTypes.INIT_PROTEIN,
-    protein: Protein | null,
-}
-
-type UpdateProteinQueryAction = {
-    i: InteractorI,
-    type: AppActionTypes.UPDATE_PROTEIN_QUERY,
-    query: string,
 }
 
 type SelectProteinAction = {

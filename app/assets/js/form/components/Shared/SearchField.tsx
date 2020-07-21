@@ -8,16 +8,15 @@ import { SearchResultList } from './SearchResultList'
 
 type Props = {
     type: SearchType,
-    query: string,
     search: (query: string) => SearchResult[],
-    update: (query: string) => void,
     select: (value: string) => void,
     placeholder?: string,
     help?: string | null
 }
 
-export const SearchField: React.FC<Props> = ({ type, query, update, search, select, placeholder = '', help = null }) => {
+export const SearchField: React.FC<Props> = ({ type, search, select, placeholder = '', help = null }) => {
     const input = useRef<HTMLInputElement>(null)
+    const [query, setQuery] = useState<string>('')
     const [enabled, setEnabled] = useState<boolean>(false)
 
     const handleKeyDown = (e: any) => {
@@ -46,7 +45,7 @@ export const SearchField: React.FC<Props> = ({ type, query, update, search, sele
                     value={query}
                     onFocus={e => setEnabled(true)}
                     onBlur={e => setEnabled(false)}
-                    onChange={e => update(e.target.value)}
+                    onChange={e => setQuery(e.target.value)}
                     onKeyDown={e => handleKeyDown(e)}
                 />
             </div>
