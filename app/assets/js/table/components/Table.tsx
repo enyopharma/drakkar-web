@@ -2,8 +2,8 @@ import React, { useState } from 'react'
 import Modal from 'react-bootstrap4-modal';
 import { FaSearch, FaTrash, FaCopy } from 'react-icons/fa'
 
-import { descriptions as api } from '../api'
-import { Description, Interactor } from '../types'
+import { descriptions as api } from '../src/api'
+import { Description, Interactor } from '../src/types'
 
 import { MappingModal } from './MappingModal'
 

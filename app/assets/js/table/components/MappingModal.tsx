@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import Modal from 'react-bootstrap4-modal';
 
-import { proteins as api } from '../api'
-import { Description, Protein } from '../types'
+import { proteins as api } from '../src/api'
+import { Description, Protein } from '../src/types'
 
 import { Mapping } from './Mapping'
 

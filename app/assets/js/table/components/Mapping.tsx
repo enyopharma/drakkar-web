@@ -2,7 +2,7 @@ import React from 'react'
 
 import { SequenceImg } from './SequenceImg'
 
-import { Protein, Isoform, Alignment } from '../types'
+import { Protein, Isoform, Alignment } from '../src/types'
 
 type Reduced = Record<string, Isoform>
 

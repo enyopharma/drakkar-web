@@ -1,6 +1,6 @@
 import { render } from 'react-dom'
 
-import { Description } from './types'
+import { Description } from './src/types'
 
 import { App } from './components/App'
 
