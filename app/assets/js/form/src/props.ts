@@ -1,6 +1,6 @@
 import * as redux from 'react-redux'
 
-import * as creators from './creators'
+import * as creators from './reducer'
 import { AppState, InteractorUI, DescriptionType, InteractorI, Interactor, ProteinType, Mature, Sequences, Alignment } from './types'
 
 type OwnProps = { type: DescriptionType, run_id: number, pmid: number }
@@ -19,13 +19,13 @@ const mapStateToProps = (state: AppState, { type }: OwnProps) => {
         method: {
             psimi_id: state.description.method.psimi_id,
         },
-        interactor1: mapStateToInteractorProps(1, type1, state.description.interactor1, state.interactor1),
-        interactor2: mapStateToInteractorProps(2, type2, state.description.interactor2, state.interactor2),
+        interactor1: mapStateToInteractorProps(1, type1, state.description.interactor1, state.interactorUI1),
+        interactor2: mapStateToInteractorProps(2, type2, state.description.interactor2, state.interactorUI2),
         feedback: state.feedback,
         saving: state.saving,
-        resetable: !state.interactor1.processing && !state.interactor2.processing,
-        savable: !state.interactor1.editing && !state.interactor2.editing
-            && !state.interactor1.processing && !state.interactor2.processing
+        resetable: !state.interactorUI1.processing && !state.interactorUI2.processing,
+        savable: !state.interactorUI1.editing && !state.interactorUI2.editing
+            && !state.interactorUI1.processing && !state.interactorUI2.processing
             && state.description.method.psimi_id != null
             && state.description.interactor1.protein.accession != null
             && state.description.interactor1.name != ''
@@ -54,10 +54,10 @@ const mapStateToInteractorProps = (i: InteractorI, type: ProteinType, interactor
 // mapDispatchToProps
 const mapDispatchToProps = (dispatch: any, { run_id, pmid }: OwnProps) => ({
     actions: {
-        save: () => dispatch(creators.fireSave(run_id, pmid)),
+        save: () => dispatch(creators.fireSave({ run_id, pmid })),
         reset: () => dispatch(creators.resetForm()),
         method: {
-            select: (psimi_id: string) => dispatch(creators.selectMethod(psimi_id)),
+            select: (psimi_id: string) => dispatch(creators.selectMethod({ psimi_id })),
             unselect: () => dispatch(creators.unselectMethod()),
         },
         interactor1: mapDispatchToInteractorProps(1, dispatch),
@@ -68,18 +68,18 @@ const mapDispatchToProps = (dispatch: any, { run_id, pmid }: OwnProps) => ({
 const mapDispatchToInteractorProps = (i: InteractorI, dispatch: any) => ({
     actions: {
         protein: {
-            select: (accession: string) => dispatch(creators.selectProtein(i, accession)),
-            unselect: () => dispatch(creators.unselectProtein(i)),
+            select: (accession: string) => dispatch(creators.selectProtein({ i, accession })),
+            unselect: () => dispatch(creators.unselectProtein({ i })),
         },
         sequence: {
-            edit: () => dispatch(creators.editMature(i)),
-            update: (mature: Mature) => dispatch(creators.updateMature(i, mature)),
+            edit: () => dispatch(creators.editMature({ i })),
+            update: (mature: Mature) => dispatch(creators.updateMature({ i, mature })),
         },
         mapping: {
-            fire: (query: string, sequences: Sequences) => dispatch(creators.fireAlignment(i, query, sequences)),
-            add: (alignment: Alignment) => dispatch(creators.addAlignment(i, alignment)),
-            remove: (index: number) => dispatch(creators.removeAlignment(i, index)),
-            cancel: () => dispatch(creators.cancelAlignment(i)),
+            fire: (query: string, sequences: Sequences) => dispatch(creators.fireAlignment({ i, query, sequences })),
+            add: (alignment: Alignment) => dispatch(creators.addAlignment({ i, alignment })),
+            remove: (index: number) => dispatch(creators.removeAlignment({ i, index })),
+            cancel: () => dispatch(creators.cancelAlignment({ i })),
         },
     },
 })

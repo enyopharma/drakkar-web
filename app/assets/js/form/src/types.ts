@@ -1,7 +1,7 @@
 export type AppState = {
-    interactor1: InteractorUI,
-    interactor2: InteractorUI,
     description: Description,
+    interactorUI1: InteractorUI,
+    interactorUI2: InteractorUI,
     saving: boolean,
     feedback: Feedback | null
 }
