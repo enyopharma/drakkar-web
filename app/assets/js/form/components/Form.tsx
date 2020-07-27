@@ -1,21 +1,25 @@
 import React, { useState } from 'react'
 import { FaSave, FaEraser } from 'react-icons/fa'
+import { useAppSelector, useAction } from '../src/hooks'
 
-import { AppProps } from '../src/props'
 import { InteractorI } from '../src/types'
-import { useAction } from '../src/hooks'
 import { resetForm, fireSave } from '../src/reducer'
 
 import { ResetModal } from './ResetModal'
 import { InteractorNav } from './InteractorNav'
-import { InteractorSection } from './InteractorSection'
 import { MethodFieldset } from './Method/MethodFieldset'
+import { ProteinFieldset } from './Protein/ProteinFieldset'
+import { SequenceFieldset } from './Sequence/SequenceFieldset'
+import { MappingFieldset } from './Mapping/MappingFieldset'
 
-export const Form: React.FC<AppProps> = ({ type, run_id, pmid, savable, resetable, saving, feedback, ...props }) => {
+export const Form: React.FC = () => {
     const save = useAction(fireSave)
     const reset = useAction(resetForm)
+    const props = useAppSelector(state => state)
     const [tab, setTab] = useState<InteractorI>(1)
     const [modal, setModal] = useState<boolean>(false)
+
+    const { type, saving, savable, resetable, feedback } = props
 
     const resetTabAndForm = () => {
         setTab(1)
@@ -28,14 +32,15 @@ export const Form: React.FC<AppProps> = ({ type, run_id, pmid, savable, resetabl
             <div id="form-top" className="card">
                 <h3 className="card-header">Add a new {type} description</h3>
                 <div className="card-body">
-                    <MethodFieldset {...props.method} />
+                    <MethodFieldset />
                 </div>
                 <div className="card-header py-0">
                     <InteractorNav type={type} current={tab} update={setTab} />
                 </div>
                 <div className="card-body">
-                    {tab == 1 ? <InteractorSection {...props.interactor1} /> : null}
-                    {tab == 2 ? <InteractorSection {...props.interactor2} /> : null}
+                    <ProteinFieldset i={tab} />
+                    <SequenceFieldset i={tab} />
+                    <MappingFieldset i={tab} />
                 </div>
                 <div className="card-footer">
                     <div className="row">
@@ -43,8 +48,8 @@ export const Form: React.FC<AppProps> = ({ type, run_id, pmid, savable, resetabl
                             <button
                                 type="button"
                                 className="btn btn-block btn-primary"
-                                onClick={e => save({ run_id, pmid })}
-                                disabled={saving || !savable}
+                                onClick={e => save()}
+                                disabled={!savable}
                             >
                                 {saving
                                     ? <span className="spinner-border spinner-border-sm"></span>

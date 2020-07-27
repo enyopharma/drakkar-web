@@ -1,4 +1,7 @@
 export type AppState = {
+    run_id: number,
+    pmid: number,
+    type: DescriptionType,
     description: Description,
     interactorUI1: InteractorUI,
     interactorUI2: InteractorUI,
@@ -11,6 +14,28 @@ export type InteractorUI = {
     processing: boolean,
     alignment: Alignment | null,
 }
+
+export type AppProps = {
+    type: DescriptionType,
+    saving: boolean,
+    savable: boolean,
+    resetable: boolean,
+    feedback: Feedback | null,
+}
+
+export type MethodProps = {
+    psimi_id: string | null,
+}
+
+export type InteractorProps = {
+    i: InteractorI,
+    type: ProteinType,
+    accession: string | null,
+    name: string,
+    start: number | null,
+    stop: number | null,
+    mapping: Alignment[],
+} & InteractorUI
 
 export type DescriptionType = 'hh' | 'vh'
 

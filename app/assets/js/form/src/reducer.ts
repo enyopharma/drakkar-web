@@ -3,7 +3,7 @@ import { combineReducers, createReducer, createAction, Action } from '@reduxjs/t
 import { ThunkAction } from 'redux-thunk'
 
 import * as api from './api'
-import { AppState, Method, InteractorI, Interactor, Protein, Mature, InteractorUI, Alignment, Sequences, Feedback } from './types'
+import { AppState, Method, DescriptionType, InteractorI, Interactor, Protein, Mature, InteractorUI, Alignment, Sequences, Feedback, Description } from './types'
 
 /**
  * Regular actions.
@@ -141,6 +141,12 @@ const buildInteractorUIReducer = (i: InteractorI) => createReducer<InteractorUI>
 /**
  * Build the actual reducer.
  */
+const run_id = createReducer(0, builder => builder.addDefaultCase((state) => state))
+
+const pmid = createReducer(0, builder => builder.addDefaultCase((state) => state))
+
+const type = createReducer('hh', builder => builder.addDefaultCase((state) => state))
+
 const method = createReducer<{ psimi_id: string | null }>({ psimi_id: null }, build => {
     build
         .addCase(__selectMethod, (state, action) => {
@@ -173,6 +179,9 @@ const interactorUI1 = buildInteractorUIReducer(1);
 const interactorUI2 = buildInteractorUIReducer(2);
 
 export const reducer = combineReducers({
+    run_id,
+    pmid,
+    type,
     description,
     interactorUI1,
     interactorUI2,
@@ -214,11 +223,11 @@ export const fireAlignment = ({ i, query, sequences }: { i: InteractorI, query: 
         .then(alignment => dispatch(showAlignment({ i, alignment })))
 }
 
-export const fireSave = ({ run_id, pmid }: { run_id: number, pmid: number }): AppThunk => async (dispatch, getState) => {
+export const fireSave = (): AppThunk => async (dispatch, getState) => {
     const state = getState()
 
     dispatch(__fireSave())
 
-    api.save(run_id, pmid, state.description)
+    api.save(state.run_id, state.pmid, state.description)
         .then(json => dispatch(showFeedback({ ...json })))
 }
