@@ -1,39 +1,44 @@
 import React, { useState, useEffect, RefObject } from 'react'
-
 import { SearchResult } from '../../src/types'
-
-import { SearchOverlay } from './SearchOverlay'
 
 type Props = {
     input: RefObject<HTMLInputElement>
     query: string,
-    enabled: boolean,
     search: (query: string) => SearchResult[],
     select: (value: string) => void,
 }
 
-export const SearchResultList: React.FC<Props> = ({ query, input, enabled, search, select }) => {
+export const SearchResultList: React.FC<Props> = ({ query, input, search, select }) => {
     const results = search(query)
 
     const [active, setActive] = useState<number>(0)
 
     useEffect(() => setActive(0), [query])
 
-    if (input.current) {
-        input.current.onkeydown = (e: any) => {
-            if (enabled && e.keyCode == 38) {
-                setActive(active - 1)
-            }
+    const onKeyDown = (e: KeyboardEvent) => {
+        if (e.keyCode == 38) {
+            e.preventDefault()
+            setActive(active - 1)
+        }
 
-            if (enabled && e.keyCode == 40) {
-                setActive(active + 1)
-            }
+        if (e.keyCode == 40) {
+            e.preventDefault()
+            setActive(active + 1)
+        }
 
-            if (enabled && e.keyCode == 13 && results[active]) {
-                select(results[active].value)
-            }
+        if (e.keyCode == 13 && results[active]) {
+            e.preventDefault()
+            select(results[active].value)
         }
     }
+
+    useEffect(() => {
+        input.current?.addEventListener('keydown', onKeyDown)
+
+        return () => {
+            input.current?.removeEventListener('keydown', onKeyDown)
+        }
+    })
 
     const active1 = results.length == 0 ? 0 : active % results.length
     const active2 = active1 >= 0 ? active1 : active1 + results.length
@@ -48,30 +53,30 @@ export const SearchResultList: React.FC<Props> = ({ query, input, enabled, searc
             : label
     }
 
-    return !enabled || query == '' ? null : (
-        <SearchOverlay>
-            <ul className="list-group">
-                {results.length == 0
-                    ? (
-                        <li className="list-group-item">
-                            No entry found
-                        </li>
-                    )
-                    : results.map((result, index) => (
-                        <li
-                            key={index}
-                            data-type="result"
-                            data-index={index}
-                            data-value={result.value}
-                            className={'list-group-item' + (index == active2 ? ' active' : '')}
-                            dangerouslySetInnerHTML={{ __html: highlight(result.label) }}
-                            onMouseDown={e => select(result.value)}
-                            onMouseOver={e => setActive(index)}
-                        >
-                        </li>
-                    ))
-                }
-            </ul>
-        </SearchOverlay>
+    return (
+        <ul className="list-group">
+            {results.length == 0
+                ? <EmptyList />
+                : results.map((result, index) => (
+                    <li
+                        key={index}
+                        data-type="result"
+                        data-index={index}
+                        data-value={result.value}
+                        className={'list-group-item' + (index == active2 ? ' active' : '')}
+                        dangerouslySetInnerHTML={{ __html: highlight(result.label) }}
+                        onMouseDown={e => select(result.value)}
+                        onMouseOver={e => setActive(index)}
+                    >
+                    </li>
+                ))
+            }
+        </ul>
     )
 }
+
+const EmptyList: React.FC = () => (
+    <li className="list-group-item">
+        No entry found
+    </li>
+)

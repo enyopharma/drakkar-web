@@ -1,6 +1,5 @@
 import React from 'react'
 import { useAction } from '../../src/hooks'
-
 import { methods as api } from '../../src/api'
 import { selectMethod } from '../../src/reducer'
 

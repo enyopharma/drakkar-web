@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-
 import { Chain } from '../../src/types'
 
 type Props = {
@@ -26,9 +25,9 @@ export const ChainsFormGroup: React.FC<Props> = ({ chains, enabled = true, set, 
 
     const filtered = selected.map(s => chains[parseInt(s)]).sort((a, b) => a.start - b.start)
 
-    const isValid = areContiguous(filtered)
+    const disabled = !enabled || !areContiguous(filtered) || filtered.length == 0
 
-    const select = (options: any) => {
+    const handleChange = (options: any) => {
         setSelected([...options]
             .filter(o => o.selected)
             .map(o => o.value)
@@ -45,15 +44,11 @@ export const ChainsFormGroup: React.FC<Props> = ({ chains, enabled = true, set, 
                 <select
                     value={selected}
                     className="form-control"
-                    onChange={e => select(e.target.options)}
+                    onChange={e => handleChange(e.target.options)}
                     disabled={chains.length == 0}
                     multiple={true}
                 >
-                    {chains.map((chain, i) => (
-                        <option key={i} value={i}>
-                            {chain.description} [{chain.start}, {chain.stop}]
-                        </option>
-                    ))}
+                    {chains.map((chain, i) => <ChainOption key={i} i={i} chain={chain} />)}
                 </select>
             </div>
             <div className="col-3">
@@ -61,11 +56,17 @@ export const ChainsFormGroup: React.FC<Props> = ({ chains, enabled = true, set, 
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={e => submit()}
-                    disabled={!enabled || !isValid || filtered.length == 0}
+                    disabled={disabled}
                 >
                     {children}
                 </button>
             </div>
         </div>
     )
+}
+
+const ChainOption: React.FC<{ i: number, chain: Chain }> = ({ i, chain }) => {
+    const label = `${chain.description} [${chain.start}, ${chain.stop}]`
+
+    return <option value={i}>{label}</option>
 }

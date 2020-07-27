@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-
 import { Domain, ScaledDomain } from '../../src/types'
 
 type Props = {
@@ -11,8 +10,10 @@ type Props = {
 export const DomainsFormGroup: React.FC<Props> = ({ domains, enabled = true, select, children }) => {
     const [domain, setDomain] = useState<number | null>(null)
 
-    const handleChange = (e: any) => {
-        setDomain(e.target.value == '' ? null : parseInt(e.target.value))
+    const disabled = !enabled || domain == null
+
+    const handleChange = (value: string) => {
+        setDomain(value == '' ? null : parseInt(value))
     }
 
     const submit = () => {
@@ -25,18 +26,11 @@ export const DomainsFormGroup: React.FC<Props> = ({ domains, enabled = true, sel
                 <select
                     value={domain == null ? '' : domain}
                     className="form-control"
-                    onChange={e => handleChange(e)}
+                    onChange={e => handleChange(e.target.value)}
                     disabled={domains.length == 0}
                 >
                     <option value="">Please select a domain</option>
-                    {domains.map((domain, i) => (
-                        <option key={i} value={i} disabled={!domain.valid}>
-                            {domain.key} - {domain.description} [{domain.valid
-                                ? [domain.start, domain.stop].join(', ')
-                                : 'out of selected sequence'
-                            }]
-                        </option>
-                    ))}
+                    {domains.map((domain, i) => <DomainOption key={i} i={i} domain={domain} />)}
                 </select>
             </div>
             <div className="col-3">
@@ -44,11 +38,25 @@ export const DomainsFormGroup: React.FC<Props> = ({ domains, enabled = true, sel
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={e => submit()}
-                    disabled={!enabled || domain == null}
+                    disabled={disabled}
                 >
                     {children}
                 </button>
             </div>
         </div>
+    )
+}
+
+const DomainOption: React.FC<{ i: number, domain: ScaledDomain }> = ({ i, domain }) => {
+    const cdx = domain.valid
+        ? `${domain.start}, ${domain.stop}`
+        : 'out of selected sequence'
+
+    const label = `${domain.key} - ${domain.description} [${cdx}]`
+
+    return (
+        <option value={i} disabled={!domain.valid}>
+            {label}
+        </option>
     )
 }

@@ -1,9 +1,8 @@
 import React from 'react'
 import { FaTrash } from 'react-icons/fa'
 import { useAction } from '../../src/hooks'
-
-import { InteractorI, ProteinType, Coordinates, Alignment } from '../../src/types'
 import { removeAlignment } from '../../src/reducer'
+import { InteractorI, ProteinType, Coordinates, Alignment } from '../../src/types'
 
 import { SequenceImg } from '../Shared/SequenceImg'
 

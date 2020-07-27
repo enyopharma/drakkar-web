@@ -1,7 +1,6 @@
 import React from 'react'
-import { useAction } from '../../src/hooks'
-
 import { Method } from '../../src/types'
+import { useAction } from '../../src/hooks'
 import { unselectMethod } from '../../src/reducer'
 
 type Props = {

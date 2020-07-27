@@ -1,15 +1,19 @@
 import React from 'react'
 import { useAction } from '../../src/hooks'
-
-import { ProteinType, InteractorI } from '../../src/types'
-import { selectProtein } from '../../src/reducer'
 import { proteins as api } from '../../src/api'
+import { selectProtein } from '../../src/reducer'
+import { ProteinType, InteractorI, SearchType } from '../../src/types'
 
 import { SearchField } from '../Shared/SearchField'
 
 type Props = {
     i: InteractorI,
     type: ProteinType,
+}
+
+const types: Record<ProteinType, SearchType> = {
+    'h': 'human',
+    'v': 'virus',
 }
 
 const placeholders: Record<ProteinType, string> = {
@@ -27,7 +31,7 @@ export const ProteinSearchField: React.FC<Props> = ({ i, type }) => {
 
     return (
         <SearchField
-            type={type == 'h' ? 'human' : 'virus'}
+            type={types[type]}
             select={(accession: string) => select({ i, accession })}
             search={(query: string) => api.search(type, query).read()}
             placeholder={placeholders[type]}

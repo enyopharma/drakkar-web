@@ -15,6 +15,8 @@ export const CoordinatesFormGroup: React.FC<Props> = ({ sequence, enabled = true
 
     useEffect(() => setValid(true), [start, stop])
 
+    const disabled = !enabled || start == null || stop == null
+
     const submit = () => {
         start != null && stop != null && start <= stop
             ? set(sequence.slice(start - 1, stop))
@@ -46,7 +48,7 @@ export const CoordinatesFormGroup: React.FC<Props> = ({ sequence, enabled = true
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={e => submit()}
-                    disabled={!enabled || start == null || stop == null}
+                    disabled={disabled}
                 >
                     {children}
                 </button>

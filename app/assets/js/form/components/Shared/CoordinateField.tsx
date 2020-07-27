@@ -9,6 +9,8 @@ type Props = {
 }
 
 export const CoordinateField: React.FC<Props> = ({ value, max, valid = true, placeholder = '', set }) => {
+    const classes = 'form-control' + (valid ? '' : ' is-invalid')
+
     const setCoordinate = (value: string): void => {
         if (value == '') { set(null); return }
 
@@ -23,9 +25,9 @@ export const CoordinateField: React.FC<Props> = ({ value, max, valid = true, pla
             type="number"
             min="1"
             max={max}
-            className={'form-control' + (valid ? '' : ' is-invalid')}
+            className={classes}
             placeholder={placeholder}
-            value={value == null ? '' : value}
+            value={value ?? ''}
             onChange={e => setCoordinate(e.target.value)}
         />
     )

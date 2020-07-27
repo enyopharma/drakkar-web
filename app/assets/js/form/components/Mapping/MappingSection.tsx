@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
-
-import { InteractorI, Protein, Isoform, ScaledDomain, Coordinates, Sequences, Alignment } from '../../src/types'
+import { InteractorI, Protein, Isoform, Coordinates, Sequences, Alignment } from '../../src/types'
 
 import { MappingModal } from './MappingModal'
 import { MappingEditor } from './MappingEditor'
@@ -17,52 +16,71 @@ type Props = {
     alignment: Alignment | null,
 }
 
-export const MappingSection: React.FC<Props> = ({ protein, alignment, ...props }) => {
+const reduceSequences = (protein: Protein) => {
+    return protein.isoforms.reduce((sequences: Sequences, isoform: Isoform) => {
+        sequences[isoform.accession] = isoform.sequence
+        return sequences
+    }, {})
+}
+
+const matureSequences = (protein: Protein, start: number, stop: number) => {
+    const sequence = protein.sequence.slice(start - 1, stop)
+
+    return { [protein.accession]: sequence }
+}
+
+const reduceCoordinates = (protein: Protein) => {
+    return protein.isoforms.reduce((reduced: Coordinates, isoform: Isoform) => {
+        reduced[isoform.accession] = {
+            start: 1,
+            stop: isoform.sequence.length,
+            length: isoform.sequence.length,
+        }
+        return reduced
+    }, {})
+}
+
+const matureCoordinates = (protein: Protein, start: number, stop: number) => {
+    const length = stop - start + 1
+    return {
+        [protein.accession]: { start, stop, length }
+    }
+}
+
+const scaledDomains = (protein: Protein, start: number, stop: number) => {
+    return protein.domains.map(domain => {
+        return {
+            key: domain.key,
+            description: domain.description,
+            start: domain.start - start + 1,
+            stop: domain.stop - start + 1,
+            valid: domain.start >= start && domain.stop <= stop,
+        }
+    })
+}
+
+export const MappingSection: React.FC<Props> = ({ protein, start, stop, alignment, ...props }) => {
     const [query, setQuery] = useState<string>('')
 
     useEffect(() => { if (alignment == null) setQuery('') }, [alignment])
 
-    const isFull = props.start == 1 && props.stop == protein.sequence.length
+    const isFull = start == 1 && stop == protein.sequence.length
 
-    const sequence = protein.sequence.slice(props.start - 1, props.stop)
+    const sequences = isFull
+        ? reduceSequences(protein)
+        : matureSequences(protein, start, stop)
 
-    const sequences: Sequences = isFull
-        ? protein.isoforms.reduce((sequences: Sequences, isoform: Isoform) => {
-            sequences[isoform.accession] = isoform.sequence
-            return sequences
-        }, {})
-        : { [protein.accession]: sequence }
+    const coordinates = isFull
+        ? reduceCoordinates(protein)
+        : matureCoordinates(protein, start, stop)
 
-    const coordinates: Coordinates = isFull
-        ? protein.isoforms.reduce((reduced: Coordinates, isoform: Isoform) => {
-            reduced[isoform.accession] = {
-                start: 1,
-                stop: isoform.sequence.length,
-                length: isoform.sequence.length,
-            }
-            return reduced
-        }, {})
-        : {
-            [protein.accession]: {
-                start: props.start,
-                stop: props.stop,
-                length: props.stop - props.start + 1
-            }
-        }
+    const domains = scaledDomains(protein, start, stop)
 
-    const domains: ScaledDomain[] = protein.domains.map(domain => {
-        return {
-            key: domain.key,
-            description: domain.description,
-            start: domain.start - props.start + 1,
-            stop: domain.stop - props.start + 1,
-            valid: domain.start >= props.start && domain.stop <= props.stop,
-        }
-    })
+    const canonical = sequences[protein.accession]
 
     return (
         <React.Fragment>
-            {alignment == null ? null : (
+            {alignment && (
                 <MappingModal
                     type={protein.type}
                     coordinates={coordinates}
@@ -72,7 +90,7 @@ export const MappingSection: React.FC<Props> = ({ protein, alignment, ...props }
             )}
             <MappingEditor
                 query={query}
-                sequence={sequence}
+                canonical={canonical}
                 sequences={sequences}
                 domains={domains}
                 update={setQuery}

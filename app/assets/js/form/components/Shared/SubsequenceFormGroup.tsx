@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-
 import { extract } from '../../src/shared'
 
 type Props = {
@@ -14,6 +13,9 @@ export const SubsequenceFormGroup: React.FC<Props> = ({ sequence, enabled = true
 
     useEffect(() => setValid(true), [subsequence])
 
+    const classes = 'form-control' + (valid ? '' : ' is-invalid')
+    const disabled = !enabled || subsequence.trim() == ''
+
     const submit = () => {
         if (subsequence.trim() == '') return
 
@@ -27,7 +29,7 @@ export const SubsequenceFormGroup: React.FC<Props> = ({ sequence, enabled = true
             <div className="col-9">
                 <input
                     type="text"
-                    className={'form-control' + (valid ? '' : ' is-invalid')}
+                    className={classes}
                     placeholder="Subsequence..."
                     value={subsequence}
                     onChange={e => setSubsequence(e.target.value)}
@@ -38,7 +40,7 @@ export const SubsequenceFormGroup: React.FC<Props> = ({ sequence, enabled = true
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={e => submit()}
-                    disabled={!enabled || subsequence.trim() == ''}
+                    disabled={disabled}
                 >
                     {children}
                 </button>

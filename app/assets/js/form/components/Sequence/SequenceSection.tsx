@@ -1,9 +1,8 @@
 import React from 'react'
 import { FaEdit } from 'react-icons/fa'
 import { useAction } from '../../src/hooks'
-
-import { InteractorI, Protein } from '../../src/types'
 import { editMature } from '../../src/reducer'
+import { InteractorI, Protein } from '../../src/types'
 
 import { SequenceEditor } from './SequenceEditor'
 import { SequenceTextarea } from './SequenceTextarea'
@@ -20,32 +19,27 @@ type Props = {
     processing: boolean,
 }
 
-export const SequenceSection: React.FC<Props> = ({ i, ...props }) => {
+export const SequenceSection: React.FC<Props> = ({ i, protein, editing, processing, ...props }) => {
     const edit = useAction(editMature)
 
-    const type = props.protein.type
-    const sequence = props.protein.sequence
-    const length = props.protein.sequence.length
-    const chains = props.protein.chains
-    const matures = props.protein.matures
-    const valid = !props.editing
-    const enabled = props.protein.type == 'v' && !props.editing && !props.processing
+    const valid = !editing
+    const enabled = protein.type == 'v' && !editing && !processing
 
     return (
         <React.Fragment>
             <div className="row">
                 <div className="col">
-                    <SequenceFormGroup {...props} valid={valid} />
+                    <SequenceFormGroup valid={valid} {...props} />
                 </div>
             </div>
             <div className="row">
                 <div className="col">
-                    <SequenceTextarea {...props} sequence={sequence} />
+                    <SequenceTextarea sequence={protein.sequence} {...props} />
                 </div>
             </div>
             <div className="row">
                 <div className="col">
-                    <SequenceImg {...props} type={type} length={length} />
+                    <SequenceImg type={protein.type} length={protein.sequence.length} {...props} />
                 </div>
                 <div className="col-1">
                     <button
@@ -57,8 +51,14 @@ export const SequenceSection: React.FC<Props> = ({ i, ...props }) => {
                     </button>
                 </div>
             </div>
-            {!props.editing ? null : (
-                <SequenceEditor i={i} sequence={sequence} chains={chains} matures={matures} {...props} />
+            {editing && (
+                <SequenceEditor
+                    i={i}
+                    sequence={protein.sequence}
+                    chains={protein.chains}
+                    matures={protein.matures}
+                    {...props}
+                />
             )}
         </React.Fragment>
     )

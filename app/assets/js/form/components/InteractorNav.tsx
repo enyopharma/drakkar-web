@@ -1,5 +1,4 @@
 import React from 'react'
-
 import { DescriptionType, InteractorI } from '../src/types'
 
 type Props = {
@@ -31,11 +30,10 @@ const classes: Record<DescriptionType, Record<InteractorI, string>> = {
 }
 
 export const InteractorNav: React.FC<Props> = ({ type, current, update }) => {
-    const getClasses = (i: InteractorI) => {
-        return classes[type][i] + (current == i ? ' active' : '')
-    }
+    const classes1 = classes[type][1] + (current == 1 ? ' active' : '')
+    const classes2 = classes[type][2] + (current == 2 ? ' active' : '')
 
-    const getUpdateTab = (i: InteractorI) => (e: any) => {
+    const updateTab = (e: React.MouseEvent, i: InteractorI) => {
         update(i)
         e.preventDefault()
     }
@@ -43,12 +41,12 @@ export const InteractorNav: React.FC<Props> = ({ type, current, update }) => {
     return (
         <ul className="nav nav-tabs nav-justified card-header-tabs">
             <li className="nav-item">
-                <a className={getClasses(1)} onClick={getUpdateTab(1)} href="#">
+                <a className={classes1} onClick={e => updateTab(e, 1)} href="#">
                     {titles[type][1]}
                 </a>
             </li>
             <li className="nav-item">
-                <a className={getClasses(2)} onClick={getUpdateTab(2)} href="#">
+                <a className={classes2} onClick={e => updateTab(e, 2)} href="#">
                     {titles[type][2]}
                 </a>
             </li>

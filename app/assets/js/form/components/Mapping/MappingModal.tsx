@@ -95,11 +95,9 @@ export const MappingModal: React.FC<Props> = ({ i, type, name, coordinates, alig
                                     {coordinates[isoform.accession].stop}
                                 )
                             </h4>
-                            {isoform.occurrences.length == 0 ? (
-                                <p>
-                                    No alignment of the sequence on this isoform.
-                                </p>
-                            ) : (
+                            {isoform.occurrences.length == 0
+                                ? <p>No alignment of the sequence on this isoform.</p>
+                                : (
                                     <ul className="list-unstyled">
                                         {isoform.occurrences.sort((a, b) => a.start - b.start).map((occurrence, j) => (
                                             <li key={j}>

@@ -25,7 +25,7 @@ export const SequenceFormGroup: React.FC<Props> = ({ name, start, stop, valid })
                     type="text"
                     className="form-control"
                     placeholder="Start"
-                    value={start == null ? '' : start}
+                    value={start ?? ''}
                     readOnly
                 />
             </div>
@@ -34,27 +34,25 @@ export const SequenceFormGroup: React.FC<Props> = ({ name, start, stop, valid })
                     type="text"
                     className="form-control"
                     placeholder="Stop"
-                    value={stop == null ? '' : stop}
+                    value={stop ?? ''}
                     readOnly
                 />
             </div>
             <div className="col">
-                {valid
-                    ? (
-                        <button className="btn btn-block btn-outline-success" disabled>
-                            <FaCheck />
-                            &nbsp;
-                            Sequence is valid
-                        </button>
-                    ) : (
-                        <button className="btn btn-block btn-outline-danger" disabled>
-                            <FaExclamationTriangle />
-                            &nbsp;
-                            Please select a sequence.
-                        </button>
-                    )
-                }
+                {valid ? <ValidButton /> : <InvalidButton />}
             </div>
-        </div>
+        </div >
     )
 }
+
+const ValidButton: React.FC = () => (
+    <button className="btn btn-block btn-outline-success" disabled>
+        <FaCheck /> Sequence is valid
+    </button>
+)
+
+const InvalidButton: React.FC = () => (
+    <button className="btn btn-block btn-outline-danger" disabled>
+        <FaExclamationTriangle /> Please select a sequence.
+    </button>
+)

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-
 import { extract } from '../../src/shared'
 
 type Props = {
@@ -14,6 +13,9 @@ export const ExtractFormGroup: React.FC<Props> = ({ sequence, enabled = true, se
     const [valid, setValid] = useState<boolean>(true)
 
     useEffect(() => setValid(true), [from, to])
+
+    const classes = 'form-control' + (valid ? '' : ' is-invalid')
+    const disabled = !enabled || from.trim() == '' || to.trim() == ''
 
     const submit = () => {
         if (from.trim() == '' || to.trim() == '') return
@@ -31,7 +33,7 @@ export const ExtractFormGroup: React.FC<Props> = ({ sequence, enabled = true, se
             <div className="col">
                 <input
                     type="text"
-                    className={'form-control' + (valid ? '' : ' is-invalid')}
+                    className={classes}
                     placeholder="From..."
                     value={from}
                     onChange={e => setFrom(e.target.value)}
@@ -40,7 +42,7 @@ export const ExtractFormGroup: React.FC<Props> = ({ sequence, enabled = true, se
             <div className="col">
                 <input
                     type="text"
-                    className={'form-control' + (valid ? '' : ' is-invalid')}
+                    className={classes}
                     placeholder="To..."
                     value={to}
                     onChange={e => setTo(e.target.value)}
@@ -51,7 +53,7 @@ export const ExtractFormGroup: React.FC<Props> = ({ sequence, enabled = true, se
                     type="button"
                     className="btn btn-block btn-info"
                     onClick={e => submit()}
-                    disabled={!enabled || from.trim() == '' || to.trim() == ''}
+                    disabled={disabled}
                 >
                     {children}
                 </button>

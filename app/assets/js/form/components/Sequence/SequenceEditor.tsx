@@ -1,8 +1,7 @@
 import React, { useState } from 'react'
 import { useAction } from '../../src/hooks'
-
-import { InteractorI, Mature, Chain } from '../../src/types'
 import { updateMature } from '../../src/reducer'
+import { InteractorI, Mature, Chain } from '../../src/types'
 
 import { ChainsFormGroup } from './ChainsFormGroup'
 import { MatureProteinList } from './MatureProteinList'
@@ -40,7 +39,8 @@ export const SequenceEditor: React.FC<Props> = ({ i, sequence, name, start, stop
 
     const areCoordinatesSet = current.start != null && current.stop != null
 
-    const areCoordinatesWellFormatted = current.start != null && current.stop != null
+    const areCoordinatesWellFormatted = current.start != null
+        && current.stop != null
         && current.start <= current.stop
 
     const doesNameExist = matures.filter(m => {
@@ -75,6 +75,9 @@ export const SequenceEditor: React.FC<Props> = ({ i, sequence, name, start, stop
         stop: stop,
     })
 
+    const classes = 'form-control' + (isNameValid ? '' : ' is-invalid')
+    const disabled = !isMatureValid
+
     const setFullLength = () => setCoordinates(1, sequence.length)
 
     const submit = () => { if (isMature(current)) { update({ i, mature: current }) } }
@@ -82,21 +85,14 @@ export const SequenceEditor: React.FC<Props> = ({ i, sequence, name, start, stop
     return (
         <React.Fragment>
             {matures.length == 0
-                ? <p>No sequence defined on this uniprot entry yet.</p>
-                : (
-                    <React.Fragment>
-                        <p>
-                            Existing sequences on this uniprot entry:
-                        </p>
-                        <MatureProteinList i={i} matures={matures} />
-                    </React.Fragment>
-                )
+                ? <EmptyList />
+                : <NonEmptyList i={i} matures={matures} />
             }
             <div className="row">
                 <div className="col-3">
                     <input
                         type="text"
-                        className={'form-control' + (isNameValid ? '' : ' is-invalid')}
+                        className={classes}
                         placeholder="Name"
                         value={current.name}
                         onChange={e => setName(e.target.value)}
@@ -125,13 +121,13 @@ export const SequenceEditor: React.FC<Props> = ({ i, sequence, name, start, stop
                         type="button"
                         className="btn btn-block btn-primary"
                         onClick={e => submit()}
-                        disabled={!isMatureValid}
+                        disabled={disabled}
                     >
                         Validate
                     </button>
                 </div>
             </div>
-            {chains.length == 0 ? null : (
+            {chains.length == 0 && (
                 <ChainsFormGroup chains={chains} set={setCoordinates}>
                     Extract coordinates
                 </ChainsFormGroup>
@@ -156,3 +152,16 @@ export const SequenceEditor: React.FC<Props> = ({ i, sequence, name, start, stop
         </React.Fragment>
     )
 }
+
+const EmptyList: React.FC = () => (
+    <p>No sequence defined on this uniprot entry yet.</p>
+)
+
+const NonEmptyList: React.FC<{ i: InteractorI, matures: Mature[] }> = ({ i, matures }) => (
+    <React.Fragment>
+        <p>
+            Existing sequences on this uniprot entry:
+        </p>
+        <MatureProteinList i={i} matures={matures} />
+    </React.Fragment>
+)

@@ -1,5 +1,4 @@
 import React from 'react'
-
 import { ProteinType } from '../../src/types'
 
 type Props = {
@@ -8,6 +7,18 @@ type Props = {
     stop: number | null,
     length: number,
     active?: boolean,
+}
+
+const startp = (start: number, length: number): string => {
+    return ((start - 1) * 100 / length) + '%'
+}
+
+const stopp = (stop: number, length: number): string => {
+    return (stop * 100 / length) + '%'
+}
+
+const widthp = (start: number, stop: number, length: number): string => {
+    return ((stop - start + 1) * 100 / length) + '%'
 }
 
 export const SequenceImg: React.FC<Props> = ({ type, start, stop, length, active = true }) => {
@@ -19,17 +30,7 @@ export const SequenceImg: React.FC<Props> = ({ type, start, stop, length, active
         )
     }
 
-    const startp = (start: number, length: number): string => {
-        return ((start - 1) * 100 / length) + '%'
-    }
-
-    const stopp = (stop: number, length: number): string => {
-        return (stop * 100 / length) + '%'
-    }
-
-    const widthp = (start: number, stop: number, length: number): string => {
-        return ((stop - start + 1) * 100 / length) + '%'
-    }
+    const classes = active ? type : ''
 
     return (
         <svg className="alignment" width="100%" height="30">
@@ -41,7 +42,7 @@ export const SequenceImg: React.FC<Props> = ({ type, start, stop, length, active
             </text>
             <rect x="0" y="16" width="100%" height="2"></rect>
             <rect
-                className={active ? type : ''}
+                className={classes}
                 x={startp(start, length)}
                 y="14"
                 width={widthp(start, stop, length)}

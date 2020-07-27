@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
+import { InteractorI, Feedback } from '../src/types'
 import { FaSave, FaEraser } from 'react-icons/fa'
-import { useAppSelector, useAction } from '../src/hooks'
-
-import { InteractorI } from '../src/types'
 import { resetForm, fireSave } from '../src/reducer'
+import { useAppSelector, useAction } from '../src/hooks'
 
 import { ResetModal } from './ResetModal'
 import { InteractorNav } from './InteractorNav'
@@ -51,12 +50,7 @@ export const Form: React.FC = () => {
                                 onClick={e => save()}
                                 disabled={!savable}
                             >
-                                {saving
-                                    ? <span className="spinner-border spinner-border-sm"></span>
-                                    : <FaSave />
-                                }
-                                &nbsp;
-                                Save description
+                                <SaveIcon saving={saving} /> Save description
                             </button>
                         </div>
                         <div className="col">
@@ -70,20 +64,26 @@ export const Form: React.FC = () => {
                             </button>
                         </div>
                     </div>
-                    {feedback == null ? null : (
-                        <div className="row">
-                            <div className="col">
-                                <div className={feedback.success ? 'text-success' : 'text-danger'}>
-                                    {feedback.success
-                                        ? <ul><li>Description successfully saved!</li></ul>
-                                        : <ul>{feedback.errors.map((e, i) => <li key={i}>{e}</li>)}</ul>
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    )}
+                    {feedback && <FeedbackRow feedback={feedback} />}
                 </div>
             </div>
         </form>
     )
 }
+
+const SaveIcon: React.FC<{ saving: boolean }> = ({ saving }) => saving
+    ? <span className="spinner-border spinner-border-sm"></span>
+    : <FaSave />
+
+const FeedbackRow: React.FC<{ feedback: Feedback }> = ({ feedback }) => (
+    <div className="row">
+        <div className="col">
+            <div className={feedback.success ? 'text-success' : 'text-danger'}>
+                {feedback.success
+                    ? <ul><li>Description successfully saved!</li></ul>
+                    : <ul>{feedback.errors.map((e, i) => <li key={i}>{e}</li>)}</ul>
+                }
+            </div>
+        </div>
+    </div>
+)

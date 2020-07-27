@@ -1,9 +1,9 @@
 import React from 'react'
 import { proteins as api } from '../../src/api'
+import { useInteractorSelector } from '../../src/hooks'
 import { InteractorI, Alignment } from '../../src/types'
 
 import { MappingSection } from './MappingSection'
-import { useInteractorSelector } from '../../src/hooks'
 
 type Props = {
     i: InteractorI,
