@@ -12,7 +12,13 @@ import { Form } from './Form'
 const StatefulForm = connect(Form);
 
 export const App = (type: DescriptionType, run_id: number, pmid: number, description: Description | null) => {
-    const preloadedState = description === null ? undefined : { description }
+    const preloadedState = description === null ? undefined : {
+        description: {
+            method: description.method,
+            interactor1: description.interactor1,
+            interactor2: description.interactor2,
+        },
+    }
 
     const store = configureStore({ reducer, preloadedState })
 

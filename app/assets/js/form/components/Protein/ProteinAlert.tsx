@@ -1,11 +1,13 @@
 import React from 'react'
+import { useAction } from '../../src/hooks'
 
-import { ProteinType, Protein } from '../../src/types'
+import { InteractorI, ProteinType, Protein } from '../../src/types'
+import { unselectProtein } from '../../src/reducer'
 
 type Props = {
+    i: InteractorI,
     protein: Protein,
     processing: boolean,
-    unselect: () => void,
 }
 
 const classes: Record<ProteinType, string> = {
@@ -13,7 +15,9 @@ const classes: Record<ProteinType, string> = {
     'v': 'alert alert-danger',
 }
 
-export const ProteinAlert: React.FC<Props> = ({ protein, processing, unselect }) => {
+export const ProteinAlert: React.FC<Props> = ({ i, protein, processing }) => {
+    const unselect = useAction(unselectProtein)
+
     return (
         <div className={classes[protein.type]}>
             <strong>{protein.accession}</strong> - {[
@@ -21,7 +25,7 @@ export const ProteinAlert: React.FC<Props> = ({ protein, processing, unselect })
                 protein.name,
                 protein.description,
             ].join(' - ')}
-            <button type="button" className="close" onClick={e => unselect()} disabled={processing}>
+            <button type="button" className="close" onClick={e => unselect({ i })} disabled={processing}>
                 <span>&times;</span>
             </button>
         </div>

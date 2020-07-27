@@ -1,14 +1,15 @@
 import React from 'react'
+import { useAction } from '../../src/hooks'
 
-import { ProteinType } from '../../src/types'
+import { ProteinType, InteractorI } from '../../src/types'
+import { selectProtein } from '../../src/reducer'
+import { proteins as api } from '../../src/api'
 
 import { SearchField } from '../Shared/SearchField'
 
-import { proteins as api } from '../../src/api'
-
 type Props = {
+    i: InteractorI,
     type: ProteinType,
-    select: (accession: string) => void,
 }
 
 const placeholders: Record<ProteinType, string> = {
@@ -21,10 +22,13 @@ const helps: Record<ProteinType, string> = {
     'v': 'You may use + to perform queries with multiple search terms (eg: influenza A + swine + thailand)',
 }
 
-export const ProteinSearchField: React.FC<Props> = ({ type, ...props }) => {
+export const ProteinSearchField: React.FC<Props> = ({ i, type }) => {
+    const select = useAction(selectProtein)
+
     return (
-        <SearchField {...props}
+        <SearchField
             type={type == 'h' ? 'human' : 'virus'}
+            select={(accession: string) => select({ i, accession })}
             search={(query: string) => api.search(type, query).read()}
             placeholder={placeholders[type]}
             help={helps[type]}

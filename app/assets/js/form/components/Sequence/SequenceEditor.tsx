@@ -1,6 +1,8 @@
 import React, { useState } from 'react'
+import { useAction } from '../../src/hooks'
 
-import { Mature, Chain } from '../../src/types'
+import { InteractorI, Mature, Chain } from '../../src/types'
+import { updateMature } from '../../src/reducer'
 
 import { ChainsFormGroup } from './ChainsFormGroup'
 import { MatureProteinList } from './MatureProteinList'
@@ -15,20 +17,21 @@ type Current = {
 }
 
 type Props = {
+    i: InteractorI,
     sequence: string,
     name: string,
     start: number | null,
     stop: number | null,
     matures: Mature[],
     chains: Chain[],
-    update: (mature: Mature) => void,
 }
 
 const isMature = (current: Current): current is Mature => {
     return current.start != null && current.stop != null
 }
 
-export const SequenceEditor: React.FC<Props> = ({ sequence, name, start, stop, matures, chains, update }) => {
+export const SequenceEditor: React.FC<Props> = ({ i, sequence, name, start, stop, matures, chains }) => {
+    const update = useAction(updateMature)
     const [current, setCurrent] = useState<Current>({ name: name, start: start, stop: stop })
 
     const isNameSet = current.name.trim() != ''
@@ -74,7 +77,7 @@ export const SequenceEditor: React.FC<Props> = ({ sequence, name, start, stop, m
 
     const setFullLength = () => setCoordinates(1, sequence.length)
 
-    const submit = () => { if (isMature(current)) { update(current) } }
+    const submit = () => { if (isMature(current)) { update({ i, mature: current }) } }
 
     return (
         <React.Fragment>
@@ -85,7 +88,7 @@ export const SequenceEditor: React.FC<Props> = ({ sequence, name, start, stop, m
                         <p>
                             Existing sequences on this uniprot entry:
                         </p>
-                        <MatureProteinList matures={matures} select={update} />
+                        <MatureProteinList i={i} matures={matures} />
                     </React.Fragment>
                 )
             }

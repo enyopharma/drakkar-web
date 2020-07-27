@@ -1,23 +1,28 @@
 import React from 'react'
 import { FaCogs } from 'react-icons/fa'
+import { useAction } from '../../src/hooks'
 
-import { Domain, ScaledDomain, Alignment } from '../../src/types'
+import { Domain, ScaledDomain, Alignment, InteractorI } from '../../src/types'
+import { fireAlignment } from '../../src/reducer'
 
 import { DomainsFormGroup } from './DomainsFormGroup'
 import { ExtractFormGroup } from '../Shared/ExtractFormGroup'
 import { CoordinatesFormGroup } from '../Shared/CoordinatesFormGroup'
 
 type Props = {
+    i: InteractorI,
     query: string,
     sequence: string,
+    sequences: Record<string, string>,
     domains: ScaledDomain[],
     mapping: Alignment[],
     processing: boolean,
-    update: (query: string) => void,
-    fire: (query: string) => void,
+    update: (sequence: string) => void,
 }
 
-export const MappingEditor: React.FC<Props> = ({ query, sequence, domains, mapping, processing, update, fire }) => {
+export const MappingEditor: React.FC<Props> = ({ i, query, sequence, sequences, domains, mapping, processing, update }) => {
+    const fire = useAction(fireAlignment)
+
     const isQueryValid = query.trim().length >= 4 && mapping.filter(alignment => {
         return query.toUpperCase().trim() == alignment.sequence.toUpperCase().trim()
     }).length == 0
@@ -57,7 +62,7 @@ export const MappingEditor: React.FC<Props> = ({ query, sequence, domains, mappi
                     <button
                         type="button"
                         className="btn btn-block btn-primary"
-                        onClick={e => fire(query)}
+                        onClick={e => fire({ i, query, sequences })}
                         disabled={processing || !isQueryValid}
                     >
                         {processing

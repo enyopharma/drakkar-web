@@ -1,13 +1,16 @@
 import React, { useState } from 'react'
+import { useAction } from '../../src/hooks'
 
-import { Mature } from '../../src/types'
+import { Mature, InteractorI } from '../../src/types'
+import { updateMature } from '../../src/reducer'
 
 type Props = {
+    i: InteractorI,
     matures: Mature[],
-    select: (mature: Mature) => void,
 }
 
-export const MatureProteinList: React.FC<Props> = ({ matures, select }) => {
+export const MatureProteinList: React.FC<Props> = ({ i, matures }) => {
+    const select = useAction(updateMature)
     const [active, setActive] = useState<number | null>(null)
 
     return (
@@ -16,7 +19,7 @@ export const MatureProteinList: React.FC<Props> = ({ matures, select }) => {
                 <li
                     key={index}
                     className={'list-group-item' + (index == active ? ' active' : '')}
-                    onClick={e => select(matures[index])}
+                    onClick={e => select({ i, mature: matures[index] })}
                     onMouseOut={e => setActive(null)}
                     onMouseOver={e => setActive(index)}
                 >

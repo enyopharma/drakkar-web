@@ -1,18 +1,16 @@
 import React from 'react'
 
-import { ProteinType } from '../../src/types'
+import { InteractorI, ProteinType } from '../../src/types'
+import { proteins as api } from '../../src/api'
 
 import { ProteinAlert } from './ProteinAlert'
 import { ProteinSearchField } from './ProteinSearchField'
 
-import { proteins as api } from '../../src/api'
-
 type Props = {
+    i: InteractorI,
     type: ProteinType,
     accession: string | null,
     processing: boolean,
-    select: (accession: string) => void,
-    unselect: () => void,
 }
 
 export const ProteinFieldset: React.FC<Props> = ({ accession, ...props }) => (

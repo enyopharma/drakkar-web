@@ -1,7 +1,9 @@
 import React from 'react'
 import { FaEdit } from 'react-icons/fa'
+import { useAction } from '../../src/hooks'
 
-import { Protein, Mature } from '../../src/types'
+import { InteractorI, Protein } from '../../src/types'
+import { editMature } from '../../src/reducer'
 
 import { SequenceEditor } from './SequenceEditor'
 import { SequenceTextarea } from './SequenceTextarea'
@@ -9,17 +11,18 @@ import { SequenceFormGroup } from './SequenceFormGroup'
 import { SequenceImg } from '../Shared/SequenceImg'
 
 type Props = {
+    i: InteractorI,
     protein: Protein,
     name: string,
     start: number | null,
     stop: number | null,
     editing: boolean,
     processing: boolean,
-    edit: () => void,
-    update: (mature: Mature) => void,
 }
 
-export const SequenceSection: React.FC<Props> = ({ edit, ...props }) => {
+export const SequenceSection: React.FC<Props> = ({ i, ...props }) => {
+    const edit = useAction(editMature)
+
     const type = props.protein.type
     const sequence = props.protein.sequence
     const length = props.protein.sequence.length
@@ -47,7 +50,7 @@ export const SequenceSection: React.FC<Props> = ({ edit, ...props }) => {
                 <div className="col-1">
                     <button
                         className="btn btn-block btn-warning"
-                        onClick={e => edit()}
+                        onClick={e => edit({ i })}
                         disabled={!enabled}
                     >
                         <FaEdit />
@@ -55,7 +58,7 @@ export const SequenceSection: React.FC<Props> = ({ edit, ...props }) => {
                 </div>
             </div>
             {!props.editing ? null : (
-                <SequenceEditor {...props} sequence={sequence} chains={chains} matures={matures} />
+                <SequenceEditor i={i} sequence={sequence} chains={chains} matures={matures} {...props} />
             )}
         </React.Fragment>
     )

@@ -1,20 +1,18 @@
 import React from 'react'
 
-import { Mature } from '../../src/types'
+import { InteractorI } from '../../src/types'
+import { proteins as api } from '../../src/api'
 
 import { SequenceSection } from './SequenceSection'
 
-import { proteins as api } from '../../src/api'
-
 type Props = {
+    i: InteractorI,
     accession: string | null,
     name: string,
     start: number | null,
     stop: number | null,
     editing: boolean,
     processing: boolean,
-    edit: () => void,
-    update: (mature: Mature) => void,
 }
 
 export const SequenceFieldset: React.FC<Props> = ({ accession, ...props }) => (

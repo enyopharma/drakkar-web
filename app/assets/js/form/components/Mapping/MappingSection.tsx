@@ -15,10 +15,6 @@ type Props = {
     mapping: Alignment[],
     processing: boolean,
     alignment: Alignment | null,
-    fire: (query: string, sequences: Sequences) => void,
-    add: (alignment: Alignment) => void,
-    remove: (i: number) => void,
-    cancel: () => void,
 }
 
 export const MappingSection: React.FC<Props> = ({ protein, alignment, ...props }) => {
@@ -64,16 +60,29 @@ export const MappingSection: React.FC<Props> = ({ protein, alignment, ...props }
         }
     })
 
-    const type = protein.type
-    const fire = (query: string) => props.fire(query, sequences)
-
     return (
         <React.Fragment>
             {alignment == null ? null : (
-                <MappingModal {...props} type={type} coordinates={coordinates} alignment={alignment} />
+                <MappingModal
+                    type={protein.type}
+                    coordinates={coordinates}
+                    alignment={alignment}
+                    {...props}
+                />
             )}
-            <MappingEditor {...props} query={query} sequence={sequence} domains={domains} update={setQuery} fire={fire} />
-            <MappingDisplay {...props} type={type} coordinates={coordinates} />
+            <MappingEditor
+                query={query}
+                sequence={sequence}
+                sequences={sequences}
+                domains={domains}
+                update={setQuery}
+                {...props}
+            />
+            <MappingDisplay
+                type={protein.type}
+                coordinates={coordinates}
+                {...props}
+            />
         </React.Fragment>
     )
 }

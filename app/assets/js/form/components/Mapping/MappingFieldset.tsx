@@ -1,10 +1,9 @@
 import React from 'react'
 
-import { InteractorI, Sequences, Alignment } from '../../src/types'
+import { InteractorI, Alignment } from '../../src/types'
+import { proteins as api } from '../../src/api'
 
 import { MappingSection } from './MappingSection'
-
-import { proteins as api } from '../../src/api'
 
 type Props = {
     i: InteractorI,
@@ -15,10 +14,6 @@ type Props = {
     mapping: Alignment[],
     processing: boolean,
     alignment: Alignment | null,
-    fire: (query: string, sequences: Sequences) => void,
-    add: (alignment: Alignment) => void,
-    remove: (i: number) => void,
-    cancel: () => void,
 }
 
 export const MappingFieldset: React.FC<Props> = ({ accession, start, stop, ...props }) => (

@@ -1,23 +1,27 @@
 import React from 'react'
 import { FaTrash } from 'react-icons/fa'
+import { useAction } from '../../src/hooks'
 
-import { ProteinType, Coordinates, Alignment } from '../../src/types'
+import { InteractorI, ProteinType, Coordinates, Alignment } from '../../src/types'
+import { removeAlignment } from '../../src/reducer'
 
 import { SequenceImg } from '../Shared/SequenceImg'
 
 type Props = {
+    i: InteractorI,
     type: ProteinType,
     name: string,
     coordinates: Coordinates,
     mapping: Alignment[],
-    remove: (i: number) => void,
 }
 
-export const MappingDisplay: React.FC<Props> = ({ type, name, coordinates, mapping, remove }) => {
+export const MappingDisplay: React.FC<Props> = ({ i, type, name, coordinates, mapping }) => {
+    const remove = useAction(removeAlignment)
+
     return (
         <React.Fragment>
-            {mapping.map((alignment, i) => (
-                <div key={i} className="row">
+            {mapping.map((alignment, index) => (
+                <div key={index} className="row">
                     <div className="col">
                         <div className="card">
                             <div className="card-header">
@@ -33,7 +37,7 @@ export const MappingDisplay: React.FC<Props> = ({ type, name, coordinates, mappi
                                     <div className="col-1">
                                         <button
                                             className="btn btn-block btn-warning"
-                                            onClick={e => remove(i)}
+                                            onClick={e => remove({ i, index })}
                                         >
                                             <FaTrash />
                                         </button>
@@ -69,7 +73,8 @@ export const MappingDisplay: React.FC<Props> = ({ type, name, coordinates, mappi
                         </div>
                     </div>
                 </div>
-            ))}
-        </React.Fragment>
+            ))
+            }
+        </React.Fragment >
     )
 }

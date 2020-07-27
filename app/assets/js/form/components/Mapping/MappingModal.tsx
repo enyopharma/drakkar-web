@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
-import Modal from 'react-bootstrap4-modal';
+import Modal from 'react-bootstrap4-modal'
+import { useAction } from '../../src/hooks'
 
 import { ProteinType, InteractorI, Coordinates, Alignment } from '../../src/types'
+import { addAlignment, cancelAlignment } from '../../src/reducer';
 
 import { SequenceImg } from '../Shared/SequenceImg';
 
@@ -13,8 +15,6 @@ type Props = {
     name: string,
     coordinates: Coordinates,
     alignment: Alignment,
-    add: (alignment: Alignment) => void,
-    cancel: () => void,
 }
 
 const indexes = (alignment: Alignment): Index[] => {
@@ -39,7 +39,9 @@ const filter = (alignment: Alignment, selected: Index[]): Alignment => {
     })
 }
 
-export const MappingModal: React.FC<Props> = ({ i, type, name, coordinates, alignment, add, cancel }) => {
+export const MappingModal: React.FC<Props> = ({ i, type, name, coordinates, alignment }) => {
+    const add = useAction(addAlignment)
+    const cancel = useAction(cancelAlignment)
     const [selected, setSelected] = useState<Index[]>(indexes(alignment))
 
     const filtered = filter(alignment, selected)
@@ -68,7 +70,7 @@ export const MappingModal: React.FC<Props> = ({ i, type, name, coordinates, alig
                 <h5 className="modal-title">
                     Mapping result on interactor {i}
                 </h5>
-                <button type="button" className="close" onClick={e => cancel()}>
+                <button type="button" className="close" onClick={e => cancel({ i })}>
                     &times;
                 </button>
             </div>
@@ -132,7 +134,7 @@ export const MappingModal: React.FC<Props> = ({ i, type, name, coordinates, alig
                     type="button"
                     className="btn btn-block btn-primary"
                     disabled={!isValid}
-                    onClick={e => add(filtered)}
+                    onClick={e => add({ i, alignment: filtered })}
                 >
                     Save selected
                 </button>

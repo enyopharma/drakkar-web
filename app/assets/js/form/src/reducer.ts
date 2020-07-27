@@ -82,7 +82,7 @@ const buildInteractorReducer = (i: InteractorI) => createReducer<Interactor>(ini
         .addCase(removeAlignment, (state, action) => {
             if (i != action.payload.i) return state
 
-            state.mapping.filter((_, i) => i != action.payload.index)
+            state.mapping = state.mapping.filter((_, i) => i != action.payload.index)
         })
         .addCase(resetForm, () => initialInteractorState)
 })
@@ -183,7 +183,7 @@ export const reducer = combineReducers({
 /**
  * Thunk actions.
  */
-type AppThunk = ThunkAction<void, AppState, unknown, Action<string>>
+export type AppThunk = ThunkAction<void, AppState, unknown, Action<string>>
 
 export const selectMethod = ({ psimi_id }: { psimi_id: string }): AppThunk => async dispatch => {
     // populate the cache.
