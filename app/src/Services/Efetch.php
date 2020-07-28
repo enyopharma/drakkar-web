@@ -23,6 +23,7 @@ final class Efetch
 
         // PUT CDATA AROUND TITLE AND ABSTRACT TO PARSE HTML
         $xml = (string) preg_replace('/<ArticleTitle(.*?)>(.+?)<\/ArticleTitle>/s', '<ArticleTitle$1><![CDATA[$2]]></ArticleTitle>', $xml);
+        $xml = (string) preg_replace('/<AbstractText.*?\/>/', '', $xml);
         $xml = (string) preg_replace('/<AbstractText(.*?)>(.+?)<\/AbstractText>/s', '<AbstractText$1><![CDATA[$2]]></AbstractText>', $xml);
 
         // parse xml.
