@@ -24,7 +24,7 @@ export const DomainsFormGroup: React.FC<Props> = ({ domains, enabled = true, sel
         <div className="row">
             <div className="col">
                 <select
-                    value={domain == null ? '' : domain}
+                    value={domain ?? ''}
                     className="form-control"
                     onChange={e => handleChange(e.target.value)}
                     disabled={domains.length == 0}

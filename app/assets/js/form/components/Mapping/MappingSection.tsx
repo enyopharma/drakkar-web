@@ -62,7 +62,11 @@ const scaledDomains = (protein: Protein, start: number, stop: number) => {
 export const MappingSection: React.FC<Props> = ({ protein, start, stop, alignment, ...props }) => {
     const [query, setQuery] = useState<string>('')
 
-    useEffect(() => { if (alignment == null) setQuery('') }, [alignment])
+    useEffect(() => {
+        if (alignment == null) {
+            setQuery('')
+        }
+    }, [alignment])
 
     const isFull = start == 1 && stop == protein.sequence.length
 

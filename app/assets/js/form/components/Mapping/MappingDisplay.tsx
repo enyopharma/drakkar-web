@@ -46,14 +46,7 @@ export const MappingDisplay: React.FC<Props> = ({ i, type, name, coordinates, ma
                             <ul className="list-group list-group-flush mt-0">
                                 {alignment.isoforms.map((isoform, j) => (
                                     <li key={j} className="list-group-item">
-                                        <h4>
-                                            {coordinates[isoform.accession].start == 1
-                                                ? isoform.accession
-                                                : [isoform.accession, '/', name].join('')} (
-                                                {coordinates[isoform.accession].start},&nbsp;
-                                                {coordinates[isoform.accession].stop}
-                                            )
-                                        </h4>
+                                        <h4>{name}/{isoform.accession}</h4>
                                         <ul className="list-unstyled">
                                             {isoform.occurrences.sort((a, b) => a.start - b.start).map((occurrence, k) => (
                                                 <li key={k}>

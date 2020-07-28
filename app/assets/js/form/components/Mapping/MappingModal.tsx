@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
 import Modal from 'react-bootstrap4-modal'
 import { useAction } from '../../src/hooks'
-
-import { ProteinType, InteractorI, Coordinates, Alignment } from '../../src/types'
 import { addAlignment, cancelAlignment } from '../../src/reducer';
+import { ProteinType, InteractorI, Coordinates, Alignment } from '../../src/types'
 
 import { SequenceImg } from '../Shared/SequenceImg';
 
@@ -87,14 +86,7 @@ export const MappingModal: React.FC<Props> = ({ i, type, name, coordinates, alig
                 <ul className="list-unstyled">
                     {alignment.isoforms.map((isoform, i) => (
                         <li key={i}>
-                            <h4>
-                                {coordinates[isoform.accession].start == 1
-                                    ? isoform.accession
-                                    : [isoform.accession, '/', name].join('')} (
-                                    {coordinates[isoform.accession].start},&nbsp;
-                                    {coordinates[isoform.accession].stop}
-                                )
-                            </h4>
+                            <h4>{name}/{isoform.accession}</h4>
                             {isoform.occurrences.length == 0
                                 ? <p>No alignment of the sequence on this isoform.</p>
                                 : (
@@ -122,7 +114,8 @@ export const MappingModal: React.FC<Props> = ({ i, type, name, coordinates, alig
                                             </li>
                                         ))}
                                     </ul>
-                                )}
+                                )
+                            }
                         </li>
                     ))}
                 </ul>
@@ -137,6 +130,6 @@ export const MappingModal: React.FC<Props> = ({ i, type, name, coordinates, alig
                     Save selected
                 </button>
             </div>
-        </Modal>
+        </Modal >
     )
 }

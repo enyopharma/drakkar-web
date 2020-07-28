@@ -85,7 +85,7 @@ export const SequenceEditor: React.FC<Props> = ({ i, sequence, name, start, stop
     return (
         <React.Fragment>
             {matures.length == 0
-                ? <EmptyList />
+                ? <p>No sequence defined on this uniprot entry yet.</p>
                 : <NonEmptyList i={i} matures={matures} />
             }
             <div className="row">
@@ -152,10 +152,6 @@ export const SequenceEditor: React.FC<Props> = ({ i, sequence, name, start, stop
         </React.Fragment>
     )
 }
-
-const EmptyList: React.FC = () => (
-    <p>No sequence defined on this uniprot entry yet.</p>
-)
 
 const NonEmptyList: React.FC<{ i: InteractorI, matures: Mature[] }> = ({ i, matures }) => (
     <React.Fragment>

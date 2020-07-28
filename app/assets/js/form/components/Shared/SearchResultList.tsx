@@ -56,7 +56,7 @@ export const SearchResultList: React.FC<Props> = ({ query, input, search, select
     return (
         <ul className="list-group">
             {results.length == 0
-                ? <EmptyList />
+                ? <li className="list-group-item">No entry found</li>
                 : results.map((result, index) => (
                     <li
                         key={index}
@@ -74,9 +74,3 @@ export const SearchResultList: React.FC<Props> = ({ query, input, search, select
         </ul>
     )
 }
-
-const EmptyList: React.FC = () => (
-    <li className="list-group-item">
-        No entry found
-    </li>
-)
