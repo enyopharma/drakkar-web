@@ -1,16 +1,16 @@
 import React from 'react'
 import { methods as api } from '../../src/api'
-import { useMethodSelector } from '../../src/hooks'
+import { useAppSelector } from '../../src/hooks'
 
 import { MethodAlert } from './MethodAlert'
 import { MethodSearchField } from './MethodSearchField'
 
 type Props = {
-    psimi_id: string,
+    method_id: number
 }
 
 export const MethodFieldset: React.FC = () => {
-    const { psimi_id } = useMethodSelector(state => state)
+    const { method_id } = useAppSelector(state => state)
 
     return (
         <React.Suspense fallback={null}>
@@ -18,9 +18,9 @@ export const MethodFieldset: React.FC = () => {
                 <legend>Method</legend>
                 <div className="row">
                     <div className="col">
-                        {psimi_id == null
+                        {method_id == null
                             ? <MethodSearchField />
-                            : <MethodAlertLoader psimi_id={psimi_id} />}
+                            : <MethodAlertLoader method_id={method_id} />}
                     </div>
                 </div>
             </fieldset>
@@ -28,8 +28,8 @@ export const MethodFieldset: React.FC = () => {
     )
 }
 
-const MethodAlertLoader: React.FC<Props> = ({ psimi_id }) => {
-    const method = api.select(psimi_id).read()
+const MethodAlertLoader: React.FC<Props> = ({ method_id }) => {
+    const method = api.select(method_id).read()
 
     return <MethodAlert method={method} />
 }

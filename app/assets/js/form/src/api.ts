@@ -8,8 +8,8 @@ import { SearchResult, Description, Method, ProteinType, Protein, Sequences, Ali
 const cmethod = cache<Method>()
 const cmethods = cache<SearchResult[]>()
 
-const fetchMethod = async (psimi_id: string) => {
-    return fetch(`/methods/${psimi_id}`)
+const fetchMethod = async (id: number) => {
+    return fetch(`/methods/${id}`)
         .then(response => response.json(), error => console.log(error))
         .then(json => json.data)
 }
@@ -18,14 +18,14 @@ const fetchMethods = async (query: string, limit: number) => {
     return fetch('/methods?' + qs.stringify({ query: query, limit: limit }))
         .then(response => response.json(), error => console.log(error))
         .then(json => json.data.map((m: Method) => ({
-            value: m.psimi_id,
+            id: m.id,
             label: [m.psimi_id, m.name].join(' - '),
         })))
 }
 
 export const methods = {
-    select: (psimi_id: string) => {
-        return cmethod.resource(psimi_id, () => fetchMethod(psimi_id), 10)
+    select: (id: number) => {
+        return cmethod.resource(id, () => fetchMethod(id), 10)
     },
 
     search: (query: string) => {
@@ -36,8 +36,8 @@ export const methods = {
 const cprotein = cache<Protein>()
 const cproteins = cache<SearchResult[]>()
 
-const fetchProtein = async (accession: string) => {
-    return fetch(`/proteins/${accession}`)
+const fetchProtein = async (id: number) => {
+    return fetch(`/proteins/${id}`)
         .then(response => response.json(), error => console.log(error))
         .then(json => json.data)
 }
@@ -46,14 +46,14 @@ const fetchProteins = async (type: ProteinType, query: string, limit: number) =>
     return fetch('/proteins?' + qs.stringify({ type: type, query: query, limit: limit }))
         .then(response => response.json(), error => console.log(error))
         .then(json => json.data.map((p: Protein) => ({
-            value: p.accession,
+            id: p.id,
             label: [p.accession, p.taxon, p.name, p.description].join(' - '),
         })))
 }
 
 export const proteins = {
-    select: (accession: string) => {
-        return cprotein.resource(accession, () => fetchProtein(accession), 10)
+    select: (id: number) => {
+        return cprotein.resource(id, () => fetchProtein(id), 10)
     },
 
     search: (type: ProteinType, query: string) => {

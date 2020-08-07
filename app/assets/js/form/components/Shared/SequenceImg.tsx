@@ -2,11 +2,11 @@ import React from 'react'
 import { ProteinType } from '../../src/types'
 
 type Props = {
-    type: ProteinType,
-    start: number | null,
-    stop: number | null,
-    length: number,
-    active?: boolean,
+    type: ProteinType
+    start: number | null
+    stop: number | null
+    length: number
+    active?: boolean
 }
 
 const startp = (start: number, length: number): string => {

@@ -99,7 +99,7 @@ return function (ContainerInterface $container): array {
             $container->get(App\ReadModel\MethodViewInterface::class),
         )),
 
-        'GET /methods/{psimi_id}' => fn () => $endpoint(new Methods\ShowEndpoint(
+        'GET /methods/{id:[0-9]+}' => fn () => $endpoint(new Methods\ShowEndpoint(
             $container->get(App\ReadModel\MethodViewInterface::class),
         )),
 
@@ -107,7 +107,7 @@ return function (ContainerInterface $container): array {
             $container->get(App\ReadModel\ProteinViewInterface::class),
         )),
 
-        'GET /proteins/{accession}' => fn () => $endpoint(new Proteins\ShowEndpoint(
+        'GET /proteins/{id:[0-9]+}' => fn () => $endpoint(new Proteins\ShowEndpoint(
             $container->get(App\ReadModel\ProteinViewInterface::class),
         )),
 

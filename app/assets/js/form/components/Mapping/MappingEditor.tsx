@@ -9,14 +9,14 @@ import { ExtractFormGroup } from '../Shared/ExtractFormGroup'
 import { CoordinatesFormGroup } from '../Shared/CoordinatesFormGroup'
 
 type Props = {
-    i: InteractorI,
-    query: string,
-    canonical: string,
-    sequences: Record<string, string>,
-    domains: ScaledDomain[],
-    mapping: Alignment[],
-    processing: boolean,
-    update: (sequence: string) => void,
+    i: InteractorI
+    query: string
+    canonical: string
+    sequences: Record<string, string>
+    domains: ScaledDomain[]
+    mapping: Alignment[]
+    processing: boolean
+    update: (sequence: string) => void
 }
 
 export const MappingEditor: React.FC<Props> = ({ i, query, canonical, sequences, domains, mapping, processing, update }) => {

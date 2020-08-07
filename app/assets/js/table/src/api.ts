@@ -3,8 +3,8 @@ import fetch from 'cross-fetch'
 import { Protein } from './types'
 
 export const proteins = {
-    select: (accession: string): Promise<Protein> => {
-        return fetch(`/proteins/${accession}`)
+    select: (id: number): Promise<Protein> => {
+        return fetch(`/proteins/${id}`)
             .then(response => response.json(), error => console.log(error))
             .then(json => json.data, error => console.log(error))
     }

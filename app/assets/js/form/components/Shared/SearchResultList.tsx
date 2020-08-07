@@ -3,9 +3,9 @@ import { SearchResult } from '../../src/types'
 
 type Props = {
     input: RefObject<HTMLInputElement>
-    query: string,
-    search: (query: string) => SearchResult[],
-    select: (value: string) => void,
+    query: string
+    search: (query: string) => SearchResult[]
+    select: (id: number) => void
 }
 
 export const SearchResultList: React.FC<Props> = ({ query, input, search, select }) => {
@@ -28,7 +28,7 @@ export const SearchResultList: React.FC<Props> = ({ query, input, search, select
 
         if (e.keyCode == 13 && results[active]) {
             e.preventDefault()
-            select(results[active].value)
+            select(results[active].id)
         }
     }
 
@@ -62,10 +62,10 @@ export const SearchResultList: React.FC<Props> = ({ query, input, search, select
                         key={index}
                         data-type="result"
                         data-index={index}
-                        data-value={result.value}
+                        data-value={result.id}
                         className={'list-group-item' + (index == active2 ? ' active' : '')}
                         dangerouslySetInnerHTML={{ __html: highlight(result.label) }}
-                        onMouseDown={e => select(result.value)}
+                        onMouseDown={e => select(result.id)}
                         onMouseOver={e => setActive(index)}
                     >
                     </li>

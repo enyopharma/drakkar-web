@@ -2,9 +2,9 @@ import React from 'react'
 import { DescriptionType, InteractorI } from '../src/types'
 
 type Props = {
-    type: DescriptionType,
-    current: InteractorI,
-    update: (i: InteractorI) => void,
+    type: DescriptionType
+    current: InteractorI
+    update: (i: InteractorI) => void
 }
 
 const titles: Record<DescriptionType, Record<InteractorI, string>> = {

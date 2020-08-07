@@ -7,11 +7,11 @@ import { InteractorI, ProteinType, Coordinates, Alignment } from '../../src/type
 import { SequenceImg } from '../Shared/SequenceImg'
 
 type Props = {
-    i: InteractorI,
-    type: ProteinType,
-    name: string,
-    coordinates: Coordinates,
-    mapping: Alignment[],
+    i: InteractorI
+    type: ProteinType
+    name: string
+    coordinates: Coordinates
+    mapping: Alignment[]
 }
 
 export const MappingDisplay: React.FC<Props> = ({ i, type, name, coordinates, mapping }) => {

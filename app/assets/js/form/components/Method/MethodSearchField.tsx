@@ -11,7 +11,7 @@ export const MethodSearchField: React.FC = () => {
     return (
         <SearchField
             type="method"
-            select={(psimi_id: string) => select({ psimi_id })}
+            select={(id: number) => select({ id })}
             search={(query: string) => api.search(query).read()}
             placeholder="Search a method..."
             help="You may use + to perform queries with multiple search terms (eg: bio + tag)"

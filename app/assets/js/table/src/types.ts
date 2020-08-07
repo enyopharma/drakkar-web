@@ -5,7 +5,10 @@ export type Description = {
     pmid: number
     run_id: number
     stable_id: string
-    method: Method
+    method_id: number
+    method: {
+        psimi_id: string
+    }
     interactor1: Interactor
     interactor2: Interactor
     created_at: string
@@ -13,22 +16,11 @@ export type Description = {
     deleted: boolean
 }
 
-export type Method = {
-    psimi_id: string
-    name: string
-}
-
-export type Protein = {
-    type: ProteinType
-    accession: string
-    sequence: string
-    isoforms: Array<{ accession: string, sequence: string }>,
-}
-
 export type Interactor = {
+    protein_id: number
     protein: {
         accession: string
-    },
+    }
     name: string
     start: number
     stop: number
@@ -43,4 +35,11 @@ export type Alignment = {
 export type Isoform = {
     accession: string
     occurrences: Array<{ start: number, stop: number }>
+}
+
+export type Protein = {
+    type: ProteinType
+    accession: string
+    sequence: string
+    isoforms: Array<{ accession: string, sequence: string }>,
 }

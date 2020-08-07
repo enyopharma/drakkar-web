@@ -3,9 +3,9 @@ import React, { useState, useEffect } from 'react'
 import { CoordinateField } from './CoordinateField'
 
 type Props = {
-    sequence: string,
-    enabled: boolean,
-    set: (sequence: string) => void,
+    sequence: string
+    enabled: boolean
+    set: (sequence: string) => void
 }
 
 export const CoordinatesFormGroup: React.FC<Props> = ({ sequence, enabled = true, set, children }) => {

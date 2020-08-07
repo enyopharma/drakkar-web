@@ -12,24 +12,30 @@ final class DatasetViewSql implements DatasetViewInterface
     private \PDO $pdo;
 
     const SELECT_DESCRIPTIONS_SQL = <<<SQL
-        SELECT r.type, d.stable_id, a.pmid, m.psimi_id,
-            i1.name AS name1, i1.start AS start1, i1.stop AS stop1, i1.mapping AS mapping1,
-            i2.name AS name2, i2.start AS start2, i2.stop AS stop2, i2.mapping AS mapping2,
-            p1.id AS protein1_id, p1.accession AS accession1,
-            p2.id AS protein2_id, p2.accession AS accession2
-        FROM runs AS r, associations AS a, descriptions AS d, methods AS m,
-            interactors AS i1, interactors AS i2,
-            proteins AS p1, proteins AS p2
+        SELECT
+            r.type,
+            a.pmid,
+            d.stable_id, d.version,
+            m.psimi_id,
+            d.protein1_id, p1.accession AS accession1, d.name1, d.start1, d.stop1, d.mapping1,
+            d.protein2_id, p2.accession AS accession2, d.name2, d.start2, d.stop2, d.mapping2
+        FROM
+            runs AS r,
+            associations AS a,
+            descriptions AS d,
+            methods AS m,
+            proteins AS p1,
+            proteins AS p2
         WHERE r.type = ?
-        AND r.id = a.run_id
-        AND a.id = d.association_id
-        AND m.id = d.method_id
-        AND i1.id = d.interactor1_id
-        AND i2.id = d.interactor2_id
-        AND p1.id = i1.protein_id
-        AND p2.id = i2.protein_id
-        AND a.state = ?
-        AND d.deleted_at IS NULL
+            AND r.id = a.run_id
+            AND a.id = d.association_id
+            AND m.id = d.method_id
+            AND p1.id = d.protein1_id
+            AND p2.id = d.protein2_id
+            AND a.state = ?
+            AND p1.obsolete IS FALSE
+            AND p2.obsolete IS FALSE
+            AND d.deleted_at IS NULL
         ORDER BY d.created_at DESC, d.id DESC
     SQL;
 
@@ -55,6 +61,7 @@ final class DatasetViewSql implements DatasetViewInterface
             yield [
                 'type' => $row['type'],
                 'stable_id' => $row['stable_id'],
+                'version' => $row['version'],
                 'publication' => [
                     'pmid' => $row['pmid'],
                 ],

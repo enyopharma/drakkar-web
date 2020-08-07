@@ -4,9 +4,9 @@ import { unselectProtein } from '../../src/reducer'
 import { InteractorI, ProteinType, Protein } from '../../src/types'
 
 type Props = {
-    i: InteractorI,
-    protein: Protein,
-    processing: boolean,
+    i: InteractorI
+    protein: Protein
+    processing: boolean
 }
 
 const classes: Record<ProteinType, string> = {

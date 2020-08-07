@@ -11,11 +11,7 @@ export const App = (type: DescriptionType, run_id: number, pmid: number, descrip
         run_id: run_id,
         pmid: pmid,
         type: type,
-        description: description == null ? undefined : {
-            method: description.method,
-            interactor1: description.interactor1,
-            interactor2: description.interactor2,
-        },
+        description: description == null ? undefined : description,
         interactorUI1: undefined,
         interactorUI2: undefined,
         saving: false,

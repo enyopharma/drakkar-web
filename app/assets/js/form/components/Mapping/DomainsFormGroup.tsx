@@ -3,8 +3,8 @@ import { Domain, ScaledDomain } from '../../src/types'
 
 type Props = {
     domains: ScaledDomain[]
-    enabled?: boolean,
-    select: (domain: Domain) => void,
+    enabled?: boolean
+    select: (domain: Domain) => void
 }
 
 export const DomainsFormGroup: React.FC<Props> = ({ domains, enabled = true, select, children }) => {

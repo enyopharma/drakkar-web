@@ -15,10 +15,10 @@ final class ProteinViewSql implements ProteinViewInterface
         FROM proteins AS p, sequences AS s, taxon AS t, taxon_name AS tn
         WHERE p.id = s.protein_id
         AND s.is_canonical IS TRUE
-        AND p.taxon_id = t.ncbi_taxon_id
+        AND p.ncbi_taxon_id = t.ncbi_taxon_id
         AND t.taxon_id = tn.taxon_id
         AND tn.name_class = 'scientific name'
-        AND p.accession = ?
+        AND p.id = ?
     SQL;
 
     const SELECT_PROTEINS_SQL = <<<SQL
@@ -26,7 +26,8 @@ final class ProteinViewSql implements ProteinViewInterface
         FROM proteins AS p, taxon AS t, taxon_name AS tn
         WHERE %s
         AND p.type = ?
-        AND p.taxon_id = t.ncbi_taxon_id
+        AND p.obsolete IS FALSE
+        AND p.ncbi_taxon_id = t.ncbi_taxon_id
         AND t.taxon_id = tn.taxon_id
         AND tn.name_class = 'scientific name'
         LIMIT ?
@@ -59,13 +60,12 @@ final class ProteinViewSql implements ProteinViewInterface
         ORDER BY f.start ASC, f.stop ASC
     SQL;
 
+    # ASSUME THE VIRAL INTERACTOR IS ALWAYS THE SECOND INTERACTOR
     const SELECT_MATURES_SQL = <<<SQL
-        SELECT i.name, i.start, i.stop
-        FROM descriptions AS d, interactors AS i
-        WHERE (i.id = d.interactor1_id OR i.id = d.interactor2_id)
-        AND d.deleted_at IS NULL
-        AND i.protein_id = ?
-        GROUP BY i.name, i.start, i.stop
+        SELECT name2 AS name, start2 AS start, stop2 AS stop
+        FROM descriptions
+        WHERE protein2_id = ? AND deleted_at IS NULL
+        GROUP BY name2, start2, stop2
     SQL;
 
     public function __construct(\PDO $pdo)
@@ -73,30 +73,30 @@ final class ProteinViewSql implements ProteinViewInterface
         $this->pdo = $pdo;
     }
 
-    public function accession(string $accession, string ...$with): Statement
+    public function id(int $id, string ...$with): Statement
     {
         $select_protein_sth = $this->pdo->prepare(self::SELECT_PROTEIN_SQL);
 
-        $select_protein_sth->execute([$accession]);
+        $select_protein_sth->execute([$id]);
 
         if (!$protein = $select_protein_sth->fetch()) {
             return Statement::from([]);
         }
 
         if (in_array('isoforms', $with)) {
-            $protein['isoforms'] = $this->isoforms($protein['id']);
+            $protein['isoforms'] = $this->isoforms($id);
         }
 
         if (in_array('chains', $with)) {
-            $protein['chains'] = $this->chains($protein['id']);
+            $protein['chains'] = $this->chains($id);
         }
 
         if (in_array('domains', $with)) {
-            $protein['domains'] = $this->domains($protein['id']);
+            $protein['domains'] = $this->domains($id);
         }
 
         if (in_array('matures', $with)) {
-            $protein['matures'] = $this->matures($protein['id']);
+            $protein['matures'] = $this->matures($id);
         }
 
         return Statement::from([$protein]);

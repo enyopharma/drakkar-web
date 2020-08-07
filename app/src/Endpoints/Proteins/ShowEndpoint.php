@@ -22,10 +22,10 @@ final class ShowEndpoint
      */
     public function __invoke(ServerRequestInterface $request)
     {
-        $accession = $request->getAttribute('accession');
+        $id = (int) $request->getAttribute('id');
 
         return $this->proteins
-            ->accession($accession, 'isoforms', 'chains', 'domains', 'matures')
+            ->id($id, 'isoforms', 'chains', 'domains', 'matures')
             ->fetch();
     }
 }

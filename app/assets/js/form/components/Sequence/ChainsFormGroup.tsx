@@ -2,9 +2,9 @@ import React, { useState } from 'react'
 import { Chain } from '../../src/types'
 
 type Props = {
-    chains: Chain[],
-    enabled?: boolean,
-    set: (start: number, stop: number) => void,
+    chains: Chain[]
+    enabled?: boolean
+    set: (start: number, stop: number) => void
 }
 
 const areContiguous = (chains: Chain[]): boolean => {

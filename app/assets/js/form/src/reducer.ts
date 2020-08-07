@@ -3,7 +3,7 @@ import { combineReducers, createReducer, createAction, Action } from '@reduxjs/t
 import { ThunkAction } from 'redux-thunk'
 
 import * as api from './api'
-import { AppState, Method, DescriptionType, InteractorI, Interactor, Protein, Mature, InteractorUI, Alignment, Sequences, Feedback, Description } from './types'
+import { AppState, Method, InteractorI, Interactor, Protein, Mature, InteractorUI, Alignment, Sequences, Feedback } from './types'
 
 /**
  * Regular actions.
@@ -31,9 +31,7 @@ const __fireSave = createAction('FIRE_SAVE')
  * Builds an interactor reducer (depends on i)
  */
 const initialInteractorState: Interactor = {
-    protein: {
-        accession: null,
-    },
+    protein_id: null,
     name: '',
     start: null,
     stop: null,
@@ -45,7 +43,7 @@ const buildInteractorReducer = (i: InteractorI) => createReducer<Interactor>(ini
         .addCase(__selectProtein, (state, action) => {
             if (i != action.payload.i) return state
 
-            state.protein.accession = action.payload.protein.accession
+            state.protein_id = action.payload.protein.id
 
             state.name = action.payload.protein.type == 'h'
                 ? action.payload.protein.name
@@ -147,17 +145,11 @@ const pmid = createReducer(0, builder => builder.addDefaultCase((state) => state
 
 const type = createReducer('hh', builder => builder.addDefaultCase((state) => state))
 
-const method = createReducer<{ psimi_id: string | null }>({ psimi_id: null }, build => {
+const method_id = createReducer<number | null>(null, build => {
     build
-        .addCase(__selectMethod, (state, action) => {
-            state.psimi_id = action.payload.method.psimi_id
-        })
-        .addCase(unselectMethod, (state) => {
-            state.psimi_id = null
-        })
-        .addCase(resetForm, (state) => {
-            state.psimi_id = null
-        })
+        .addCase(__selectMethod, (_, action) => action.payload.method.id)
+        .addCase(unselectMethod, () => null)
+        .addCase(resetForm, () => null)
 })
 
 const saving = createReducer<boolean>(false, builder => {
@@ -174,7 +166,7 @@ const feedback = createReducer<Feedback | null>(null, builder => {
 
 const interactor1 = buildInteractorReducer(1);
 const interactor2 = buildInteractorReducer(2);
-const description = combineReducers({ method, interactor1, interactor2 })
+const description = combineReducers({ method_id, interactor1, interactor2 })
 const interactorUI1 = buildInteractorUIReducer(1);
 const interactorUI2 = buildInteractorUIReducer(2);
 
@@ -194,10 +186,10 @@ export const reducer = combineReducers({
  */
 export type AppThunk = ThunkAction<void, AppState, unknown, Action<string>>
 
-export const selectMethod = ({ psimi_id }: { psimi_id: string }): AppThunk => async dispatch => {
+export const selectMethod = ({ id }: { id: number }): AppThunk => async dispatch => {
     // populate the cache.
     const f = () => {
-        const method = api.methods.select(psimi_id).read()
+        const method = api.methods.select(id).read()
 
         dispatch(__selectMethod({ method }))
     }
@@ -205,10 +197,10 @@ export const selectMethod = ({ psimi_id }: { psimi_id: string }): AppThunk => as
     try { f() } catch (promise) { promise.then(f) }
 }
 
-export const selectProtein = ({ i, accession }: { i: InteractorI, accession: string }): AppThunk => async dispatch => {
+export const selectProtein = ({ i, id }: { i: InteractorI, id: number }): AppThunk => async dispatch => {
     // populate the cache.
     const f = () => {
-        const protein = api.proteins.select(accession).read()
+        const protein = api.proteins.select(id).read()
 
         dispatch(__selectProtein({ i, protein }))
     }

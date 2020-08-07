@@ -7,14 +7,14 @@ import { ProteinAlert } from './ProteinAlert'
 import { ProteinSearchField } from './ProteinSearchField'
 
 type Props = {
-    i: InteractorI,
-    type: ProteinType,
-    accession: string,
-    processing: boolean,
+    i: InteractorI
+    type: ProteinType
+    protein_id: number
+    processing: boolean
 }
 
 export const ProteinFieldset: React.FC<{ i: InteractorI }> = ({ i }) => {
-    const { accession, ...props } = useInteractorSelector(i, state => state)
+    const { protein_id, ...props } = useInteractorSelector(i, state => state)
 
     return (
         <React.Suspense fallback={null}>
@@ -22,9 +22,9 @@ export const ProteinFieldset: React.FC<{ i: InteractorI }> = ({ i }) => {
                 <legend>Protein</legend>
                 <div className="row">
                     <div className="col">
-                        {accession == null
+                        {protein_id == null
                             ? <ProteinSearchField {...props} />
-                            : <ProteinAlertLoader accession={accession} {...props} />
+                            : <ProteinAlertLoader protein_id={protein_id} {...props} />
                         }
                     </div>
                 </div>
@@ -33,8 +33,8 @@ export const ProteinFieldset: React.FC<{ i: InteractorI }> = ({ i }) => {
     )
 }
 
-const ProteinAlertLoader: React.FC<Props> = ({ accession, ...props }) => {
-    const protein = api.select(accession).read()
+const ProteinAlertLoader: React.FC<Props> = ({ protein_id, ...props }) => {
+    const protein = api.select(protein_id).read()
 
     return <ProteinAlert protein={protein} {...props} />
 }

@@ -10,19 +10,19 @@ import { ExtractFormGroup } from '../Shared/ExtractFormGroup'
 import { SubsequenceFormGroup } from '../Shared/SubsequenceFormGroup'
 
 type Current = {
-    name: string,
-    start: number | null,
-    stop: number | null,
+    name: string
+    start: number | null
+    stop: number | null
 }
 
 type Props = {
-    i: InteractorI,
-    sequence: string,
-    name: string,
-    start: number | null,
-    stop: number | null,
-    matures: Mature[],
-    chains: Chain[],
+    i: InteractorI
+    sequence: string
+    name: string
+    start: number | null
+    stop: number | null
+    matures: Mature[]
+    chains: Chain[]
 }
 
 const isMature = (current: Current): current is Mature => {

@@ -9,11 +9,11 @@ import { SequenceImg } from '../Shared/SequenceImg';
 type Index = [number, number]
 
 type Props = {
-    i: InteractorI,
-    type: ProteinType,
-    name: string,
-    coordinates: Coordinates,
-    alignment: Alignment,
+    i: InteractorI
+    type: ProteinType
+    name: string
+    coordinates: Coordinates
+    alignment: Alignment
 }
 
 const indexes = (alignment: Alignment): Index[] => {

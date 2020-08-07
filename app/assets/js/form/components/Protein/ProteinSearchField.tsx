@@ -7,8 +7,8 @@ import { ProteinType, InteractorI, SearchType } from '../../src/types'
 import { SearchField } from '../Shared/SearchField'
 
 type Props = {
-    i: InteractorI,
-    type: ProteinType,
+    i: InteractorI
+    type: ProteinType
 }
 
 const types: Record<ProteinType, SearchType> = {
@@ -32,7 +32,7 @@ export const ProteinSearchField: React.FC<Props> = ({ i, type }) => {
     return (
         <SearchField
             type={types[type]}
-            select={(accession: string) => select({ i, accession })}
+            select={(id: number) => select({ i, id })}
             search={(query: string) => api.search(type, query).read()}
             placeholder={placeholders[type]}
             help={helps[type]}

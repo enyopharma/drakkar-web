@@ -22,8 +22,8 @@ final class ShowEndpoint
      */
     public function __invoke(ServerRequestInterface $request)
     {
-        $psimi_id = $request->getAttribute('psimi_id');
+        $id = (int) $request->getAttribute('id');
 
-        return $this->methods->psimiId($psimi_id)->fetch();
+        return $this->methods->id($id)->fetch();
     }
 }

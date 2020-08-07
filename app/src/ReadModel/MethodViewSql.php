@@ -9,16 +9,11 @@ final class MethodViewSql implements MethodViewInterface
     private \PDO $pdo;
 
     const SELECT_METHOD_SQL = <<<SQL
-        SELECT id, psimi_id, name
-        FROM methods
-        WHERE psimi_id = ?
+        SELECT id, psimi_id, name FROM methods WHERE id = ?
     SQL;
 
     const SELECT_METHODS_SQL = <<<SQL
-        SELECT id, psimi_id, name
-        FROM methods
-        WHERE %s
-        LIMIT ?
+        SELECT id, psimi_id, name FROM methods WHERE %s LIMIT ?
     SQL;
 
     public function __construct(\PDO $pdo)
@@ -26,11 +21,11 @@ final class MethodViewSql implements MethodViewInterface
         $this->pdo = $pdo;
     }
 
-    public function psimiId(string $psimi_id): Statement
+    public function id(int $id): Statement
     {
         $select_method_sth = $this->pdo->prepare(self::SELECT_METHOD_SQL);
 
-        $select_method_sth->execute([$psimi_id]);
+        $select_method_sth->execute([$id]);
 
         return Statement::from($select_method_sth);
     }

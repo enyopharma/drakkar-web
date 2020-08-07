@@ -4,7 +4,7 @@ import { useAction } from '../../src/hooks'
 import { unselectMethod } from '../../src/reducer'
 
 type Props = {
-    method: Method,
+    method: Method
 }
 
 export const MethodAlert: React.FC<Props> = ({ method }) => {

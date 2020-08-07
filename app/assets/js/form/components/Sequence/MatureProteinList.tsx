@@ -4,8 +4,8 @@ import { updateMature } from '../../src/reducer'
 import { Mature, InteractorI } from '../../src/types'
 
 type Props = {
-    i: InteractorI,
-    matures: Mature[],
+    i: InteractorI
+    matures: Mature[]
 }
 
 const classes = (active: boolean) => 'list-group-item' + (active ? ' active' : '')

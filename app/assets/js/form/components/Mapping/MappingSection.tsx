@@ -6,14 +6,14 @@ import { MappingEditor } from './MappingEditor'
 import { MappingDisplay } from './MappingDisplay'
 
 type Props = {
-    i: InteractorI,
-    protein: Protein,
-    name: string,
-    start: number,
-    stop: number,
-    mapping: Alignment[],
-    processing: boolean,
-    alignment: Alignment | null,
+    i: InteractorI
+    protein: Protein
+    name: string
+    start: number
+    stop: number
+    mapping: Alignment[]
+    processing: boolean
+    alignment: Alignment | null
 }
 
 const reduceSequences = (protein: Protein) => {

@@ -1,11 +1,11 @@
 import React from 'react'
 
 type Props = {
-    value: number | null,
-    max: number,
-    valid?: boolean,
+    value: number | null
+    max: number
+    valid?: boolean
     placeholder?: string
-    set: (value: number | null) => void,
+    set: (value: number | null) => void
 }
 
 export const CoordinateField: React.FC<Props> = ({ value, max, valid = true, placeholder = '', set }) => {

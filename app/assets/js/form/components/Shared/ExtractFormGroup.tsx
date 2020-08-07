@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react'
 import { extract } from '../../src/shared'
 
 type Props = {
-    sequence: string,
-    enabled?: boolean,
-    set: (start: number, stop: number) => void,
+    sequence: string
+    enabled?: boolean
+    set: (start: number, stop: number) => void
 }
 
 export const ExtractFormGroup: React.FC<Props> = ({ sequence, enabled = true, set, children }) => {

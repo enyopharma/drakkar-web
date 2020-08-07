@@ -2,10 +2,10 @@ import React from 'react'
 import { FaCheck, FaExclamationTriangle } from 'react-icons/fa'
 
 type Props = {
-    name: string,
-    start: number | null,
-    stop: number | null,
-    valid: boolean,
+    name: string
+    start: number | null
+    stop: number | null
+    valid: boolean
 }
 
 export const SequenceFormGroup: React.FC<Props> = ({ name, start, stop, valid }) => {

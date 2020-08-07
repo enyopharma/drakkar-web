@@ -10,13 +10,13 @@ import { SequenceFormGroup } from './SequenceFormGroup'
 import { SequenceImg } from '../Shared/SequenceImg'
 
 type Props = {
-    i: InteractorI,
-    protein: Protein,
-    name: string,
-    start: number | null,
-    stop: number | null,
-    editing: boolean,
-    processing: boolean,
+    i: InteractorI
+    protein: Protein
+    name: string
+    start: number | null
+    stop: number | null
+    editing: boolean
+    processing: boolean
 }
 
 export const SequenceSection: React.FC<Props> = ({ i, protein, editing, processing, ...props }) => {

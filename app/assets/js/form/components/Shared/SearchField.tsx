@@ -6,10 +6,10 @@ import { SearchOverlay } from './SearchOverlay'
 import { SearchResultList } from './SearchResultList'
 
 type Props = {
-    type: SearchType,
-    search: (query: string) => SearchResult[],
-    select: (value: string) => void,
-    placeholder?: string,
+    type: SearchType
+    search: (query: string) => SearchResult[]
+    select: (id: number) => void
+    placeholder?: string
     help?: string | null
 }
 

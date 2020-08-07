@@ -1,9 +1,9 @@
 import React from 'react'
 
 type Props = {
-    sequence: string,
-    start: number | null,
-    stop: number | null,
+    sequence: string
+    start: number | null
+    stop: number | null
 }
 
 const style = {
