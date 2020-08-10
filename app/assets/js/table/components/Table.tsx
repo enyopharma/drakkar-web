@@ -65,7 +65,7 @@ export const Table: React.FC<Props> = ({ descriptions }) => {
                     {descriptions.map((description, i) => (
                         <tr key={i} className={deleted[i] ? 'table-danger' : ''}>
                             <td className="text-center align-middle">
-                                {description.stable_id}
+                                {description.stable_id}/{description.version}
                             </td>
                             <td className="text-center align-middle">
                                 {description.method.psimi_id}

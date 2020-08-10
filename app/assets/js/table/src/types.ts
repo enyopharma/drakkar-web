@@ -5,6 +5,7 @@ export type Description = {
     pmid: number
     run_id: number
     stable_id: string
+    version: number
     method_id: number
     method: {
         psimi_id: string
