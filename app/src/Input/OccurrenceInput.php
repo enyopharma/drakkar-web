@@ -7,11 +7,9 @@ namespace App\Input;
 use Quanta\Validation;
 use Quanta\Validation\Error;
 use Quanta\Validation\Guard;
-use Quanta\Validation\Bound;
 use Quanta\Validation\Field;
+use Quanta\Validation\InvalidDataException;
 use Quanta\Validation\Rules\OfType;
-use Quanta\Validation\Rules\LessThanEqual;
-use Quanta\Validation\Rules\GreaterThanEqual;
 
 final class OccurrenceInput
 {
@@ -21,24 +19,38 @@ final class OccurrenceInput
 
     private float $identity;
 
-    public static function factory(): callable
+    public static function factory(string $subject, string $query): callable
     {
-        $factory = fn (...$xs) => new self(...$xs);
-
         $is_int = new Guard(new OfType('int'));
         $is_flt = new Guard(new OfType('float'));
-        $is_gte1 = new Guard(new GreaterThanEqual(1));
-        $is_gte96 = new Guard(new GreaterThanEqual(96));
-        $is_gte100 = new Guard(new LessThanEqual(100));
-        $are_coordinates_valid = new Guard(fn ($x) => $x->areCoordinatesValid());
 
-        $validation = new Validation($factory,
-            Field::required('start', $is_int, $is_gte1)->focus(),
-            Field::required('stop', $is_int, $is_gte1)->focus(),
-            Field::required('identity', $is_flt, $is_gte96, $is_gte100)->focus(),
+        return new Validation(fn (...$xs) => self::from($subject, $query, ...$xs),
+            Field::required('start', $is_int)->focus(),
+            Field::required('stop', $is_int)->focus(),
+            Field::required('identity', $is_flt)->focus(),
         );
+    }
 
-        return new Bound($validation, $are_coordinates_valid);
+    public static function from(string $subject, string $query, int $start, int $stop, float $identity): self
+    {
+        $input = new self($start, $stop, $identity);
+
+        $errors = [
+            ...array_map(fn ($e) => $e->nest('start'), $input->validateStart($subject)),
+            ...array_map(fn ($e) => $e->nest('stop'), $input->validateStop($subject)),
+        ];
+
+        if (count($errors) == 0) {
+            $errors = $input->validateCoordinates($query);
+        }
+
+        $errors = [...$errors, ...array_map(fn ($e) => $e->nest('identity'), $input->validateIdentity($subject))];
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        return $input;
     }
 
     private function __construct(int $start, int $stop, float $identity)
@@ -48,27 +60,6 @@ final class OccurrenceInput
         $this->identity = $identity;
     }
 
-    private function areCoordinatesValid(): array
-    {
-        if ($this->start <= $this->stop) {
-            return [];
-        }
-
-        return [
-            new Error('start must be less than stop'),
-        ];
-    }
-
-    public function start(): int
-    {
-        return $this->start;
-    }
-
-    public function stop(): int
-    {
-        return $this->stop;
-    }
-
     public function data(): array
     {
         return [
@@ -76,5 +67,39 @@ final class OccurrenceInput
             'stop' => $this->stop,
             'identity' => $this->identity,
         ];
+    }
+
+    private function validateStart(string $subject): array
+    {
+        return $this->start < 1 || $this->stop > strlen($subject)
+            ? [new Error('must be inside the isoform sequence')]
+            : [];
+    }
+
+    private function validateStop(string $subject): array
+    {
+        return $this->start < 1 || $this->stop > strlen($subject)
+            ? [new Error('must be inside the isoform sequence')]
+            : [];
+    }
+
+    private function validateCoordinates(string $query): array
+    {
+        if ($this->start > $this->stop) {
+            return [new Error('start must be greater than stop')];
+        }
+
+        if ($this->stop - $this->start + 1 != strlen($query)) {
+            return [new Error('occurrence must have the same length as the query sequence')];
+        }
+
+        return [];
+    }
+
+    private function validateIdentity(): array
+    {
+        return $this->identity < 96 || $this->identity > 100
+            ? [new Error('must be between 96 and 100')]
+            : [];
     }
 }

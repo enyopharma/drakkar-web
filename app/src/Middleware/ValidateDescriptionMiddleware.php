@@ -13,8 +13,6 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Quanta\Validation\Error;
 use Quanta\Validation\InvalidDataException;
 
-use App\Input\DataSource;
-use App\Input\Association;
 use App\Input\DescriptionInput;
 
 final class ValidateDescriptionMiddleware implements MiddlewareInterface
@@ -55,10 +53,8 @@ final class ValidateDescriptionMiddleware implements MiddlewareInterface
             return $this->factory->createResponse(404);
         }
 
-        $association = new Association($association['id'], $association['type']);
-
         // get the factory.
-        $factory = DescriptionInput::factory(new DataSource($this->pdo), $association);
+        $factory = DescriptionInput::factory($this->pdo, $association['id'], $association['type']);
 
         // try to produce a description input.
         try {

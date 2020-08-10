@@ -8,100 +8,127 @@ use Quanta\Validation;
 use Quanta\Validation\Map;
 use Quanta\Validation\Error;
 use Quanta\Validation\Guard;
-use Quanta\Validation\Bound;
 use Quanta\Validation\Field;
+use Quanta\Validation\InvalidDataException;
 use Quanta\Validation\Rules\OfType;
-use Quanta\Validation\Rules\NotEmpty;
-use Quanta\Validation\Rules\Matching;
-use Quanta\Validation\Rules\GreaterThanEqual;
 
 final class IsoformInput
 {
-    const ACCESSION_PATTERN = '/^[A-Z0-9]+(-[0-9]+)?$/';
-
     private string $accession;
 
     private array $occurrences;
 
-    public static function factory(DataSource $source): callable
+    public static function factory(IsoformCache $cache, string $query): callable
     {
-        $factory = function (string $accession, array $occurrences) {
-            return new self($accession, ...array_values($occurrences));
-        };
-
         $is_arr = new Guard(new OfType('array'));
         $is_str = new Guard(new OfType('string'));
-        $is_gte1 = new Guard(new GreaterThanEqual(1));
-        $is_not_empty = new Guard(new NotEmpty);
-        $is_accession = new Guard(new Matching(self::ACCESSION_PATTERN));
-        $is_occurrence = OccurrenceInput::factory();
-        $is_existing = new Guard(fn ($x) => $x->isExisting($source));
-        $are_occurrences_valid = new Guard(fn ($x) => $x->areOccurrencesValid($source));
 
-        $validation = new Validation($factory,
-            Field::required('accession', $is_str, $is_not_empty, $is_accession)->focus(),
-            Field::required('occurrences', $is_arr, $is_gte1, Map::merged($is_arr, $is_occurrence))->focus(),
+        $factory = fn ($accession, $occurrences) => self::from($cache, $query, $accession, ...array_values($occurrences));
+
+        return new Validation($factory,
+            Field::required('accession', $is_str)->focus(),
+            Field::required('occurrences', $is_arr, Map::merged($is_arr))->focus(),
         );
-
-        return new Bound($validation, $is_existing, $are_occurrences_valid);
     }
 
-    private function __construct(
-        string $accession,
-        OccurrenceInput $occurrence,
-        OccurrenceInput ...$occurrences
-    ) {
+    public static function from(IsoformCache $cache, string $query, string $accession, array ...$occurrences): self
+    {
+        $input = new self($accession, ...$occurrences);
+
+        // validate the accession.
+        $errors = array_map(fn ($e) => $e->nest('accession'), $input->validateAccession($cache));
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        // validate the occurrences.
+        $errors = array_map(fn ($e) => $e->nest('occurrences'), $input->validateOccurrencesCount());
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        $errors = array_map(fn ($e) => $e->nest('occurrences'), $input->validateOccurrences($cache, $query));
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        $errors = array_map(fn ($e) => $e->nest('occurrences'), $input->validateOccurrencesUniqueness());
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        return $input;
+    }
+
+    private function __construct(string $accession, array ...$occurrences)
+    {
         $this->accession = $accession;
-        $this->occurrences = [$occurrence, ...$occurrences];
-    }
-
-    private function isExisting(DataSource $source): array
-    {
-        $data = $source->isoform($this->accession);
-
-        if ($data) {
-            return [];
-        }
-
-        return [
-            new Error(sprintf('no isoform with accession [%s]', $this->accession)),
-        ];
-    }
-
-    private function areOccurrencesValid(DataSource $source): array
-    {
-        $data = $source->isoform($this->accession);
-
-        if (!$data) return [];
-
-        $length = strlen($data['sequence']);
-
-        $errors = [];
-
-        foreach ($this->occurrences as $i => $occurrence) {
-            if ($occurrence->stop() > $length) {
-                $errors[] = new Error(sprintf('occurrence [%s] must be inside the isoform', $i));
-            }
-        }
-
-        return $errors;
-    }
-
-    public function accession(): string
-    {
-        return $this->accession;
-    }
-
-    public function occurrences(): array
-    {
-        return $this->occurrences;
+        $this->occurrences = $occurrences;
     }
 
     public function data(): array
     {
         return [
             'accession' => $this->accession,
-            'occurrences' => array_map(fn ($x) => $x->data(), $this->occurrences),
+            'occurrences' => $this->occurrences,
         ];
+    }
+
+    private function validateAccession(IsoformCache $cache): array
+    {
+        $sequence = $cache->sequence($this->accession);
+
+        return !$sequence
+            ? [new Error(sprintf('is not associated to this protein'))]
+            : [];
+    }
+
+    private function validateOccurrencesCount(): array
+    {
+        return count($this->occurrences) == 0
+            ? [new Error('must not be empty')]
+            : [];
+    }
+
+    private function validateOccurrences(IsoformCache $cache, string $query): array
+    {
+        $sequence = $cache->sequence($this->accession);
+
+        if (!$sequence) return [];
+
+        $are_occurrences = Map::merged(OccurrenceInput::factory($sequence, $query));
+
+        try {
+            $are_occurrences($this->occurrences);
+        }
+
+        catch (InvalidDataException $e) {
+            return $e->errors();
+        }
+
+        return [];
+    }
+
+    private function validateOccurrencesUniqueness(): array
+    {
+        $errors = [];
+
+        $seen = [];
+
+        foreach ($this->occurrences as ['start' => $start, 'stop' => $stop]) {
+            $nb = $seen[$start][$stop] ?? 0;
+
+            if ($nb == 1) {
+                $errors[] = new Error(sprintf('[%s, %s] must be present only once', $start, $stop));
+            }
+
+            $seen[$start][$stop] = $nb + 1;
+        }
+
+        return $errors;
     }
 }

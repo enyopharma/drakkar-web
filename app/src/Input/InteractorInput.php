@@ -8,20 +8,37 @@ use Quanta\Validation;
 use Quanta\Validation\Map;
 use Quanta\Validation\Error;
 use Quanta\Validation\Guard;
-use Quanta\Validation\Bound;
 use Quanta\Validation\Field;
+use Quanta\Validation\InvalidDataException;
 use Quanta\Validation\Rules\OfType;
-use Quanta\Validation\Rules\NotEmpty;
-use Quanta\Validation\Rules\Matching;
-use Quanta\Validation\Rules\GreaterThanEqual;
 
 use App\Assertions\ProteinType;
 
 final class InteractorInput
 {
+    const SELECT_PROTEIN_SQL = <<<SQL
+        SELECT p.*, s.sequence
+        FROM proteins AS p, sequences AS s
+        WHERE p.id = s.protein_id AND p.id = ? AND s.is_canonical = TRUE
+    SQL;
+
+    const SELECT_MATURE_NAME_SQL = <<<SQL
+        SELECT name2 AS name
+        FROM descriptions
+        WHERE protein2_id = ? AND start2 = ? AND stop2 = ? AND deleted_at IS NULL
+        LIMIT 1
+    SQL;
+
+    const SELECT_MATURE_COORDINATES_SQL = <<<SQL
+        SELECT start2 AS start, stop2 AS stop
+        FROM descriptions
+        WHERE protein2_id = ? AND name2 = ? AND deleted_at IS NULL
+        LIMIT 1
+    SQL;
+
     const NAME_PATTERN = '/^[^\s]+$/';
 
-    private ProteinInput $protein;
+    private int $protein_id;
 
     private string $name;
 
@@ -31,196 +48,241 @@ final class InteractorInput
 
     private array $alignments;
 
-    public static function factory(DataSource $source): callable
+    public static function factory(\PDO $pdo, string $type): callable
     {
-        $factory = function ($protein, $name, $start, $stop, array $alignments) {
-            return new self($protein, $name, $start, $stop, ...array_values($alignments));
-        };
+        ProteinType::argument($type);
 
         $is_arr = new Guard(new OfType('array'));
         $is_str = new Guard(new OfType('string'));
         $is_int = new Guard(new OfType('int'));
-        $is_gte1 = new Guard(new GreaterThanEqual(1));
-        $is_not_empty = new Guard(new NotEmpty);
-        $is_name = new Guard(new Matching(self::NAME_PATTERN));
-        $is_protein = ProteinInput::factory($source);
-        $is_alignment = AlignmentInput::factory($source);
-        $is_valid = new Guard(
-            fn ($x) => $x->areCoordinatesValid($source),
-            fn ($x) => $x->areAlignmentsOnProtein($source),
-            fn ($x) => $x->areAlignmentsUnique(),
-        );
-        $is_name_consistent = new Guard(fn ($x) => $x->isNameConsistent($source));
-        $are_coordinates_consistent = new Guard(fn ($x) => $x->areCoordinatesConsistent($source));
-        $are_alignments_valid = new Guard(fn ($x) => $x->areAlignmentsValid());
 
-        $validation = new Validation($factory,
-            Field::required('protein', $is_arr, $is_protein)->focus(),
-            Field::required('name', $is_str, $is_not_empty, $is_name)->focus(),
-            Field::required('start', $is_int, $is_gte1)->focus(),
-            Field::required('stop', $is_int, $is_gte1)->focus(),
-            Field::required('mapping', $is_arr, Map::merged($is_arr, $is_alignment))->focus(),
-        );
+        $factory = function ($protein_id, $name, $start, $stop, array $alignments) use ($pdo, $type) {
+            return self::from($pdo, $type, $protein_id, $name, $start, $stop, ...array_values($alignments));
+        };
 
-        return new Bound(
-            $validation,
-            $is_valid,
-            $is_name_consistent,
-            $are_coordinates_consistent,
-            $are_alignments_valid,
+        return new Validation($factory,
+            Field::required('protein_id', $is_int)->focus(),
+            Field::required('name', $is_str)->focus(),
+            Field::required('start', $is_int)->focus(),
+            Field::required('stop', $is_int)->focus(),
+            Field::required('mapping', $is_arr, Map::merged($is_arr))->focus(),
         );
     }
 
-    private function __construct(
-        ProteinInput $protein,
-        string $name,
-        int $start,
-        int $stop,
-        AlignmentInput ...$alignments
-    ) {
-        $this->protein = $protein;
+    public static function from(\PDO $pdo, string $type, int $protein_id, string $name, int $start, int $stop, array ...$alignments): self
+    {
+        ProteinType::argument($type);
+
+        $input = new self($protein_id, $name, $start, $stop, ...$alignments);
+
+        // validate mature info.
+        $errors = $type == ProteinType::H
+            ? $input->validateHProtein($pdo)
+            : $input->validateVProtein($pdo);
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        // validate the alignments.
+        $errors = array_map(fn ($e) => $e->nest('mapping'), $input->validateAlignments($pdo));
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        $errors = array_map(fn ($e) => $e->nest('mapping'), $input->validateAlignmentsUniqueness());
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        return $input;
+    }
+
+    private function __construct(int $protein_id, string $name, int $start, int $stop, array ...$alignments)
+    {
+        $this->protein_id = $protein_id;
         $this->name = $name;
         $this->start = $start;
         $this->stop = $stop;
         $this->alignments = $alignments;
     }
 
-    private function areAlignmentsUnique(): array
-    {
-        $map = [];
-
-        foreach ($this->alignments as $alignment) {
-            $sequence = $alignment->sequence();
-
-            $map[$sequence]++;
-        }
-
-        $errors = [];
-
-        foreach ($map as $sequence => $n) {
-            if ($n > 1) {
-                $errors[] = new Error('alignments must be present only once');
-            }
-        }
-
-        return $errors;
-    }
-
-    private function areAlignmentsOnProtein(DataSource $source): array
-    {
-        $protein = $this->protein->accession();
-
-        foreach ($this->alignments as $alignment) {
-            foreach ($alignment->isoforms() as $isoform) {
-                $accession = $isoform->accession();
-
-                $data = $source->isoform($accession);
-
-                if ($data && $protein != $data['protein']) {
-                    return [
-                        new Error(
-                            sprintf('all alignments must be on protein [%s]', $protein)
-                        ),
-                    ];
-                }
-            }
-        }
-
-        return [];
-    }
-
-    private function areCoordinatesValid(DataSource $source): array
-    {
-        $errors = [];
-
-        $accession = $this->protein->accession();
-
-        $data = $source->protein($accession);
-
-        if (!$data) return [];
-
-        $length = strlen($data['sequence']);
-
-        if ($this->start > $this->stop) {
-            $errors[] = new Error('start must be less than stop');
-        }
-
-        if ($data['type'] == ProteinType::H && ($this->start > 1 || $this->stop < $length)) {
-            $errors[] = new Error('human interactor must be full length');
-        }
-
-        if ($this->stop > $length) {
-            $errors[] = new Error('coordinates must be inside the protein');
-        }
-
-        return $errors;
-    }
-
-    private function isNameConsistent(DataSource $source): array
-    {
-        $accession = $this->protein->accession();
-
-        $data = $source->name($accession, $this->start, $this->stop);
-
-        if (!$data || $this->name == $data['name']) {
-            return [];
-        }
-
-        return [
-            new Error(
-                vsprintf('invalid name %s for interactor (%s, %s, %s) - %s expected', [
-                    $this->name,
-                    $accession,
-                    $this->start,
-                    $this->stop,
-                    $data['name'],
-                ])
-            ),
-        ];
-    }
-
-    private function areCoordinatesConsistent(DataSource $source): array
-    {
-        $accession = $this->protein->accession();
-
-        $data = $source->coordinates($accession, $this->name);
-
-        if (!$data || ($this->start == $data['start'] && $this->stop == $data['stop'])) {
-            return [];
-        }
-
-        return [
-            new Error(
-                vsprintf('invalid coordinates [%s - %s] for interactor (%s, %s) - [%s - %s] expected', [
-                    $this->start,
-                    $this->stop,
-                    $accession,
-                    $this->name,
-                    $data['start'],
-                    $data['stop'],
-                ])
-            )
-        ];
-    }
-
-    private function areAlignmentsValid(): array
-    {
-        return [];
-    }
-
-    public function protein(): ProteinInput
-    {
-        return $this->protein;
-    }
-
     public function data(): array
     {
         return [
-            'protein' => $this->protein->data(),
+            'protein_id' => $this->protein_id,
             'name' => $this->name,
             'start' => $this->start,
             'stop' => $this->stop,
-            'mapping' => array_map(fn ($x) => $x->data(), $this->alignments),
+            'mapping' => $this->alignments,
         ];
+    }
+
+    private function validateHProtein(\PDO $pdo): array
+    {
+        $select_protein_sth = $pdo->prepare(self::SELECT_PROTEIN_SQL);
+
+        $select_protein_sth->execute([$this->protein_id]);
+
+        $protein = $select_protein_sth->fetch();
+
+        if ($protein === false) {
+            return [new Error('protein not found')];
+        }
+
+        if ($protein['type'] != ProteinType::H) {
+            return [new Error('must be a human protein')];
+        }
+
+        if ($protein['obsolete']) {
+            return [new Error(vsprintf('protein %s version %s is obsolete', [
+                $protein['accession'],
+                $protein['version'],
+            ]))];
+        }
+
+        if ($protein['name'] != $this->name) {
+            return [new Error(vsprintf('invalid name \'%s\' for interactor (human, %s) - \'%s\' expected', [
+                $this->name,
+                $protein['accession'],
+                $protein['name'],
+            ]))];
+        }
+
+        if ($this->start != 1 || $this->stop != strlen($protein['sequence'])) {
+            return [new Error(vsprintf('invalid coordinates [%s, %s] for interactor (human, %s) - [1, %s] expected', [
+                $this->start,
+                $this->stop,
+                $protein['accession'],
+                strlen($protein['sequence']),
+            ]))];
+        }
+
+        return [];
+    }
+
+    private function validateVProtein(\PDO $pdo): array
+    {
+        $select_protein_sth = $pdo->prepare(self::SELECT_PROTEIN_SQL);
+
+        $select_protein_sth->execute([$this->protein_id]);
+
+        $protein = $select_protein_sth->fetch();
+
+        // validate the protein.
+        if ($protein === false) {
+            return [new Error('protein not found')];
+        }
+
+        if ($protein['type'] != ProteinType::V) {
+            return [new Error('must be a viral protein')];
+        }
+
+        if ($protein['obsolete']) {
+            return [new Error(vsprintf('protein %s version %s is obsolete', [
+                $protein['accession'],
+                $protein['version'],
+            ]))];
+        }
+
+        // validate name/coordinates consistency.
+        $select_name_sth = $pdo->prepare(self::SELECT_MATURE_NAME_SQL);
+
+        $select_name_sth->execute([$this->protein_id, $this->start, $this->stop]);
+
+        $data = $select_name_sth->fetch();
+
+        if ($data && $data['name'] != $this->name) {
+            return [
+                new Error(vsprintf('invalid name \'%s\' for interactor (viral, %s, %s, %s) - \'%s\' expected', [
+                    $this->name,
+                    $protein['accession'],
+                    $this->start,
+                    $this->stop,
+                    $data['name'],
+                ])),
+            ];
+        }
+
+        // validate coordinates/name consistency.
+        $select_coordinates_sth = $pdo->prepare(self::SELECT_MATURE_COORDINATES_SQL);
+
+        $select_coordinates_sth->execute([$this->protein_id, $this->name]);
+
+        $data = $select_coordinates_sth->fetch();
+
+        if ($data && ($data['start'] != $this->start || $data['stop'] != $this->stop)) {
+            return [
+                new Error(vsprintf('invalid coordinates [%s, %s] for interactor (viral, %s, %s) - [%s, %s] expected', [
+                    $this->start,
+                    $this->stop,
+                    $protein['accession'],
+                    $this->name,
+                    $data['start'],
+                    $data['stop'],
+                ])),
+            ];
+        }
+
+        // validate name and coordinates for a new mature protein.
+        $errors = [];
+
+        if (preg_match(self::NAME_PATTERN, $this->name) === 0) {
+            $errors[] = new Error('name is not valid');
+        }
+
+        if ($this->start < 1) {
+            $errors[] = new Error('start must be greater than 0');
+        }
+
+        if ($this->stop < 1) {
+            $errors[] = new Error('stop must be greater than 0');
+        }
+
+        if ($this->start > $this->stop) {
+            $errors[] = new Error('start must be greater than or equal to stop');
+        }
+
+        if ($protein && $this->stop > strlen($protein['sequence'])) {
+            $errors[] = new Error('coordinates must be inside the protein sequence');
+        }
+
+        return $errors;
+    }
+
+    private function validateAlignments(\PDO $pdo): array
+    {
+        $cache = new IsoformCache($pdo, $this->protein_id, $this->start, $this->stop);
+
+        $are_alignments = Map::merged(AlignmentInput::factory($cache));
+
+        try {
+            $are_alignments($this->alignments);
+        }
+
+        catch (InvalidDataException $e) {
+            return $e->errors();
+        }
+
+        return [];
+    }
+
+    private function validateAlignmentsUniqueness(): array
+    {
+        $seen = [];
+
+        foreach ($this->alignments as ['sequence' => $sequence]) {
+            $nb = $seen[$sequence] ?? 0;
+
+            if ($nb == 1) {
+                return [new Error('alignment sequence must be present only once')];
+            }
+
+            $seen[$sequence] = $nb + 1;
+        }
+
+        return [];
     }
 }

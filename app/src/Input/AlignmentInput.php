@@ -8,150 +8,133 @@ use Quanta\Validation;
 use Quanta\Validation\Map;
 use Quanta\Validation\Error;
 use Quanta\Validation\Guard;
-use Quanta\Validation\Bound;
 use Quanta\Validation\Field;
+use Quanta\Validation\InvalidDataException;
 use Quanta\Validation\Rules\OfType;
-use Quanta\Validation\Rules\Matching;
-use Quanta\Validation\Rules\GreaterThanEqual;
 
 final class AlignmentInput
 {
     const MIN_LENGTH = 4;
 
-    const SEQUENCE_PATTERN = '/^[a-zA-Z]*$/';
+    const SEQUENCE_PATTERN = '/^[A-Z]*$/';
 
     private string $sequence;
 
     private array $isoforms;
 
-    public static function factory(DataSource $source): callable
+    public static function factory(IsoformCache $cache): callable
     {
-        $factory = function (string $sequence, array $isoforms) {
-            return new self(strtoupper($sequence), ...array_values($isoforms));
-        };
-
         $is_arr = new Guard(new OfType('array'));
         $is_str = new Guard(new OfType('string'));
-        $is_gte1 = new Guard(new GreaterThanEqual(1));
-        $is_gte_min = new Guard(new GreaterThanEqual(self::MIN_LENGTH));
-        $is_sequence = new Guard(new Matching(self::SEQUENCE_PATTERN));
-        $is_isoform = IsoformInput::factory($source);
-        $is_valid = new Guard(
-            fn ($x) => $x->areSameProtein($source),
-            fn ($x) => $x->areIsoformsUnique(),
-            fn ($x) => $x->areLengthsValid($source),
-        );
 
-        $validation = new Validation($factory,
-            Field::required('sequence', $is_str, $is_gte_min, $is_sequence)->focus(),
-            Field::required('isoforms', $is_arr, $is_gte1, Map::merged($is_arr, $is_isoform))->focus(),
-        );
+        $factory = fn ($sequence, $isoforms) => self::from($cache, $sequence, ...array_values($isoforms));
 
-        return new Bound($validation, $is_valid);
+        return new Validation($factory,
+            Field::required('sequence', $is_str)->focus(),
+            Field::required('isoforms', $is_arr, Map::merged($is_arr))->focus()
+        );
     }
 
-    private function __construct(
-        string $sequence,
-        IsoformInput $isoform,
-        IsoformInput ...$isoforms
-    ) {
+    public static function from(IsoformCache $cache, string $sequence, array ...$isoforms): self
+    {
+        $input = new self($sequence, ...$isoforms);
+
+        // validate the sequence.
+        $errors = array_map(fn($e) => $e->nest('sequence'), $input->validateSequence());
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        // validate the isoforms.
+        $errors = array_map(fn ($e) => $e->nest('isoforms'), $input->validateIsoformsCount());
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        $errors = array_map(fn ($e) => $e->nest('isoforms'), $input->validateIsoforms($cache));
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        $errors = array_map(fn ($e) => $e->nest('isoforms'), $input->validateIsoformsUniqueness());
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        return $input;
+    }
+
+    private function __construct(string $sequence, array ...$isoforms)
+    {
         $this->sequence = $sequence;
-        $this->isoforms = [$isoform, ...$isoforms];
-    }
-
-    private function areSameProtein(DataSource $source): array
-    {
-        $map = [];
-
-        foreach ($this->isoforms as $isoform) {
-            $accession = $isoform->accession();
-
-            $data = $source->isoform($accession);
-
-            if ($data) {
-                $map[$data['protein']]++;
-            }
-        }
-
-        if (count($map) == 1) {
-            return [];
-        }
-
-        return [
-            new Error('all isoforms must be the same protein'),
-        ];
-    }
-
-    private function areIsoformsUnique(): array
-    {
-        $map = [];
-
-        foreach ($this->isoforms as $isoform) {
-            $accession = $isoform->accession();
-
-            $map[$accession]++;
-        }
-
-        $errors = [];
-
-        foreach ($map as $accession => $n) {
-            if ($n > 1) {
-                $errors[] = new Error(
-                    sprintf('isoform [%s] must be present only once', $accession)
-                );
-            }
-        }
-
-        return $errors;
-    }
-
-    private function areLengthsValid(DataSource $source): array
-    {
-        $errors = [];
-
-        $length = strlen($this->sequence);
-
-        foreach ($this->isoforms as $isoform) {
-            $accession = $isoform->accession();
-
-            $data = $source->isoform($accession);
-
-            if ($data && $length > strlen($data['sequence'])) {
-                $errors[] = new Error(
-                    sprintf('isoform [%s] sequence must be greater than or equal to sequence', $accession)
-                );
-            }
-
-            foreach ($isoform->occurrences() as $o => $occurrence) {
-                if ($length != $occurrence->stop() - $occurrence->start() + 1) {
-                    $errors[] = new Error(
-                        vsprintf('occurrence [%s][%s] must have the same length as the sequence', [
-                            $accession,
-                            (string) $o,
-                        ]
-                    ));
-                }
-            }
-        }
-
-        return $errors;
-    }
-
-    public function sequence(): string
-    {
-        return $this->sequence;
-    }
-
-    public function isoforms(): array
-    {
-        return $this->isoforms;
+        $this->isoforms = $isoforms;
     }
 
     public function data(): array
     {
         return [
             'sequence' => $this->sequence,
-            'isoforms' => array_map(fn ($x) => $x->data(), $this->isoforms),
+            'isoforms' => $this->isoforms,
         ];
+    }
+
+    private function validateSequence(): array
+    {
+        $errors = [];
+
+        if (strlen($this->sequence) < 4) {
+            $errors[] = new Error('must be longer than 3');
+        }
+
+        if (preg_match(self::SEQUENCE_PATTERN, $this->sequence) === 0) {
+            $errors[] = new Error('must contain only letters');
+        }
+
+        return $errors;
+    }
+
+    private function validateIsoformsCount(): array
+    {
+        return count($this->isoforms) == 0
+            ? [new Error('must not be empty')]
+            : [];
+    }
+
+    private function validateIsoforms(IsoformCache $cache): array
+    {
+        $are_isoforms = Map::merged(IsoformInput::factory($cache, $this->sequence));
+
+        try {
+            $are_isoforms($this->isoforms);
+        }
+
+        catch (InvalidDataException $e) {
+            return $e->errors();
+        }
+
+        return [];
+    }
+
+    private function validateIsoformsUniqueness(): array
+    {
+        $errors = [];
+
+        $seen = [];
+
+        foreach ($this->isoforms as ['accession' => $accession]) {
+            $nb = $seen[$accession] ?? 0;
+
+            if ($nb == 1) {
+                $errors[] = new Error(sprintf('\'%s\' must be present only once', $accession));
+            }
+
+            $seen[$accession] = $nb + 1;
+        }
+
+        return $errors;
     }
 }
