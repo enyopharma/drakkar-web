@@ -29,12 +29,18 @@
     </h1>
 </div>
 
+<?php
+    $source = [
+        'create' => ['runs.publications.descriptions.create', $publication],
+        'copy' => ['runs.publications.descriptions.copy', $description],
+        'edit' => ['runs.publications.descriptions.edit', $description],
+    ];
+?>
+
 <?= $this->insert('publications/card', [
     'run' => $run,
     'publication' => $publication,
-    'source' => count($description) == 0
-        ? $this->url('runs.publications.descriptions.create', $publication)
-        : $this->url('runs.publications.descriptions.edit', $description)
+    'source' => $this->url(...($source[$type] ?? [])),
 ]) ?>
 
 <?php if ($publication['state'] == App\Assertions\PublicationState::SELECTED): ?>

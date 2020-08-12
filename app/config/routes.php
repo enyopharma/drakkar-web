@@ -67,7 +67,7 @@ return function (ContainerInterface $container): array {
             $container->get(App\ReadModel\AssociationViewInterface::class),
         )),
 
-        'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/edit' => fn () => $endpoint(new Descriptions\EditEndpoint(
+        'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/{type:copy|edit}' => fn () => $endpoint(new Descriptions\EditEndpoint(
             $container->get(League\Plates\Engine::class),
             $container->get(App\ReadModel\RunViewInterface::class),
             $container->get(App\ReadModel\AssociationViewInterface::class),

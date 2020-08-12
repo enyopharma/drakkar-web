@@ -49,6 +49,7 @@ final class CreateEndpoint
         }
 
         return $this->engine->render('descriptions/form', [
+            'type' => 'create',
             'run' => $run,
             'publication' => $publication,
             'description' => [],

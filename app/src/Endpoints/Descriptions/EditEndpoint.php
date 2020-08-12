@@ -43,6 +43,7 @@ final class EditEndpoint
         $run_id = (int) $request->getAttribute('run_id');
         $pmid = (int) $request->getAttribute('pmid');
         $id = (int) $request->getAttribute('id');
+        $type = $request->getAttribute('type');
 
         // get the run.
         if (!$run = $this->runs->id($run_id)->fetch()) {
@@ -59,7 +60,14 @@ final class EditEndpoint
             return false;
         }
 
+        // erase stable id when copying.
+        if ($type == 'copy') {
+            $description['stable_id'] = '';
+        }
+
+        // return the html.
         return $this->engine->render('descriptions/form', [
+            'type' => $type,
             'run' => $run,
             'publication' => $publication,
             'description' => $description,

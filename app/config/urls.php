@@ -30,6 +30,14 @@ return [
         ]);
     },
 
+    'runs.publications.descriptions.copy' => function (array $description) {
+        return vsprintf('/runs/%s/publications/%s/descriptions/%s/copy', [
+            $description['run_id'],
+            $description['pmid'],
+            $description['id'],
+        ]);
+    },
+
     'runs.publications.descriptions.edit' => function (array $description) {
         return vsprintf('/runs/%s/publications/%s/descriptions/%s/edit', [
             $description['run_id'],
