@@ -10,7 +10,8 @@ final class FormViewSql implements FormViewInterface
 
     const SELECT_DESCRIPTION_SQL = <<<SQL
         SELECT
-            a.run_id, a.pmid, d.id, d.method_id,
+            a.run_id, a.pmid,
+            d.id, d.stable_id, d.method_id,
             d.protein1_id, d.name1, d.start1, d.stop1, d.mapping1,
             d.protein2_id, d.name2, d.start2, d.stop2, d.mapping2
         FROM associations AS a, descriptions AS d
@@ -41,6 +42,7 @@ final class FormViewSql implements FormViewInterface
                 'run_id' => $row['run_id'],
                 'pmid' => $row['pmid'],
                 'id' => $row['id'],
+                'stable_id' => $row['stable_id'],
                 'method_id' => $row['method_id'],
                 'interactor1' => [
                     'protein_id' => $row['protein1_id'],

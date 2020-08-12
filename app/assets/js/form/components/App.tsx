@@ -12,6 +12,7 @@ export const App = (type: DescriptionType, run_id: number, pmid: number, descrip
         pmid: pmid,
         type: type,
         description: description == null ? undefined : {
+            stable_id: description.stable_id,
             method_id: description.method_id,
             interactor1: description.interactor1,
             interactor2: description.interactor2,

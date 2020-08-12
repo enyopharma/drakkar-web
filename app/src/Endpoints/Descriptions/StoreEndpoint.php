@@ -37,8 +37,11 @@ final class StoreEndpoint
             StoreDescriptionResult::DESCRIPTION_ALREADY_EXISTS => function () use ($responder) {
                 return $responder(409, $this->conflict('Description already exists'));
             },
-            StoreDescriptionResult::STABLE_ID_FAILURE => function () use ($responder) {
-                return $responder(409, $this->conflict('Failed to generate a stable id'));
+            StoreDescriptionResult::FIRST_VERSION_FAILURE => function () use ($responder) {
+                return $responder(409, $this->conflict('Failed to insert the description'));
+            },
+            StoreDescriptionResult::NEW_VERSION_FAILURE => function () use ($responder) {
+                return $responder(409, $this->conflict('Failed to insert a new version of the description'));
             },
         ]);
     }

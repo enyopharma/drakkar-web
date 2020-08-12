@@ -42,6 +42,11 @@ export const Form: React.FC = () => {
                     <MappingFieldset i={tab} />
                 </div>
                 <div className="card-footer">
+                    {props.stable_id.trim().length > 0 && (
+                        <div className="alert alert-danger">
+                            Validating this form will create a new version of description {props.stable_id}!
+                        </div>
+                    )}
                     <div className="row">
                         <div className="col">
                             <button

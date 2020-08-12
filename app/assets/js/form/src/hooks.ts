@@ -23,6 +23,7 @@ export const useAppSelector = <T>(selector: (props: AppProps) => T): T => {
 
         return selector({
             type: state.type,
+            stable_id: state.description.stable_id,
             method_id: state.description.method_id,
             saving: state.saving,
             savable,

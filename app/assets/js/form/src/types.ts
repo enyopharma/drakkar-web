@@ -17,6 +17,7 @@ export type InteractorUI = {
 
 export type AppProps = {
     type: DescriptionType
+    stable_id: string
     method_id: number | null
     saving: boolean
     savable: boolean
@@ -37,6 +38,7 @@ export type InteractorProps = {
 export type DescriptionType = 'hh' | 'vh'
 
 export type Description = {
+    stable_id: string
     method_id: number | null
     interactor1: Interactor
     interactor2: Interactor

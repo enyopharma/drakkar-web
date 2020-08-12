@@ -145,6 +145,8 @@ const pmid = createReducer(0, builder => builder.addDefaultCase((state) => state
 
 const type = createReducer('hh', builder => builder.addDefaultCase((state) => state))
 
+const stable_id = createReducer('', builder => builder.addDefaultCase((state) => state))
+
 const method_id = createReducer<number | null>(null, build => {
     build
         .addCase(__selectMethod, (_, action) => action.payload.method.id)
@@ -166,7 +168,7 @@ const feedback = createReducer<Feedback | null>(null, builder => {
 
 const interactor1 = buildInteractorReducer(1);
 const interactor2 = buildInteractorReducer(2);
-const description = combineReducers({ method_id, interactor1, interactor2 })
+const description = combineReducers({ stable_id, method_id, interactor1, interactor2 })
 const interactorUI1 = buildInteractorUIReducer(1);
 const interactorUI2 = buildInteractorUIReducer(2);
 

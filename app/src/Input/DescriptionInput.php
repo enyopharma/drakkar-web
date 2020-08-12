@@ -16,11 +16,17 @@ use App\Assertions\ProteinType;
 
 final class DescriptionInput
 {
+    const SELECT_DESCRIPTIONS_SQL = <<<SQL
+        SELECT id, association_id FROM descriptions WHERE stable_id = ?
+    SQL;
+
     const SELECT_METHOD_SQL = <<<SQL
         SELECT id FROM methods WHERE id = ?
     SQL;
 
     private int $association_id;
+
+    private string $stable_id;
 
     private int $method_id;
 
@@ -33,22 +39,24 @@ final class DescriptionInput
         RunType::argument($type);
 
         return new Validation(fn (...$xs) => self::from($pdo, $association_id, $type, ...$xs),
+            Field::required('stable_id', new Guard(new OfType('string')))->focus(),
             Field::required('method_id', new Guard(new OfType('int')))->focus(),
             Field::required('interactor1', new Guard(new OfType('array')))->focus(),
             Field::required('interactor2', new Guard(new OfType('array')))->focus(),
         );
     }
 
-    public static function from(\PDO $pdo, int $association_id, string $type, int $method_id, array $interactor1, array $interactor2): self
+    public static function from(\PDO $pdo, int $association_id, string $type, string $stable_id, int $method_id, array $interactor1, array $interactor2): self
     {
         RunType::argument($type);
 
         $type1 = ProteinType::H;
         $type2 = $type == RunType::HH ? ProteinType::H : ProteinType::V;
 
-        $input = new self($association_id, $method_id, $interactor1, $interactor2);
+        $input = new self($association_id, $stable_id, $method_id, $interactor1, $interactor2);
 
         $errors = [
+            ...$input->validateStableId($pdo),
             ...$input->validateMethod($pdo),
             ...array_map(fn ($x) => $x->nest('interactor1'), $input->validateInteractor1($pdo, $type1)),
             ...array_map(fn ($x) => $x->nest('interactor2'), $input->validateInteractor2($pdo, $type2)),
@@ -61,9 +69,10 @@ final class DescriptionInput
         return $input;
     }
 
-    private function __construct(int $association_id, int $method_id, array $interactor1, array $interactor2)
+    private function __construct(int $association_id, string $stable_id, int $method_id, array $interactor1, array $interactor2)
     {
         $this->association_id = $association_id;
+        $this->stable_id = $stable_id;
         $this->method_id = $method_id;
         $this->interactor1 = $interactor1;
         $this->interactor2 = $interactor2;
@@ -72,11 +81,35 @@ final class DescriptionInput
     public function data(): array
     {
         return [
+            'stable_id' => $this->stable_id,
             'association_id' => $this->association_id,
             'method_id' => $this->method_id,
             'interactor1' => $this->interactor1,
             'interactor2' => $this->interactor2,
         ];
+    }
+
+    private function validateStableId(\PDO $pdo): array
+    {
+        if ($this->stable_id == '') {
+            return [];
+        }
+
+        $select_descriptions_sth = $pdo->prepare(self::SELECT_DESCRIPTIONS_SQL);
+
+        $select_descriptions_sth->execute([$this->stable_id]);
+
+        $description = $select_descriptions_sth->fetch();
+
+        if (!$description) {
+            return [new Error('stable_id must be existing')];
+        }
+
+        if ($description['association_id'] != $this->association_id) {
+            return [new Error('stable_id must be associated to the same publication')];
+        }
+
+        return [];
     }
 
     private function validateMethod(\PDO $pdo): array

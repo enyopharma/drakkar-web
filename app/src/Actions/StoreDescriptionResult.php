@@ -8,7 +8,8 @@ final class StoreDescriptionResult
 {
     const SUCCESS = 0;
     const DESCRIPTION_ALREADY_EXISTS = 1;
-    const STABLE_ID_FAILURE = 2;
+    const FIRST_VERSION_FAILURE = 2;
+    const NEW_VERSION_FAILURE = 3;
 
     private int $state;
 
@@ -51,7 +52,8 @@ final class StoreDescriptionResult
         $all = [
             self::SUCCESS,
             self::DESCRIPTION_ALREADY_EXISTS,
-            self::STABLE_ID_FAILURE,
+            self::FIRST_VERSION_FAILURE,
+            self::NEW_VERSION_FAILURE,
         ];
 
         $keys = array_keys($alternatives);
