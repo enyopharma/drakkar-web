@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import Modal from 'react-bootstrap4-modal';
-import { FaSearch, FaTrash, FaCopy } from 'react-icons/fa'
+import { FaSearch, FaCopy, FaEdit, FaTrash } from 'react-icons/fa'
 
 import { descriptions as api } from '../src/api'
 import { Description, Interactor } from '../src/types'
@@ -58,6 +58,7 @@ export const Table: React.FC<Props> = ({ descriptions }) => {
                         <th className="text-center">Created at</th>
                         <th className="text-center">Deleted at</th>
                         <th className="text-center">Copy</th>
+                        <th className="text-center">Edit</th>
                         <th className="text-center">Delete</th>
                     </tr>
                 </thead>
@@ -108,6 +109,9 @@ const TableRow: React.FC<{ description: Description, deleted: boolean, mapping: 
                 <CopyLink {...description} />
             </td>
             <td className="text-center align-middle">
+                <EditLink {...description} />
+            </td>
+            <td className="text-center align-middle">
                 <DeleteButton deleted={deleted} update={update} />
             </td>
         </tr>
@@ -130,13 +134,24 @@ const MappingLink: React.FC<{ interactor1: Interactor, interactor2: Interactor, 
     )
 }
 
-const CopyLink: React.FC<{ id: number, pmid: number, run_id: number }> = ({ id, pmid, run_id }) => {
-    const url = `/runs/${run_id}/publications/${pmid}/descriptions/${id}/edit`
+const CopyLink: React.FC<{ run_id: number, pmid: number, id: number }> = ({ run_id, pmid, id }) => {
+    const url = `/runs/${run_id}/publications/${pmid}/descriptions/${id}/copy`
     const classes = "btn btn-block btn-sm btn-outline-primary"
 
     return (
         <a className={classes} href={url}>
             <FaCopy /> Copy
+        </a>
+    )
+}
+
+const EditLink: React.FC<{ run_id: number, pmid: number, id: number }> = ({ run_id, pmid, id }) => {
+    const url = `/runs/${run_id}/publications/${pmid}/descriptions/${id}/edit`
+    const classes = "btn btn-block btn-sm btn-outline-primary"
+
+    return (
+        <a className={classes} href={url}>
+            <FaEdit /> Edit
         </a>
     )
 }
