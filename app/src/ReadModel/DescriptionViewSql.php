@@ -29,8 +29,8 @@ final class DescriptionViewSql implements DescriptionViewInterface
             a.run_id, a.pmid,
             d.id, d.stable_id, d.version, d.created_at, d.deleted_at,
             d.method_id, m.psimi_id,
-            d.name1, d.protein1_id, p1.accession AS accession1, d.start1, d.stop1, d.mapping1,
-            d.name2, d.protein2_id, p2.accession AS accession2, d.start2, d.stop2, d.mapping2
+            d.protein1_id, p1.accession AS accession1, p1.obsolete AS obsolete1, d.name1, d.start1, d.stop1, d.mapping1,
+            d.protein2_id, p2.accession AS accession2, p2.obsolete AS obsolete2, d.name2, d.start2, d.stop2, d.mapping2
         FROM
             associations AS a,
             descriptions AS d,
@@ -91,11 +91,12 @@ final class DescriptionViewSql implements DescriptionViewInterface
     {
         while ($row = $sth->fetch()) {
             yield [
-                'stable_id' => $row['stable_id'],
-                'version' => $row['version'],
                 'id' => $row['id'],
                 'pmid' => $row['pmid'],
                 'run_id' => $row['run_id'],
+                'stable_id' => $row['stable_id'],
+                'version' => $row['version'],
+                'obsolete' => $row['obsolete1'] || $row['obsolete2'],
                 'method' => [
                     'id' => $row['id'],
                     'psimi_id' => $row['psimi_id'],

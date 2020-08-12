@@ -6,6 +6,7 @@ export type Description = {
     run_id: number
     stable_id: string
     version: number
+    obsolete: boolean
     method: {
         id: number
         psimi_id: string

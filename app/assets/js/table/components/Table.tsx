@@ -63,35 +63,12 @@ export const Table: React.FC<Props> = ({ descriptions }) => {
                 </thead>
                 <tbody>
                     {descriptions.map((description, i) => (
-                        <tr key={i} className={deleted[i] ? 'table-danger' : ''}>
-                            <td className="text-center align-middle">
-                                {description.stable_id}/{description.version}
-                            </td>
-                            <td className="text-center align-middle">
-                                {description.method.psimi_id}
-                            </td>
-                            <td className="text-center align-middle">
-                                {InteractorName(description.interactor1)}
-                            </td>
-                            <td className="text-center align-middle">
-                                {InteractorName(description.interactor2)}
-                            </td>
-                            <td className="text-center align-middle">
-                                <MappingLink {...description} show={() => showMapping(i)} />
-                            </td>
-                            <td className="text-center align-middle">
-                                {description.created_at}
-                            </td>
-                            <td className="text-center align-middle">
-                                {description.deleted_at}
-                            </td>
-                            <td className="text-center align-middle">
-                                <CopyLink {...description} />
-                            </td>
-                            <td className="text-center align-middle">
-                                <DeleteButton deleted={deleted[i]} update={() => deleteDescription(i)} />
-                            </td>
-                        </tr>
+                        <TableRow key={i}
+                            description={description}
+                            deleted={deleted[i]}
+                            mapping={() => showMapping(i)}
+                            update={() => deleteDescription(i)}
+                        />
                     ))}
                 </tbody>
             </table>
@@ -99,18 +76,41 @@ export const Table: React.FC<Props> = ({ descriptions }) => {
     )
 }
 
-const InteractorName = (interactor: Interactor) => (
-    `${interactor.protein.accession}/${interactor.name}`
-)
+const TableRow: React.FC<{ description: Description, deleted: boolean, mapping: () => void, update: () => void }> = props => {
+    const { description, deleted, mapping, update } = props
 
-const CopyLink: React.FC<{ id: number, pmid: number, run_id: number }> = ({ id, pmid, run_id }) => {
-    const url = `/runs/${run_id}/publications/${pmid}/descriptions/${id}/edit`
-    const classes = "btn btn-block btn-sm btn-outline-primary"
+    const classes = deleted ? 'table-danger' : description.obsolete ? 'table-warning' : ''
 
     return (
-        <a className={classes} href={url}>
-            <FaCopy /> Copy
-        </a>
+        <tr className={classes}>
+            <td className="text-center align-middle">
+                {description.stable_id}/{description.version}
+            </td>
+            <td className="text-center align-middle">
+                {description.method.psimi_id}
+            </td>
+            <td className="text-center align-middle">
+                {description.interactor1.protein.accession}/{description.interactor1.name}
+            </td>
+            <td className="text-center align-middle">
+                {description.interactor2.protein.accession}/{description.interactor2.name}
+            </td>
+            <td className="text-center align-middle">
+                <MappingLink {...description} show={mapping} />
+            </td>
+            <td className="text-center align-middle">
+                {description.created_at}
+            </td>
+            <td className="text-center align-middle">
+                {description.deleted_at}
+            </td>
+            <td className="text-center align-middle">
+                <CopyLink {...description} />
+            </td>
+            <td className="text-center align-middle">
+                <DeleteButton deleted={deleted} update={update} />
+            </td>
+        </tr>
     )
 }
 
@@ -127,6 +127,17 @@ const MappingLink: React.FC<{ interactor1: Interactor, interactor2: Interactor, 
         <button className={classes} onClick={e => show()}>
             <FaSearch /> Mapping
         </button>
+    )
+}
+
+const CopyLink: React.FC<{ id: number, pmid: number, run_id: number }> = ({ id, pmid, run_id }) => {
+    const url = `/runs/${run_id}/publications/${pmid}/descriptions/${id}/edit`
+    const classes = "btn btn-block btn-sm btn-outline-primary"
+
+    return (
+        <a className={classes} href={url}>
+            <FaCopy /> Copy
+        </a>
     )
 }
 
