@@ -14,32 +14,14 @@ final class DescriptionViewSql implements DescriptionViewInterface
         WHERE a.id = d.association_id
         AND a.run_id = ?
         AND a.pmid = ?
+        AND d.stable_id LIKE ?
     SQL;
 
-    const SELECT_DESCRIPTION_ID_SQL = <<<SQL
-        SELECT
-            a.run_id, a.pmid,
-            d.id, d.stable_id, d.version, d.created_at, d.deleted_at,
-            d.method_id,
-            d.name1, d.protein1_id, d.start1, d.stop1, d.mapping1,
-            d.name2, d.protein2_id, d.start2, d.stop2, d.mapping2
+    const SELECT_DESCRIPTION_SQL = <<<SQL
+        SELECT a.run_id, a.pmid
         FROM associations AS a, descriptions AS d
-        WHERE a.id = d.association_id
-            AND a.run_id = ?
-            AND a.pmid = ?
-            AND d.id = ?
-    SQL;
-
-    const SELECT_DESCRIPTION_STABLE_ID_SQL = <<<SQL
-        SELECT
-            a.run_id, a.pmid,
-            d.id, d.stable_id, d.version, d.created_at, d.deleted_at,
-            d.method_id,
-            d.name1, d.protein1_id, d.start1, d.stop1, d.mapping1,
-            d.name2, d.protein2_id, d.start2, d.stop2, d.mapping2
-        FROM associations AS a, descriptions AS d
-        WHERE a.id = d.association_id
-            AND d.stable_id = ?
+        WHERE a.id = d.association_id AND d.stable_id = ?
+        LIMIT 1
     SQL;
 
     const SELECT_DESCRIPTIONS_SQL = <<<SQL
@@ -61,6 +43,7 @@ final class DescriptionViewSql implements DescriptionViewInterface
           AND p2.id = d.protein2_id
           AND a.run_id = ?
           AND a.pmid = ?
+          AND d.stable_id LIKE ?
         ORDER BY
             d.created_at DESC, d.id DESC
         LIMIT ? OFFSET ?
@@ -71,38 +54,35 @@ final class DescriptionViewSql implements DescriptionViewInterface
         $this->pdo = $pdo;
     }
 
-    public function count(int $run_id, int $pmid): int
+    public function search(string $stable_id): Statement
     {
+        $select_description_sth = $this->pdo->prepare(self::SELECT_DESCRIPTION_SQL);
+
+        $select_description_sth->execute([$stable_id]);
+
+        $descriptions = $select_description_sth->fetchAll();
+
+        return Statement::from($descriptions);
+    }
+
+    public function count(int $run_id, int $pmid, string $stable_id): int
+    {
+        if ($stable_id == '') $stable_id = '%';
+
         $count_descriptions_sth = $this->pdo->prepare(self::COUNT_DESCRIPTIONS_SQL);
 
-        $count_descriptions_sth->execute([$run_id, $pmid]);
+        $count_descriptions_sth->execute([$run_id, $pmid, $stable_id]);
 
         return $count_descriptions_sth->fetch(\PDO::FETCH_COLUMN) ?? 0;
     }
 
-    public function id(int $run_id, int $pmid, int $id): Statement
+    public function all(int $run_id, int $pmid, string $stable_id, int $limit, int $offset): Statement
     {
-        $select_description_sth = $this->pdo->prepare(self::SELECT_DESCRIPTION_ID_SQL);
+        if ($stable_id == '') $stable_id = '%';
 
-        $select_description_sth->execute([$run_id, $pmid, $id]);
-
-        return Statement::from($this->generator($select_description_sth));
-    }
-
-    public function search(string $stable_id): Statement
-    {
-        $select_description_sth = $this->pdo->prepare(self::SELECT_DESCRIPTION_STABLE_ID_SQL);
-
-        $select_description_sth->execute([$stable_id]);
-
-        return Statement::from($this->generator($select_description_sth));
-    }
-
-    public function all(int $run_id, int $pmid, int $limit, int $offset): Statement
-    {
         $select_descriptions_sth = $this->pdo->prepare(self::SELECT_DESCRIPTIONS_SQL);
 
-        $select_descriptions_sth->execute([$run_id, $pmid, $limit, $offset]);
+        $select_descriptions_sth->execute([$run_id, $pmid, $stable_id, $limit, $offset]);
 
         return Statement::from($this->generator($select_descriptions_sth));
     }
@@ -110,22 +90,31 @@ final class DescriptionViewSql implements DescriptionViewInterface
     private function generator(\PDOStatement $sth): \Generator
     {
         while ($row = $sth->fetch()) {
-            $data = [
+            yield [
                 'stable_id' => $row['stable_id'],
                 'version' => $row['version'],
                 'id' => $row['id'],
                 'pmid' => $row['pmid'],
                 'run_id' => $row['run_id'],
-                'method_id' => $row['method_id'],
+                'method' => [
+                    'id' => $row['id'],
+                    'psimi_id' => $row['psimi_id'],
+                ],
                 'interactor1' => [
-                    'protein_id' => $row['protein1_id'],
+                    'protein' => [
+                        'id' => $row['protein1_id'],
+                        'accession' => $row['accession1']
+                    ],
                     'name' => $row['name1'],
                     'start' => $row['start1'],
                     'stop' => $row['stop1'],
                     'mapping' => json_decode($row['mapping1'], true),
                 ],
                 'interactor2' => [
-                    'protein_id' => $row['protein2_id'],
+                    'protein' => [
+                        'id' => $row['protein2_id'],
+                        'accession' => $row['accession2']
+                    ],
                     'name' => $row['name2'],
                     'start' => $row['start2'],
                     'stop' => $row['stop2'],
@@ -135,20 +124,6 @@ final class DescriptionViewSql implements DescriptionViewInterface
                 'deleted_at' => $this->date($row['deleted_at']),
                 'deleted' => !is_null($row['deleted_at']),
             ];
-
-            if ($row['psimi_id']) {
-                $data['method'] = ['psimi_id' => $row['psimi_id']];
-            }
-
-            if ($row['accession1']) {
-                $data['interactor1']['protein'] = ['accession' => $row['accession1']];
-            }
-
-            if ($row['accession2']) {
-                $data['interactor2']['protein'] = ['accession' => $row['accession2']];
-            }
-
-            yield $data;
         }
     }
 

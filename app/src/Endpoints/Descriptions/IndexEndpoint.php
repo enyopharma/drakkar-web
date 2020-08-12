@@ -51,6 +51,7 @@ final class IndexEndpoint
 
         $params = (array) $request->getQueryParams();
 
+        $stable_id = $params['stable_id'] ?? '';
         $page = (int) ($params['page'] ?? 1);
         $limit = (int) ($params['limit'] ?? 20);
 
@@ -65,7 +66,7 @@ final class IndexEndpoint
         }
 
         // get the descriptions.
-        $total = $this->descriptions->count($run_id, $pmid);
+        $total = $this->descriptions->count($run_id, $pmid, $stable_id);
         $offset = ($page - 1) * $limit;
 
         if ($limit < 0) {
@@ -80,14 +81,17 @@ final class IndexEndpoint
             return $responder(302, $this->outOfRangeUrl($publication, (int) ceil($total/$limit), $limit));
         }
 
+        $descriptions = $this->descriptions->all($run_id, $pmid, $stable_id, $limit, $offset)->fetchAll();
+
         // success!
         return $this->engine->render('descriptions/index', [
             'run' => $run,
             'publication' => $publication,
-            'descriptions' => $this->descriptions->all($run_id, $pmid, $limit, $offset)->fetchAll(),
+            'descriptions' => $descriptions,
             'page' => $page,
             'total' => $total,
             'limit' => $limit,
+            'stable_id' => $stable_id,
         ]);
     }
 

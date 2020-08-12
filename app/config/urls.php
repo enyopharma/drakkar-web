@@ -23,14 +23,6 @@ return [
         ]);
     },
 
-    'runs.publications.descriptions.show' => function (array $description) {
-        return vsprintf('/runs/%s/publications/%s/descriptions/%s', [
-            $description['run_id'],
-            $description['pmid'],
-            $description['id'],
-        ]);
-    },
-
     'runs.publications.descriptions.create' => function (array $publication) {
         return vsprintf('/runs/%s/publications/%s/descriptions/create', [
             $publication['run_id'],

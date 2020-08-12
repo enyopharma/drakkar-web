@@ -6,11 +6,9 @@ namespace App\ReadModel;
 
 interface DescriptionViewInterface
 {
-    public function count(int $run_id, int $pmid): int;
-
-    public function id(int $run_id, int $pmid, int $id): Statement;
-
     public function search(string $stable_id): Statement;
 
-    public function all(int $run_id, int $pmid, int $limit, int $offset): Statement;
+    public function count(int $run_id, int $pmid, string $stable_id): int;
+
+    public function all(int $run_id, int $pmid, string $stable_id, int $limit, int $offset): Statement;
 }

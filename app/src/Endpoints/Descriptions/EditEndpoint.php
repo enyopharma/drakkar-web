@@ -9,8 +9,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use League\Plates\Engine;
 
 use App\ReadModel\RunViewInterface;
+use App\ReadModel\FormViewInterface;
 use App\ReadModel\AssociationViewInterface;
-use App\ReadModel\DescriptionViewInterface;
 
 final class EditEndpoint
 {
@@ -20,13 +20,13 @@ final class EditEndpoint
 
     private AssociationViewInterface $associations;
 
-    private DescriptionViewInterface $descriptions;
+    private FormViewInterface $descriptions;
 
     public function __construct(
         Engine $engine,
         RunViewInterface $runs,
         AssociationViewInterface $associations,
-        DescriptionViewInterface $descriptions
+        FormViewInterface $descriptions
     ) {
         $this->engine = $engine;
         $this->runs = $runs;

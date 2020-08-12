@@ -6,8 +6,8 @@ export type Description = {
     run_id: number
     stable_id: string
     version: number
-    method_id: number
     method: {
+        id: number
         psimi_id: string
     }
     interactor1: Interactor
@@ -18,8 +18,8 @@ export type Description = {
 }
 
 export type Interactor = {
-    protein_id: number
     protein: {
+        id: number
         accession: string
     }
     name: string

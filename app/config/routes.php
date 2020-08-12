@@ -61,13 +61,6 @@ return function (ContainerInterface $container): array {
             $container->get(App\ReadModel\DescriptionViewInterface::class),
         )),
 
-        'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}' => fn () => $endpoint(new Descriptions\ShowEndpoint(
-            $container->get(League\Plates\Engine::class),
-            $container->get(App\ReadModel\RunViewInterface::class),
-            $container->get(App\ReadModel\AssociationViewInterface::class),
-            $container->get(App\ReadModel\DescriptionViewInterface::class),
-        )),
-
         'GET /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/create' => fn () => $endpoint(new Descriptions\CreateEndpoint(
             $container->get(League\Plates\Engine::class),
             $container->get(App\ReadModel\RunViewInterface::class),
@@ -78,7 +71,7 @@ return function (ContainerInterface $container): array {
             $container->get(League\Plates\Engine::class),
             $container->get(App\ReadModel\RunViewInterface::class),
             $container->get(App\ReadModel\AssociationViewInterface::class),
-            $container->get(App\ReadModel\DescriptionViewInterface::class),
+            $container->get(App\ReadModel\FormViewInterface::class),
         )),
 
         'POST /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions' => fn () => Quanta\Http\RequestHandler::queue(

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\ReadModel\RunViewInterface;
+use App\ReadModel\FormViewInterface;
 use App\ReadModel\MethodViewInterface;
 use App\ReadModel\ProteinViewInterface;
 use App\ReadModel\DatasetViewInterface;
@@ -12,6 +13,10 @@ use App\ReadModel\DescriptionViewInterface;
 
 return [
     RunViewInterface::class => fn ($container) => new App\ReadModel\RunViewSql(
+        $container->get(PDO::class),
+    ),
+
+    FormViewInterface::class => fn ($container) => new App\ReadModel\FormViewSql(
         $container->get(PDO::class),
     ),
 

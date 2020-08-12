@@ -19,10 +19,10 @@ export const MappingModal: React.FC<Props> = ({ description, close }) => {
         setProtein1(null)
         setProtein2(null)
 
-        api.select(description.interactor1.protein_id)
+        api.select(description.interactor1.protein.id)
             .then(protein => setProtein1(protein))
 
-        api.select(description.interactor2.protein_id)
+        api.select(description.interactor2.protein.id)
             .then(protein => setProtein2(protein))
     }, [description])
 

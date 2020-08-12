@@ -1,7 +1,11 @@
 <?php
+    $params = $stable_id == ''
+        ? ['page' => $page, 'limit' => $limit]
+        : ['stable_id' => $stable_id, 'page' => $page, 'limit' => $limit];
+
     $url = fn (int $page) => $this->url('runs.publications.descriptions.index',
         $publication,
-        ['page' => $page, 'limit' => $limit],
+        $params,
         'descriptions',
     );
 ?>
