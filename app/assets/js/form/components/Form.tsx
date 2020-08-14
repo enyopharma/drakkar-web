@@ -4,6 +4,7 @@ import { FaSave, FaEraser } from 'react-icons/fa'
 import { resetForm, fireSave } from '../src/reducer'
 import { useAppSelector, useAction } from '../src/hooks'
 
+import { SaveModal } from './SaveModal'
 import { ResetModal } from './ResetModal'
 import { InteractorNav } from './InteractorNav'
 import { MethodFieldset } from './Method/MethodFieldset'
@@ -16,18 +17,39 @@ export const Form: React.FC = () => {
     const reset = useAction(resetForm)
     const props = useAppSelector(state => state)
     const [tab, setTab] = useState<InteractorI>(1)
-    const [modal, setModal] = useState<boolean>(false)
+    const [showSave, setSaveModal] = useState<boolean>(false)
+    const [showReset, setResetModal] = useState<boolean>(false)
 
     const { type, saving, savable, resetable, feedback } = props
 
-    const resetTabAndForm = () => {
-        setTab(1)
+    const editing = props.stable_id.trim().length > 0
+
+    const onSave = () => {
+        editing
+            ? setSaveModal(true)
+            : save()
+    }
+
+    const onReset = () => {
+        setResetModal(true)
+    }
+
+    const saveAndClose = () => {
+        save()
+        setSaveModal(false)
+    }
+
+    const resetAndClose = () => {
         reset()
+        setTab(1)
+        setResetModal(false)
+        document.getElementById('form-top')?.scrollIntoView()
     }
 
     return (
         <form id="form-top" onSubmit={e => e.preventDefault()}>
-            <ResetModal top="form-top" show={modal} reset={resetTabAndForm} close={() => setModal(false)} />
+            <SaveModal stable_id={props.stable_id} show={showSave} save={saveAndClose} close={() => setSaveModal(false)} />
+            <ResetModal show={showReset} reset={resetAndClose} close={() => setResetModal(false)} />
             <div id="form-top" className="card">
                 <h3 className="card-header">Add a new {type} description</h3>
                 <div className="card-body">
@@ -42,7 +64,7 @@ export const Form: React.FC = () => {
                     <MappingFieldset i={tab} />
                 </div>
                 <div className="card-footer">
-                    {props.stable_id.trim().length > 0 && (
+                    {editing && (
                         <div className="alert alert-danger">
                             Validating this form will create a new version of description {props.stable_id}!
                         </div>
@@ -52,7 +74,7 @@ export const Form: React.FC = () => {
                             <button
                                 type="button"
                                 className="btn btn-block btn-primary"
-                                onClick={e => save()}
+                                onClick={e => onSave()}
                                 disabled={!savable}
                             >
                                 <SaveIcon saving={saving} /> Save description
@@ -62,7 +84,7 @@ export const Form: React.FC = () => {
                             <button
                                 type="button"
                                 className="btn btn-block btn-primary"
-                                onClick={e => setModal(true)}
+                                onClick={e => onReset()}
                                 disabled={!resetable}
                             >
                                 <FaEraser /> Reset form data
