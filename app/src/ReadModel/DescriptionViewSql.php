@@ -29,14 +29,20 @@ final class DescriptionViewSql implements DescriptionViewInterface
             a.run_id, a.pmid,
             d.id, d.stable_id, d.version, d.created_at, d.deleted_at,
             d.method_id, m.psimi_id,
-            d.protein1_id, p1.accession AS accession1, p1.obsolete AS obsolete1, d.name1, d.start1, d.stop1, d.mapping1,
-            d.protein2_id, p2.accession AS accession2, p2.obsolete AS obsolete2, d.name2, d.start2, d.stop2, d.mapping2
+            d.protein1_id, p1.accession AS accession1, d.name1, d.start1, d.stop1, d.mapping1,
+            d.protein2_id, p2.accession AS accession2, d.name2, d.start2, d.stop2, d.mapping2,
+            pv1.current_version AS version1,
+            pv2.current_version AS version2
         FROM
             associations AS a,
             descriptions AS d,
             methods AS m,
-            proteins AS p1,
+            proteins AS p1
+                LEFT JOIN proteins_versions AS pv1
+                ON p1.accession = pv1.accession AND p1.version = pv1.version,
             proteins AS p2
+                LEFT JOIN proteins_versions AS pv2
+                ON p2.accession = pv2.accession AND p2.version = pv2.version
         WHERE a.id = d.association_id
           AND m.id = d.method_id
           AND p1.id = d.protein1_id
@@ -96,7 +102,7 @@ final class DescriptionViewSql implements DescriptionViewInterface
                 'run_id' => $row['run_id'],
                 'stable_id' => $row['stable_id'],
                 'version' => $row['version'],
-                'obsolete' => $row['obsolete1'] || $row['obsolete2'],
+                'obsolete' => is_null($row['version1']) || is_null($row['version2']),
                 'method' => [
                     'id' => $row['id'],
                     'psimi_id' => $row['psimi_id'],

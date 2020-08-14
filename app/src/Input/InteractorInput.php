@@ -17,9 +17,16 @@ use App\Assertions\ProteinType;
 final class InteractorInput
 {
     const SELECT_PROTEIN_SQL = <<<SQL
-        SELECT p.*, s.sequence
-        FROM proteins AS p, sequences AS s
-        WHERE p.id = s.protein_id AND p.id = ? AND s.is_canonical = TRUE
+        SELECT p.*, pv.current_version AS version, s.sequence
+        FROM
+            proteins AS p
+                LEFT JOIN proteins_versions AS pv
+                ON p.accession = pv.accession AND p.version = pv.version,
+            sequences AS s
+        WHERE p.id = ?
+        AND p.accession = s.canonical
+        AND p.version = s.version
+        AND s.is_canonical = TRUE
     SQL;
 
     const SELECT_MATURE_NAME_SQL = <<<SQL
@@ -136,7 +143,7 @@ final class InteractorInput
             return [new Error('must be a human protein')];
         }
 
-        if ($protein['obsolete']) {
+        if (is_null($protein['version'])) {
             return [new Error(vsprintf('protein %s version %s is obsolete', [
                 $protein['accession'],
                 $protein['version'],
@@ -180,7 +187,7 @@ final class InteractorInput
             return [new Error('must be a viral protein')];
         }
 
-        if ($protein['obsolete']) {
+        if (is_null($protein['version'])) {
             return [new Error(vsprintf('protein %s version %s is obsolete', [
                 $protein['accession'],
                 $protein['version'],

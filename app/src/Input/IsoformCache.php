@@ -7,7 +7,12 @@ namespace App\Input;
 final class IsoformCache
 {
     const SELECT_ISOFORM_SQL = <<<SQL
-        SELECT sequence, is_canonical FROM sequences WHERE protein_id = ? AND accession = ?
+        SELECT s.sequence, s.is_canonical
+        FROM proteins AS p, sequences AS s
+        WHERE p.accession = s.canonical
+        AND p.version = s.version
+        AND p.id = ?
+        AND s.accession = ?
     SQL;
 
     private \PDO $pdo;

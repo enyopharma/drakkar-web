@@ -25,16 +25,20 @@ final class DatasetViewSql implements DatasetViewInterface
             descriptions AS d,
             methods AS m,
             proteins AS p1,
-            proteins AS p2
+            proteins AS p2,
+            proteins_versions AS pv1,
+            proteins_versions AS pv2
         WHERE r.type = ?
             AND r.id = a.run_id
             AND a.id = d.association_id
             AND m.id = d.method_id
             AND p1.id = d.protein1_id
+            AND p1.accession = pv1.accession
+            AND p1.version = pv1.version
             AND p2.id = d.protein2_id
+            AND p2.accession = pv2.accession
+            AND p2.version = pv2.version
             AND a.state = ?
-            AND p1.obsolete IS FALSE
-            AND p2.obsolete IS FALSE
             AND d.deleted_at IS NULL
         ORDER BY d.created_at DESC, d.id DESC
     SQL;

@@ -8,14 +8,6 @@ use App\Input\DescriptionInput;
 
 final class StoreDescriptionSql implements StoreDescriptionInterface
 {
-    const SELECT_METHOD_SQL = <<<SQL
-        SELECT * FROM methods WHERE psimi_id = ?
-    SQL;
-
-    const SELECT_PROTEIN_SQL = <<<SQL
-        SELECT * FROM proteins WHERE accession = ? AND obsolete IS false
-    SQL;
-
     const SELECT_DESCRIPTION_SQL = <<<SQL
         SELECT id
         FROM descriptions
