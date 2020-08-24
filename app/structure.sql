@@ -147,40 +147,6 @@ ALTER SEQUENCE public.descriptions_id_seq OWNED BY public.descriptions.id;
 
 
 --
--- Name: features; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.features (
-    id integer NOT NULL,
-    sequence_id integer NOT NULL,
-    key character varying(8) NOT NULL,
-    description text NOT NULL,
-    start integer NOT NULL,
-    stop integer NOT NULL
-);
-
-
---
--- Name: features_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.features_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: features_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.features_id_seq OWNED BY public.features.id;
-
-
---
 -- Name: keywords; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -252,9 +218,10 @@ CREATE TABLE public.proteins (
     type character(1) NOT NULL,
     ncbi_taxon_id integer NOT NULL,
     accession character varying(10) NOT NULL,
-    name character varying(255) NOT NULL,
     description text NOT NULL,
     version character(7) NOT NULL,
+    names character varying[] NOT NULL,
+    sequences jsonb NOT NULL,
     CONSTRAINT proteins_type_check CHECK (((type)::text = ANY (ARRAY[('h'::character varying)::text, ('v'::character varying)::text])))
 );
 
@@ -287,7 +254,9 @@ CREATE TABLE public.proteins_versions (
     accession character varying(10) NOT NULL,
     version character(7) NOT NULL,
     current_version character(7) NOT NULL,
-    search text
+    name character varying NOT NULL,
+    names character varying[] NOT NULL,
+    features jsonb NOT NULL
 );
 
 
@@ -335,33 +304,6 @@ CREATE SEQUENCE public.runs_id_seq
 --
 
 ALTER SEQUENCE public.runs_id_seq OWNED BY public.runs.id;
-
-
---
--- Name: sequences_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.sequences_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: sequences; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.sequences (
-    id integer DEFAULT nextval('public.sequences_id_seq'::regclass) NOT NULL,
-    canonical character varying(10) NOT NULL,
-    accession character varying(12) NOT NULL,
-    version character(7) NOT NULL,
-    is_canonical boolean NOT NULL,
-    sequence text NOT NULL,
-    hash character(32) NOT NULL
-);
 
 
 --
@@ -415,13 +357,6 @@ ALTER TABLE ONLY public.associations ALTER COLUMN id SET DEFAULT nextval('public
 --
 
 ALTER TABLE ONLY public.descriptions ALTER COLUMN id SET DEFAULT nextval('public.descriptions_id_seq'::regclass);
-
-
---
--- Name: features id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.features ALTER COLUMN id SET DEFAULT nextval('public.features_id_seq'::regclass);
 
 
 --
@@ -485,14 +420,6 @@ ALTER TABLE ONLY public.descriptions
 
 
 --
--- Name: features features_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.features
-    ADD CONSTRAINT features_pkey PRIMARY KEY (id);
-
-
---
 -- Name: keywords keywords_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -533,6 +460,14 @@ ALTER TABLE ONLY public.proteins
 
 
 --
+-- Name: proteins_versions proteins_versions_accession_current_version_key; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.proteins_versions
+    ADD CONSTRAINT proteins_versions_accession_current_version_key UNIQUE (accession, current_version);
+
+
+--
 -- Name: proteins_versions proteins_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -554,22 +489,6 @@ ALTER TABLE ONLY public.publications
 
 ALTER TABLE ONLY public.runs
     ADD CONSTRAINT runs_pkey PRIMARY KEY (id);
-
-
---
--- Name: sequences sequences_accession_version_key; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.sequences
-    ADD CONSTRAINT sequences_accession_version_key UNIQUE (accession, version);
-
-
---
--- Name: sequences sequences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.sequences
-    ADD CONSTRAINT sequences_pkey PRIMARY KEY (id);
 
 
 --
@@ -641,13 +560,6 @@ CREATE INDEX descriptions_protein2_id_key ON public.descriptions USING btree (pr
 
 
 --
--- Name: features_sequence_id_key; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX features_sequence_id_key ON public.features USING btree (sequence_id);
-
-
---
 -- Name: methods_search_key; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -659,20 +571,6 @@ CREATE INDEX methods_search_key ON public.methods USING gin (search public.gin_t
 --
 
 CREATE INDEX proteins_ncbi_taxon_id_key ON public.proteins USING btree (ncbi_taxon_id);
-
-
---
--- Name: proteins_versions_search_key; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX proteins_versions_search_key ON public.proteins_versions USING gin (search public.gin_trgm_ops);
-
-
---
--- Name: sequences_canonical_version_key; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX sequences_canonical_version_key ON public.sequences USING btree (canonical, version);
 
 
 --
