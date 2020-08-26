@@ -22,7 +22,7 @@ final class AlignmentInput
 
     private array $isoforms;
 
-    public static function factory(IsoformCache $cache): callable
+    public static function factory(SequenceCache $cache): callable
     {
         $is_arr = new Guard(new OfType('array'));
         $is_str = new Guard(new OfType('string'));
@@ -35,31 +35,11 @@ final class AlignmentInput
         );
     }
 
-    public static function from(IsoformCache $cache, string $sequence, array ...$isoforms): self
+    public static function from(SequenceCache $cache, string $sequence, array ...$isoforms): self
     {
         $input = new self($sequence, ...$isoforms);
 
-        // validate the sequence.
-        $errors = array_map(fn($e) => $e->nest('sequence'), $input->validateSequence());
-
-        if (count($errors) > 0) {
-            throw new InvalidDataException(...$errors);
-        }
-
-        // validate the isoforms.
-        $errors = array_map(fn ($e) => $e->nest('isoforms'), $input->validateIsoformsCount());
-
-        if (count($errors) > 0) {
-            throw new InvalidDataException(...$errors);
-        }
-
-        $errors = array_map(fn ($e) => $e->nest('isoforms'), $input->validateIsoforms($cache));
-
-        if (count($errors) > 0) {
-            throw new InvalidDataException(...$errors);
-        }
-
-        $errors = array_map(fn ($e) => $e->nest('isoforms'), $input->validateIsoformsUniqueness());
+        $errors = $input->validate($cache);
 
         if (count($errors) > 0) {
             throw new InvalidDataException(...$errors);
@@ -80,6 +60,23 @@ final class AlignmentInput
             'sequence' => $this->sequence,
             'isoforms' => $this->isoforms,
         ];
+    }
+
+    private function validate(SequenceCache $cache): array
+    {
+        $errors = array_map(fn($e) => $e->nest('sequence'), $this->validateSequence());
+
+        if (count($errors) > 0) return $errors;
+
+        $errors = array_map(fn ($e) => $e->nest('isoforms'), $this->validateIsoformsCount());
+
+        if (count($errors) > 0) return $errors;
+
+        $errors = array_map(fn ($e) => $e->nest('isoforms'), $this->validateIsoforms($cache));
+
+        if (count($errors) > 0) return $errors;
+
+        return array_map(fn ($e) => $e->nest('isoforms'), $this->validateIsoformsUniqueness());
     }
 
     private function validateSequence(): array
@@ -104,7 +101,7 @@ final class AlignmentInput
             : [];
     }
 
-    private function validateIsoforms(IsoformCache $cache): array
+    private function validateIsoforms(SequenceCache $cache): array
     {
         $are_isoforms = Map::merged(IsoformInput::factory($cache, $this->sequence));
 

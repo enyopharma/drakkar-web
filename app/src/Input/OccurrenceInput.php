@@ -35,16 +35,7 @@ final class OccurrenceInput
     {
         $input = new self($start, $stop, $identity);
 
-        $errors = [
-            ...array_map(fn ($e) => $e->nest('start'), $input->validateStart($subject)),
-            ...array_map(fn ($e) => $e->nest('stop'), $input->validateStop($subject)),
-        ];
-
-        if (count($errors) == 0) {
-            $errors = $input->validateCoordinates($query);
-        }
-
-        $errors = [...$errors, ...array_map(fn ($e) => $e->nest('identity'), $input->validateIdentity($subject))];
+        $errors = $input->validate($subject, $query);
 
         if (count($errors) > 0) {
             throw new InvalidDataException(...$errors);
@@ -67,6 +58,20 @@ final class OccurrenceInput
             'stop' => $this->stop,
             'identity' => $this->identity,
         ];
+    }
+
+    private function validate(string $subject, string $query): array
+    {
+        $errors = [
+            ...array_map(fn ($e) => $e->nest('start'), $this->validateStart($subject)),
+            ...array_map(fn ($e) => $e->nest('stop'), $this->validateStop($subject)),
+        ];
+
+        if (count($errors) == 0) {
+            $errors = $this->validateCoordinates($query);
+        }
+
+        return [...$errors, ...array_map(fn ($e) => $e->nest('identity'), $this->validateIdentity())];
     }
 
     private function validateStart(string $subject): array

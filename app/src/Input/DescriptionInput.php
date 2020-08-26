@@ -50,17 +50,9 @@ final class DescriptionInput
     {
         RunType::argument($type);
 
-        $type1 = ProteinType::H;
-        $type2 = $type == RunType::HH ? ProteinType::H : ProteinType::V;
-
         $input = new self($association_id, $stable_id, $method_id, $interactor1, $interactor2);
 
-        $errors = [
-            ...$input->validateStableId($pdo),
-            ...$input->validateMethod($pdo),
-            ...array_map(fn ($x) => $x->nest('interactor1'), $input->validateInteractor1($pdo, $type1)),
-            ...array_map(fn ($x) => $x->nest('interactor2'), $input->validateInteractor2($pdo, $type2)),
-        ];
+        $errors = $input->validate($pdo, $type);
 
         if (count($errors) > 0) {
             throw new InvalidDataException(...$errors);
@@ -86,6 +78,19 @@ final class DescriptionInput
             'method_id' => $this->method_id,
             'interactor1' => $this->interactor1,
             'interactor2' => $this->interactor2,
+        ];
+    }
+
+    private function validate(\PDO $pdo, string $type): array
+    {
+        $type1 = ProteinType::H;
+        $type2 = $type == RunType::HH ? ProteinType::H : ProteinType::V;
+
+        return [
+            ...$this->validateStableId($pdo),
+            ...$this->validateMethod($pdo),
+            ...array_map(fn ($x) => $x->nest('interactor1'), $this->validateInteractor1($pdo, $type1)),
+            ...array_map(fn ($x) => $x->nest('interactor2'), $this->validateInteractor2($pdo, $type2)),
         ];
     }
 

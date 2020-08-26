@@ -102,24 +102,24 @@ export type Chain = {
 }
 
 export type Domain = {
-    key: string
+    type: string
     description: string
     start: number
     stop: number
+}
+
+export type ScaledDomain = {
+    type: string
+    description: string
+    start: number
+    stop: number
+    valid: boolean
 }
 
 export type Mature = {
     name: string
     start: number
     stop: number
-}
-
-export type ScaledDomain = {
-    key: string
-    description: string
-    start: number
-    stop: number
-    valid: boolean
 }
 
 export type Sequences = Record<string, string>

@@ -52,7 +52,7 @@ const DomainOption: React.FC<{ i: number, domain: ScaledDomain }> = ({ i, domain
         ? `${domain.start}, ${domain.stop}`
         : 'out of selected sequence'
 
-    const label = `${domain.key} - ${domain.description} [${cdx}]`
+    const label = `${domain.type} - ${domain.description} [${cdx}]`
 
     return (
         <option value={i} disabled={!domain.valid}>

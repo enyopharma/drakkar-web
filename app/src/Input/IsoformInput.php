@@ -18,7 +18,7 @@ final class IsoformInput
 
     private array $occurrences;
 
-    public static function factory(IsoformCache $cache, string $query): callable
+    public static function factory(SequenceCache $cache, string $query): callable
     {
         $is_arr = new Guard(new OfType('array'));
         $is_str = new Guard(new OfType('string'));
@@ -31,31 +31,11 @@ final class IsoformInput
         );
     }
 
-    public static function from(IsoformCache $cache, string $query, string $accession, array ...$occurrences): self
+    public static function from(SequenceCache $cache, string $query, string $accession, array ...$occurrences): self
     {
         $input = new self($accession, ...$occurrences);
 
-        // validate the accession.
-        $errors = array_map(fn ($e) => $e->nest('accession'), $input->validateAccession($cache));
-
-        if (count($errors) > 0) {
-            throw new InvalidDataException(...$errors);
-        }
-
-        // validate the occurrences.
-        $errors = array_map(fn ($e) => $e->nest('occurrences'), $input->validateOccurrencesCount());
-
-        if (count($errors) > 0) {
-            throw new InvalidDataException(...$errors);
-        }
-
-        $errors = array_map(fn ($e) => $e->nest('occurrences'), $input->validateOccurrences($cache, $query));
-
-        if (count($errors) > 0) {
-            throw new InvalidDataException(...$errors);
-        }
-
-        $errors = array_map(fn ($e) => $e->nest('occurrences'), $input->validateOccurrencesUniqueness());
+        $errors = $input->validate($cache, $query);
 
         if (count($errors) > 0) {
             throw new InvalidDataException(...$errors);
@@ -78,7 +58,24 @@ final class IsoformInput
         ];
     }
 
-    private function validateAccession(IsoformCache $cache): array
+    private function validate(SequenceCache $cache, string $query): array
+    {
+        $errors = array_map(fn ($e) => $e->nest('accession'), $this->validateAccession($cache));
+
+        if (count($errors) > 0) return $errors;
+
+        $errors = array_map(fn ($e) => $e->nest('occurrences'), $this->validateOccurrencesCount());
+
+        if (count($errors) > 0) return $errors;
+
+        $errors = array_map(fn ($e) => $e->nest('occurrences'), $this->validateOccurrences($cache, $query));
+
+        if (count($errors) > 0) return $errors;
+
+        return array_map(fn ($e) => $e->nest('occurrences'), $this->validateOccurrencesUniqueness());
+    }
+
+    private function validateAccession(SequenceCache $cache): array
     {
         $sequence = $cache->sequence($this->accession);
 
@@ -94,7 +91,7 @@ final class IsoformInput
             : [];
     }
 
-    private function validateOccurrences(IsoformCache $cache, string $query): array
+    private function validateOccurrences(SequenceCache $cache, string $query): array
     {
         $sequence = $cache->sequence($this->accession);
 

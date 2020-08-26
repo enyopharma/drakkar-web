@@ -50,7 +50,7 @@ const matureCoordinates = (protein: Protein, start: number, stop: number) => {
 const scaledDomains = (protein: Protein, start: number, stop: number) => {
     return protein.domains.map(domain => {
         return {
-            key: domain.key,
+            type: domain.type,
             description: domain.description,
             start: domain.start - start + 1,
             stop: domain.stop - start + 1,

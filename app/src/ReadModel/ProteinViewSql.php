@@ -11,55 +11,45 @@ final class ProteinViewSql implements ProteinViewInterface
     private \PDO $pdo;
 
     const SELECT_PROTEIN_SQL = <<<SQL
-        SELECT p.id, p.type, p.accession, p.version, tn.name AS taxon, p.name, p.description, s.sequence
-        FROM proteins AS p, sequences AS s, taxon AS t, taxon_name AS tn
-        WHERE p.accession = s.canonical AND p.version = s.version
-        AND s.is_canonical IS TRUE
-        AND p.ncbi_taxon_id = t.ncbi_taxon_id
-        AND t.taxon_id = tn.taxon_id
-        AND tn.name_class = 'scientific name'
+        SELECT p.id, p.type, p.accession, p.version, p.name, p.description,
+            p.sequences->>p.accession AS sequence, p.sequences,
+            COALESCE(tn.name, 'obsolete taxon') AS taxon
+        FROM
+            proteins AS p,
+            taxon AS t LEFT JOIN taxon_name AS tn ON t.taxon_id = tn.taxon_id AND tn.name_class = 'scientific name'
+        WHERE p.ncbi_taxon_id = t.ncbi_taxon_id
         AND p.id = ?
     SQL;
 
     const SELECT_PROTEINS_SQL = <<<SQL
-        SELECT p.id, p.type, p.accession, pv.current_version AS version,
-            tn.name AS taxon, p.name, p.description
-        FROM proteins AS p, proteins_versions AS pv, taxon AS t, taxon_name AS tn
-        WHERE %s
-        AND p.type = ?
-        AND p.accession = pv.accession
-        AND p.version = pv.version
+        SELECT p.id, p.type, p.accession, p.name, p.description, COALESCE(tn.name, 'obsolete taxon') AS taxon
+        FROM
+            proteins AS p,
+            proteins_versions AS v,
+            taxon AS t LEFT JOIN taxon_name AS tn ON t.taxon_id = tn.taxon_id AND tn.name_class = 'scientific name'
+        WHERE p.type = ? AND %s
+        AND p.accession = v.accession AND p.version = v.version
         AND p.ncbi_taxon_id = t.ncbi_taxon_id
-        AND t.taxon_id = tn.taxon_id
-        AND tn.name_class = 'scientific name'
         LIMIT ?
     SQL;
 
-    const SELECT_ISOFORMS_SQL = <<<SQL
-        SELECT accession, sequence, is_canonical
-        FROM sequences
-        WHERE canonical = ? AND version = ?
-        ORDER BY is_canonical DESC, accession ASC
+    const SELECT_DOMAINS_SQL = <<<SQL
+        SELECT f->>'type' AS type, f->>'start' AS start, f->>'stop' AS stop, f->>'description' AS description
+        FROM proteins_versions AS v, jsonb_array_elements(v.features) AS f
+        WHERE v.accession = ? AND v.version = ? AND f->>'type' IN (
+            'topological domain',
+            'transmembrane region',
+            'intramembrane region',
+            'domain',
+            'region of interest',
+            'short sequence motif'
+        )
     SQL;
 
     const SELECT_CHAINS_SQL = <<<SQL
-        SELECT f.key, f.description, f.start, f.stop
-        FROM sequences AS s, features AS f
-        WHERE s.canonical = ? AND s.version = ?
-        AND s.id = f.sequence_id
-        AND s.is_canonical IS TRUE
-        AND f.key = 'CHAIN'
-        ORDER BY f.start ASC, f.stop ASC
-    SQL;
-
-    const SELECT_DOMAINS_SQL = <<<SQL
-        SELECT f.key, f.description, f.start, f.stop
-        FROM sequences AS s, features AS f
-        WHERE s.canonical = ? AND s.version = ?
-        AND s.id = f.sequence_id
-        AND s.is_canonical IS TRUE
-        AND f.key IN ('TOPO_DOM', 'TRANSMEM', 'INTRAMEM', 'DOMAIN', 'REGION', 'MOTIF')
-        ORDER BY f.start ASC, f.stop ASC
+        SELECT f->>'type' AS type, f->>'start' AS start, f->>'stop' AS stop, f->>'description' AS description
+        FROM proteins_versions AS v, jsonb_array_elements(v.features) AS f
+        WHERE v.accession = ? AND v.version = ? AND f->>'type' = 'chain'
     SQL;
 
     # ASSUME THE VIRAL INTERACTOR IS ALWAYS THE SECOND INTERACTOR
@@ -85,23 +75,27 @@ final class ProteinViewSql implements ProteinViewInterface
             return Statement::from([]);
         }
 
-        ['accession' => $canonical, 'version' => $version] = $protein;
+        ['accession' => $accession, 'version' => $version] = $protein;
+
+        $sequences = json_decode($protein['sequences'], true);
 
         if (in_array('isoforms', $with)) {
-            $protein['isoforms'] = $this->isoforms($canonical, $version);
-        }
-
-        if (in_array('chains', $with)) {
-            $protein['chains'] = $this->chains($canonical, $version);
+            $protein['isoforms'] = $this->isoforms($accession, $sequences);
         }
 
         if (in_array('domains', $with)) {
-            $protein['domains'] = $this->domains($canonical, $version);
+            $protein['domains'] = $this->domains($accession, $version);
+        }
+
+        if (in_array('chains', $with)) {
+            $protein['chains'] = $this->chains($accession, $version);
         }
 
         if (in_array('matures', $with)) {
-            $protein['matures'] = $this->matures($id);
+            $protein['matures'] = $protein['type'] == ProteinType::H ? [] : $this->matures($id);
         }
+
+        unset($protein['sequences']);
 
         return Statement::from([$protein]);
     }
@@ -111,57 +105,39 @@ final class ProteinViewSql implements ProteinViewInterface
         ProteinType::argument($type);
 
         $qs = explode('+', $query);
-        $qs = array_filter($qs);
-        $qs = array_map(fn ($q) => '%' . trim($q) . '%', $qs);
+        $qs = array_map('trim', $qs);
+        $qs = array_filter($qs, fn ($q) => strlen($q) > 2);
+        $qs = array_map(fn ($q) => '%' . $q . '%', $qs);
 
         if (count($qs) == 0) {
             return Statement::from([]);
         }
 
-        $where = implode(' AND ', array_pad([], count($qs), 'search ILIKE ?'));
+        $where = implode(' AND ', array_pad([], count($qs), 'v.search ILIKE ?'));
 
         $select_proteins_sth = $this->pdo->prepare(sprintf(self::SELECT_PROTEINS_SQL, $where));
 
-        $select_proteins_sth->execute([...$qs, $type, $limit]);
+        $select_proteins_sth->execute([$type, ...$qs, $limit]);
 
         return Statement::from($select_proteins_sth);
     }
 
-    private function isoforms(string $canonical, string $version): array
+    private function isoforms(string $canonical, array $sequences): array
     {
-        $select_isoforms_sth = $this->pdo->prepare(self::SELECT_ISOFORMS_SQL);
+        $map = fn (string $accession, string $sequence) => [
+            'accession' => $accession,
+            'sequence' => $sequence,
+            'is_canonical' => $canonical == $accession,
+        ];
 
-        $select_isoforms_sth->execute([$canonical, $version]);
-
-        $isoforms = $select_isoforms_sth->fetchAll();
-
-        if ($isoforms === false) {
-            throw new \LogicException;
-        }
-
-        return $isoforms;
+        return array_map($map, array_keys($sequences), $sequences);
     }
 
-    private function chains(string $canonical, string $version): array
-    {
-        $select_chains_sth = $this->pdo->prepare(self::SELECT_CHAINS_SQL);
-
-        $select_chains_sth->execute([$canonical, $version]);
-
-        $chains = $select_chains_sth->fetchAll();
-
-        if ($chains === false) {
-            throw new \LogicException;
-        }
-
-        return $chains;
-    }
-
-    private function domains(string $canonical, string $version): array
+    private function domains(string $accession, string $version): array
     {
         $select_domains_sth = $this->pdo->prepare(self::SELECT_DOMAINS_SQL);
 
-        $select_domains_sth->execute([$canonical, $version]);
+        $select_domains_sth->execute([$accession, $version]);
 
         $domains = $select_domains_sth->fetchAll();
 
@@ -170,6 +146,21 @@ final class ProteinViewSql implements ProteinViewInterface
         }
 
         return $domains;
+    }
+
+    private function chains(string $accession, string $version): array
+    {
+        $select_chains_sth = $this->pdo->prepare(self::SELECT_CHAINS_SQL);
+
+        $select_chains_sth->execute([$accession, $version]);
+
+        $chains = $select_chains_sth->fetchAll();
+
+        if ($chains === false) {
+            throw new \LogicException;
+        }
+
+        return $chains;
     }
 
     private function matures(int $id): array

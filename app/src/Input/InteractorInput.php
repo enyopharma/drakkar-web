@@ -17,16 +17,9 @@ use App\Assertions\ProteinType;
 final class InteractorInput
 {
     const SELECT_PROTEIN_SQL = <<<SQL
-        SELECT p.*, pv.current_version AS version, s.sequence
-        FROM
-            proteins AS p
-                LEFT JOIN proteins_versions AS pv
-                ON p.accession = pv.accession AND p.version = pv.version,
-            sequences AS s
+        SELECT p.*, p.sequences->>p.accession AS sequence, v.current_version AS version
+        FROM proteins AS p LEFT JOIN proteins_versions AS v ON p.accession = v.accession AND p.version = v.version
         WHERE p.id = ?
-        AND p.accession = s.canonical
-        AND p.version = s.version
-        AND s.is_canonical = TRUE
     SQL;
 
     const SELECT_MATURE_NAME_SQL = <<<SQL
@@ -82,23 +75,7 @@ final class InteractorInput
 
         $input = new self($protein_id, $name, $start, $stop, ...$alignments);
 
-        // validate mature info.
-        $errors = $type == ProteinType::H
-            ? $input->validateHProtein($pdo)
-            : $input->validateVProtein($pdo);
-
-        if (count($errors) > 0) {
-            throw new InvalidDataException(...$errors);
-        }
-
-        // validate the alignments.
-        $errors = array_map(fn ($e) => $e->nest('mapping'), $input->validateAlignments($pdo));
-
-        if (count($errors) > 0) {
-            throw new InvalidDataException(...$errors);
-        }
-
-        $errors = array_map(fn ($e) => $e->nest('mapping'), $input->validateAlignmentsUniqueness());
+        $errors = $input->validate($pdo, $type);
 
         if (count($errors) > 0) {
             throw new InvalidDataException(...$errors);
@@ -127,7 +104,7 @@ final class InteractorInput
         ];
     }
 
-    private function validateHProtein(\PDO $pdo): array
+    private function validate(\PDO $pdo, string $type): array
     {
         $select_protein_sth = $pdo->prepare(self::SELECT_PROTEIN_SQL);
 
@@ -139,8 +116,21 @@ final class InteractorInput
             return [new Error('protein not found')];
         }
 
-        if ($protein['type'] != ProteinType::H) {
-            return [new Error('must be a human protein')];
+        $errors = $this->validateProtein($pdo, $type, $protein);
+
+        if (count($errors) > 0) return $errors;
+
+        $errors = array_map(fn ($e) => $e->nest('mapping'), $this->validateAlignments($protein));
+
+        if (count($errors) > 0) return $errors;
+
+        return array_map(fn ($e) => $e->nest('mapping'), $this->validateAlignmentsUniqueness());
+    }
+
+    private function validateProtein(\PDO $pdo, string $type, array $protein): array
+    {
+        if ($protein['type'] != $type) {
+            return [new Error(sprintf('must be a %s protein', $type == ProteinType::H ? 'human' : 'viral'))];
         }
 
         if (is_null($protein['version'])) {
@@ -150,6 +140,13 @@ final class InteractorInput
             ]))];
         }
 
+        return $type == ProteinType::H
+            ? $this->validateHProtein($protein)
+            : $this->validateVProtein($pdo, $protein);
+    }
+
+    private function validateHProtein(array $protein): array
+    {
         if ($protein['name'] != $this->name) {
             return [new Error(vsprintf('invalid name \'%s\' for interactor (human, %s) - \'%s\' expected', [
                 $this->name,
@@ -170,29 +167,32 @@ final class InteractorInput
         return [];
     }
 
-    private function validateVProtein(\PDO $pdo): array
+    private function validateVProtein(\PDO $pdo, array $protein): array
     {
-        $select_protein_sth = $pdo->prepare(self::SELECT_PROTEIN_SQL);
+        // validate name and coordinates for a new mature protein.
+        $errors = [];
 
-        $select_protein_sth->execute([$this->protein_id]);
-
-        $protein = $select_protein_sth->fetch();
-
-        // validate the protein.
-        if ($protein === false) {
-            return [new Error('protein not found')];
+        if (preg_match(self::NAME_PATTERN, $this->name) === 0) {
+            $errors[] = new Error('name is not valid');
         }
 
-        if ($protein['type'] != ProteinType::V) {
-            return [new Error('must be a viral protein')];
+        if ($this->start < 1) {
+            $errors[] = new Error('start must be greater than 0');
         }
 
-        if (is_null($protein['version'])) {
-            return [new Error(vsprintf('protein %s version %s is obsolete', [
-                $protein['accession'],
-                $protein['version'],
-            ]))];
+        if ($this->stop < 1) {
+            $errors[] = new Error('stop must be greater than 0');
         }
+
+        if ($this->start > $this->stop) {
+            $errors[] = new Error('start must be greater than or equal to stop');
+        }
+
+        if ($protein && $this->stop > strlen($protein['sequence'])) {
+            $errors[] = new Error('coordinates must be inside the protein sequence');
+        }
+
+        if (count($errors) > 0) return $errors;
 
         // validate name/coordinates consistency.
         $select_name_sth = $pdo->prepare(self::SELECT_MATURE_NAME_SQL);
@@ -233,35 +233,14 @@ final class InteractorInput
             ];
         }
 
-        // validate name and coordinates for a new mature protein.
-        $errors = [];
-
-        if (preg_match(self::NAME_PATTERN, $this->name) === 0) {
-            $errors[] = new Error('name is not valid');
-        }
-
-        if ($this->start < 1) {
-            $errors[] = new Error('start must be greater than 0');
-        }
-
-        if ($this->stop < 1) {
-            $errors[] = new Error('stop must be greater than 0');
-        }
-
-        if ($this->start > $this->stop) {
-            $errors[] = new Error('start must be greater than or equal to stop');
-        }
-
-        if ($protein && $this->stop > strlen($protein['sequence'])) {
-            $errors[] = new Error('coordinates must be inside the protein sequence');
-        }
-
-        return $errors;
+        return [];
     }
 
-    private function validateAlignments(\PDO $pdo): array
+    private function validateAlignments(array $protein): array
     {
-        $cache = new IsoformCache($pdo, $this->protein_id, $this->start, $this->stop);
+        $sequences = json_decode($protein['sequences'], true);
+
+        $cache = new SequenceCache($protein['accession'], $this->start, $this->stop, $sequences);
 
         $are_alignments = Map::merged(AlignmentInput::factory($cache));
 
