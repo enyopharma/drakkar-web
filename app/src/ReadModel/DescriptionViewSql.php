@@ -68,6 +68,10 @@ final class DescriptionViewSql implements DescriptionViewInterface
 
         $descriptions = $select_description_sth->fetchAll();
 
+        if ($descriptions === false) {
+            throw new \LogicException;
+        }
+
         return Statement::from($descriptions);
     }
 

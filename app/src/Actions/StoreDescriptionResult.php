@@ -27,9 +27,14 @@ final class StoreDescriptionResult
         return new self(self::DESCRIPTION_ALREADY_EXISTS);
     }
 
-    public static function stableIdFailure(): self
+    public static function firstVersionFailure(): self
     {
-        return new self(self::STABLE_ID_FAILURE);
+        return new self(self::FIRST_VERSION_FAILURE);
+    }
+
+    public static function newVersionFailure(): self
+    {
+        return new self(self::NEW_VERSION_FAILURE);
     }
 
     private function __construct(int $state, array $description = [], string ...$errors)
