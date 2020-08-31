@@ -75,13 +75,7 @@ final class InteractorInput
 
         $input = new self($protein_id, $name, $start, $stop, ...$alignments);
 
-        $errors = $input->validate($pdo, $type);
-
-        if (count($errors) > 0) {
-            throw new InvalidDataException(...$errors);
-        }
-
-        return $input;
+        return validated($input, ...$input->validate($pdo, $type));
     }
 
     private function __construct(int $protein_id, string $name, int $start, int $stop, array ...$alignments)
@@ -116,15 +110,11 @@ final class InteractorInput
             return [new Error('protein not found')];
         }
 
-        $errors = $this->validateProtein($pdo, $type, $protein);
-
-        if (count($errors) > 0) return $errors;
-
-        $errors = array_map(fn ($e) => $e->nest('mapping'), $this->validateAlignments($protein));
-
-        if (count($errors) > 0) return $errors;
-
-        return array_map(fn ($e) => $e->nest('mapping'), $this->validateAlignmentsUniqueness());
+        return bound(
+            $this->validateProtein($pdo, $type, $protein),
+            nested('mapping', ...$this->validateAlignments($protein)),
+            nested('mapping', ...$this->validateAlignmentsUniqueness()),
+        );
     }
 
     private function validateProtein(\PDO $pdo, string $type, array $protein): array
@@ -134,9 +124,8 @@ final class InteractorInput
         }
 
         if (is_null($protein['version'])) {
-            return [new Error(vsprintf('protein %s version %s is obsolete', [
+            return [new Error(vsprintf('This version of protein %s is obsolete', [
                 $protein['accession'],
-                $protein['version'],
             ]))];
         }
 
@@ -238,21 +227,15 @@ final class InteractorInput
 
     private function validateAlignments(array $protein): array
     {
+        // format the sequences array.
+        $accession = $protein['accession'];
         $sequences = json_decode($protein['sequences'], true);
 
-        $cache = new SequenceCache($protein['accession'], $this->start, $this->stop, $sequences);
+        $sequences[$accession] = substr($sequences[$accession], $this->start - 1, $this->stop - $this->start + 1);
 
-        $are_alignments = Map::merged(AlignmentInput::factory($cache));
+        $are_alignments = Map::merged(AlignmentInput::factory($sequences));
 
-        try {
-            $are_alignments($this->alignments);
-        }
-
-        catch (InvalidDataException $e) {
-            return $e->errors();
-        }
-
-        return [];
+        return unpacked(fn () => $are_alignments($this->alignments));
     }
 
     private function validateAlignmentsUniqueness(): array

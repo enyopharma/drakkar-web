@@ -52,13 +52,7 @@ final class DescriptionInput
 
         $input = new self($association_id, $stable_id, $method_id, $interactor1, $interactor2);
 
-        $errors = $input->validate($pdo, $type);
-
-        if (count($errors) > 0) {
-            throw new InvalidDataException(...$errors);
-        }
-
-        return $input;
+        return validated($input, ...$input->validate($pdo, $type));
     }
 
     private function __construct(int $association_id, string $stable_id, int $method_id, array $interactor1, array $interactor2)
@@ -89,8 +83,8 @@ final class DescriptionInput
         return [
             ...$this->validateStableId($pdo),
             ...$this->validateMethod($pdo),
-            ...array_map(fn ($x) => $x->nest('interactor1'), $this->validateInteractor1($pdo, $type1)),
-            ...array_map(fn ($x) => $x->nest('interactor2'), $this->validateInteractor2($pdo, $type2)),
+            ...nested('interactor1', ...$this->validateInteractor1($pdo, $type1)),
+            ...nested('interactor2', ...$this->validateInteractor2($pdo, $type2)),
         ];
     }
 

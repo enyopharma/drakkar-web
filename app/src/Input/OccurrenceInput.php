@@ -35,13 +35,7 @@ final class OccurrenceInput
     {
         $input = new self($start, $stop, $identity);
 
-        $errors = $input->validate($subject, $query);
-
-        if (count($errors) > 0) {
-            throw new InvalidDataException(...$errors);
-        }
-
-        return $input;
+        return validated($input, ...$input->validate($subject, $query));
     }
 
     private function __construct(int $start, int $stop, float $identity)
@@ -63,27 +57,27 @@ final class OccurrenceInput
     private function validate(string $subject, string $query): array
     {
         $errors = [
-            ...array_map(fn ($e) => $e->nest('start'), $this->validateStart($subject)),
-            ...array_map(fn ($e) => $e->nest('stop'), $this->validateStop($subject)),
+            ...nested('start', ...$this->validateStart($subject)),
+            ...nested('stop', ...$this->validateStop($subject)),
         ];
 
         if (count($errors) == 0) {
             $errors = $this->validateCoordinates($query);
         }
 
-        return [...$errors, ...array_map(fn ($e) => $e->nest('identity'), $this->validateIdentity())];
+        return [...$errors, ...nested('identity', ...$this->validateIdentity())];
     }
 
     private function validateStart(string $subject): array
     {
-        return $this->start < 1 || $this->stop > strlen($subject)
+        return $this->start < 1
             ? [new Error('must be inside the isoform sequence')]
             : [];
     }
 
     private function validateStop(string $subject): array
     {
-        return $this->start < 1 || $this->stop > strlen($subject)
+        return $this->stop > strlen($subject)
             ? [new Error('must be inside the isoform sequence')]
             : [];
     }
@@ -91,7 +85,7 @@ final class OccurrenceInput
     private function validateCoordinates(string $query): array
     {
         if ($this->start > $this->stop) {
-            return [new Error('start must be greater than stop')];
+            return [new Error('stop must be greater than start')];
         }
 
         if ($this->stop - $this->start + 1 != strlen($query)) {

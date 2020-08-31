@@ -18,12 +18,12 @@ final class IsoformInput
 
     private array $occurrences;
 
-    public static function factory(SequenceCache $cache, string $query): callable
+    public static function factory(array $sequences, string $query): callable
     {
         $is_arr = new Guard(new OfType('array'));
         $is_str = new Guard(new OfType('string'));
 
-        $factory = fn ($accession, $occurrences) => self::from($cache, $query, $accession, ...array_values($occurrences));
+        $factory = fn ($accession, $occurrences) => self::from($sequences, $query, $accession, ...array_values($occurrences));
 
         return new Validation($factory,
             Field::required('accession', $is_str)->focus(),
@@ -31,17 +31,11 @@ final class IsoformInput
         );
     }
 
-    public static function from(SequenceCache $cache, string $query, string $accession, array ...$occurrences): self
+    public static function from(array $sequences, string $query, string $accession, array ...$occurrences): self
     {
         $input = new self($accession, ...$occurrences);
 
-        $errors = $input->validate($cache, $query);
-
-        if (count($errors) > 0) {
-            throw new InvalidDataException(...$errors);
-        }
-
-        return $input;
+        return validated($input, ...$input->validate($sequences, $query));
     }
 
     private function __construct(string $accession, array ...$occurrences)
@@ -58,28 +52,19 @@ final class IsoformInput
         ];
     }
 
-    private function validate(SequenceCache $cache, string $query): array
+    private function validate(array $sequences, string $query): array
     {
-        $errors = array_map(fn ($e) => $e->nest('accession'), $this->validateAccession($cache));
-
-        if (count($errors) > 0) return $errors;
-
-        $errors = array_map(fn ($e) => $e->nest('occurrences'), $this->validateOccurrencesCount());
-
-        if (count($errors) > 0) return $errors;
-
-        $errors = array_map(fn ($e) => $e->nest('occurrences'), $this->validateOccurrences($cache, $query));
-
-        if (count($errors) > 0) return $errors;
-
-        return array_map(fn ($e) => $e->nest('occurrences'), $this->validateOccurrencesUniqueness());
+        return bound(
+            nested('accession', ...$this->validateAccession($sequences)),
+            nested('occurrences', ...$this->validateOccurrencesCount()),
+            nested('occurrences', ...$this->validateOccurrences($sequences, $query)),
+            nested('occurrences', ...$this->validateOccurrencesUniqueness()),
+        );
     }
 
-    private function validateAccession(SequenceCache $cache): array
+    private function validateAccession(array $sequences): array
     {
-        $sequence = $cache->sequence($this->accession);
-
-        return !$sequence
+        return !array_key_exists($this->accession, $sequences)
             ? [new Error(sprintf('is not associated to this protein'))]
             : [];
     }
@@ -91,23 +76,15 @@ final class IsoformInput
             : [];
     }
 
-    private function validateOccurrences(SequenceCache $cache, string $query): array
+    private function validateOccurrences(array $sequences, string $query): array
     {
-        $sequence = $cache->sequence($this->accession);
+        $sequence = $sequences[$this->accession] ?? null;
 
-        if (!$sequence) return [];
+        if (is_null($sequence)) return [];
 
         $are_occurrences = Map::merged(OccurrenceInput::factory($sequence, $query));
 
-        try {
-            $are_occurrences($this->occurrences);
-        }
-
-        catch (InvalidDataException $e) {
-            return $e->errors();
-        }
-
-        return [];
+        return unpacked(fn () => $are_occurrences($this->occurrences));
     }
 
     private function validateOccurrencesUniqueness(): array
