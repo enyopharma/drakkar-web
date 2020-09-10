@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
-import { InteractorI } from '../src/types'
+import { InteractorI, Feedback } from '../src/types'
 import { FaSave, FaEraser } from 'react-icons/fa'
 import { resetForm, fireSave } from '../src/reducer'
 import { useAppSelector, useAction } from '../src/hooks'
@@ -107,6 +107,7 @@ export const Form: React.FC = () => {
                             </button>
                         </div>
                     </div>
+                    {feedback && <FeedbackRow feedback={feedback} />}
                 </div>
             </div>
         </form>
@@ -116,3 +117,17 @@ export const Form: React.FC = () => {
 const SaveIcon: React.FC<{ saving: boolean }> = ({ saving }) => saving
     ? <span className="spinner-border spinner-border-sm"></span>
     : <FaSave />
+
+const FeedbackRow: React.FC<{ feedback: Feedback }> = ({ feedback }) => {
+    if (!feedback.success) return null
+
+    return (
+        <div className="row">
+            <div className="col">
+                <div className="text-success">
+                    <ul><li>Description successfully saved!</li></ul>
+                </div>
+            </div>
+        </div>
+    )
+}
