@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Publications;
 
-use Psr\Http\Message\ServerRequestInterface;
-
 use App\Actions\UpdatePublicationStateResult;
 use App\Actions\UpdatePublicationStateInterface;
 use App\Assertions\PublicationState;
@@ -22,16 +20,13 @@ final class UpdateEndpoint
     /**
      * @return \Psr\Http\Message\ResponseInterface|false
      */
-    public function __invoke(ServerRequestInterface $request, callable $responder)
+    public function __invoke(callable $input, callable $responder)
     {
-        $run_id = (int) $request->getAttribute('run_id');
-        $pmid = (int) $request->getAttribute('pmid');
-
-        $params = (array) $request->getParsedBody();
-
-        $state = (string) ($params['state'] ?? '');
-        $annotation = (string) ($params['annotation'] ?? '');
-        $source = (string) ($params['_source'] ?? '');
+        $run_id = (int) $input('run_id');
+        $pmid = (int) $input('pmid');
+        $state = $input('state', '');
+        $annotation = $input('annotation', '');
+        $source = $input('_source', '');
 
         if (!PublicationState::isValid($state)) {
             return false;

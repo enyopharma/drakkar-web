@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Descriptions;
 
-use Psr\Http\Message\ServerRequestInterface;
-
 use League\Plates\Engine;
 
 use App\ReadModel\RunViewInterface;
@@ -32,11 +30,11 @@ final class CreateEndpoint
     /**
      * @return string|false
      */
-    public function __invoke(ServerRequestInterface $request)
+    public function __invoke(callable $input)
     {
-        // parse request.
-        $run_id = (int) $request->getAttribute('run_id');
-        $pmid = (int) $request->getAttribute('pmid');
+        // get input.
+        $run_id = (int) $input('run_id');
+        $pmid = (int) $input('pmid');
 
         // get the run.
         if (!$run = $this->runs->id($run_id)->fetch()) {

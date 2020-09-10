@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Dataset;
 
-use Psr\Http\Message\ServerRequestInterface;
-
 use GuzzleHttp\Psr7;
 
 use App\ReadModel\DatasetViewInterface;
@@ -23,9 +21,9 @@ final class DownloadEndpoint
     /**
      * @return \Psr\Http\Message\ResponseInterface|false
      */
-    public function __invoke(ServerRequestInterface $request, callable $responder)
+    public function __invoke(callable $input, callable $responder)
     {
-        $type = $request->getAttribute('type');
+        $type = $input('type');
 
         if (!RunType::isValid($type)) {
             return false;

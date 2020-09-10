@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Runs;
 
-use Psr\Http\Message\ServerRequestInterface;
-
 use League\Plates\Engine;
 
 use App\ReadModel\RunViewInterface;
@@ -25,7 +23,7 @@ final class IndexEndpoint
     /**
      * @return string
      */
-    public function __invoke(ServerRequestInterface $request)
+    public function __invoke()
     {
         return $this->engine->render('runs/index', [
             'runs' => $this->runs->all('nbs')->fetchAll(),

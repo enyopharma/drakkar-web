@@ -19,11 +19,12 @@ use App\Endpoints\Descriptions;
  * @return array[]
  */
 return function (ContainerInterface $container): array {
-    $factory = $container->get(Psr\Http\Message\ResponseFactoryInterface::class);
-
-    $endpoint = Quanta\Http\EndpointFactory::default($factory);
+    $responder = new Quanta\Http\Responder(
+        $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
+    );
 
     $lazy = fn (callable $f) => new Quanta\Http\LazyRequestHandler($f);
+    $endpoint = fn (callable $f) => new Quanta\Http\Endpoint($responder, $f);
 
     return array_map($lazy, [
         'GET /' => fn () => $endpoint(new Runs\IndexEndpoint(
@@ -80,7 +81,7 @@ return function (ContainerInterface $container): array {
             )),
             new App\Middleware\ValidateDescriptionMiddleware(
                 $container->get(PDO::class),
-                $factory,
+                $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
             ),
         ),
 

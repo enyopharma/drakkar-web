@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Publications;
 
-use Psr\Http\Message\ServerRequestInterface;
-
 use League\Plates\Engine;
 
 use App\Routing\UrlGenerator;
@@ -34,16 +32,13 @@ final class IndexEndpoint
     /**
      * @return \Psr\Http\Message\ResponseInterface|string|false
      */
-    public function __invoke(ServerRequestInterface $request, callable $responder)
+    public function __invoke(callable $input, callable $responder)
     {
-        // parse request.
-        $run_id = (int) $request->getAttribute('run_id');
-
-        $params = (array) $request->getQueryParams();
-
-        $state = (string) ($params['state'] ?? PublicationState::PENDING);
-        $page = (int) ($params['page'] ?? 1);
-        $limit = (int) ($params['limit'] ?? 20);
+        // get input.
+        $run_id = (int) $input('run_id');
+        $state = $input('state', PublicationState::PENDING);
+        $page = (int) $input('page', 1);
+        $limit = (int) $input('limit', 20);
 
         // get the run.
         if (!$run = $this->runs->id($run_id, 'nbs')->fetch()) {

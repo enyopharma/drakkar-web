@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Publications;
 
-use Psr\Http\Message\ServerRequestInterface;
-
 use League\Plates\Engine;
 
 use App\ReadModel\PublicationViewInterface;
@@ -25,16 +23,14 @@ final class SearchEndpoint
     /**
      * @return string
      */
-    public function __invoke(ServerRequestInterface $request)
+    public function __invoke(callable $input)
     {
-        $params = (array) $request->getQueryParams();
+        $pmid = trim($input('pmid'));
 
-        $pmid = (int) trim($params['pmid'] ?? '');
-
-        $publications = $this->publications->search($pmid)->fetchAll();
+        $publications = $this->publications->search((int) $pmid)->fetchAll();
 
         return $this->engine->render('publications/search', [
-            'pmid' => (string) ($params['pmid'] ?? ''),
+            'pmid' => $pmid,
             'publications' => $publications,
         ]);
     }

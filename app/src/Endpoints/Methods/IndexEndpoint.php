@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Methods;
 
-use Psr\Http\Message\ServerRequestInterface;
-
 use App\ReadModel\MethodViewInterface;
 
 final class IndexEndpoint
@@ -20,12 +18,10 @@ final class IndexEndpoint
     /**
      * @return array
      */
-    public function __invoke(ServerRequestInterface $request)
+    public function __invoke(callable $input)
     {
-        $params = (array) $request->getQueryParams();
-
-        $query = (string) ($params['query'] ?? '');
-        $limit = (int) ($params['limit'] ?? 5);
+        $query = $input('query', '');
+        $limit = (int) $input('limit', 5);
 
         return $this->methods->search($query, $limit)->fetchAll();
     }

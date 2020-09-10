@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Proteins;
 
-use Psr\Http\Message\ServerRequestInterface;
-
 use App\ReadModel\ProteinViewInterface;
 
 final class ShowEndpoint
@@ -20,9 +18,9 @@ final class ShowEndpoint
     /**
      * @return array|false
      */
-    public function __invoke(ServerRequestInterface $request)
+    public function __invoke(callable $input)
     {
-        $id = (int) $request->getAttribute('id');
+        $id = (int) $input('id');
 
         return $this->proteins
             ->id($id, 'isoforms', 'chains', 'domains', 'matures')

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Descriptions;
 
-use Psr\Http\Message\ServerRequestInterface;
-
 use App\Input\DescriptionInput;
 use App\Actions\StoreDescriptionResult;
 use App\Actions\StoreDescriptionInterface;
@@ -22,10 +20,10 @@ final class StoreEndpoint
     /**
      * @return \Psr\Http\Message\ResponseInterface|array
      */
-    public function __invoke(ServerRequestInterface $request, callable $responder)
+    public function __invoke(callable $input, callable $responder)
     {
         // get the description input.
-        $input = $request->getAttribute(DescriptionInput::class);
+        $input = $input(DescriptionInput::class);
 
         if (!$input instanceof DescriptionInput) {
             throw new \LogicException;

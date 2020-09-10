@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Descriptions;
 
-use Psr\Http\Message\ServerRequestInterface;
-
 use League\Plates\Engine;
 
 use App\Routing\UrlGenerator;
@@ -43,15 +41,12 @@ final class IndexEndpoint
     /**
      * @return \Psr\Http\Message\ResponseInterface|string|false
      */
-    public function __invoke(ServerRequestInterface $request, callable $responder)
+    public function __invoke(callable $input, callable $responder)
     {
-        // parse request.
-        $run_id = (int) $request->getAttribute('run_id');
-        $pmid = (int) $request->getAttribute('pmid');
-
-        $params = (array) $request->getQueryParams();
-
-        $stable_id = $params['stable_id'] ?? '';
+        // get input.
+        $run_id = (int) $input('run_id');
+        $pmid = (int) $input('pmid');
+        $stable_id = $input('stable_id', '');
         $page = (int) ($params['page'] ?? 1);
         $limit = (int) ($params['limit'] ?? 20);
 

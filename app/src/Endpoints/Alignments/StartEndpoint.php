@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Alignments;
 
-use Psr\Http\Message\ServerRequestInterface;
-
 use Predis\Client;
 
 final class StartEndpoint
@@ -20,13 +18,11 @@ final class StartEndpoint
     /**
      * @return array
      */
-    public function __invoke(ServerRequestInterface $request)
+    public function __invoke(callable $input)
     {
-        $params = (array) $request->getParsedBody();
-
-        $id = (string) $params['id'];
-        $query = (string) $params['query'];
-        $sequences = array_filter((array) ($params['sequences'] ?? []), 'is_string');
+        $id = $input('id');
+        $query = $input('query');
+        $sequences = array_filter((array) $input('sequences', []), 'is_string');
 
         $payload = json_encode(['id' => $id, 'query' => $query, 'sequences' => $sequences]);
 

@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Descriptions;
 
-use Psr\Http\Message\ServerRequestInterface;
-
 use League\Plates\Engine;
 
 use App\Routing\UrlGenerator;
@@ -29,11 +27,9 @@ final class SearchEndpoint
     /**
      * @return \Psr\Http\Message\ResponseInterface|string
      */
-    public function __invoke(ServerRequestInterface $request, callable $responder)
+    public function __invoke(callable $input, callable $responder)
     {
-        $params = (array) $request->getQueryParams();
-
-        $stable_id = trim($params['stable_id'] ?? '');
+        $stable_id = trim($input('stable_id', ''));
 
         $description = $this->descriptions->search($stable_id)->fetch();
 

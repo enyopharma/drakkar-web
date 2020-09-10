@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Proteins;
 
-use Psr\Http\Message\ServerRequestInterface;
-
 use App\ReadModel\ProteinViewInterface;
 use App\Assertions\ProteinType;
 
@@ -21,13 +19,11 @@ final class IndexEndpoint
     /**
      * @return array|false
      */
-    public function __invoke(ServerRequestInterface $request)
+    public function __invoke(callable $input)
     {
-        $params = (array) $request->getQueryParams();
-
-        $type = (string) ($params['type'] ?? '');
-        $query = (string) ($params['query'] ?? '');
-        $limit = (int) ($params['limit'] ?? 5);
+        $type = $input('type', '');
+        $query = $input('query', '');
+        $limit = (int) $input('limit', 5);
 
         if (!ProteinType::isValid($type)) {
             return false;
