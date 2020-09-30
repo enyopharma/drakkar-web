@@ -48,37 +48,44 @@ final class InteractorInput
 
     private array $alignments;
 
-    public static function factory(\PDO $pdo, string $type): callable
+    public static function factory(): callable
     {
-        ProteinType::argument($type);
+        $factory = function ($protein_id, $name, $start, $stop, array $alignments) {
+            return self::from($protein_id, $name, $start, $stop, ...array_values($alignments));
+        };
 
         $is_arr = new Guard(new OfType('array'));
         $is_str = new Guard(new OfType('string'));
         $is_int = new Guard(new OfType('int'));
-
-        $factory = function ($protein_id, $name, $start, $stop, array $alignments) use ($pdo, $type) {
-            return self::from($pdo, $type, $protein_id, $name, $start, $stop, ...array_values($alignments));
-        };
+        $alignment = AlignmentInput::factory();
 
         return new Validation($factory,
             Field::required('protein_id', $is_int)->focus(),
             Field::required('name', $is_str)->focus(),
             Field::required('start', $is_int)->focus(),
             Field::required('stop', $is_int)->focus(),
-            Field::required('mapping', $is_arr, Map::merged($is_arr))->focus(),
+            Field::required('mapping', $is_arr, Map::merged($is_arr, $alignment))->focus(),
         );
     }
 
-    public static function from(\PDO $pdo, string $type, int $protein_id, string $name, int $start, int $stop, array ...$alignments): self
+    public static function from(int $protein_id, string $name, int $start, int $stop, AlignmentInput ...$alignments): self
     {
-        ProteinType::argument($type);
-
         $input = new self($protein_id, $name, $start, $stop, ...$alignments);
 
-        return validated($input, ...$input->validate($pdo, $type));
+        $errors = [
+            ...array_map(fn ($e) => $e->nest('protein_id'), $input->validateProteinId()),
+            ...array_map(fn ($e) => $e->nest('name'), $input->validateName()),
+            ...$input->validateCoordinates(),
+        ];
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        return $input;
     }
 
-    private function __construct(int $protein_id, string $name, int $start, int $stop, array ...$alignments)
+    private function __construct(int $protein_id, string $name, int $start, int $stop, AlignmentInput ...$alignments)
     {
         $this->protein_id = $protein_id;
         $this->name = $name;
@@ -94,44 +101,76 @@ final class InteractorInput
             'name' => $this->name,
             'start' => $this->start,
             'stop' => $this->stop,
-            'mapping' => $this->alignments,
+            'mapping' => array_map(fn ($a) => $a->data(), $this->alignments),
         ];
     }
 
-    private function validate(\PDO $pdo, string $type): array
+    private function validateProteinId(): array
     {
+        return $this->protein_id < 1
+            ? [new Error('must be positive')]
+            : [];
+    }
+
+    private function validateName(): array
+    {
+        return preg_match(self::NAME_PATTERN, $this->name) === 0
+            ? [new Error('must match %s', self::NAME_PATTERN)]
+            : [];
+    }
+
+    private function validateCoordinates(): array
+    {
+        $errors = [];
+
+        if ($this->start < 1) {
+            $errors[] = (new Error('must be positive'))->nest('start');
+        }
+
+        if ($this->stop < 1) {
+            $errors[] = (new Error('must be positive'))->nest('stop');
+        }
+
+        if (count($errors) == 0 && $this->start > $this->stop) {
+            $errors[] = new Error('start must be smaller than stop');
+        }
+
+        return $errors;
+    }
+
+    public function validateForDbAndType(\PDO $pdo, string $type): array
+    {
+        ProteinType::argument($type);
+
         $select_protein_sth = $pdo->prepare(self::SELECT_PROTEIN_SQL);
 
         $select_protein_sth->execute([$this->protein_id]);
 
         $protein = $select_protein_sth->fetch();
 
-        if ($protein === false) {
-            return [new Error('protein not found')];
+        if (!$protein) {
+            return [(new Error('must exist'))->nest('protein_id')];
         }
 
-        return bound(
-            $this->validateProtein($pdo, $type, $protein),
-            nested('mapping', ...$this->validateAlignments($protein)),
-            nested('mapping', ...$this->validateAlignmentsUniqueness()),
-        );
-    }
+        $errors = [];
 
-    private function validateProtein(\PDO $pdo, string $type, array $protein): array
-    {
         if ($protein['type'] != $type) {
-            return [new Error(sprintf('must be a %s protein', $type == ProteinType::H ? 'human' : 'viral'))];
+            $errors[] = new Error(sprintf('must be a %s protein', $type == ProteinType::H ? 'human' : 'viral'));
         }
 
         if (is_null($protein['version'])) {
-            return [new Error(vsprintf('This version of protein %s is obsolete', [
-                $protein['accession'],
-            ]))];
+            $errors[] = new Error(sprintf('this version of protein %s is obsolete', $protein['accession']));
         }
 
-        return $type == ProteinType::H
+        $es = $type == ProteinType::H
             ? $this->validateHProtein($protein)
             : $this->validateVProtein($pdo, $protein);
+
+        $errors = [...$errors, ...$es];
+
+        return count($errors) == 0
+            ? array_map(fn ($e) => $e->nest('mapping'), $this->validateMapping($protein))
+            : $errors;
     }
 
     private function validateHProtein(array $protein): array
@@ -158,30 +197,10 @@ final class InteractorInput
 
     private function validateVProtein(\PDO $pdo, array $protein): array
     {
-        // validate name and coordinates for a new mature protein.
-        $errors = [];
-
-        if (preg_match(self::NAME_PATTERN, $this->name) === 0) {
-            $errors[] = new Error('name is not valid');
+        // validate coordinates.
+        if ($this->stop > strlen($protein['sequence'])) {
+            return [new Error('coordinates must be inside the protein sequence')];
         }
-
-        if ($this->start < 1) {
-            $errors[] = new Error('start must be greater than 0');
-        }
-
-        if ($this->stop < 1) {
-            $errors[] = new Error('stop must be greater than 0');
-        }
-
-        if ($this->start > $this->stop) {
-            $errors[] = new Error('start must be greater than or equal to stop');
-        }
-
-        if ($protein && $this->stop > strlen($protein['sequence'])) {
-            $errors[] = new Error('coordinates must be inside the protein sequence');
-        }
-
-        if (count($errors) > 0) return $errors;
 
         // validate name/coordinates consistency.
         $select_name_sth = $pdo->prepare(self::SELECT_MATURE_NAME_SQL);
@@ -225,33 +244,25 @@ final class InteractorInput
         return [];
     }
 
-    private function validateAlignments(array $protein): array
+    private function validateMapping(array $protein): array
     {
-        // format the sequences array.
-        $accession = $protein['accession'];
-        $sequences = json_decode($protein['sequences'], true);
+        $errors = [];
 
-        $sequences[$accession] = substr($sequences[$accession], $this->start - 1, $this->stop - $this->start + 1);
+        $sequences = array_map(fn ($a) => $a->sequence(), $this->alignments);
 
-        $are_alignments = Map::merged(AlignmentInput::factory($sequences));
-
-        return unpacked(fn () => $are_alignments($this->alignments));
-    }
-
-    private function validateAlignmentsUniqueness(): array
-    {
-        $seen = [];
-
-        foreach ($this->alignments as ['sequence' => $sequence]) {
-            $nb = $seen[$sequence] ?? 0;
-
-            if ($nb == 1) {
-                return [new Error('alignment sequence must be present only once')];
-            }
-
-            $seen[$sequence] = $nb + 1;
+        if (count($sequences) > count(array_unique($sequences))) {
+            $errors[] = (new Error('must be unique'))->nest('sequence');
         }
 
-        return [];
+        $accession = $protein['accession'];
+        $subjects = json_decode($protein['sequences'], true);
+
+        $subjects[$accession] = substr($subjects[$accession], $this->start - 1, $this->stop - $this->start + 1);
+
+        foreach ($this->alignments as $i => $alignment) {
+            $errors = [...$errors, ...array_map(fn ($e) => $e->nest((string) $i), $alignment->validateForSubjects($subjects))];
+        }
+
+        return $errors;
     }
 }

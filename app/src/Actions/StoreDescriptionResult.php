@@ -7,19 +7,25 @@ namespace App\Actions;
 final class StoreDescriptionResult
 {
     const SUCCESS = 0;
-    const DESCRIPTION_ALREADY_EXISTS = 1;
-    const FIRST_VERSION_FAILURE = 2;
-    const NEW_VERSION_FAILURE = 3;
+    const INCONSISTENT_DATA = 1;
+    const DESCRIPTION_ALREADY_EXISTS = 2;
+    const FIRST_VERSION_FAILURE = 3;
+    const NEW_VERSION_FAILURE = 4;
 
     private int $state;
 
     private array $description;
 
-    private array $errors;
+    private array $messages;
 
     public static function success(array $description): self
     {
         return new self(self::SUCCESS, $description);
+    }
+
+    public static function inconsistentData(string $message, string ...$messages): self
+    {
+        return new self(self::INCONSISTENT_DATA, [], $message, ...$messages);
     }
 
     public static function descriptionAlreadyExists(): self
@@ -37,11 +43,11 @@ final class StoreDescriptionResult
         return new self(self::NEW_VERSION_FAILURE);
     }
 
-    private function __construct(int $state, array $description = [], string ...$errors)
+    private function __construct(int $state, array $description = [], string ...$messages)
     {
         $this->state = $state;
         $this->description = $description;
-        $this->errors = $errors;
+        $this->messages = $messages;
     }
 
     public function isSuccess(): bool
@@ -56,6 +62,7 @@ final class StoreDescriptionResult
     {
         $all = [
             self::SUCCESS,
+            self::INCONSISTENT_DATA,
             self::DESCRIPTION_ALREADY_EXISTS,
             self::FIRST_VERSION_FAILURE,
             self::NEW_VERSION_FAILURE,
@@ -71,6 +78,6 @@ final class StoreDescriptionResult
             throw new \InvalidArgumentException('alternative must be a callable');
         }
 
-        return $alternative($this->description, ...$this->errors);
+        return $alternative($this->description, ...$this->messages);
     }
 }

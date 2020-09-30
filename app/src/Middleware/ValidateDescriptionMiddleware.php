@@ -22,11 +22,7 @@ final class ValidateDescriptionMiddleware implements MiddlewareInterface
     private ResponseFactoryInterface $factory;
 
     const SELECT_ASSOCIATION_SQL = <<<SQL
-        SELECT a.id, r.type
-        FROM runs AS r, associations AS a
-        WHERE r.id = a.run_id
-        AND a.run_id = ?
-        AND a.pmid = ?
+        SELECT id FROM associations WHERE run_id = ? AND pmid = ?
     SQL;
 
     public function __construct(\PDO $pdo, ResponseFactoryInterface $factory)
@@ -54,7 +50,7 @@ final class ValidateDescriptionMiddleware implements MiddlewareInterface
         }
 
         // get the factory.
-        $factory = DescriptionInput::factory($this->pdo, $association['id'], $association['type']);
+        $factory = DescriptionInput::factory($association['id']);
 
         // try to produce a description input.
         try {

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
+use Quanta\Validation\Error;
+
 use App\Input\DescriptionInput;
 
 final class StoreDescriptionSql implements StoreDescriptionInterface
@@ -46,6 +48,13 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
 
     public function store(DescriptionInput $input): StoreDescriptionResult
     {
+        // validate input data against db.
+        $errors = $input->validateForDb($this->pdo);
+
+        if (count($errors) > 0) {
+            return StoreDescriptionResult::inconsistentData(...array_map([$this, 'message'], $errors));
+        }
+
         // exctract data from the input.
         $data = $input->data();
 
@@ -67,6 +76,16 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
         return $stable_id == ''
             ? $this->insertFirstVersion($association_id, $method_id, $interactor1, $interactor2)
             : $this->insertNewVersion($association_id, $stable_id, $method_id, $interactor1, $interactor2);
+    }
+
+    private function message(Error $error): string
+    {
+        $name = array_map(fn ($key) => '[' . $key . ']', $error->keys());
+        $name = implode('', $name);
+
+        return $name == ''
+            ? $error->message()
+            : $name . ' => ' . $error->message();
     }
 
     private function isExisting(int $association_id, string $stable_id, int $method_id, array $interactor1, array $interactor2): bool

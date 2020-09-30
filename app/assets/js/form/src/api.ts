@@ -118,5 +118,5 @@ export const save = async (run_id: number, pmid: number, description: Descriptio
 
     return fetch(`/runs/${run_id}/publications/${pmid}/descriptions`, params)
         .then(response => response.json(), error => console.log(error))
-        .then(json => ({ success: json.success, errors: json.reason ? [json.reason] : json.errors }))
+        .then(json => ({ success: json.success, errors: json.reason ? json.reason : json.errors }))
 }

@@ -32,6 +32,9 @@ final class StoreEndpoint
         // store the description.
         return $this->action->store($input)->match([
             StoreDescriptionResult::SUCCESS => fn ($description) => $description,
+            StoreDescriptionResult::INCONSISTENT_DATA => function ($_, ...$messages) use ($responder) {
+                return $responder(409, $this->conflict(...$messages));
+            },
             StoreDescriptionResult::DESCRIPTION_ALREADY_EXISTS => function () use ($responder) {
                 return $responder(409, $this->conflict('Description already exists'));
             },
@@ -44,12 +47,12 @@ final class StoreEndpoint
         ]);
     }
 
-    private function conflict(string $reason): array
+    private function conflict(string ...$messages): array
     {
         return [
             'code' => 409,
             'success' => false,
-            'reason' => $reason,
+            'reason' => $messages,
             'data' => [],
         ];
     }
