@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Input;
 
-use Quanta\Validation;
 use Quanta\Validation\Map;
 use Quanta\Validation\Error;
-use Quanta\Validation\Guard;
 use Quanta\Validation\Field;
+use Quanta\Validation\OfType;
+use Quanta\Validation\ErrorList;
+use Quanta\Validation\ArrayFactory;
 use Quanta\Validation\InvalidDataException;
-use Quanta\Validation\Rules\OfType;
 
 final class AlignmentInput
 {
@@ -26,11 +26,11 @@ final class AlignmentInput
     {
         $factory = fn ($sequence, $isoforms) => self::from($sequence, ...array_values($isoforms));
 
-        $is_arr = new Guard(new OfType('array'));
-        $is_str = new Guard(new OfType('string'));
+        $is_arr = OfType::guard('array');
+        $is_str = OfType::guard('string');
         $isoform = IsoformInput::factory();
 
-        return new Validation($factory,
+        return new ArrayFactory($factory,
             Field::required('sequence', $is_str)->focus(),
             Field::required('isoforms', $is_arr, Map::merged($is_arr, $isoform))->focus()
         );
@@ -41,8 +41,8 @@ final class AlignmentInput
         $input = new self($sequence, ...$isoforms);
 
         $errors = [
-            ...array_map(fn ($e) => $e->nest('sequence'), $input->validateSequence()),
-            ...array_map(fn ($e) => $e->nest('isoforms'), $input->validateIsoforms()),
+            ...$input->validateSequence()->errors('sequence'),
+            ...$input->validateIsoforms()->errors('isoforms'),
         ];
 
         if (count($errors) > 0) {
@@ -71,7 +71,7 @@ final class AlignmentInput
         ];
     }
 
-    private function validateSequence(): array
+    private function validateSequence(): ErrorList
     {
         $errors = [];
 
@@ -83,10 +83,10 @@ final class AlignmentInput
             $errors[] = new Error(sprintf('must match %s', self::SEQUENCE_PATTERN));
         }
 
-        return $errors;
+        return new ErrorList(...$errors);
     }
 
-    private function validateIsoforms(): array
+    private function validateIsoforms(): ErrorList
     {
         $errors = [];
 
@@ -97,24 +97,24 @@ final class AlignmentInput
         $accessions = array_map(fn ($i) => $i->accession(), $this->isoforms);
 
         if (count($accessions) > count(array_unique($accessions))) {
-            $errors[] = (new Error('must be unique'))->nest('accession');
+            $errors[] = Error::nested('accession', 'must be unique');
         }
 
         foreach ($this->isoforms as $i => $isoform) {
-            $errors = [...$errors, ...array_map(fn ($e) => $e->nest((string) $i), $isoform->validateForSequence($this->sequence))];
+            $errors = [...$errors, ...$isoform->validateForSequence($this->sequence)->errors((string) $i)];
         }
 
-        return $errors;
+        return new ErrorList(...$errors);
     }
 
-    public function validateForSubjects(array $subjects): array
+    public function validateForSubjects(array $subjects): ErrorList
     {
         $errors = [];
 
         foreach ($this->isoforms as $i => $isoform) {
-            $errors = [...$errors, ...array_map(fn ($e) => $e->nest((string) $i), $isoform->validateForSubjects($subjects))];
+            $errors = [...$errors, ...$isoform->validateForSubjects($subjects)->errors('isoforms', (string) $i)];
         }
 
-        return array_map(fn ($e) => $e->nest('isoforms'), $errors);
+        return new ErrorList(...$errors);
     }
 }

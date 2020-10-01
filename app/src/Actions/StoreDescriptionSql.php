@@ -49,7 +49,7 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
     public function store(DescriptionInput $input): StoreDescriptionResult
     {
         // validate input data against db.
-        $errors = $input->validateForDb($this->pdo);
+        $errors = $input->validateForDb($this->pdo)->errors();
 
         if (count($errors) > 0) {
             return StoreDescriptionResult::inconsistentData(...array_map([$this, 'message'], $errors));

@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Input;
 
-use Quanta\Validation;
 use Quanta\Validation\Error;
-use Quanta\Validation\Guard;
 use Quanta\Validation\Field;
+use Quanta\Validation\OfType;
+use Quanta\Validation\ErrorList;
+use Quanta\Validation\ArrayFactory;
 use Quanta\Validation\InvalidDataException;
-use Quanta\Validation\Rules\OfType;
 
 use App\Assertions\RunType;
 use App\Assertions\ProteinType;
@@ -44,11 +44,15 @@ final class DescriptionInput
     {
         $interactor = InteractorInput::factory();
 
-        return new Validation(fn (...$xs) => self::from($association_id, ...$xs),
-            Field::required('stable_id', new Guard(new OfType('string')))->focus(),
-            Field::required('method_id', new Guard(new OfType('int')))->focus(),
-            Field::required('interactor1', new Guard(new OfType('array')), $interactor)->focus(),
-            Field::required('interactor2', new Guard(new OfType('array')), $interactor)->focus(),
+        $is_str = OfType::guard('string');
+        $is_int = OfType::guard('int');
+        $is_arr = OfType::guard('array');
+
+        return new ArrayFactory(fn (...$xs) => self::from($association_id, ...$xs),
+            Field::required('stable_id', $is_str)->focus(),
+            Field::required('method_id', $is_int)->focus(),
+            Field::required('interactor1', $is_arr, $interactor)->focus(),
+            Field::required('interactor2', $is_arr, $interactor)->focus(),
         );
     }
 
@@ -57,8 +61,8 @@ final class DescriptionInput
         $input = new self($association_id, $stable_id, $method_id, $interactor1, $interactor2);
 
         $errors = [
-            ...array_map(fn ($e) => $e->nest('stable_id'), $input->validateStableId()),
-            ...array_map(fn ($e) => $e->nest('method_id'), $input->validateMethodId()),
+            ...$input->validateStableId()->errors('stable_id'),
+            ...$input->validateMethodId()->errors('method_id'),
         ];;
 
         if (count($errors) > 0) {
@@ -88,21 +92,25 @@ final class DescriptionInput
         ];
     }
 
-    private function validateStableId(): array
+    private function validateStableId(): ErrorList
     {
-        return strlen($this->stable_id) > 0 && preg_match(self::STABLE_ID_PATTERN, $this->stable_id) === 0
+        $errors = strlen($this->stable_id) > 0 && preg_match(self::STABLE_ID_PATTERN, $this->stable_id) === 0
             ? [new Error(sprintf('must match %s', self::STABLE_ID_PATTERN))]
             : [];
+
+        return new ErrorList(...$errors);
     }
 
-    private function validateMethodId(): array
+    private function validateMethodId(): ErrorList
     {
-        return $this->method_id < 1
+        $errors = $this->method_id < 1
             ? [new Error('must be positive')]
             : [];
+        
+        return new ErrorList(...$errors);
     }
 
-    public function validateForDb(\PDO $pdo): array
+    public function validateForDb(\PDO $pdo): ErrorList
     {
         $select_association_sth = $pdo->prepare(self::SELECT_ASSOCIATION_SQL);
 
@@ -117,18 +125,18 @@ final class DescriptionInput
         $type1 = ProteinType::H;
         $type2 = $association['type'] == RunType::HH ? ProteinType::H : ProteinType::V;
 
-        return [
-            ...array_map(fn ($e) => $e->nest('stable_id'), $this->validateStableIdForDb($pdo)),
-            ...array_map(fn ($e) => $e->nest('method_id'), $this->validateMethodIdForDb($pdo)),
-            ...array_map(fn ($e) => $e->nest('interactor1'), $this->interactor1->validateForDbAndType($pdo, $type1)),
-            ...array_map(fn ($e) => $e->nest('interactor2'), $this->interactor2->validateForDbAndType($pdo, $type2)),
-        ];
+        return new ErrorList(
+            ...$this->validateStableIdForDb($pdo)->errors('stable_id'),
+            ...$this->validateMethodIdForDb($pdo)->errors('method_id'),
+            ...$this->interactor1->validateForDbAndType($pdo, $type1)->errors('interactor1'),
+            ...$this->interactor2->validateForDbAndType($pdo, $type2)->errors('interactor2'),
+        );
     }
 
-    private function validateStableIdForDb(\PDO $pdo): array
+    private function validateStableIdForDb(\PDO $pdo): ErrorList
     {
         if ($this->stable_id == '') {
-            return [];
+            return new ErrorList;
         }
 
         $select_descriptions_sth = $pdo->prepare(self::SELECT_DESCRIPTIONS_SQL);
@@ -138,17 +146,17 @@ final class DescriptionInput
         $description = $select_descriptions_sth->fetch();
 
         if (!$description) {
-            return [new Error('must exist')];
+            return new ErrorList(new Error('must exist'));
         }
 
         if ($description['association_id'] != $this->association_id) {
-            return [new Error('must be associated to the same publication')];
+            return new ErrorList(new Error('must be associated to the same publication'));
         }
 
-        return [];
+        return new ErrorList;
     }
 
-    private function validateMethodIdForDb(\PDO $pdo): array
+    private function validateMethodIdForDb(\PDO $pdo): ErrorList
     {
         $select_method_sth = $pdo->prepare(self::SELECT_METHOD_SQL);
 
@@ -157,9 +165,9 @@ final class DescriptionInput
         $method = $select_method_sth->fetch();
 
         if (!$method) {
-            return [new Error('must exist')];
+            return new ErrorList(new Error('must exist'));
         }
 
-        return [];
+        return new ErrorList;
     }
 }

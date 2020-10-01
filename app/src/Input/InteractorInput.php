@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Input;
 
-use Quanta\Validation;
 use Quanta\Validation\Map;
 use Quanta\Validation\Error;
-use Quanta\Validation\Guard;
 use Quanta\Validation\Field;
+use Quanta\Validation\OfType;
+use Quanta\Validation\ErrorList;
+use Quanta\Validation\ArrayFactory;
 use Quanta\Validation\InvalidDataException;
-use Quanta\Validation\Rules\OfType;
 
 use App\Assertions\ProteinType;
 
@@ -54,12 +54,12 @@ final class InteractorInput
             return self::from($protein_id, $name, $start, $stop, ...array_values($alignments));
         };
 
-        $is_arr = new Guard(new OfType('array'));
-        $is_str = new Guard(new OfType('string'));
-        $is_int = new Guard(new OfType('int'));
+        $is_arr = OfType::guard('array');
+        $is_str = OfType::guard('string');
+        $is_int = OfType::guard('int');
         $alignment = AlignmentInput::factory();
 
-        return new Validation($factory,
+        return new ArrayFactory($factory,
             Field::required('protein_id', $is_int)->focus(),
             Field::required('name', $is_str)->focus(),
             Field::required('start', $is_int)->focus(),
@@ -73,9 +73,9 @@ final class InteractorInput
         $input = new self($protein_id, $name, $start, $stop, ...$alignments);
 
         $errors = [
-            ...array_map(fn ($e) => $e->nest('protein_id'), $input->validateProteinId()),
-            ...array_map(fn ($e) => $e->nest('name'), $input->validateName()),
-            ...$input->validateCoordinates(),
+            ...$input->validateProteinId()->errors('protein_id'),
+            ...$input->validateName()->errors('name'),
+            ...$input->validateCoordinates()->errors(),
         ];
 
         if (count($errors) > 0) {
@@ -105,21 +105,25 @@ final class InteractorInput
         ];
     }
 
-    private function validateProteinId(): array
+    private function validateProteinId(): ErrorList
     {
-        return $this->protein_id < 1
+        $errors = $this->protein_id < 1
             ? [new Error('must be positive')]
             : [];
+
+        return new ErrorList(...$errors);
     }
 
-    private function validateName(): array
+    private function validateName(): ErrorList
     {
-        return preg_match(self::NAME_PATTERN, $this->name) === 0
+        $errors = preg_match(self::NAME_PATTERN, $this->name) === 0
             ? [new Error('must match %s', self::NAME_PATTERN)]
             : [];
+
+        return new ErrorList(...$errors);
     }
 
-    private function validateCoordinates(): array
+    private function validateCoordinates(): ErrorList
     {
         $errors = [];
 
@@ -135,10 +139,10 @@ final class InteractorInput
             $errors[] = new Error('start must be smaller than stop');
         }
 
-        return $errors;
+        return new ErrorList(...$errors);
     }
 
-    public function validateForDbAndType(\PDO $pdo, string $type): array
+    public function validateForDbAndType(\PDO $pdo, string $type): ErrorList
     {
         ProteinType::argument($type);
 
@@ -149,7 +153,7 @@ final class InteractorInput
         $protein = $select_protein_sth->fetch();
 
         if (!$protein) {
-            return [(new Error('must exist'))->nest('protein_id')];
+            return new ErrorList(Error::nested('protein_id', 'must exist'));
         }
 
         $errors = [];
@@ -168,9 +172,11 @@ final class InteractorInput
 
         $errors = [...$errors, ...$es];
 
-        return count($errors) == 0
-            ? array_map(fn ($e) => $e->nest('mapping'), $this->validateMapping($protein))
+        $errors = count($errors) == 0
+            ? $this->validateMapping($protein)->errors('mapping')
             : $errors;
+
+        return new ErrorList(...$errors);
     }
 
     private function validateHProtein(array $protein): array
@@ -244,14 +250,14 @@ final class InteractorInput
         return [];
     }
 
-    private function validateMapping(array $protein): array
+    private function validateMapping(array $protein): ErrorList
     {
         $errors = [];
 
         $sequences = array_map(fn ($a) => $a->sequence(), $this->alignments);
 
         if (count($sequences) > count(array_unique($sequences))) {
-            $errors[] = (new Error('must be unique'))->nest('sequence');
+            $errors[] = Error::nested('sequence', 'must be unique');
         }
 
         $accession = $protein['accession'];
@@ -260,9 +266,9 @@ final class InteractorInput
         $subjects[$accession] = substr($subjects[$accession], $this->start - 1, $this->stop - $this->start + 1);
 
         foreach ($this->alignments as $i => $alignment) {
-            $errors = [...$errors, ...array_map(fn ($e) => $e->nest((string) $i), $alignment->validateForSubjects($subjects))];
+            $errors = [...$errors, ...$alignment->validateForSubjects($subjects)->errors((string) $i)];
         }
 
-        return $errors;
+        return new ErrorList(...$errors);
     }
 }

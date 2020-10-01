@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace App\Input;
 
-use Quanta\Validation;
 use Quanta\Validation\Map;
 use Quanta\Validation\Error;
-use Quanta\Validation\Guard;
 use Quanta\Validation\Field;
+use Quanta\Validation\OfType;
+use Quanta\Validation\ErrorList;
+use Quanta\Validation\ArrayFactory;
 use Quanta\Validation\InvalidDataException;
-use Quanta\Validation\Rules\OfType;
 
 final class IsoformInput
 {
@@ -24,11 +24,11 @@ final class IsoformInput
     {
         $factory = fn ($accession, $occurrences) => self::from($accession, ...array_values($occurrences));
 
-        $is_arr = new Guard(new OfType('array'));
-        $is_str = new Guard(new OfType('string'));
+        $is_arr = OfType::guard('array');
+        $is_str = OfType::guard('string');
         $occurrence = OccurrenceInput::factory();
 
-        return new Validation($factory,
+        return new ArrayFactory($factory,
             Field::required('accession', $is_str)->focus(),
             Field::required('occurrences', $is_arr, Map::merged($is_arr, $occurrence))->focus(),
         );
@@ -39,8 +39,8 @@ final class IsoformInput
         $input = new self($accession, ...$occurrences);
 
         $errors = [
-            ...array_map(fn ($e) => $e->nest('accession'), $input->validateAccession()),
-            ...array_map(fn ($e) => $e->nest('occurrences'), $input->validateOccurrences()),
+            ...$input->validateAccession()->errors('accession'),
+            ...$input->validateOccurrences()->errors('occurrences'),
         ];
 
         if (count($errors) > 0) {
@@ -69,19 +69,21 @@ final class IsoformInput
         ];
     }
 
-    private function validateAccession(): array
+    private function validateAccession(): ErrorList
     {
-        return preg_match(self::ACCESSION_PATTERN, $this->accession) === 0
+        $errors = preg_match(self::ACCESSION_PATTERN, $this->accession) === 0
             ? [new Error(sprintf('must match %s', self::ACCESSION_PATTERN))]
             : [];
+
+        return new ErrorList(...$errors);
     }
 
-    private function validateOccurrences(): array
+    private function validateOccurrences(): ErrorList
     {
         $errors = [];
 
         if (count($this->occurrences) == 0) {
-            $errors[] = (new Error('must not be empty'))->nest('occurrences');
+            $errors[] = new Error('must not be empty');
         }
 
         $seen = [];
@@ -98,32 +100,32 @@ final class IsoformInput
             $seen[$start][$stop] = $nb + 1;
         }
 
-        return $errors;
+        return new ErrorList(...$errors);
     }
 
-    public function validateForSequence(string $sequence): array
+    public function validateForSequence(string $sequence): ErrorList
     {
         $errors = [];
 
         foreach ($this->occurrences as $i => $occurrence) {
-            $errors = [...$errors, ...array_map(fn ($e) => $e->nest((string) $i), $occurrence->validateForSequence($sequence))];
+            $errors = [...$errors, ...$occurrence->validateForSequence($sequence)->errors('occurrences', (string) $i)];
         }
 
-        return array_map(fn ($e) => $e->nest('occurrences'), $errors);
+        return new ErrorList(...$errors);
     }
 
-    public function validateForSubjects(array $subjects): array
+    public function validateForSubjects(array $subjects): ErrorList
     {
         if (!array_key_exists($this->accession, $subjects)) {
-            return [(new Error('must be associated with the interactor'))->nest('accession')];
+            return new ErrorList(Error::nested('accession', 'must be associated with the interactor'));
         }
 
         $errors = [];
 
         foreach ($this->occurrences as $i => $occurrence) {
-            $errors = [...$errors, ...array_map(fn ($e) => $e->nest((string) $i), $occurrence->validateForSubject($subjects[$this->accession]))];
+            $errors = [...$errors, ...$occurrence->validateForSubject($subjects[$this->accession])->errors('occurrences', (string) $i)];
         }
 
-        return array_map(fn ($e) => $e->nest('occurrences'), $errors);
+        return new ErrorList(...$errors);
     }
 }

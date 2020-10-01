@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Input;
 
-use Quanta\Validation;
 use Quanta\Validation\Error;
-use Quanta\Validation\Guard;
 use Quanta\Validation\Field;
+use Quanta\Validation\OfType;
+use Quanta\Validation\ErrorList;
+use Quanta\Validation\ArrayFactory;
 use Quanta\Validation\InvalidDataException;
-use Quanta\Validation\Rules\OfType;
 
 final class OccurrenceInput
 {
@@ -27,10 +27,13 @@ final class OccurrenceInput
 
     public static function factory(): callable
     {
-        return new Validation([self::class, 'from'],
-            Field::required('start', new Guard(new OfType('int')))->focus(),
-            Field::required('stop', new Guard(new OfType('int')))->focus(),
-            Field::required('identity', new Guard(new OfType('float')))->focus(),
+        $is_int = OfType::guard('int');
+        $is_flt = OfType::guard('float');
+
+        return new ArrayFactory([self::class, 'from'],
+            Field::required('start', $is_int)->focus(),
+            Field::required('stop', $is_int)->focus(),
+            Field::required('identity', $is_flt)->focus(),
         );
     }
 
@@ -39,8 +42,8 @@ final class OccurrenceInput
         $input = new self($start, $stop, $identity);
 
         $errors = [
-            ...$input->validateCoordinates(),
-            ...array_map(fn ($e) => $e->nest('identity'), $input->validateIdentity())
+            ...$input->validateCoordinates()->errors(),
+            ...$input->validateIdentity()->errors('identity')
         ];
 
         if (count($errors) > 0) {
@@ -71,16 +74,16 @@ final class OccurrenceInput
         ];
     }
 
-    private function validateCoordinates(): array
+    private function validateCoordinates(): ErrorList
     {
         $errors = [];
 
         if ($this->start < 1) {
-            $errors[] = (new Error('must be positive'))->nest('start');
+            $errors[] = Error::nested('start', 'must be positive');
         }
 
         if ($this->stop < 1) {
-            $errors[] = (new Error('must be positive'))->nest('stop');
+            $errors[] = Error::nested('stop', 'must be positive');
         }
 
         if (count($errors) == 0 && $this->start > $this->stop) {
@@ -91,27 +94,33 @@ final class OccurrenceInput
             $errors[] = new Error(sprintf('length must be at least %s', self::MIN_LENGTH));
         }
 
-        return $errors;
+        return new ErrorList(...$errors);
     }
 
-    private function validateIdentity(): array
+    private function validateIdentity(): ErrorList
     {
-        return $this->identity < self::MIN_IDENTITY || $this->identity > self::MAX_IDENTITY
+        $errors = $this->identity < self::MIN_IDENTITY || $this->identity > self::MAX_IDENTITY
             ? [new Error(sprintf('must be between %s and %s', self::MIN_IDENTITY, self::MAX_IDENTITY))]
             : [];
+
+        return new ErrorList(...$errors);
     }
 
-    public function validateForSequence(string $sequence): array
+    public function validateForSequence(string $sequence): ErrorList
     {
-        return $this->stop - $this->start + 1 != strlen($sequence)
+        $errors = $this->stop - $this->start + 1 != strlen($sequence)
             ? [new Error('must have the same length as sequence')]
             : [];
+
+        return new ErrorList(...$errors);
     }
 
-    public function validateForSubject(string $subject): array
+    public function validateForSubject(string $subject): ErrorList
     {
-        return $this->stop > strlen($subject)
+        $errors = $this->stop > strlen($subject)
             ? [new Error('must be smaller than subject')]
             : [];
+        
+        return new ErrorList(...$errors);
     }
 }
