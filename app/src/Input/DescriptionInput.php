@@ -61,8 +61,8 @@ final class DescriptionInput
         $input = new self($association_id, $stable_id, $method_id, $interactor1, $interactor2);
 
         $errors = [
-            ...$input->validateStableId()->errors('stable_id'),
-            ...$input->validateMethodId()->errors('method_id'),
+            ...$input->validateStableId(),
+            ...$input->validateMethodId(),
         ];;
 
         if (count($errors) > 0) {
@@ -92,22 +92,18 @@ final class DescriptionInput
         ];
     }
 
-    private function validateStableId(): ErrorList
+    private function validateStableId(): array
     {
-        $errors = strlen($this->stable_id) > 0 && preg_match(self::STABLE_ID_PATTERN, $this->stable_id) === 0
-            ? [new Error(sprintf('must match %s', self::STABLE_ID_PATTERN))]
+        return strlen($this->stable_id) > 0 && preg_match(self::STABLE_ID_PATTERN, $this->stable_id) === 0
+            ? [Error::nested('stable_id', sprintf('must match %s', self::STABLE_ID_PATTERN))]
             : [];
-
-        return new ErrorList(...$errors);
     }
 
-    private function validateMethodId(): ErrorList
+    private function validateMethodId(): array
     {
-        $errors = $this->method_id < 1
-            ? [new Error('must be positive')]
+        return $this->method_id < 1
+            ? [Error::nested('method_id', 'must be positive')]
             : [];
-        
-        return new ErrorList(...$errors);
     }
 
     public function validateForDb(\PDO $pdo): ErrorList
@@ -126,17 +122,17 @@ final class DescriptionInput
         $type2 = $association['type'] == RunType::HH ? ProteinType::H : ProteinType::V;
 
         return new ErrorList(
-            ...$this->validateStableIdForDb($pdo)->errors('stable_id'),
-            ...$this->validateMethodIdForDb($pdo)->errors('method_id'),
+            ...$this->validateStableIdForDb($pdo),
+            ...$this->validateMethodIdForDb($pdo),
             ...$this->interactor1->validateForDbAndType($pdo, $type1)->errors('interactor1'),
             ...$this->interactor2->validateForDbAndType($pdo, $type2)->errors('interactor2'),
         );
     }
 
-    private function validateStableIdForDb(\PDO $pdo): ErrorList
+    private function validateStableIdForDb(\PDO $pdo): array
     {
         if ($this->stable_id == '') {
-            return new ErrorList;
+            return [];
         }
 
         $select_descriptions_sth = $pdo->prepare(self::SELECT_DESCRIPTIONS_SQL);
@@ -146,17 +142,17 @@ final class DescriptionInput
         $description = $select_descriptions_sth->fetch();
 
         if (!$description) {
-            return new ErrorList(new Error('must exist'));
+            return [Error::nested('stable_id', 'must exist')];
         }
 
         if ($description['association_id'] != $this->association_id) {
-            return new ErrorList(new Error('must be associated to the same publication'));
+            return [Error::nested('stable_id', 'must be associated to the same publication')];
         }
 
-        return new ErrorList;
+        return [];
     }
 
-    private function validateMethodIdForDb(\PDO $pdo): ErrorList
+    private function validateMethodIdForDb(\PDO $pdo): array
     {
         $select_method_sth = $pdo->prepare(self::SELECT_METHOD_SQL);
 
@@ -165,9 +161,9 @@ final class DescriptionInput
         $method = $select_method_sth->fetch();
 
         if (!$method) {
-            return new ErrorList(new Error('must exist'));
+            return [Error::nested('method_id', 'must exist')];
         }
 
-        return new ErrorList;
+        return [];
     }
 }

@@ -42,8 +42,8 @@ final class OccurrenceInput
         $input = new self($start, $stop, $identity);
 
         $errors = [
-            ...$input->validateCoordinates()->errors(),
-            ...$input->validateIdentity()->errors('identity')
+            ...$input->validateCoordinates(),
+            ...$input->validateIdentity(),
         ];
 
         if (count($errors) > 0) {
@@ -74,7 +74,7 @@ final class OccurrenceInput
         ];
     }
 
-    private function validateCoordinates(): ErrorList
+    private function validateCoordinates(): array
     {
         $errors = [];
 
@@ -94,16 +94,14 @@ final class OccurrenceInput
             $errors[] = new Error(sprintf('length must be at least %s', self::MIN_LENGTH));
         }
 
-        return new ErrorList(...$errors);
+        return $errors;
     }
 
-    private function validateIdentity(): ErrorList
+    private function validateIdentity(): array
     {
-        $errors = $this->identity < self::MIN_IDENTITY || $this->identity > self::MAX_IDENTITY
-            ? [new Error(sprintf('must be between %s and %s', self::MIN_IDENTITY, self::MAX_IDENTITY))]
+        return $this->identity < self::MIN_IDENTITY || $this->identity > self::MAX_IDENTITY
+            ? [Error::nested('identity', sprintf('must be between %s and %s', self::MIN_IDENTITY, self::MAX_IDENTITY))]
             : [];
-
-        return new ErrorList(...$errors);
     }
 
     public function validateForSequence(string $sequence): ErrorList

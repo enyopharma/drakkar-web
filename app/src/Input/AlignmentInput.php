@@ -41,8 +41,8 @@ final class AlignmentInput
         $input = new self($sequence, ...$isoforms);
 
         $errors = [
-            ...$input->validateSequence()->errors('sequence'),
-            ...$input->validateIsoforms()->errors('isoforms'),
+            ...$input->validateSequence(),
+            ...$input->validateIsoforms(),
         ];
 
         if (count($errors) > 0) {
@@ -71,40 +71,40 @@ final class AlignmentInput
         ];
     }
 
-    private function validateSequence(): ErrorList
+    private function validateSequence(): array
     {
         $errors = [];
 
         if (strlen($this->sequence) < self::MIN_LENGTH) {
-            $errors[] = new Error(sprintf('must be longer than %s', self::MIN_LENGTH - 1));
+            $errors[] = Error::nested('sequence', sprintf('must be longer than %s', self::MIN_LENGTH - 1));
         }
 
         if (preg_match(self::SEQUENCE_PATTERN, $this->sequence) === 0) {
-            $errors[] = new Error(sprintf('must match %s', self::SEQUENCE_PATTERN));
+            $errors[] = Error::nested('sequence', sprintf('must match %s', self::SEQUENCE_PATTERN));
         }
 
-        return new ErrorList(...$errors);
+        return $errors;
     }
 
-    private function validateIsoforms(): ErrorList
+    private function validateIsoforms(): array
     {
         $errors = [];
 
         if (count($this->isoforms) == 0) {
-            $errors[] = new Error('must not be empty');
+            $errors[] = Error::nested('isoforms', 'must not be empty');
         }
 
         $accessions = array_map(fn ($i) => $i->accession(), $this->isoforms);
 
         if (count($accessions) > count(array_unique($accessions))) {
-            $errors[] = Error::nested('accession', 'must be unique');
+            $errors[] = Error::nested('accession', 'must be unique')->nest('isoforms');
         }
 
         foreach ($this->isoforms as $i => $isoform) {
-            $errors = [...$errors, ...$isoform->validateForSequence($this->sequence)->errors((string) $i)];
+            $errors = [...$errors, ...$isoform->validateForSequence($this->sequence)->errors('isoforms', (string) $i)];
         }
 
-        return new ErrorList(...$errors);
+        return $errors;
     }
 
     public function validateForSubjects(array $subjects): ErrorList

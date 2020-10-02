@@ -39,8 +39,8 @@ final class IsoformInput
         $input = new self($accession, ...$occurrences);
 
         $errors = [
-            ...$input->validateAccession()->errors('accession'),
-            ...$input->validateOccurrences()->errors('occurrences'),
+            ...$input->validateAccession(),
+            ...$input->validateOccurrences(),
         ];
 
         if (count($errors) > 0) {
@@ -69,21 +69,19 @@ final class IsoformInput
         ];
     }
 
-    private function validateAccession(): ErrorList
+    private function validateAccession(): array
     {
-        $errors = preg_match(self::ACCESSION_PATTERN, $this->accession) === 0
-            ? [new Error(sprintf('must match %s', self::ACCESSION_PATTERN))]
+        return preg_match(self::ACCESSION_PATTERN, $this->accession) === 0
+            ? [Error::nested('accession', sprintf('must match %s', self::ACCESSION_PATTERN))]
             : [];
-
-        return new ErrorList(...$errors);
     }
 
-    private function validateOccurrences(): ErrorList
+    private function validateOccurrences(): array
     {
         $errors = [];
 
         if (count($this->occurrences) == 0) {
-            $errors[] = new Error('must not be empty');
+            $errors[] = Error::nested('occurrences', 'must not be empty');
         }
 
         $seen = [];
@@ -94,13 +92,13 @@ final class IsoformInput
             $nb = $seen[$start][$stop] ?? 0;
 
             if ($nb == 1) {
-                $errors[] = new Error(sprintf('[%s, %s] must be present only once', $start, $stop));
+                $errors[] = Error::nested('occurrences', sprintf('[%s, %s] must be present only once', $start, $stop));
             }
 
             $seen[$start][$stop] = $nb + 1;
         }
 
-        return new ErrorList(...$errors);
+        return $errors;
     }
 
     public function validateForSequence(string $sequence): ErrorList
