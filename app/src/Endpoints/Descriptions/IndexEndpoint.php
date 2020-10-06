@@ -47,8 +47,8 @@ final class IndexEndpoint
         $run_id = (int) $input('run_id');
         $pmid = (int) $input('pmid');
         $stable_id = $input('stable_id', '');
-        $page = (int) ($params['page'] ?? 1);
-        $limit = (int) ($params['limit'] ?? 20);
+        $page = (int) $input('page', 1);
+        $limit = (int) $input('limit', 20);
 
         // get the run.
         if (!$run = $this->runs->id($run_id)->fetch()) {
