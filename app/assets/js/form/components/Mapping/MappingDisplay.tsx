@@ -1,5 +1,7 @@
 import React from 'react'
-import { FaTrash } from 'react-icons/fa'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash'
+
 import { useAction } from '../../src/hooks'
 import { removeAlignment } from '../../src/reducer'
 import { InteractorI, ProteinType, Coordinates, Alignment } from '../../src/types'
@@ -38,7 +40,7 @@ export const MappingDisplay: React.FC<Props> = ({ i, type, name, coordinates, ma
                                             className="btn btn-block btn-warning"
                                             onClick={e => remove({ i, index })}
                                         >
-                                            <FaTrash />
+                                            <FontAwesomeIcon icon={faTrash} />
                                         </button>
                                     </div>
                                 </div>

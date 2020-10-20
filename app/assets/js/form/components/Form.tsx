@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import Swal from 'sweetalert2'
 import withReactContent from 'sweetalert2-react-content'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSave } from '@fortawesome/free-solid-svg-icons/faSave'
+import { faEraser } from '@fortawesome/free-solid-svg-icons/faEraser'
+
 import { InteractorI, Feedback } from '../src/types'
-import { FaSave, FaEraser } from 'react-icons/fa'
 import { resetForm, fireSave } from '../src/reducer'
 import { useAppSelector, useAction } from '../src/hooks'
 
@@ -103,7 +106,7 @@ export const Form: React.FC = () => {
                                 onClick={() => onReset()}
                                 disabled={!resetable}
                             >
-                                <FaEraser /> Reset form data
+                                <FontAwesomeIcon icon={faEraser} /> Reset form data
                             </button>
                         </div>
                     </div>
@@ -116,7 +119,7 @@ export const Form: React.FC = () => {
 
 const SaveIcon: React.FC<{ saving: boolean }> = ({ saving }) => saving
     ? <span className="spinner-border spinner-border-sm"></span>
-    : <FaSave />
+    : <FontAwesomeIcon icon={faSave} />
 
 const FeedbackRow: React.FC<{ feedback: Feedback }> = ({ feedback }) => {
     if (!feedback.success) return null

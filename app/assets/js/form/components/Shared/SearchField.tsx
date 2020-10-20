@@ -1,5 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react'
-import { FaSearch } from 'react-icons/fa'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch'
+
 import { SearchType, SearchResult } from '../../src/types'
 
 import { SearchOverlay } from './SearchOverlay'
@@ -39,7 +41,7 @@ export const SearchField: React.FC<Props> = ({ type, search, select, placeholder
             <div className="input-group">
                 <div className="input-group-prepend">
                     <span className="input-group-text">
-                        <FaSearch />
+                        <FontAwesomeIcon icon={faSearch} />
                     </span>
                 </div>
                 <input

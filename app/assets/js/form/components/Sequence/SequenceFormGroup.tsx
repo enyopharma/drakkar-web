@@ -1,5 +1,7 @@
 import React from 'react'
-import { FaCheck, FaExclamationTriangle } from 'react-icons/fa'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCheck } from '@fortawesome/free-solid-svg-icons/faCheck'
+import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons/faExclamationTriangle'
 
 type Props = {
     name: string
@@ -47,12 +49,12 @@ export const SequenceFormGroup: React.FC<Props> = ({ name, start, stop, valid })
 
 const ValidButton: React.FC = () => (
     <button className="btn btn-block btn-outline-success" disabled>
-        <FaCheck /> Sequence is valid
+        <FontAwesomeIcon icon={faCheck} /> Sequence is valid
     </button>
 )
 
 const InvalidButton: React.FC = () => (
     <button className="btn btn-block btn-outline-danger" disabled>
-        <FaExclamationTriangle /> Please select a sequence.
+        <FontAwesomeIcon icon={faExclamationTriangle} /> Please select a sequence.
     </button>
 )

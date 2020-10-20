@@ -11,7 +11,7 @@ module.exports = (env, argv) => {
             form: './assets/js/form/index.ts',
             table: './assets/js/table/index.ts',
         },
-        devtool: argv.mode == 'development' ? 'inline-source-map' : false,
+        devtool: argv.mode == 'development' ? 'inline-source-map' : '',
         output: {
             filename: '[name].[contenthash].js',
             path: path.resolve(__dirname, './public/build'),
@@ -66,6 +66,15 @@ module.exports = (env, argv) => {
         optimization: {
             moduleIds: 'hashed',
             runtimeChunk: 'single',
+            splitChunks: {
+                cacheGroups: {
+                    commons: {
+                        test: /[\\/]react-dom[\\/]/,
+                        name: 'react-dom',
+                        chunks: 'all',
+                    },
+                },
+            },
         },
     }
 }

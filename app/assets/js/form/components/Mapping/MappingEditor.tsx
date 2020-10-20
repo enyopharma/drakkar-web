@@ -1,5 +1,7 @@
 import React from 'react'
-import { FaCogs } from 'react-icons/fa'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faCogs } from '@fortawesome/free-solid-svg-icons/faCogs'
+
 import { useAction } from '../../src/hooks'
 import { fireAlignment } from '../../src/reducer'
 import { Domain, ScaledDomain, Alignment, InteractorI } from '../../src/types'
@@ -76,4 +78,4 @@ export const MappingEditor: React.FC<Props> = ({ i, query, canonical, sequences,
 
 const ProcessingIcon: React.FC<{ processing: boolean }> = ({ processing }) => processing
     ? <span className="spinner-border spinner-border-sm"></span>
-    : <FaCogs />
+    : <FontAwesomeIcon icon={faCogs} />

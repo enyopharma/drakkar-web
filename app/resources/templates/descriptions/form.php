@@ -2,6 +2,7 @@
 
 <?php if ($publication['state'] == App\Assertions\PublicationState::SELECTED): ?>
 <?php $this->push('scripts'); ?>
+<script type="text/javascript" src="<?= $this->asset('react-dom.js') ?>"></script>
 <script type="text/javascript" src="<?= $this->asset('form.js') ?>"></script>
 <script type="text/javascript">
     descriptions.form(

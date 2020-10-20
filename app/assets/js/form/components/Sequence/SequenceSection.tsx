@@ -1,5 +1,7 @@
 import React from 'react'
-import { FaEdit } from 'react-icons/fa'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faEdit } from '@fortawesome/free-solid-svg-icons/faEdit'
+
 import { useAction } from '../../src/hooks'
 import { editMature } from '../../src/reducer'
 import { InteractorI, Protein } from '../../src/types'
@@ -47,7 +49,7 @@ export const SequenceSection: React.FC<Props> = ({ i, protein, editing, processi
                         onClick={e => edit({ i })}
                         disabled={!enabled}
                     >
-                        <FaEdit />
+                        <FontAwesomeIcon icon={faEdit} />
                     </button>
                 </div>
             </div>

@@ -1,6 +1,10 @@
 import React, { useState } from 'react'
 import Modal from 'react-bootstrap4-modal';
-import { FaSearch, FaCopy, FaEdit, FaTrash } from 'react-icons/fa'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch'
+import { faCopy } from '@fortawesome/free-solid-svg-icons/faCopy'
+import { faEdit } from '@fortawesome/free-solid-svg-icons/faEdit'
+import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash'
 
 import { descriptions as api } from '../src/api'
 import { Description, Interactor } from '../src/types'
@@ -129,7 +133,7 @@ const MappingLink: React.FC<{ interactor1: Interactor, interactor2: Interactor, 
 
     return (
         <button className={classes} onClick={e => show()}>
-            <FaSearch /> Mapping
+            <FontAwesomeIcon icon={faSearch} /> Mapping
         </button>
     )
 }
@@ -140,7 +144,7 @@ const CopyLink: React.FC<{ run_id: number, pmid: number, id: number }> = ({ run_
 
     return (
         <a className={classes} href={url}>
-            <FaCopy /> Copy
+            <FontAwesomeIcon icon={faCopy} /> Copy
         </a>
     )
 }
@@ -151,7 +155,7 @@ const EditLink: React.FC<{ run_id: number, pmid: number, id: number }> = ({ run_
 
     return (
         <a className={classes} href={url}>
-            <FaEdit /> Edit
+            <FontAwesomeIcon icon={faEdit} /> Edit
         </a>
     )
 }
@@ -161,7 +165,7 @@ const DeleteButton: React.FC<{ deleted: boolean, update: () => void }> = ({ dele
 
     return (
         <button className={classes} disabled={deleted} onClick={e => update()}>
-            <FaTrash /> Delete
+            <FontAwesomeIcon icon={faTrash} /> Delete
         </button>
     )
 }

@@ -12,6 +12,7 @@
 
 <?php if (count($descriptions) > 0): ?>
 <?php $this->push('scripts'); ?>
+<script type="text/javascript" src="<?= $this->asset('react-dom.js') ?>"></script>
 <script type="text/javascript" src="<?= $this->asset('table.js') ?>"></script>
 <script type="text/javascript">
     descriptions.table('descriptions-table', <?= json_encode($descriptions) ?>);
