@@ -36,12 +36,9 @@ final class StoreRunSql implements StoreRunInterface
         AND a.pmid IN(%s)
     SQL;
 
-    private \PDO $pdo;
-
-    public function __construct(\PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
+    public function __construct(
+        private \PDO $pdo,
+    ) {}
 
     public function store(string $type, string $name, int ...$pmids): StoreRunResult
     {
@@ -59,11 +56,17 @@ final class StoreRunSql implements StoreRunInterface
         $insert_association_sth = $this->pdo->prepare(self::INSERT_ASSOCIATION_SQL);
         $select_run_sth = $this->pdo->prepare(self::SELECT_RUN_SQL);
         $select_publication_sth = $this->pdo->prepare(self::SELECT_PUBLICATION_SQL);
-        $select_publications_sth = $this->pdo->prepare(
-            vsprintf(self::SELECT_PUBLICATIONS_SQL, [
-                implode(', ', array_pad([], count($pmids), '?')),
-            ])
-        );
+
+        $select_publications_sth = $this->pdo->prepare(vsprintf(self::SELECT_PUBLICATIONS_SQL, [
+            implode(', ', array_pad([], count($pmids), '?')),
+        ]));
+
+        if ($insert_run_sth === false) throw new \Exception;
+        if ($insert_publication_sth === false) throw new \Exception;
+        if ($insert_association_sth === false) throw new \Exception;
+        if ($select_run_sth === false) throw new \Exception;
+        if ($select_publication_sth === false) throw new \Exception;
+        if ($select_publications_sth === false) throw new \Exception;
 
         // return an error when a run with the same name already exist.
         $select_run_sth->execute([$name]);
@@ -89,7 +92,7 @@ final class StoreRunSql implements StoreRunInterface
 
         $insert_run_sth->execute([$type, $name]);
 
-        $run['id'] = (int) $this->pdo->lastInsertId();
+        $id = (int) $this->pdo->lastInsertId();
 
         foreach ($pmids as $pmid) {
             $select_publication_sth->execute([$pmid]);
@@ -98,12 +101,12 @@ final class StoreRunSql implements StoreRunInterface
                 $insert_publication_sth->execute([$pmid]);
             }
 
-            $insert_association_sth->execute([$run['id'], $pmid]);
+            $insert_association_sth->execute([$id, $pmid]);
         }
 
         $this->pdo->commit();
 
         // success !
-        return StoreRunResult::success($run['id']);;
+        return StoreRunResult::success($id);
     }
 }

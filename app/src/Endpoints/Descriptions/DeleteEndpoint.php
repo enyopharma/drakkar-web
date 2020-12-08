@@ -9,17 +9,11 @@ use App\Actions\DeleteDescriptionInterface;
 
 final class DeleteEndpoint
 {
-    private DeleteDescriptionInterface $action;
+    public function __construct(
+        private DeleteDescriptionInterface $action,
+    ) {}
 
-    public function __construct(DeleteDescriptionInterface $action)
-    {
-        $this->action = $action;
-    }
-
-    /**
-     * @return array|false
-     */
-    public function __invoke(callable $input)
+    public function __invoke(callable $input): array|false
     {
         $run_id = (int) $input('run_id');
         $pmid = (int) $input('pmid');

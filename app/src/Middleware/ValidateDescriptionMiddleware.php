@@ -17,19 +17,14 @@ use App\Input\DescriptionInput;
 
 final class ValidateDescriptionMiddleware implements MiddlewareInterface
 {
-    private \PDO $pdo;
-
-    private ResponseFactoryInterface $factory;
-
     const SELECT_ASSOCIATION_SQL = <<<SQL
         SELECT id FROM associations WHERE run_id = ? AND pmid = ?
     SQL;
 
-    public function __construct(\PDO $pdo, ResponseFactoryInterface $factory)
-    {
-        $this->pdo = $pdo;
-        $this->factory = $factory;
-    }
+    public function __construct(
+        private \PDO $pdo,
+        private ResponseFactoryInterface $factory,
+    ) {}
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
@@ -42,6 +37,8 @@ final class ValidateDescriptionMiddleware implements MiddlewareInterface
 
         // get the association.
         $select_association_sth = $this->pdo->prepare(self::SELECT_ASSOCIATION_SQL);
+
+        if ($select_association_sth === false) throw new \Exception;
 
         $select_association_sth->execute([$run_id, $pmid]);
 

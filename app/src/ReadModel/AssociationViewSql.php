@@ -8,8 +8,6 @@ use App\Assertions\PublicationState;
 
 final class AssociationViewSql implements AssociationViewInterface
 {
-    private \PDO $pdo;
-
     const SELECT_ASSOCIATION_SQL = <<<SQL
         SELECT a.run_id, p.pmid, a.state, a.annotation, p.metadata
         FROM associations AS a, publications AS p
@@ -28,14 +26,15 @@ final class AssociationViewSql implements AssociationViewInterface
         LIMIT ? OFFSET ?
     SQL;
 
-    public function __construct(\PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
+    public function __construct(
+        private \PDO $pdo,
+    ) {}
 
     public function pmid(int $run_id, int $pmid): Statement
     {
         $select_association_sth = $this->pdo->prepare(self::SELECT_ASSOCIATION_SQL);
+
+        if ($select_association_sth === false) throw new \Exception;
 
         $select_association_sth->execute([$run_id, $pmid]);
 
@@ -47,6 +46,8 @@ final class AssociationViewSql implements AssociationViewInterface
         PublicationState::argument($state);
 
         $select_associations_sth = $this->pdo->prepare(self::SELECT_ASSOCIATIONS_SQL);
+
+        if ($select_associations_sth === false) throw new \Exception;
 
         $select_associations_sth->execute([$run_id, $state, $limit, $offset]);
 

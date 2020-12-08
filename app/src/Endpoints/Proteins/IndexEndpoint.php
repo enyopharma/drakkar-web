@@ -16,10 +16,7 @@ final class IndexEndpoint
         $this->proteins = $proteins;
     }
 
-    /**
-     * @return array|false
-     */
-    public function __invoke(callable $input)
+    public function __invoke(callable $input): array|false
     {
         $type = $input('type', '');
         $query = $input('query', '');

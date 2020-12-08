@@ -17,14 +17,9 @@ final class PopulateRunCommand extends Command
 {
     protected static $defaultName = 'runs:populate';
 
-    private PopulateRunInterface $action;
-
-    private ?OutputInterface $output = null;
-
-    public function __construct(PopulateRunInterface $action)
-    {
-        $this->action = $action;
-
+    public function __construct(
+        private PopulateRunInterface $action,
+    ) {
         parent::__construct();
     }
 
@@ -38,8 +33,6 @@ final class PopulateRunCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->output = $output;
-
         $id = (int) ((array) $input->getArgument('id'))[0];
 
         // get the populate publication command.
@@ -52,10 +45,10 @@ final class PopulateRunCommand extends Command
 
         // execute the action and produce a response.
         return $this->action->populate($id, $populate)->match([
-            Result::SUCCESS => fn ($name) => $this->success($name),
-            Result::NOT_FOUND => fn () => $this->notfound($id),
-            Result::ALREADY_POPULATED => fn ($name) => $this->alreadyPopulated($name),
-            Result::FAILURE => fn ($name) => $this->failure($name),
+            Result::SUCCESS => fn ($name) => $this->success($output, $name),
+            Result::NOT_FOUND => fn () => $this->notfound($output, $id),
+            Result::ALREADY_POPULATED => fn ($name) => $this->alreadyPopulated($output, $name),
+            Result::FAILURE => fn ($name) => $this->failure($output, $name),
         ]);
     }
 
@@ -68,36 +61,36 @@ final class PopulateRunCommand extends Command
         throw new \Exception('no application');
     }
 
-    private function success(string $name): int
+    private function success(OutputInterface $output, string $name): int
     {
-        $this->output && $this->output->writeln(
+        $output->writeln(
             sprintf('<info>Metadata of curation run \'%s\' publications successfully updated.</info>', $name)
         );
 
         return 0;
     }
 
-    private function notfound(int $id): int
+    private function notfound(OutputInterface $output, int $id): int
     {
-        $this->output && $this->output->writeln(
+        $output->writeln(
             sprintf('<error>No run with [\'id\' => %s]</error>', $id)
         );
 
         return 1;
     }
 
-    private function alreadyPopulated(string $name): int
+    private function alreadyPopulated(OutputInterface $output, string $name): int
     {
-        $this->output && $this->output->writeln(
+        $output->writeln(
             sprintf('<info>Metadata of curation run \'%s\' publications are already populated</info>', $name)
         );
 
         return 1;
     }
 
-    private function failure(string $name): int
+    private function failure(OutputInterface $output, string $name): int
     {
-        $this->output && $this->output->writeln(
+        $output->writeln(
             sprintf('<error>Failed to retrieve metadata of run \'%s\' publications</error>', $name)
         );
 

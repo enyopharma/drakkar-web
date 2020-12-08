@@ -8,8 +8,6 @@ use App\Assertions\ProteinType;
 
 final class ProteinViewSql implements ProteinViewInterface
 {
-    private \PDO $pdo;
-
     const SELECT_PROTEIN_SQL = <<<SQL
         SELECT p.id, p.type, p.accession, p.version, p.name, p.description,
             p.sequences->>p.accession AS sequence, p.sequences,
@@ -60,14 +58,15 @@ final class ProteinViewSql implements ProteinViewInterface
         GROUP BY name2, start2, stop2
     SQL;
 
-    public function __construct(\PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
+    public function __construct(
+        private \PDO $pdo,
+    ) {}
 
     public function id(int $id, string ...$with): Statement
     {
         $select_protein_sth = $this->pdo->prepare(self::SELECT_PROTEIN_SQL);
+
+        if ($select_protein_sth === false) throw new \Exception;
 
         $select_protein_sth->execute([$id]);
 
@@ -117,6 +116,8 @@ final class ProteinViewSql implements ProteinViewInterface
 
         $select_proteins_sth = $this->pdo->prepare(sprintf(self::SELECT_PROTEINS_SQL, $where));
 
+        if ($select_proteins_sth === false) throw new \Exception;
+
         $select_proteins_sth->execute([$type, ...$qs, $limit]);
 
         return Statement::from($select_proteins_sth);
@@ -137,44 +138,32 @@ final class ProteinViewSql implements ProteinViewInterface
     {
         $select_domains_sth = $this->pdo->prepare(self::SELECT_DOMAINS_SQL);
 
+        if ($select_domains_sth === false) throw new \Exception;
+
         $select_domains_sth->execute([$accession, $version]);
 
-        $domains = $select_domains_sth->fetchAll();
-
-        if ($domains === false) {
-            throw new \LogicException;
-        }
-
-        return $domains;
+        return $select_domains_sth->fetchAll();
     }
 
     private function chains(string $accession, string $version): array
     {
         $select_chains_sth = $this->pdo->prepare(self::SELECT_CHAINS_SQL);
 
+        if ($select_chains_sth === false) throw new \Exception;
+
         $select_chains_sth->execute([$accession, $version]);
 
-        $chains = $select_chains_sth->fetchAll();
-
-        if ($chains === false) {
-            throw new \LogicException;
-        }
-
-        return $chains;
+        return $select_chains_sth->fetchAll();
     }
 
     private function matures(int $id): array
     {
         $select_matures_sth = $this->pdo->prepare(self::SELECT_MATURES_SQL);
 
+        if ($select_matures_sth === false) throw new \Exception;
+
         $select_matures_sth->execute([$id]);
 
-        $matures = $select_matures_sth->fetchAll();
-
-        if ($matures === false) {
-            throw new \LogicException;
-        }
-
-        return $matures;
+        return $select_matures_sth->fetchAll();
     }
 }

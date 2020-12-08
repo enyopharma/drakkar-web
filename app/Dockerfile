@@ -16,7 +16,7 @@ COPY assets ./assets
 RUN npm run prod
 
 # Stage 3 - copy the artifacts and start php-fpm
-FROM php:7.4-fpm
+FROM php:8.0-fpm
 RUN apt-get update && \
     apt-get install -y libpq-dev && \
     rm -rf /var/lib/apt/lists/* && \

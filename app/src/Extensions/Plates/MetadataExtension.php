@@ -62,18 +62,12 @@ final class MetadataExtension implements ExtensionInterface
         ];
     }
 
-    /**
-     * @param mixed $title
-     */
-    private function title($title): string
+    private function title(mixed $title): string
     {
         return is_string($title) ? $title : '';
     }
 
-    /**
-     * @param mixed $journal
-     */
-    private function journal($journal): string
+    private function journal(mixed $journal): string
     {
         return is_string($journal) ? $journal : '';
     }

@@ -11,26 +11,13 @@ use App\ReadModel\AssociationViewInterface;
 
 final class CreateEndpoint
 {
-    private Engine $engine;
-
-    private RunViewInterface $runs;
-
-    private AssociationViewInterface $associations;
-
     public function __construct(
-        Engine $engine,
-        RunViewInterface $runs,
-        AssociationViewInterface $associations
-    ) {
-        $this->engine = $engine;
-        $this->runs = $runs;
-        $this->associations = $associations;
-    }
+        private Engine $engine,
+        private RunViewInterface $runs,
+        private AssociationViewInterface $associations,
+    ) {}
 
-    /**
-     * @return string|false
-     */
-    public function __invoke(callable $input)
+    public function __invoke(callable $input): string|false
     {
         // get input.
         $run_id = (int) $input('run_id');

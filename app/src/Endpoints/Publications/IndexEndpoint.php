@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Publications;
 
+use Psr\Http\Message\ResponseInterface;
+
 use League\Plates\Engine;
 
 use App\Routing\UrlGenerator;
@@ -13,26 +15,14 @@ use App\Assertions\PublicationState;
 
 final class IndexEndpoint
 {
-    private Engine $engine;
+    public function __construct(
+        private Engine $engine,
+        private UrlGenerator $generator,
+        private RunViewInterface $runs,
+        private AssociationViewInterface $associations,
+    ) {}
 
-    private UrlGenerator $generator;
-
-    private RunViewInterface $runs;
-
-    private AssociationViewInterface $associations;
-
-    public function __construct(Engine $engine, UrlGenerator $generator, RunViewInterface $runs, AssociationViewInterface $associations)
-    {
-        $this->engine = $engine;
-        $this->generator = $generator;
-        $this->runs = $runs;
-        $this->associations = $associations;
-    }
-
-    /**
-     * @return \Psr\Http\Message\ResponseInterface|string|false
-     */
-    public function __invoke(callable $input, callable $responder)
+    public function __invoke(callable $input, callable $responder): ResponseInterface|string|false
     {
         // get input.
         $run_id = (int) $input('run_id');

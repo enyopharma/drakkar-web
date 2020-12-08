@@ -13,12 +13,9 @@ use League\Plates\Engine;
 
 final class NotFoundHtmlBodyMiddleware implements MiddlewareInterface
 {
-    private Engine $engine;
-
-    public function __construct(Engine $engine)
-    {
-        $this->engine = $engine;
-    }
+    public function __construct(
+        private Engine $engine,
+    ) {}
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {

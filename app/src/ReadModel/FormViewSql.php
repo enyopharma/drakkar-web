@@ -6,8 +6,6 @@ namespace App\ReadModel;
 
 final class FormViewSql implements FormViewInterface
 {
-    private \PDO $pdo;
-
     const SELECT_DESCRIPTION_SQL = <<<SQL
         SELECT
             a.run_id, a.pmid,
@@ -21,14 +19,15 @@ final class FormViewSql implements FormViewInterface
             AND d.id = ?
     SQL;
 
-    public function __construct(\PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
+    public function __construct(
+        private \PDO $pdo,
+    ) {}
 
     public function id(int $run_id, int $pmid, int $id): Statement
     {
         $select_description_sth = $this->pdo->prepare(self::SELECT_DESCRIPTION_SQL);
+
+        if ($select_description_sth === false) throw new \Exception;
 
         $select_description_sth->execute([$run_id, $pmid, $id]);
 

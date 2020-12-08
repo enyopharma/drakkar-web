@@ -6,8 +6,6 @@ namespace App\ReadModel;
 
 final class PublicationViewSql implements PublicationViewInterface
 {
-    private \PDO $pdo;
-
     const SELECT_PUBLICATIONS_SQL = <<<SQL
         SELECT r.id AS run_id, r.type AS run_type, r.name AS run_name, p.pmid, a.state, a.annotation, p.metadata
         FROM runs AS r, associations AS a, publications AS p
@@ -16,14 +14,15 @@ final class PublicationViewSql implements PublicationViewInterface
         AND p.pmid = ?
     SQL;
 
-    public function __construct(\PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
+    public function __construct(
+        private \PDO $pdo,
+    ) {}
 
     public function search(int $pmid): Statement
     {
         $select_publications_sth = $this->pdo->prepare(self::SELECT_PUBLICATIONS_SQL);
+
+        if ($select_publications_sth === false) throw new \Exception;
 
         $select_publications_sth->execute([$pmid]);
 

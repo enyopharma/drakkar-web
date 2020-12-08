@@ -6,12 +6,9 @@ namespace App\Routing;
 
 final class UrlGenerator
 {
-    private array $map;
-
-    public function __construct(array $map)
-    {
-        $this->map = $map;
-    }
+    public function __construct(
+        private array $map,
+    ) {}
 
     public function isDefined(string $name): bool
     {

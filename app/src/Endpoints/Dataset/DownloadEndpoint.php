@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Dataset;
 
+use Psr\Http\Message\ResponseInterface;
+
 use GuzzleHttp\Psr7;
 
 use App\ReadModel\DatasetViewInterface;
@@ -11,17 +13,11 @@ use App\Assertions\RunType;
 
 final class DownloadEndpoint
 {
-    private DatasetViewInterface $dataset;
+    public function __construct(
+        private DatasetViewInterface $dataset,
+    ) {}
 
-    public function __construct(DatasetViewInterface $dataset)
-    {
-        $this->dataset = $dataset;
-    }
-
-    /**
-     * @return \Psr\Http\Message\ResponseInterface|false
-     */
-    public function __invoke(callable $input, callable $responder)
+    public function __invoke(callable $input, callable $responder): ResponseInterface|false
     {
         $type = $input('type');
 
@@ -41,9 +37,6 @@ final class DownloadEndpoint
             ->withBody($stream);
     }
 
-    /**
-     * @return \Generator<string>
-     */
     private function generator(iterable $descriptions): \Generator
     {
         foreach ($descriptions as $description) {

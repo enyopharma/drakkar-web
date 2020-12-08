@@ -8,17 +8,11 @@ use App\ReadModel\MethodViewInterface;
 
 final class ShowEndpoint
 {
-    private MethodViewInterface $methods;
+    public function __construct(
+        private MethodViewInterface $methods,
+    ) {}
 
-    public function __construct(MethodViewInterface $methods)
-    {
-        $this->methods = $methods;
-    }
-
-    /**
-     * @return array|false
-     */
-    public function __invoke(callable $input)
+    public function __invoke(callable $input): array|false
     {
         $id = (int) $input('id');
 

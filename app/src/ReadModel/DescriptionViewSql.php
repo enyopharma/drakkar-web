@@ -6,8 +6,6 @@ namespace App\ReadModel;
 
 final class DescriptionViewSql implements DescriptionViewInterface
 {
-    private \PDO $pdo;
-
     const COUNT_DESCRIPTIONS_SQL = <<<SQL
         SELECT COUNT(*)
         FROM associations AS a, descriptions AS d
@@ -55,22 +53,19 @@ final class DescriptionViewSql implements DescriptionViewInterface
         LIMIT ? OFFSET ?
     SQL;
 
-    public function __construct(\PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
+    public function __construct(
+        private \PDO $pdo,
+    ) {}
 
     public function search(string $stable_id): Statement
     {
         $select_description_sth = $this->pdo->prepare(self::SELECT_DESCRIPTION_SQL);
 
+        if ($select_description_sth === false) throw new \Exception;
+
         $select_description_sth->execute([$stable_id]);
 
         $descriptions = $select_description_sth->fetchAll();
-
-        if ($descriptions === false) {
-            throw new \LogicException;
-        }
 
         return Statement::from($descriptions);
     }
@@ -80,6 +75,8 @@ final class DescriptionViewSql implements DescriptionViewInterface
         if ($stable_id == '') $stable_id = '%';
 
         $count_descriptions_sth = $this->pdo->prepare(self::COUNT_DESCRIPTIONS_SQL);
+
+        if ($count_descriptions_sth === false) throw new \Exception;
 
         $count_descriptions_sth->execute([$run_id, $pmid, $stable_id]);
 
@@ -91,6 +88,8 @@ final class DescriptionViewSql implements DescriptionViewInterface
         if ($stable_id == '') $stable_id = '%';
 
         $select_descriptions_sth = $this->pdo->prepare(self::SELECT_DESCRIPTIONS_SQL);
+
+        if ($select_descriptions_sth === false) throw new \Exception;
 
         $select_descriptions_sth->execute([$run_id, $pmid, $stable_id, $limit, $offset]);
 

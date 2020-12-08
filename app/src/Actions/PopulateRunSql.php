@@ -21,12 +21,9 @@ final class PopulateRunSql implements PopulateRunInterface
         UPDATE runs SET populated = TRUE WHERE id = ?
     SQL;
 
-    private \PDO $pdo;
-
-    public function __construct(\PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
+    public function __construct(
+        private \PDO $pdo,
+    ) {}
 
     public function populate(int $id, callable $populate): PopulateRunResult
     {
@@ -34,6 +31,10 @@ final class PopulateRunSql implements PopulateRunInterface
         $select_run_sth = $this->pdo->prepare(self::SELECT_RUN_SQL);
         $select_publications_sth = $this->pdo->prepare(self::SELECT_PUBLICATIONS_SQL);
         $update_run_sth = $this->pdo->prepare(self::UPDATE_RUN_SQL);
+
+        if ($select_run_sth === false) throw new \Exception;
+        if ($select_publications_sth === false) throw new \Exception;
+        if ($update_run_sth === false) throw new \Exception;
 
         // select the curation run.
         $select_run_sth->execute([$id]);

@@ -9,17 +9,16 @@ use League\Plates\Extension\ExtensionInterface;
 
 final class HighlightExtension implements ExtensionInterface
 {
-    private \PDO $pdo;
-
-    private ?array $keywords = null;
+    private ?array $keywords;
 
     const SELECT_KEYWORDS_SQL = <<<SQL
         SELECT * FROM keywords
     SQL;
 
-    public function __construct(\PDO $pdo)
-    {
-        $this->pdo = $pdo;
+    public function __construct(
+        private \PDO $pdo,
+    ) {
+        $this->keywords = null;
     }
 
     public function register(Engine $engine): void
@@ -60,8 +59,10 @@ final class HighlightExtension implements ExtensionInterface
 
     private function keywords(): array
     {
-        if (! $this->keywords) {
+        if (!$this->keywords) {
             $select_keywords_sth = $this->pdo->prepare(self::SELECT_KEYWORDS_SQL);
+
+            if ($select_keywords_sth === false) throw new \Exception;
 
             $select_keywords_sth->execute();
 

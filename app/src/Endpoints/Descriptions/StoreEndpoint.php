@@ -4,23 +4,19 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Descriptions;
 
+use Psr\Http\Message\ResponseInterface;
+
 use App\Input\DescriptionInput;
 use App\Actions\StoreDescriptionResult;
 use App\Actions\StoreDescriptionInterface;
 
 final class StoreEndpoint
 {
-    private StoreDescriptionInterface $action;
+    public function __construct(
+        private StoreDescriptionInterface $action,
+    ) {}
 
-    public function __construct(StoreDescriptionInterface $action)
-    {
-        $this->action = $action;
-    }
-
-    /**
-     * @return \Psr\Http\Message\ResponseInterface|array
-     */
-    public function __invoke(callable $input, callable $responder)
+    public function __invoke(callable $input, callable $responder): ResponseInterface|array
     {
         // get the description input.
         $input = $input(DescriptionInput::class);

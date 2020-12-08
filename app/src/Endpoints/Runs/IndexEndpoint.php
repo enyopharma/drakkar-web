@@ -10,20 +10,12 @@ use App\ReadModel\RunViewInterface;
 
 final class IndexEndpoint
 {
-    private Engine $engine;
+    public function __construct(
+        private Engine $engine,
+        private RunViewInterface $runs,
+    ) {}
 
-    private RunViewInterface $runs;
-
-    public function __construct(Engine $engine, RunViewInterface $runs)
-    {
-        $this->engine = $engine;
-        $this->runs = $runs;
-    }
-
-    /**
-     * @return string
-     */
-    public function __invoke()
+    public function __invoke(): string
     {
         return $this->engine->render('runs/index', [
             'runs' => $this->runs->all('nbs')->fetchAll(),

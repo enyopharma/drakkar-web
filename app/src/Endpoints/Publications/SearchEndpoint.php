@@ -10,20 +10,12 @@ use App\ReadModel\PublicationViewInterface;
 
 final class SearchEndpoint
 {
-    private Engine $engine;
+    public function __construct(
+        private Engine $engine,
+        private PublicationViewInterface $publications,
+    ) {}
 
-    private PublicationViewInterface $publications;
-
-    public function __construct(Engine $engine, PublicationViewInterface $publications)
-    {
-        $this->engine = $engine;
-        $this->publications = $publications;
-    }
-
-    /**
-     * @return string
-     */
-    public function __invoke(callable $input)
+    public function __invoke(callable $input): string
     {
         $pmid = trim($input('pmid'));
 

@@ -38,14 +38,6 @@ final class InteractorInput
 
     const NAME_PATTERN = '/^[^\s]+$/';
 
-    private int $protein_id;
-
-    private string $name;
-
-    private int $start;
-
-    private int $stop;
-
     private array $alignments;
 
     public static function factory(): callable
@@ -85,12 +77,13 @@ final class InteractorInput
         return $input;
     }
 
-    private function __construct(int $protein_id, string $name, int $start, int $stop, AlignmentInput ...$alignments)
-    {
-        $this->protein_id = $protein_id;
-        $this->name = $name;
-        $this->start = $start;
-        $this->stop = $stop;
+    private function __construct(
+        private int $protein_id,
+        private string $name,
+        private int $start,
+        private int $stop,
+        AlignmentInput ...$alignments,
+    ) {
         $this->alignments = $alignments;
     }
 
@@ -143,6 +136,8 @@ final class InteractorInput
         ProteinType::argument($type);
 
         $select_protein_sth = $pdo->prepare(self::SELECT_PROTEIN_SQL);
+
+        if ($select_protein_sth === false) throw new \Exception;
 
         $select_protein_sth->execute([$this->protein_id]);
 
@@ -207,6 +202,8 @@ final class InteractorInput
         // validate name/coordinates consistency.
         $select_name_sth = $pdo->prepare(self::SELECT_MATURE_NAME_SQL);
 
+        if ($select_name_sth === false) throw new \Exception;
+
         $select_name_sth->execute([$this->protein_id, $this->start, $this->stop]);
 
         $data = $select_name_sth->fetch();
@@ -225,6 +222,8 @@ final class InteractorInput
 
         // validate coordinates/name consistency.
         $select_coordinates_sth = $pdo->prepare(self::SELECT_MATURE_COORDINATES_SQL);
+
+        if ($select_coordinates_sth === false) throw new \Exception;
 
         $select_coordinates_sth->execute([$this->protein_id, $this->name]);
 

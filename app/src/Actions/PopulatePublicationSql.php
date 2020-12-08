@@ -38,15 +38,10 @@ final class PopulatePublicationSql implements PopulatePublicationInterface
         WHERE pmid = ?
     SQL;
 
-    private \PDO $pdo;
-
-    private Efetch $efetch;
-
-    public function __construct(\PDO $pdo, Efetch $efetch)
-    {
-        $this->pdo = $pdo;
-        $this->efetch = $efetch;
-    }
+    public function __construct(
+        private \PDO $pdo,
+        private Efetch $efetch,
+    ) {}
 
     public function populate(int $pmid): PopulatePublicationResult
     {
@@ -56,6 +51,12 @@ final class PopulatePublicationSql implements PopulatePublicationInterface
         $count_not_populated_sth = $this->pdo->prepare(self::COUNT_NOT_POPULATED_SQL);
         $update_run_sth = $this->pdo->prepare(self::UPDATE_RUN_SQL);
         $update_publication_sth = $this->pdo->prepare(self::UPDATE_PUBLICATION_SQL);
+
+        if ($select_runs_sth === false) throw new \Exception;
+        if ($select_publication_sth === false) throw new \Exception;
+        if ($count_not_populated_sth === false) throw new \Exception;
+        if ($update_run_sth === false) throw new \Exception;
+        if ($update_publication_sth === false) throw new \Exception;
 
         // select the publication.
         $select_publication_sth->execute([$pmid]);

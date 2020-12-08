@@ -12,30 +12,14 @@ use App\ReadModel\AssociationViewInterface;
 
 final class EditEndpoint
 {
-    private Engine $engine;
-
-    private RunViewInterface $runs;
-
-    private AssociationViewInterface $associations;
-
-    private FormViewInterface $descriptions;
-
     public function __construct(
-        Engine $engine,
-        RunViewInterface $runs,
-        AssociationViewInterface $associations,
-        FormViewInterface $descriptions
-    ) {
-        $this->engine = $engine;
-        $this->runs = $runs;
-        $this->associations = $associations;
-        $this->descriptions = $descriptions;
-    }
+        private Engine $engine,
+        private RunViewInterface $runs,
+        private AssociationViewInterface $associations,
+        private FormViewInterface $descriptions,
+    ) {}
 
-    /**
-     * @return string|false
-     */
-    public function __invoke(callable $input)
+    public function __invoke(callable $input): string|false
     {
         // parse request.
         $run_id = (int) $input('run_id');

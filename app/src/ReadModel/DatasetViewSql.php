@@ -9,8 +9,6 @@ use App\Assertions\PublicationState;
 
 final class DatasetViewSql implements DatasetViewInterface
 {
-    private \PDO $pdo;
-
     const SELECT_DESCRIPTIONS_SQL = <<<SQL
         SELECT
             r.type,
@@ -43,16 +41,17 @@ final class DatasetViewSql implements DatasetViewInterface
         ORDER BY d.created_at DESC, d.id DESC
     SQL;
 
-    public function __construct(\PDO $pdo)
-    {
-        $this->pdo = $pdo;
-    }
+    public function __construct(
+        private \PDO $pdo,
+    ) {}
 
     public function all(string $type): Statement
     {
         RunType::argument($type);
 
         $select_descriptions_sth = $this->pdo->prepare(self::SELECT_DESCRIPTIONS_SQL);
+
+        if ($select_descriptions_sth === false) throw new \Exception;
 
         $select_descriptions_sth->execute([$type, PublicationState::CURATED]);
 

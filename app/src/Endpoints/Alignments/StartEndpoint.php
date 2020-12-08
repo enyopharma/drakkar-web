@@ -8,17 +8,11 @@ use Predis\Client;
 
 final class StartEndpoint
 {
-    private Client $client;
+    public function __construct(
+        private Client $client,
+    ) {}
 
-    public function __construct(Client $client)
-    {
-        $this->client = $client;
-    }
-
-    /**
-     * @return array
-     */
-    public function __invoke(callable $input)
+    public function __invoke(callable $input): array
     {
         $id = $input('id');
         $query = $input('query');

@@ -30,16 +30,6 @@ final class DescriptionInput
 
     const STABLE_ID_PATTERN = '/^EY[A-Z0-9]{8}$/';
 
-    private int $association_id;
-    
-    private string $stable_id;
-
-    private int $method_id;
-
-    private InteractorInput $interactor1;
-
-    private InteractorInput $interactor2;
-
     public static function factory(int $association_id): callable
     {
         $interactor = InteractorInput::factory();
@@ -72,14 +62,13 @@ final class DescriptionInput
         return $input;
     }
 
-    private function __construct(int $association_id, string $stable_id, int $method_id, InteractorInput $interactor1, InteractorInput $interactor2)
-    {
-        $this->association_id = $association_id;
-        $this->stable_id = $stable_id;
-        $this->method_id = $method_id;
-        $this->interactor1 = $interactor1;
-        $this->interactor2 = $interactor2;
-    }
+    private function __construct(
+        private int $association_id,
+        private string $stable_id,
+        private int $method_id,
+        private InteractorInput $interactor1,
+        private InteractorInput $interactor2,
+    ) {}
 
     public function data(): array
     {
@@ -110,6 +99,8 @@ final class DescriptionInput
     {
         $select_association_sth = $pdo->prepare(self::SELECT_ASSOCIATION_SQL);
 
+        if ($select_association_sth === false) throw new \Exception;
+
         $select_association_sth->execute([$this->association_id]);
 
         $association = $select_association_sth->fetch();
@@ -137,6 +128,8 @@ final class DescriptionInput
 
         $select_descriptions_sth = $pdo->prepare(self::SELECT_DESCRIPTIONS_SQL);
 
+        if ($select_descriptions_sth === false) throw new \Exception;
+
         $select_descriptions_sth->execute([$this->stable_id]);
 
         $description = $select_descriptions_sth->fetch();
@@ -155,6 +148,8 @@ final class DescriptionInput
     private function validateMethodIdForDb(\PDO $pdo): array
     {
         $select_method_sth = $pdo->prepare(self::SELECT_METHOD_SQL);
+
+        if ($select_method_sth === false) throw new \Exception;
 
         $select_method_sth->execute([$this->method_id]);
 

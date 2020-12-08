@@ -8,17 +8,11 @@ use App\ReadModel\MethodViewInterface;
 
 final class IndexEndpoint
 {
-    private MethodViewInterface $methods;
+    public function __construct(
+        private MethodViewInterface $methods,
+    ) {}
 
-    public function __construct(MethodViewInterface $methods)
-    {
-        $this->methods = $methods;
-    }
-
-    /**
-     * @return array
-     */
-    public function __invoke(callable $input)
+    public function __invoke(callable $input): array
     {
         $query = $input('query', '');
         $limit = (int) $input('limit', 5);

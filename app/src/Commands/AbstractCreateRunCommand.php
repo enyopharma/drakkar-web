@@ -15,18 +15,11 @@ use App\Assertions\RunType;
 
 abstract class AbstractCreateRunCommand extends Command
 {
-    private StoreRunInterface $action;
-
-    private string $type;
-
-    private ?OutputInterface $output = null;
-
-    public function __construct(StoreRunInterface $action, string $type)
-    {
+    public function __construct(
+        private StoreRunInterface $action,
+        private string $type,
+    ) {
         RunType::argument($type);
-
-        $this->action = $action;
-        $this->type = $type;
 
         parent::__construct();
     }
@@ -41,8 +34,6 @@ abstract class AbstractCreateRunCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->output = $output;
-
         $name = ((array) $input->getArgument('name'))[0];
 
         try {
@@ -50,43 +41,43 @@ abstract class AbstractCreateRunCommand extends Command
         }
 
         catch (\UnexpectedValueException $e) {
-            return $this->invalidPmid($e->getMessage());
+            return $this->invalidPmid($output, $e->getMessage());
         }
 
         return $this->action->store($this->type, $name, ...$pmids)->match([
-            Result::SUCCESS => fn ($id) => $this->success($id),
-            Result::NO_PMID => fn () => $this->noPmid(),
-            Result::RUN_ALREADY_EXISTS => fn ($id, $name) => $this->runAlreadyExists($id, $name),
-            Result::ASSOCIATION_ALREADY_EXISTS => fn ($id, $name, $pmid) => $this->associationAlreadyExists($id, $name, $pmid),
+            Result::SUCCESS => fn ($id) => $this->success($output, $id),
+            Result::NO_PMID => fn () => $this->noPmid($output, ),
+            Result::RUN_ALREADY_EXISTS => fn ($id, $name) => $this->runAlreadyExists($output, $id, $name),
+            Result::ASSOCIATION_ALREADY_EXISTS => fn ($id, $name, $pmid) => $this->associationAlreadyExists($output, $id, $name, $pmid),
         ]);
     }
 
-    private function success(int $id): int
+    private function success(OutputInterface $output, int $id): int
     {
-        $this->output && $this->output->writeln(
+        $output->writeln(
             sprintf('<info>Curation run created with [\'id\' => %s].</info>', $id)
         );
 
         return 0;
     }
 
-    private function invalidPmid(string $message): int
+    private function invalidPmid(OutputInterface $output, string $message): int
     {
-        $this->output && $this->output->writeln(sprintf('<error>%s</error>', $message));
+        $output->writeln(sprintf('<error>%s</error>', $message));
 
         return 1;
     }
 
-    private function noPmid(): int
+    private function noPmid(OutputInterface $output, ): int
     {
-        $this->output && $this->output->writeln('<error>At least one pmid is required.</error>');
+        $output->writeln('<error>At least one pmid is required.</error>');
 
         return 1;
     }
 
-    private function runAlreadyExists(int $id, string $name): int
+    private function runAlreadyExists(OutputInterface $output, int $id, string $name): int
     {
-        $this->output && $this->output->writeln(
+        $output->writeln(
             vsprintf('<error>Name \'%s\' already used by \'%s\' curation run %s</error>', [
                 $name,
                 $this->type,
@@ -97,9 +88,9 @@ abstract class AbstractCreateRunCommand extends Command
         return 1;
     }
 
-    private function associationAlreadyExists(int $run_id, string $run_name, int $pmid): int
+    private function associationAlreadyExists(OutputInterface $output, int $run_id, string $run_name, int $pmid): int
     {
-        $this->output && $this->output->writeln(
+        $output->writeln(
             vsprintf('<error>Publication with PMID %s is already associated with \'%s\' curation run %s (\'%s\')</error>', [
                 $pmid,
                 $this->type,
