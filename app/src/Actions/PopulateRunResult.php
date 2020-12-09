@@ -11,10 +11,6 @@ final class PopulateRunResult
     const ALREADY_POPULATED = 2;
     const FAILURE = 3;
 
-    private int $state;
-
-    private string $name;
-
     public static function success(string $name): self
     {
         return new self(self::SUCCESS, $name);
@@ -35,34 +31,30 @@ final class PopulateRunResult
         return new self(self::FAILURE, $name);
     }
 
-    private function __construct(int $state, string $name = '')
-    {
-        $this->state = $state;
-        $this->name = $name;
-    }
-
-    public function isSuccess(): bool
-    {
-        return $this->state == self::SUCCESS;
-    }
+    /**
+     * @param 0|1|2|3 $status
+     */
+    private function __construct(
+        private int $status,
+        private string $name = '',
+    ) {}
 
     /**
-     * @return mixed
+     * @return 0|1|2|3
      */
-    public function match(array $alternatives)
+    public function status()
     {
-        $all = [self::SUCCESS, self::NOT_FOUND, self::ALREADY_POPULATED, self::FAILURE];
+        return $this->status;
+    }
 
-        $keys = array_keys($alternatives);
+    public function name(): string
+    {
+        $types = [self::SUCCESS, self::ALREADY_POPULATED, self::FAILURE];
 
-        if (count(array_diff($all, $keys)) > 0) {
-            throw new \InvalidArgumentException('missing alternatives');
+        if (in_array($this->status, $types, true)) {
+            return $this->name;
         }
 
-        if (! is_callable($alternative = $alternatives[$this->state])) {
-            throw new \InvalidArgumentException('alternative must be a callable');
-        }
-
-        return $alternative($this->name);
+        throw new \LogicException('Result has no name');
     }
 }

@@ -19,9 +19,11 @@ final class DeleteEndpoint
         $pmid = (int) $input('pmid');
         $id = (int) $input('id');
 
-        return $this->action->delete($run_id, $pmid, $id)->match([
-            DeleteDescriptionResult::SUCCESS => fn () => [],
-            DeleteDescriptionResult::NOT_FOUND => fn () => false,
-        ]);
+        $result = $this->action->delete($run_id, $pmid, $id);
+
+        return match ($result->status()) {
+            0 => [],
+            1 => false,
+        };
     }
 }

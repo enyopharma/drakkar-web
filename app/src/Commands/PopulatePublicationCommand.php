@@ -9,8 +9,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use App\Actions\PopulatePublicationResult;
 use App\Actions\PopulatePublicationInterface;
-use App\Actions\PopulatePublicationResult as Result;
 
 final class PopulatePublicationCommand extends Command
 {
@@ -34,12 +34,14 @@ final class PopulatePublicationCommand extends Command
     {
         $pmid = (int) ((array) $input->getArgument('pmid'))[0];
 
-        return $this->action->populate($pmid)->match([
-            Result::SUCCESS => fn () => $this->success($output, $pmid),
-            Result::ALREADY_POPULATED => fn () => $this->alreadyPopulated($output, $pmid),
-            Result::NOT_FOUND => fn () => $this->notFound($output, $pmid),
-            Result::PARSING_ERROR => fn ($message) => $this->parsingError($output, $pmid, $message),
-        ]);
+        $result = $this->action->populate($pmid);
+
+        return match ($result->status()) {
+            0 => $this->success($output, $pmid),
+            1 => $this->alreadyPopulated($output, $pmid),
+            2 => $this->notFound($output, $pmid),
+            3 => $this->parsingError($output, $pmid, $result->message()),
+        };
     }
 
     private function success(OutputInterface $output, int $pmid): int

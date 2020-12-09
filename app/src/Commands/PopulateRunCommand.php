@@ -10,8 +10,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use App\Actions\PopulateRunResult;
 use App\Actions\PopulateRunInterface;
-use App\Actions\PopulateRunResult as Result;
 
 final class PopulateRunCommand extends Command
 {
@@ -44,12 +44,14 @@ final class PopulateRunCommand extends Command
         };
 
         // execute the action and produce a response.
-        return $this->action->populate($id, $populate)->match([
-            Result::SUCCESS => fn ($name) => $this->success($output, $name),
-            Result::NOT_FOUND => fn () => $this->notfound($output, $id),
-            Result::ALREADY_POPULATED => fn ($name) => $this->alreadyPopulated($output, $name),
-            Result::FAILURE => fn ($name) => $this->failure($output, $name),
-        ]);
+        $result = $this->action->populate($id, $populate);
+
+        return match ($result->status()) {
+            0 => $this->success($output, $result->name()),
+            1 => $this->notfound($output, $id),
+            2 => $this->alreadyPopulated($output, $result->name()),
+            3 => $this->failure($output, $result->name()),
+        };
     }
 
     private function command(string $cmd): Command

@@ -166,7 +166,7 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
 
         $id = (int) $this->pdo->lastInsertId();
 
-        return StoreDescriptionResult::success(['id' => $id]);
+        return StoreDescriptionResult::success($id);
     }
 
     private function insertNewVersion(int $association_id, string $stable_id, int $method_id, array $interactor1, array $interactor2): StoreDescriptionResult
@@ -214,9 +214,9 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
 
         $this->pdo->commit();
 
-        $description['id'] = (int) $this->pdo->lastInsertId();
+        $id = (int) $this->pdo->lastInsertId();
 
-        return StoreDescriptionResult::success($description);
+        return StoreDescriptionResult::success($id);
     }
 
     private function sameMapping(array $mapping1, array $mapping2): bool

@@ -28,9 +28,11 @@ final class UpdateEndpoint
             return false;
         }
 
-        return $this->action->update($run_id, $pmid, $state, $annotation)->match([
-            UpdatePublicationStateResult::SUCCESS => fn () => $responder(302, $source),
-            UpdatePublicationStateResult::NOT_FOUND => fn () => false,
-        ]);
+        $result = $this->action->update($run_id, $pmid, $state, $annotation);
+
+        return match ($result->status()) {
+            0 => $responder(302, $source),
+            1 => false,
+        };
     }
 }

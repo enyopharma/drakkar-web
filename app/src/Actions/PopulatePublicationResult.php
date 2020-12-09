@@ -11,10 +11,6 @@ final class PopulatePublicationResult
     const ALREADY_POPULATED = 2;
     const PARSING_ERROR = 3;
 
-    private int $state;
-
-    private string $message;
-
     public static function success(): self
     {
         return new self(self::SUCCESS);
@@ -35,34 +31,30 @@ final class PopulatePublicationResult
         return new self(self::PARSING_ERROR, $message);
     }
 
-    private function __construct(int $state, string $message = '')
-    {
-        $this->state = $state;
-        $this->message = $message;
-    }
-
-    public function isSuccess(): bool
-    {
-        return $this->state == self::SUCCESS;
-    }
+    /**
+     * @param 0|1|2|3 $status
+     */
+    private function __construct(
+        private int $status,
+        private string $message = '',
+    ) {}
 
     /**
-     * @return mixed
+     * @return 0|1|2|3
      */
-    public function match(array $alternatives)
+    public function status()
     {
-        $all = [self::SUCCESS, self::NOT_FOUND, self::ALREADY_POPULATED, self::PARSING_ERROR];
+        return $this->status;
+    }
 
-        $keys = array_keys($alternatives);
+    public function message(): string
+    {
+        $types = [self::PARSING_ERROR];
 
-        if (count(array_diff($all, $keys)) > 0) {
-            throw new \InvalidArgumentException('missing alternatives');
+        if (in_array($this->status, $types, true)) {
+            return $this->message;
         }
 
-        if (! is_callable($alternative = $alternatives[$this->state])) {
-            throw new \InvalidArgumentException('alternative must be a callable');
-        }
-
-        return $alternative($this->message);
+        throw new \LogicException('Result has no message');
     }
 }

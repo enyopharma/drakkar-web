@@ -9,9 +9,9 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use App\Actions\StoreRunInterface;
-use App\Actions\StoreRunResult as Result;
 use App\Assertions\RunType;
+use App\Actions\StoreRunResult;
+use App\Actions\StoreRunInterface;
 
 abstract class AbstractCreateRunCommand extends Command
 {
@@ -44,12 +44,14 @@ abstract class AbstractCreateRunCommand extends Command
             return $this->invalidPmid($output, $e->getMessage());
         }
 
-        return $this->action->store($this->type, $name, ...$pmids)->match([
-            Result::SUCCESS => fn ($id) => $this->success($output, $id),
-            Result::NO_PMID => fn () => $this->noPmid($output, ),
-            Result::RUN_ALREADY_EXISTS => fn ($id, $name) => $this->runAlreadyExists($output, $id, $name),
-            Result::ASSOCIATION_ALREADY_EXISTS => fn ($id, $name, $pmid) => $this->associationAlreadyExists($output, $id, $name, $pmid),
-        ]);
+        $result = $this->action->store($this->type, $name, ...$pmids);
+
+        return match ($result->status()) {
+            0 => $this->success($output, $result->id()),
+            1 => $this->noPmid($output),
+            2 => $this->runAlreadyExists($output, $result->id(), $result->name()),
+            3 => $this->associationAlreadyExists($output, $result->id(), $result->name(), $result->pmid()),
+        };
     }
 
     private function success(OutputInterface $output, int $id): int
@@ -68,7 +70,7 @@ abstract class AbstractCreateRunCommand extends Command
         return 1;
     }
 
-    private function noPmid(OutputInterface $output, ): int
+    private function noPmid(OutputInterface $output): int
     {
         $output->writeln('<error>At least one pmid is required.</error>');
 

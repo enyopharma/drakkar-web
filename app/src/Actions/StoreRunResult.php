@@ -11,17 +11,9 @@ final class StoreRunResult
     const RUN_ALREADY_EXISTS = 2;
     const ASSOCIATION_ALREADY_EXISTS = 3;
 
-    private int $state;
-
-    private ?int $run_id;
-
-    private ?string $run_name;
-
-    private ?int $pmid;
-
-    public static function success(int $run_id): self
+    public static function success(int $id): self
     {
-        return new self(self::SUCCESS, $run_id);
+        return new self(self::SUCCESS, $id);
     }
 
     public static function noPmid(): self
@@ -29,51 +21,64 @@ final class StoreRunResult
         return new self(self::NO_PMID);
     }
 
-    public static function runAlreadyExists(int $run_id, string $run_name): self
+    public static function runAlreadyExists(int $id, string $name): self
     {
-        return new self(self::RUN_ALREADY_EXISTS, $run_id, $run_name);
+        return new self(self::RUN_ALREADY_EXISTS, $id, $name);
     }
 
-    public static function associationAlreadyExists(int $run_id, string $run_name, int $pmid): self
+    public static function associationAlreadyExists(int $id, string $name, int $pmid): self
     {
-        return new self(self::ASSOCIATION_ALREADY_EXISTS, $run_id, $run_name, $pmid);
-    }
-
-    private function __construct(int $state, int $run_id = null, string $run_name = null, int $pmid = null)
-    {
-        $this->state = $state;
-        $this->run_id = $run_id;
-        $this->run_name = $run_name;
-        $this->pmid = $pmid;
-    }
-
-    public function isSuccess(): bool
-    {
-        return $this->state == self::SUCCESS;
+        return new self(self::ASSOCIATION_ALREADY_EXISTS, $id, $name, $pmid);
     }
 
     /**
-     * @return mixed
+     * @param 0|1|2|3 $status
      */
-    public function match(array $alternatives)
+    private function __construct(
+        private int $status,
+        private ?int $id = null,
+        private string $name = '',
+        private ?int $pmid = null,
+    ) {}
+
+    /**
+     * @return 0|1|2|3
+     */
+    public function status()
     {
-        $all = [
-            self::SUCCESS,
-            self::NO_PMID,
-            self::RUN_ALREADY_EXISTS,
-            self::ASSOCIATION_ALREADY_EXISTS,
-        ];
+        return $this->status;
+    }
 
-        $keys = array_keys($alternatives);
+    public function id(): int
+    {
+        $types = [self::SUCCESS, self::RUN_ALREADY_EXISTS, self::ASSOCIATION_ALREADY_EXISTS];
 
-        if (count(array_diff($all, $keys)) > 0) {
-            throw new \InvalidArgumentException('missing alternatives');
+        if (in_array($this->status, $types, true) && !is_null($this->id)) {
+            return $this->id;
         }
 
-        if (!is_callable($alternative = $alternatives[$this->state])) {
-            throw new \InvalidArgumentException('alternative must be a callable');
+        throw new \LogicException('Result has no id');
+    }
+
+    public function name(): string
+    {
+        $types = [self::RUN_ALREADY_EXISTS, self::ASSOCIATION_ALREADY_EXISTS];
+
+        if (in_array($this->status, $types, true)) {
+            return $this->name;
         }
 
-        return $alternative($this->run_id, $this->run_name, $this->pmid);
+        throw new \LogicException('Result has no name');
+    }
+
+    public function pmid(): int
+    {
+        $types = [self::ASSOCIATION_ALREADY_EXISTS];
+
+        if (in_array($this->status, $types, true) && !is_null($this->pmid)) {
+            return $this->pmid;
+        }
+
+        throw new \LogicException('Result has no pmid');
     }
 }

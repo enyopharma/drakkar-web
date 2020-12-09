@@ -12,20 +12,14 @@ final class StoreDescriptionResult
     const FIRST_VERSION_FAILURE = 3;
     const NEW_VERSION_FAILURE = 4;
 
-    private int $state;
-
-    private array $description;
-
-    private array $messages;
-
-    public static function success(array $description): self
+    public static function success(int $id): self
     {
-        return new self(self::SUCCESS, $description);
+        return new self(self::SUCCESS, $id);
     }
 
     public static function inconsistentData(string $message, string ...$messages): self
     {
-        return new self(self::INCONSISTENT_DATA, [], $message, ...$messages);
+        return new self(self::INCONSISTENT_DATA, null, $message, ...$messages);
     }
 
     public static function descriptionAlreadyExists(): self
@@ -43,41 +37,46 @@ final class StoreDescriptionResult
         return new self(self::NEW_VERSION_FAILURE);
     }
 
-    private function __construct(int $state, array $description = [], string ...$messages)
-    {
-        $this->state = $state;
-        $this->description = $description;
+    private array $messages;
+
+    /**
+     * @param 0|1|2|3|4 $status
+     */
+    private function __construct(
+        private int $status,
+        private ?int $id = null,
+        string ...$messages,
+    ) {
         $this->messages = $messages;
     }
 
-    public function isSuccess(): bool
+    /**
+     * @return 0|1|2|3|4
+     */
+    public function status()
     {
-        return $this->state == self::SUCCESS;
+        return $this->status;
     }
 
-    /**
-     * @return mixed
-     */
-    public function match(array $alternatives)
+    public function id(): int
     {
-        $all = [
-            self::SUCCESS,
-            self::INCONSISTENT_DATA,
-            self::DESCRIPTION_ALREADY_EXISTS,
-            self::FIRST_VERSION_FAILURE,
-            self::NEW_VERSION_FAILURE,
-        ];
+        $types = [self::SUCCESS];
 
-        $keys = array_keys($alternatives);
-
-        if (count(array_diff($all, $keys)) > 0) {
-            throw new \InvalidArgumentException('missing alternatives');
+        if (in_array($this->status, $types, true) && !is_null($this->id)) {
+            return $this->id;
         }
 
-        if (! is_callable($alternative = $alternatives[$this->state])) {
-            throw new \InvalidArgumentException('alternative must be a callable');
+        throw new \LogicException('Result has no id');
+    }
+
+    public function messages(): array
+    {
+        $types = [self::INCONSISTENT_DATA];
+
+        if (in_array($this->status, $types, true)) {
+            return $this->messages;
         }
 
-        return $alternative($this->description, ...$this->messages);
+        throw new \LogicException('Result has no messages');
     }
 }

@@ -26,21 +26,15 @@ final class StoreEndpoint
         }
 
         // store the description.
-        return $this->action->store($input)->match([
-            StoreDescriptionResult::SUCCESS => fn ($description) => $description,
-            StoreDescriptionResult::INCONSISTENT_DATA => function ($_, ...$messages) use ($responder) {
-                return $responder(409, $this->conflict(...$messages));
-            },
-            StoreDescriptionResult::DESCRIPTION_ALREADY_EXISTS => function () use ($responder) {
-                return $responder(409, $this->conflict('Description already exists'));
-            },
-            StoreDescriptionResult::FIRST_VERSION_FAILURE => function () use ($responder) {
-                return $responder(409, $this->conflict('Failed to insert the description'));
-            },
-            StoreDescriptionResult::NEW_VERSION_FAILURE => function () use ($responder) {
-                return $responder(409, $this->conflict('Failed to insert a new version of the description'));
-            },
-        ]);
+        $result = $this->action->store($input);
+
+        return match ($result->status()) {
+            0 => ['id' => $result->id()],
+            1 => $responder(409, $this->conflict(...$result->messages())),
+            2 => $responder(409, $this->conflict('Description already exists')),
+            3 => $responder(409, $this->conflict('Failed to insert the description')),
+            4 => $responder(409, $this->conflict('Failed to insert a new version of the description')),
+        };
     }
 
     private function conflict(string ...$messages): array
