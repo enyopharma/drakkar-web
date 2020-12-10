@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.2 (Ubuntu 12.2-4)
--- Dumped by pg_dump version 12.2 (Ubuntu 12.2-4)
+-- Dumped from database version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
+-- Dumped by pg_dump version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -40,7 +40,7 @@ CREATE FUNCTION public.constrain_taxon() RETURNS integer
 CREATE RULE rule_taxon_i
        AS ON INSERT TO taxon
        WHERE (
-             SELECT taxon_id FROM taxon 
+             SELECT taxon_id FROM taxon
              WHERE ncbi_taxon_id = new.ncbi_taxon_id
              )
        	     IS NOT NULL
@@ -127,6 +127,214 @@ CREATE TABLE public.descriptions (
 
 
 --
+-- Name: methods; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.methods (
+    id integer NOT NULL,
+    psimi_id character varying(7) NOT NULL,
+    name character varying(255) NOT NULL,
+    search text
+);
+
+
+--
+-- Name: proteins; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.proteins (
+    id integer NOT NULL,
+    type character(1) NOT NULL,
+    ncbi_taxon_id integer NOT NULL,
+    accession character varying(10) NOT NULL,
+    name character varying(255) NOT NULL,
+    description text NOT NULL,
+    version character(7) NOT NULL,
+    sequences jsonb NOT NULL,
+    CONSTRAINT proteins_type_check CHECK (((type)::text = ANY (ARRAY[('h'::character varying)::text, ('v'::character varying)::text])))
+);
+
+
+--
+-- Name: proteins_versions; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.proteins_versions (
+    accession character varying(10) NOT NULL,
+    version character(7) NOT NULL,
+    current_version character(7) NOT NULL,
+    names character varying[] NOT NULL,
+    features jsonb NOT NULL,
+    search text
+);
+
+
+--
+-- Name: runs; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.runs (
+    id integer NOT NULL,
+    type character(2) NOT NULL,
+    name text NOT NULL,
+    populated boolean DEFAULT false NOT NULL,
+    created_at timestamp(0) without time zone DEFAULT now() NOT NULL,
+    info text DEFAULT ''::text NOT NULL,
+    CONSTRAINT runs_type_check CHECK (((type)::text = ANY (ARRAY[('hh'::character varying)::text, ('vh'::character varying)::text])))
+);
+
+
+--
+-- Name: taxon_pk_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.taxon_pk_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: taxon; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.taxon (
+    taxon_id integer DEFAULT nextval('public.taxon_pk_seq'::regclass) NOT NULL,
+    ncbi_taxon_id integer,
+    parent_taxon_id integer,
+    node_rank character varying(32),
+    genetic_code smallint,
+    mito_genetic_code smallint,
+    left_value integer,
+    right_value integer
+);
+
+
+--
+-- Name: taxon_name; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.taxon_name (
+    taxon_id integer NOT NULL,
+    name character varying(255) NOT NULL,
+    name_class character varying(32) NOT NULL
+);
+
+
+--
+-- Name: dataset; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.dataset AS
+ SELECT d.stable_id,
+    r.type,
+    r.id AS run_id,
+    r.name AS run,
+    a.id AS association_id,
+    a.state,
+    a.annotation,
+    d.id AS description_id,
+    a.pmid,
+    m.id AS method_id,
+    m.psimi_id,
+    m.name AS method,
+    p1.id AS protein1_id,
+    p1.type AS type1,
+    p1.accession AS accession1,
+    p1.name AS name1,
+    d.start1,
+    d.stop1,
+    p1.description AS description1,
+    'Homo sapiens'::text AS taxon1,
+    4480672 AS left_value1,
+    4480677 AS right_value1,
+    d.mapping1,
+    p1.version AS original_version1,
+    v1.current_version AS current_version1,
+    (v1.current_version IS NULL) AS is_obsolete1,
+    p2.id AS protein2_id,
+    p2.type AS type2,
+    p2.accession AS accession2,
+    p2.name AS name2,
+    d.start2,
+    d.stop2,
+    p2.description AS description2,
+    COALESCE(tn2.name, 'Obsolete'::character varying) AS taxon2,
+    t2.left_value AS left_value2,
+    t2.right_value AS right_value2,
+    d.mapping2,
+    p2.version AS original_version2,
+    v2.current_version AS current_version2,
+    (v2.current_version IS NULL) AS is_obsolete2,
+    d.created_at,
+    d.deleted_at
+   FROM public.runs r,
+    public.associations a,
+    public.descriptions d,
+    public.methods m,
+    (public.proteins p1
+     LEFT JOIN public.proteins_versions v1 ON ((((p1.accession)::text = (v1.accession)::text) AND (p1.version = v1.version)))),
+    (public.proteins p2
+     LEFT JOIN public.proteins_versions v2 ON ((((p2.accession)::text = (v2.accession)::text) AND (p2.version = v2.version)))),
+    (public.taxon t2
+     LEFT JOIN public.taxon_name tn2 ON (((t2.taxon_id = tn2.taxon_id) AND ((tn2.name_class)::text = 'scientific name'::text))))
+  WHERE ((r.id = a.run_id) AND (a.id = d.association_id) AND (m.id = d.method_id) AND (p1.id = d.protein1_id) AND (p2.id = d.protein2_id) AND (p2.ncbi_taxon_id = t2.ncbi_taxon_id));
+
+
+--
+-- Name: dataset_coronaviridae; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW public.dataset_coronaviridae AS
+ SELECT dataset.stable_id,
+    dataset.type,
+    dataset.run_id,
+    dataset.run,
+    dataset.association_id,
+    dataset.state,
+    dataset.annotation,
+    dataset.description_id,
+    dataset.pmid,
+    dataset.method_id,
+    dataset.psimi_id,
+    dataset.method,
+    dataset.protein1_id,
+    dataset.type1,
+    dataset.accession1,
+    dataset.name1,
+    dataset.start1,
+    dataset.stop1,
+    dataset.description1,
+    dataset.taxon1,
+    dataset.left_value1,
+    dataset.right_value1,
+    dataset.mapping1,
+    dataset.original_version1,
+    dataset.current_version1,
+    dataset.is_obsolete1,
+    dataset.protein2_id,
+    dataset.type2,
+    dataset.accession2,
+    dataset.name2,
+    dataset.start2,
+    dataset.stop2,
+    dataset.description2,
+    dataset.taxon2,
+    dataset.left_value2,
+    dataset.right_value2,
+    dataset.mapping2,
+    dataset.original_version2,
+    dataset.current_version2,
+    dataset.is_obsolete2,
+    dataset.created_at,
+    dataset.deleted_at
+   FROM public.dataset
+  WHERE ((dataset.type = 'vh'::bpchar) AND (dataset.left_value2 >= 309095) AND (dataset.right_value2 <= 312416));
+
+
+--
 -- Name: descriptions_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -178,18 +386,6 @@ ALTER SEQUENCE public.keywords_id_seq OWNED BY public.keywords.id;
 
 
 --
--- Name: methods; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.methods (
-    id integer NOT NULL,
-    psimi_id character varying(7) NOT NULL,
-    name character varying(255) NOT NULL,
-    search text
-);
-
-
---
 -- Name: methods_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -207,23 +403,6 @@ CREATE SEQUENCE public.methods_id_seq
 --
 
 ALTER SEQUENCE public.methods_id_seq OWNED BY public.methods.id;
-
-
---
--- Name: proteins; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.proteins (
-    id integer NOT NULL,
-    type character(1) NOT NULL,
-    ncbi_taxon_id integer NOT NULL,
-    accession character varying(10) NOT NULL,
-    description text NOT NULL,
-    version character(7) NOT NULL,
-    names character varying[] NOT NULL,
-    sequences jsonb NOT NULL,
-    CONSTRAINT proteins_type_check CHECK (((type)::text = ANY (ARRAY[('h'::character varying)::text, ('v'::character varying)::text])))
-);
 
 
 --
@@ -247,20 +426,6 @@ ALTER SEQUENCE public.proteins_id_seq OWNED BY public.proteins.id;
 
 
 --
--- Name: proteins_versions; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.proteins_versions (
-    accession character varying(10) NOT NULL,
-    version character(7) NOT NULL,
-    current_version character(7) NOT NULL,
-    name character varying NOT NULL,
-    names character varying[] NOT NULL,
-    features jsonb NOT NULL
-);
-
-
---
 -- Name: publications; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -268,21 +433,6 @@ CREATE TABLE public.publications (
     pmid bigint NOT NULL,
     populated boolean DEFAULT false,
     metadata jsonb
-);
-
-
---
--- Name: runs; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.runs (
-    id integer NOT NULL,
-    type character(2) NOT NULL,
-    name text NOT NULL,
-    populated boolean DEFAULT false NOT NULL,
-    created_at timestamp(0) without time zone DEFAULT now() NOT NULL,
-    info text DEFAULT ''::text NOT NULL,
-    CONSTRAINT runs_type_check CHECK (((type)::text = ANY (ARRAY[('hh'::character varying)::text, ('vh'::character varying)::text])))
 );
 
 
@@ -304,45 +454,6 @@ CREATE SEQUENCE public.runs_id_seq
 --
 
 ALTER SEQUENCE public.runs_id_seq OWNED BY public.runs.id;
-
-
---
--- Name: taxon_pk_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.taxon_pk_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: taxon; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.taxon (
-    taxon_id integer DEFAULT nextval('public.taxon_pk_seq'::regclass) NOT NULL,
-    ncbi_taxon_id integer,
-    parent_taxon_id integer,
-    node_rank character varying(32),
-    genetic_code smallint,
-    mito_genetic_code smallint,
-    left_value integer,
-    right_value integer
-);
-
-
---
--- Name: taxon_name; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.taxon_name (
-    taxon_id integer NOT NULL,
-    name character varying(255) NOT NULL,
-    name_class character varying(32) NOT NULL
-);
 
 
 --
@@ -571,6 +682,13 @@ CREATE INDEX methods_search_key ON public.methods USING gin (search public.gin_t
 --
 
 CREATE INDEX proteins_ncbi_taxon_id_key ON public.proteins USING btree (ncbi_taxon_id);
+
+
+--
+-- Name: proteins_versions_search_key; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX proteins_versions_search_key ON public.proteins_versions USING gin (search public.gin_trgm_ops);
 
 
 --
