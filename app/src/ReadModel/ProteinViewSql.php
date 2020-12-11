@@ -11,16 +11,19 @@ final class ProteinViewSql implements ProteinViewInterface
     const SELECT_PROTEIN_SQL = <<<SQL
         SELECT p.id, p.type, p.accession, p.version, p.name, p.description,
             p.sequences->>p.accession AS sequence, p.sequences,
-            COALESCE(tn.name, 'obsolete taxon') AS taxon
+            COALESCE(tn.name, 'obsolete taxon') AS taxon,
+            (v.current_version IS NULL) AS obsolete
         FROM
-            proteins AS p,
+            proteins AS p LEFT JOIN proteins_versions AS v ON p.accession = v.accession AND p.version = v.version,
             taxon AS t LEFT JOIN taxon_name AS tn ON t.taxon_id = tn.taxon_id AND tn.name_class = 'scientific name'
         WHERE p.ncbi_taxon_id = t.ncbi_taxon_id
         AND p.id = ?
     SQL;
 
     const SELECT_PROTEINS_SQL = <<<SQL
-        SELECT p.id, p.type, p.accession, p.name, p.description, COALESCE(tn.name, 'obsolete taxon') AS taxon
+        SELECT p.id, p.type, p.accession, p.version, p.name, p.description,
+            COALESCE(tn.name, 'obsolete taxon') AS taxon,
+            FALSE AS obsolete
         FROM
             proteins AS p,
             proteins_versions AS v,

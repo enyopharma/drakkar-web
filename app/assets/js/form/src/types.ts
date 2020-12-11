@@ -78,10 +78,12 @@ export type Protein = {
     id: number
     type: ProteinType
     accession: string
+    version: string
     taxon: string
     name: string
     description: string
     sequence: string
+    obsolete: boolean
     isoforms: Isoform[]
     chains: Chain[]
     domains: Domain[]

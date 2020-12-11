@@ -1,6 +1,10 @@
 <?php $this->layout('layout'); ?>
 
-<?php if ($publication['state'] == App\Assertions\PublicationState::SELECTED): ?>
+<?php
+    $display = $type == 'edit' || $publication['state'] == App\Assertions\PublicationState::SELECTED;
+?>
+
+<?php if ($display): ?>
 <?php $this->push('scripts'); ?>
 <script type="text/javascript" src="<?= $this->asset('react-dom.js') ?>"></script>
 <script type="text/javascript" src="<?= $this->asset('form.js') ?>"></script>
@@ -44,7 +48,7 @@
     'source' => $this->url(...($source[$type] ?? [])),
 ]) ?>
 
-<?php if ($publication['state'] == App\Assertions\PublicationState::SELECTED): ?>
+<?php if ($display): ?>
 <div id="description-form"></div>
 <?php else: ?>
 <p class="card-text text-warning">

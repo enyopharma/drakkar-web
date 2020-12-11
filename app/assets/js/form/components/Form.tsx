@@ -28,7 +28,7 @@ export const Form: React.FC = () => {
     return (
         <form id="form-top" onSubmit={e => e.preventDefault()}>
             <div id="form-top" className="card">
-                <h3 className="card-header">Add a new {type} description</h3>
+                <h3 className="card-header">{type.toUpperCase()} description form</h3>
                 <div className="card-body">
                     <MethodFieldset />
                 </div>
