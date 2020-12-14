@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { useAction } from '../../src/hooks'
 import { updateMature } from '../../src/reducer'
 import { InteractorI, Mature, Chain } from '../../src/types'
@@ -8,12 +8,6 @@ import { MatureProteinList } from './MatureProteinList'
 import { CoordinateField } from '../Shared/CoordinateField'
 import { ExtractFormGroup } from '../Shared/ExtractFormGroup'
 import { SubsequenceFormGroup } from '../Shared/SubsequenceFormGroup'
-
-type Current = {
-    name: string
-    start: number | null
-    stop: number | null
-}
 
 type Props = {
     i: InteractorI
@@ -25,83 +19,45 @@ type Props = {
     chains: Chain[]
 }
 
-const isMature = (current: Current): current is Mature => {
-    return current.start != null && current.stop != null
-}
-
 export const SequenceEditor: React.FC<Props> = ({ i, sequence, name, start, stop, matures, chains }) => {
-    const update = useAction(updateMature)
-    const [current, setCurrent] = useState<Current>({ name: name, start: start, stop: stop })
+    const [sname, setSName] = useState<string>(name)
+    const [sstart, setSStart] = useState<number | null>(start)
+    const [sstop, setSStop] = useState<number | null>(stop)
 
-    const isNameSet = current.name.trim() != ''
+    const setCoordinates = (start: number, stop: number) => {
+        setSStart(start)
+        setSStop(stop)
+    }
 
-    const isNameWellFormatted = current.name.trim().match(/^[^\s]+$/)
+    const names = matures.map(m => m.name)
 
-    const areCoordinatesSet = current.start != null && current.stop != null
+    const isNameSet = sname.trim().length > 0
+    const isNameWellFormatted = sname.match(/^[^\s]+$/) != null
+    const doesNameExist = matures.filter(m => m.name == sname).length > 0
 
-    const areCoordinatesWellFormatted = current.start != null
-        && current.stop != null
-        && current.start <= current.stop
+    const areCoordinatesSet = sstart != null && sstop != null
+    const areCoordinatesWellFormatted = sstart != null && sstop != null && sstart <= sstop
+    const doCoordinatesExist = matures.filter(m => m.start == sstart && m.stop == sstop).length > 0
 
-    const doesNameExist = matures.filter(m => {
-        return m.name.trim().toLowerCase() == current.name.trim().toLowerCase()
-    }).length > 0
+    const doesMatureExist = matures.filter(m => m.name == sname && m.start == sstart && m.stop == sstop).length > 0
 
-    const doCoordinatesExist = matures.filter(m => {
-        return m.start == current.start && m.stop == current.stop
-    }).length > 0
+    const isNameValid = !isNameSet || doesMatureExist || isNameWellFormatted && !doCoordinatesExist
 
-    const doesMatureExist = matures.filter(m => {
-        return m.name.trim().toLowerCase() == current.name.trim().toLowerCase()
-            && m.start == current.start
-            && m.stop == current.stop
-    }).length > 0
+    const areCoordinatesValid = !areCoordinatesSet || doesMatureExist || areCoordinatesWellFormatted && !doesNameExist
 
-    const isNameValid = doesMatureExist || !isNameSet || isNameWellFormatted && !doesNameExist
-
-    const areCoordinatesValid = doesMatureExist || !areCoordinatesSet || areCoordinatesWellFormatted && !doCoordinatesExist
-
-    const isMatureValid = doesMatureExist ||
-        isNameSet && isNameWellFormatted && !doesNameExist &&
-        areCoordinatesSet && areCoordinatesWellFormatted && !doCoordinatesExist
-
-    const setName = (name: string) => setCurrent({ name: name, start: current.start, stop: current.stop })
-    const setStart = (start: number | null) => setCurrent({ name: current.name, start: start, stop: current.stop })
-    const setStop = (stop: number | null) => setCurrent({ name: current.name, start: current.start, stop: stop })
-
-    const setCoordinates = (start: number, stop: number) => setCurrent({
-        name: current.name,
-        start: start,
-        stop: stop,
-    })
-
-    const classes = 'form-control' + (isNameValid ? '' : ' is-invalid')
-    const disabled = !isMatureValid
-
-    const setFullLength = () => setCoordinates(1, sequence.length)
-
-    const submit = () => { if (isMature(current)) { update({ i, mature: current }) } }
+    const isMatureValid = isNameValid && areCoordinatesValid
 
     return (
         <React.Fragment>
-            {matures.length == 0
-                ? <p>No sequence defined on this uniprot entry yet.</p>
-                : <NonEmptyList i={i} matures={matures} />
-            }
+            <MatureProteinListSection i={i} matures={matures} />
             <div className="row">
                 <div className="col-3">
-                    <input
-                        type="text"
-                        className={classes}
-                        placeholder="Name"
-                        value={current.name}
-                        onChange={e => setName(e.target.value)}
-                    />
+                    <NameInput value={sname} update={setSName} valid={isNameValid} existing={names} />
                 </div>
                 <div className="col-3">
                     <CoordinateField
-                        value={current.start}
-                        set={setStart}
+                        value={sstart}
+                        set={setSStart}
                         max={sequence.length}
                         valid={areCoordinatesValid}
                         placeholder="Start"
@@ -109,22 +65,17 @@ export const SequenceEditor: React.FC<Props> = ({ i, sequence, name, start, stop
                 </div>
                 <div className="col-3">
                     <CoordinateField
-                        value={current.stop}
-                        set={setStop}
+                        value={sstop}
+                        set={setSStop}
                         max={sequence.length}
                         valid={areCoordinatesValid}
                         placeholder="Stop"
                     />
                 </div>
                 <div className="col-3">
-                    <button
-                        type="button"
-                        className="btn btn-block btn-primary"
-                        onClick={e => submit()}
-                        disabled={disabled}
-                    >
+                    <ValidateButton i={i} name={sname} start={sstart} stop={sstop} disabled={!isMatureValid}>
                         Validate
-                    </button>
+                    </ValidateButton>
                 </div>
             </div>
             {chains.length == 0 && (
@@ -140,24 +91,96 @@ export const SequenceEditor: React.FC<Props> = ({ i, sequence, name, start, stop
             </ExtractFormGroup>
             <div className="row">
                 <div className="col offset-9">
-                    <button
-                        type="button"
-                        className="btn btn-block btn-info"
-                        onClick={e => setFullLength()}
-                    >
+                    <FullLengthButton sequence={sequence} set={setCoordinates}>
                         Set to full length
-                    </button>
+                    </FullLengthButton>
                 </div>
             </div>
         </React.Fragment>
     )
 }
 
-const NonEmptyList: React.FC<{ i: InteractorI, matures: Mature[] }> = ({ i, matures }) => (
-    <React.Fragment>
-        <p>
-            Existing sequences on this uniprot entry:
-        </p>
-        <MatureProteinList i={i} matures={matures} />
-    </React.Fragment>
+type MatureProteinListSectionProps = {
+    i: InteractorI
+    matures: Mature[]
+}
+
+const MatureProteinListSection: React.FC<MatureProteinListSectionProps> = ({ i, matures }) => {
+    if (matures.length === 0) {
+        return <p>No sequence defined on this uniprot entry yet.</p>
+    }
+
+    return (
+        <React.Fragment>
+            <p>
+                Existing sequences on this uniprot entry:
+            </p>
+            <MatureProteinList i={i} matures={matures} />
+        </React.Fragment>
+    )
+}
+
+type NameInputProps = {
+    value: string
+    existing: string[]
+    valid?: boolean
+    placeholder?: string
+    update: (value: string) => void
+}
+
+const NameInput: React.FC<NameInputProps> = ({ value, existing, valid = true, placeholder = 'Name', update }) => {
+    const classes = 'form-control' + (valid ? '' : ' is-invalid')
+
+    const supdate = useCallback((svalue: string) => {
+        const found = existing.filter(name => name.toLowerCase() === svalue.toLowerCase())
+
+        const value = found.length === 0 ? svalue : found[0]
+
+        update(value)
+    }, [update, existing])
+
+    return (
+        <input
+            type="text"
+            className={classes}
+            placeholder={placeholder}
+            value={value}
+            onChange={e => supdate(e.target.value)}
+        />
+    )
+}
+
+type FullLengthButtonProps = {
+    sequence: string
+    set: (start: number, stop: number) => void
+}
+
+const FullLengthButton: React.FC<FullLengthButtonProps> = ({ sequence, set, children }) => (
+    <button type="button" className="btn btn-block btn-info" onClick={() => set(1, sequence.length)}>
+        {children}
+    </button>
 )
+
+type ValidateButtonProps = {
+    i: InteractorI
+    name: string
+    start: number | null
+    stop: number | null
+    disabled?: boolean
+}
+
+const ValidateButton: React.FC<ValidateButtonProps> = ({ i, name, start, stop, disabled = false, children }) => {
+    const update = useAction(updateMature)
+
+    const supdate = useCallback(() => {
+        if (start && stop) {
+            update({ i, mature: { name, start, stop } })
+        }
+    }, [i, name, start, stop])
+
+    return (
+        <button type="button" className="btn btn-block btn-primary" onClick={() => supdate()} disabled={disabled}>
+            {children}
+        </button>
+    )
+}
