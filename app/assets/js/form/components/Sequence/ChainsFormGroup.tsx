@@ -27,11 +27,16 @@ export const ChainsFormGroup: React.FC<Props> = ({ chains, enabled = true, set, 
 
     const disabled = !enabled || !areContiguous(filtered) || filtered.length == 0
 
-    const handleChange = (options: any) => {
-        setSelected([...options]
-            .filter(o => o.selected)
-            .map(o => o.value)
-        )
+    const handleChange = (options: HTMLOptionsCollection) => {
+        const elems = []
+
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].selected) {
+                elems.push(options[i].value)
+            }
+        }
+
+        setSelected(elems)
     }
 
     const submit = () => {

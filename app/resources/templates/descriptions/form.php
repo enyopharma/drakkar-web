@@ -9,7 +9,7 @@
 <script type="text/javascript" src="<?= $this->asset('react-dom.js') ?>"></script>
 <script type="text/javascript" src="<?= $this->asset('form.js') ?>"></script>
 <script type="text/javascript">
-    descriptions.form(
+    Drakkar.form(
         'description-form',
         '<?= $run['type'] ?>',
         <?= $run['id'] ?>,

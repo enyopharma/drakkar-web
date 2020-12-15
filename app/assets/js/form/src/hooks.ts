@@ -1,7 +1,6 @@
 import { useCallback } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { AnyAction, ActionCreator } from '@reduxjs/toolkit'
-import { AppThunk } from './reducer'
+import { ActionCreator, AnyAction, ThunkAction, Action } from '@reduxjs/toolkit'
 import { AppState, AppProps, InteractorProps, InteractorI, ProteinType } from './types'
 
 export const useAppSelector = <T>(selector: (props: AppProps) => T): T => {
@@ -50,8 +49,12 @@ export const useInteractorSelector = <T>(i: InteractorI, selector: (props: Inter
     })
 }
 
-export const useAction = <T extends ActionCreator<AnyAction> | ((...args: any[]) => AppThunk)>(creator: T) => {
+type AppAction = ActionCreator<AnyAction | ThunkAction<void, AppState, unknown, Action<string>>>
+
+type UseActionType = (creator: AppAction) => (...args: Parameters<AppAction>) => void
+
+export const useAction: UseActionType = creator => {
     const dispatch = useDispatch()
 
-    return useCallback((...args: Parameters<T>) => { dispatch(creator(...args)) }, [dispatch, creator])
+    return useCallback((...args: Parameters<AppAction>) => { dispatch(creator(...args)) }, [dispatch, creator])
 }

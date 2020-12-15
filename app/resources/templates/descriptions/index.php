@@ -15,7 +15,7 @@
 <script type="text/javascript" src="<?= $this->asset('react-dom.js') ?>"></script>
 <script type="text/javascript" src="<?= $this->asset('table.js') ?>"></script>
 <script type="text/javascript">
-    descriptions.table('descriptions-table', <?= json_encode($descriptions) ?>);
+    Drakkar.table('descriptions-table', <?= json_encode($descriptions) ?>);
 </script>
 <?php $this->end(); ?>
 <?php endif; ?>

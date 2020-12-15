@@ -33,10 +33,12 @@ export const SearchResultList: React.FC<Props> = ({ query, input, search, select
     }
 
     useEffect(() => {
-        input.current?.addEventListener('keydown', onKeyDown)
+        const elem = input.current
+
+        elem?.addEventListener('keydown', onKeyDown)
 
         return () => {
-            input.current?.removeEventListener('keydown', onKeyDown)
+            elem?.removeEventListener('keydown', onKeyDown)
         }
     })
 

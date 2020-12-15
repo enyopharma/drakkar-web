@@ -139,3 +139,7 @@ export type SearchResult = {
     id: number
     label: string
 }
+
+export type Resource<T> = {
+    read: () => T
+}

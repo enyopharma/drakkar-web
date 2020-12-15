@@ -3,7 +3,8 @@
   "scripts": {
     "dev": "webpack --mode development",
     "prod": "webpack --mode production",
-    "watch": "webpack --mode development --watch"
+    "watch": "webpack --mode development --watch",
+    "lint": "eslint './assets/**/*.{ts,tsx}'"
   },
   "devDependencies": {
     "@babel/core": "^7.12.3",
@@ -16,12 +17,19 @@
     "@types/react": "^16.9.53",
     "@types/react-dom": "^16.9.8",
     "@types/react-redux": "^7.1.9",
+    "@types/uuid": "^8.3.0",
+    "@typescript-eslint/eslint-plugin": "^4.9.1",
+    "@typescript-eslint/parser": "^4.9.1",
     "babel-loader": "^8.1.0",
     "bootstrap": "^4.5.3",
     "bootswatch": "^4.5.2",
     "clean-webpack-plugin": "^3.0.0",
     "cross-fetch": "^3.0.6",
     "css-loader": "^3.6.0",
+    "eslint": "^7.15.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-react": "^7.21.5",
+    "eslint-plugin-react-hooks": "^4.2.0",
     "jquery": "^3.5.1",
     "mini-css-extract-plugin": "^0.8.0",
     "node-sass": "^4.14.1",

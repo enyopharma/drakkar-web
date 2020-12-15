@@ -6,7 +6,14 @@ import { DescriptionType, Description } from '../src/types'
 
 import { Form } from './Form'
 
-export const App = (type: DescriptionType, run_id: number, pmid: number, description: Description | null) => {
+type AppProps = {
+    type: DescriptionType
+    run_id: number
+    pmid: number
+    description: Description | null
+}
+
+export const App: React.FC<AppProps> = ({ type, run_id, pmid, description }) => {
     const preloadedState = {
         run_id: run_id,
         pmid: pmid,

@@ -1,9 +1,9 @@
 import qs from 'query-string'
 import fetch from 'cross-fetch'
-const uuid = require('uuid/v4')
+import { v4 as uuid } from 'uuid'
 
 import { cache } from './cache'
-import { SearchResult, Description, Method, ProteinType, Protein, Sequences, Alignment, Feedback } from './types'
+import { Resource, SearchResult, Description, Method, ProteinType, Protein, Sequences, Alignment, Feedback } from './types'
 
 const cmethod = cache<Method>()
 const cmethods = cache<SearchResult[]>()
@@ -24,11 +24,11 @@ const fetchMethods = async (query: string, limit: number) => {
 }
 
 export const methods = {
-    select: (id: number) => {
+    select: (id: number): Resource<Method> => {
         return cmethod.resource(id, () => fetchMethod(id), 10)
     },
 
-    search: (query: string) => {
+    search: (query: string): Resource<SearchResult[]> => {
         return cmethods.resource(query, () => fetchMethods(query, 5), 300)
     },
 }
@@ -52,11 +52,11 @@ const fetchProteins = async (type: ProteinType, query: string, limit: number) =>
 }
 
 export const proteins = {
-    select: (id: number) => {
+    select: (id: number): Resource<Protein> => {
         return cprotein.resource(id, () => fetchProtein(id), 10)
     },
 
-    search: (type: ProteinType, query: string) => {
+    search: (type: ProteinType, query: string): Resource<SearchResult[]> => {
         return cproteins.resource(`${type}:${query}`, () => fetchProteins(type, query, 5), 300)
     },
 }

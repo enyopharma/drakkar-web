@@ -176,7 +176,7 @@ const ValidateButton: React.FC<ValidateButtonProps> = ({ i, name, start, stop, d
         if (start && stop) {
             update({ i, mature: { name, start, stop } })
         }
-    }, [i, name, start, stop])
+    }, [i, name, start, stop, update])
 
     return (
         <button type="button" className="btn btn-block btn-primary" onClick={() => supdate()} disabled={disabled}>

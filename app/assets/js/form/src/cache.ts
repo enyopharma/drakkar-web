@@ -1,8 +1,6 @@
-type Key = number | string
+import { Resource } from './types'
 
-type Resource<T> = {
-    read: () => T
-}
+type Key = number | string
 
 type Cache<T> = {
     resource: (key: Key, factory: () => Promise<T>, delay?: number) => Resource<T>
@@ -26,7 +24,8 @@ export const cache = <T>(): Cache<T> => {
 const resource = <T>(promise: Promise<T>) => {
     let status = ResourceStatuses.PENDING
     let result: T
-    let suspender = promise.then(
+
+    const suspender = promise.then(
         r => {
             status = ResourceStatuses.SUCCESS
             result = r
