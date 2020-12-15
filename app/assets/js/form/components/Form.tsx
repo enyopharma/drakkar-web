@@ -10,8 +10,8 @@ import { resetForm, fireSave } from '../src/reducer'
 import { useAppSelector, useAction } from '../src/hooks'
 
 import { InteractorNav } from './InteractorNav'
-import { MethodFieldset } from './Method/MethodFieldset'
-import { ProteinFieldset } from './Protein/ProteinFieldset'
+import { MethodFieldset } from './MethodFieldset'
+import { ProteinFieldset } from './ProteinFieldset'
 import { SequenceFieldset } from './Sequence/SequenceFieldset'
 import { MappingFieldset } from './Mapping/MappingFieldset'
 
