@@ -1,6 +1,6 @@
 import React from 'react'
 
-type Props = {
+type SequenceTextareaProps = {
     sequence: string
     start: number | null
     stop: number | null
@@ -19,7 +19,7 @@ const style = {
     backgroundColor: '#e9ecef',
 } as React.CSSProperties
 
-export const SequenceTextarea: React.FC<Props> = ({ sequence, start, stop }) => {
+export const SequenceTextarea: React.FC<SequenceTextareaProps> = ({ sequence, start, stop }) => {
     const before = start == null ? '' : sequence.slice(0, start - 1)
     const after = stop == null ? '' : sequence.slice(stop, sequence.length)
     const slice = start == null || stop == null ? sequence : sequence.slice(start - 1, stop)

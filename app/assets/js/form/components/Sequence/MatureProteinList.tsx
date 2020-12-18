@@ -3,26 +3,23 @@ import { useAction } from '../../src/hooks'
 import { updateMature } from '../../src/reducer'
 import { Mature, InteractorI } from '../../src/types'
 
-type Props = {
+type MatureProteinListProps = {
     i: InteractorI
     matures: Mature[]
 }
 
-const classes = (active: boolean) => 'list-group-item' + (active ? ' active' : '')
-
-export const MatureProteinList: React.FC<Props> = ({ i, matures }) => {
+export const MatureProteinList: React.FC<MatureProteinListProps> = ({ i, matures }) => {
     const select = useAction(updateMature)
     const [active, setActive] = useState<number | null>(null)
 
     return (
-        <ul className="list-group">
-            {matures.map((mature, index) => (
+        <ul className="list-group" onMouseOut={() => setActive(null)}>
+            {matures.map((mature, key) => (
                 <li
-                    key={index}
-                    className={classes(index == active)}
-                    onClick={e => select({ i, mature: matures[index] })}
-                    onMouseOut={e => setActive(null)}
-                    onMouseOver={e => setActive(index)}
+                    key={key}
+                    className={'list-group-item' + (active === key ? ' active' : '')}
+                    onClick={() => select({ i, mature })}
+                    onMouseOver={() => setActive(key)}
                 >
                     <strong>{mature.name}</strong> - {mature.start} - {mature.stop}
                 </li>

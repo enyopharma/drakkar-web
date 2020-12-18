@@ -9,7 +9,7 @@ import { CoordinateField } from '../Shared/CoordinateField'
 import { ExtractFormGroup } from '../Shared/ExtractFormGroup'
 import { SubsequenceFormGroup } from '../Shared/SubsequenceFormGroup'
 
-type Props = {
+type SequenceEditorProps = {
     i: InteractorI
     sequence: string
     name: string
@@ -19,7 +19,7 @@ type Props = {
     chains: Chain[]
 }
 
-export const SequenceEditor: React.FC<Props> = ({ i, sequence, name, start, stop, matures, chains }) => {
+export const SequenceEditor: React.FC<SequenceEditorProps> = ({ i, sequence, name, start, stop, matures, chains }) => {
     const [sname, setSName] = useState<string>(name)
     const [sstart, setSStart] = useState<number | null>(start)
     const [sstop, setSStop] = useState<number | null>(stop)
@@ -79,7 +79,7 @@ export const SequenceEditor: React.FC<Props> = ({ i, sequence, name, start, stop
                 </div>
             </div>
             {chains.length == 0 && (
-                <ChainsFormGroup chains={chains} set={setCoordinates}>
+                <ChainsFormGroup chains={chains} update={setCoordinates}>
                     Extract coordinates
                 </ChainsFormGroup>
             )}

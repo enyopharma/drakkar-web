@@ -1,10 +1,92 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Chain } from '../../src/types'
 
-type Props = {
+type ChainsFormGroupProps = {
     chains: Chain[]
     enabled?: boolean
-    set: (start: number, stop: number) => void
+    update: (start: number, stop: number) => void
+}
+
+export const ChainsFormGroup: React.FC<ChainsFormGroupProps> = ({ chains, enabled = true, update, children }) => {
+    const [selected, setSelected] = useState<string[]>([])
+
+    const filtered = selected.map(s => chains[parseInt(s)])
+
+    return (
+        <div className="row">
+            <div className="col">
+                <ChainSelectInput selected={selected} update={setSelected} chains={chains} />
+            </div>
+            <div className="col-3">
+                <SubmitButton chains={filtered} enabled={enabled} update={update}>
+                    {children}
+                </SubmitButton>
+            </div>
+        </div>
+    )
+}
+
+type ChainSelectInputProps = {
+    selected: string[]
+    update: (selected: string[]) => void
+    chains: Chain[]
+}
+
+const ChainSelectInput: React.FC<ChainSelectInputProps> = ({ selected, update, chains }) => {
+    const onChange = useCallback((options: HTMLOptionsCollection) => {
+        const selected = []
+
+        for (let i = 0; i < options.length; i++) {
+            if (options[i].selected) {
+                selected.push(options[i].value)
+            }
+        }
+
+        update(selected)
+    }, [update])
+
+    return (
+        <select
+            value={selected}
+            className="form-control"
+            onChange={e => onChange(e.target.options)}
+            disabled={chains.length == 0}
+            multiple={true}
+        >
+            {chains.map((chain, i) => <ChainOption key={i} i={i} chain={chain} />)}
+        </select>
+    )
+}
+
+type ChainOptionProps = {
+    i: number
+    chain: Chain
+}
+
+const ChainOption: React.FC<ChainOptionProps> = ({ i, chain }) => {
+    const label = `${chain.description} [${chain.start}, ${chain.stop}]`
+
+    return <option value={i}>{label}</option>
+}
+
+type SubmitButtonProps = {
+    chains: Chain[]
+    enabled: boolean
+    update: (start: number, stop: number) => void
+}
+
+const SubmitButton: React.FC<SubmitButtonProps> = ({ chains, enabled, update, children }) => {
+    const disabled = !enabled || !areContiguous(chains) || chains.length == 0
+
+    const sorted = chains.sort((a, b) => a.start - b.start)
+
+    const submit = () => update(sorted[0].start, sorted[sorted.length - 1].stop)
+
+    return (
+        <button type="button" className="btn btn-block btn-info" onClick={() => submit()} disabled={disabled}>
+            {children}
+        </button>
+    )
 }
 
 const areContiguous = (chains: Chain[]): boolean => {
@@ -18,60 +100,4 @@ const areContiguous = (chains: Chain[]): boolean => {
     }
 
     return true
-}
-
-export const ChainsFormGroup: React.FC<Props> = ({ chains, enabled = true, set, children }) => {
-    const [selected, setSelected] = useState<string[]>([])
-
-    const filtered = selected.map(s => chains[parseInt(s)]).sort((a, b) => a.start - b.start)
-
-    const disabled = !enabled || !areContiguous(filtered) || filtered.length == 0
-
-    const handleChange = (options: HTMLOptionsCollection) => {
-        const elems = []
-
-        for (let i = 0; i < options.length; i++) {
-            if (options[i].selected) {
-                elems.push(options[i].value)
-            }
-        }
-
-        setSelected(elems)
-    }
-
-    const submit = () => {
-        set(filtered[0].start, filtered[filtered.length - 1].stop)
-    }
-
-    return (
-        <div className="row">
-            <div className="col">
-                <select
-                    value={selected}
-                    className="form-control"
-                    onChange={e => handleChange(e.target.options)}
-                    disabled={chains.length == 0}
-                    multiple={true}
-                >
-                    {chains.map((chain, i) => <ChainOption key={i} i={i} chain={chain} />)}
-                </select>
-            </div>
-            <div className="col-3">
-                <button
-                    type="button"
-                    className="btn btn-block btn-info"
-                    onClick={e => submit()}
-                    disabled={disabled}
-                >
-                    {children}
-                </button>
-            </div>
-        </div>
-    )
-}
-
-const ChainOption: React.FC<{ i: number, chain: Chain }> = ({ i, chain }) => {
-    const label = `${chain.description} [${chain.start}, ${chain.stop}]`
-
-    return <option value={i}>{label}</option>
 }

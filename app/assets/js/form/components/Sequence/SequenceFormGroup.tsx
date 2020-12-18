@@ -3,14 +3,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faCheck } from '@fortawesome/free-solid-svg-icons/faCheck'
 import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons/faExclamationTriangle'
 
-type Props = {
+type SequenceFormGroupProps = {
     name: string
     start: number | null
     stop: number | null
     valid: boolean
 }
 
-export const SequenceFormGroup: React.FC<Props> = ({ name, start, stop, valid }) => {
+export const SequenceFormGroup: React.FC<SequenceFormGroupProps> = ({ name, start, stop, valid }) => {
     return (
         <div className="row">
             <div className="col">
