@@ -1,8 +1,8 @@
-import React, { useRef, useState, useCallback } from 'react'
+import React, { useRef, useCallback } from 'react'
 import { methods as api } from '../src/api'
 import { useAppSelector, useAction } from '../src/hooks'
 import { selectMethod, unselectMethod } from '../src/reducer'
-import { Resource, SearchResult, Method } from '../src/types'
+import { Resource, Method } from '../src/types'
 
 import { SearchInput } from './Shared/SearchInput'
 
@@ -22,18 +22,6 @@ const useMethod = (): [Resource<Method> | null, (method_id: number) => void, () 
     }, [select])
 
     return [resource.current, sselect, unselect]
-}
-
-const useQuery = (init: string): [string, Resource<SearchResult[]>, (query: string) => void] => {
-    const [query, update] = useState<string>(init)
-    const resource = useRef<Resource<SearchResult[]>>(api.search(init))
-
-    const supdate = useCallback((query: string) => {
-        resource.current = api.search(query)
-        update(query)
-    }, [])
-
-    return [query, resource.current, supdate]
 }
 
 export const MethodFieldset: React.FC = () => {
@@ -60,14 +48,12 @@ type MethodSearchInputProps = {
 }
 
 const MethodSearchInput: React.FC<MethodSearchInputProps> = ({ select }) => {
-    const [query, resource, setQuery] = useQuery('')
+    const factory = useCallback((query: string) => api.search(query), [])
 
     return (
         <SearchInput
             type="method"
-            query={query}
-            resource={resource}
-            update={setQuery}
+            factory={factory}
             select={select}
             placeholder="Search a method..."
             help="You may use + to perform queries with multiple search terms (eg: bio + tag)"

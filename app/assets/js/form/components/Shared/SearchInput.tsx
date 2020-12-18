@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect, ChangeEvent } from 'react'
+import React, { useRef, useState, useEffect, useCallback } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSearch } from '@fortawesome/free-solid-svg-icons/faSearch'
 
@@ -12,18 +12,30 @@ const classes: Record<SearchType, string> = {
 
 const isQueryEmpty = (query: string | undefined) => query === undefined || query.trim().length === 0
 
+const useQuery = (init: string, factory: (query: string) => Resource<SearchResult[]>): [string, Resource<SearchResult[]>, (query: string) => void] => {
+    const [query, update] = useState<string>(init)
+    const resource = useRef<Resource<SearchResult[]>>(factory(init))
+
+    const supdate = useCallback((query: string) => {
+        resource.current = factory(query)
+        update(query)
+    }, [factory])
+
+    return [query, resource.current, supdate]
+}
+
 type SearchInputProps = {
     type: SearchType
-    query: string
-    resource: Resource<SearchResult[]>
-    update: (query: string) => void
+    factory: (query: string) => Resource<SearchResult[]>
     select: (id: number) => void
     placeholder?: string
     help?: string | null
 }
 
-export const SearchInput: React.FC<SearchInputProps> = ({ type, query, resource, update, select, placeholder = '', help = null }) => {
+export const SearchInput: React.FC<SearchInputProps> = ({ type, factory, select, placeholder = '', help = null }) => {
     const input = useRef<HTMLInputElement>(null)
+
+    const [query, resource, setQuery] = useQuery('', factory)
 
     return (
         <div>
@@ -39,7 +51,7 @@ export const SearchInput: React.FC<SearchInputProps> = ({ type, query, resource,
                     placeholder={placeholder}
                     className="form-control form-control-lg"
                     value={query}
-                    onChange={e => update(e.target.value)}
+                    onChange={e => setQuery(e.target.value)}
                 />
             </div>
             <SearchOverlay input={input}>
