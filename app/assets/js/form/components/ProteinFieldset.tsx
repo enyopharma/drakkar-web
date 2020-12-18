@@ -1,10 +1,10 @@
-import React, { useRef, useCallback } from 'react'
+import React, { useRef, useState, useCallback } from 'react'
 import { proteins as api } from '../src/api'
 import { selectProtein, unselectProtein } from '../src/reducer'
 import { useInteractorSelector, useAction } from '../src/hooks'
-import { InteractorI, ProteinType, SearchType, Resource, Protein } from '../src/types'
+import { InteractorI, ProteinType, SearchType, Resource, SearchResult, Protein } from '../src/types'
 
-import { SearchField } from './Shared/SearchField'
+import { SearchInput } from './Shared/SearchInput'
 
 const types: Record<ProteinType, SearchType> = {
     'h': 'human',
@@ -46,6 +46,20 @@ const useProtein = (i: InteractorI): [Resource<Protein> | null, (protein_id: num
     return [resource.current, sselect, sunselect]
 }
 
+const useQuery = (i: InteractorI, init: string): [ProteinType, string, Resource<SearchResult[]>, (query: string) => void] => {
+    const type = useInteractorSelector(i, state => state.type)
+
+    const [query, update] = useState<string>(init)
+    const resource = useRef<Resource<SearchResult[]>>(api.search(type, init))
+
+    const supdate = useCallback((query: string) => {
+        resource.current = api.search(type, query)
+        update(query)
+    }, [type])
+
+    return [type, query, resource.current, supdate]
+}
+
 type ProteinFieldsetProps = {
     i: InteractorI
 }
@@ -76,13 +90,15 @@ type ProteinSearchInputProps = {
 }
 
 const ProteinSearchInput: React.FC<ProteinSearchInputProps> = ({ i, select }) => {
-    const type = useInteractorSelector(i, state => state.type)
+    const [type, query, resource, setQuery] = useQuery(i, '')
 
     return (
-        <SearchField
+        <SearchInput
             type={types[type]}
+            query={query}
+            resource={resource}
+            update={setQuery}
             select={select}
-            search={(query: string) => api.search(type, query).read()}
             placeholder={placeholders[type]}
             help={helps[type]}
         />
