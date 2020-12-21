@@ -1,53 +1,60 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
+
 import { Domain, ScaledDomain } from '../../src/types'
 
 type Props = {
     domains: ScaledDomain[]
-    enabled?: boolean
     select: (domain: Domain) => void
+    enabled?: boolean
 }
 
 export const DomainsFormGroup: React.FC<Props> = ({ domains, enabled = true, select, children }) => {
-    const [domain, setDomain] = useState<number | null>(null)
-
-    const disabled = !enabled || domain == null
-
-    const handleChange = (value: string) => {
-        setDomain(value == '' ? null : parseInt(value))
-    }
-
-    const submit = () => {
-        if (domain != null) select(domains[domain])
-    }
+    const [selected, setSelected] = useState<number | null>(null)
 
     return (
         <div className="row">
             <div className="col">
-                <select
-                    value={domain ?? ''}
-                    className="form-control"
-                    onChange={e => handleChange(e.target.value)}
-                    disabled={domains.length == 0}
-                >
-                    <option value="">Please select a domain</option>
-                    {domains.map((domain, i) => <DomainOption key={i} i={i} domain={domain} />)}
-                </select>
+                <DomainInput selected={selected} domains={domains} update={setSelected} />
             </div>
             <div className="col-3">
-                <button
-                    type="button"
-                    className="btn btn-block btn-info"
-                    onClick={e => submit()}
-                    disabled={disabled}
-                >
+                <SubmitButton selected={selected} domains={domains} select={select} enabled={enabled}>
                     {children}
-                </button>
+                </SubmitButton>
             </div>
         </div>
     )
 }
 
-const DomainOption: React.FC<{ i: number, domain: ScaledDomain }> = ({ i, domain }) => {
+type DomainInputProps = {
+    selected: number | null
+    domains: ScaledDomain[]
+    update: (selected: number | null) => void
+}
+
+const DomainInput: React.FC<DomainInputProps> = ({ selected, domains, update }) => {
+    const supdate = useCallback((value: string) => {
+        update(value === '' ? null : parseInt(value))
+    }, [update])
+
+    return (
+        <select
+            value={selected ?? ''}
+            className="form-control"
+            onChange={e => supdate(e.target.value)}
+            disabled={domains.length == 0}
+        >
+            <option value="">Please select a domain</option>
+            {domains.map((domain, i) => <DomainOption key={i} i={i} domain={domain} />)}
+        </select>
+    )
+}
+
+type DomainOptionProps = {
+    i: number
+    domain: ScaledDomain
+}
+
+const DomainOption: React.FC<DomainOptionProps> = ({ i, domain }) => {
     const cdx = domain.valid
         ? `${domain.start}, ${domain.stop}`
         : 'out of selected sequence'
@@ -58,5 +65,29 @@ const DomainOption: React.FC<{ i: number, domain: ScaledDomain }> = ({ i, domain
         <option value={i} disabled={!domain.valid}>
             {label}
         </option>
+    )
+}
+
+type SubmitButtonProps = {
+    selected: number | null
+    domains: Domain[]
+    select: (domain: Domain) => void
+    enabled: boolean
+}
+
+const SubmitButton: React.FC<SubmitButtonProps> = ({ selected, domains, select, enabled, children }) => {
+    const submit = useCallback(() => {
+        if (selected != null) select(domains[selected])
+    }, [selected, domains, select])
+
+    return (
+        <button
+            type="button"
+            className="btn btn-block btn-info"
+            onClick={() => submit()}
+            disabled={!enabled || selected === null}
+        >
+            {children}
+        </button>
     )
 }

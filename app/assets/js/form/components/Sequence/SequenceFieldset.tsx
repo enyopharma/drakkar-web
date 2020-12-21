@@ -4,7 +4,7 @@ import { faEdit } from '@fortawesome/free-solid-svg-icons/faEdit'
 
 import { editMature } from '../../src/reducer'
 import { proteins as api } from '../../src/api'
-import { InteractorI, Resource, Protein } from '../../src/types'
+import { InteractorI, Resource, Protein, Interactor } from '../../src/types'
 import { useInteractorSelector, useAction } from '../../src/hooks'
 
 const SequenceEditor = React.lazy(() => import('./SequenceEditor').then(m => ({ default: m.SequenceEditor })))
@@ -17,7 +17,7 @@ type SequenceFieldsetProps = {
 }
 
 export const SequenceFieldset: React.FC<SequenceFieldsetProps> = ({ i }) => {
-    const { protein_id, ...props } = useInteractorSelector(i, state => state)
+    const protein_id = useInteractorSelector(i, state => state.protein_id)
 
     const resource = protein_id === null ? null : api.select(protein_id)
 
@@ -42,49 +42,83 @@ type SequenceSectionProps = {
 export const SequenceSection: React.FC<SequenceSectionProps> = ({ i, resource }) => {
     const protein = resource.read()
 
-    const { type, name, start, stop, editing, processing } = useInteractorSelector(i, state => state)
-    const edit = useAction(editMature)
-
-    const valid = !editing
-    const enabled = type == 'v' && !editing && !processing
-
     return (
         <React.Fragment>
             <div className="row">
                 <div className="col">
-                    <SequenceFormGroup name={name} start={start} stop={stop} valid={valid} />
+                    <SequenceFormGroup i={i} />
                 </div>
             </div>
             <div className="row">
                 <div className="col">
-                    <SequenceTextarea sequence={protein.sequence} start={start} stop={stop} />
+                    <SequenceTextarea i={i} sequence={protein.sequence} />
                 </div>
             </div>
             <div className="row">
                 <div className="col">
-                    <SequenceImg type={type} start={start} stop={stop} length={protein.sequence.length} />
+                    <MatureSequenceImg i={i} protein={protein} />
                 </div>
                 <div className="col-1">
-                    <button
-                        className="btn btn-block btn-warning"
-                        onClick={() => edit({ i })}
-                        disabled={!enabled}
-                    >
+                    <EditButton i={i}>
                         <FontAwesomeIcon icon={faEdit} />
-                    </button>
+                    </EditButton>
                 </div>
             </div>
-            {editing && (
-                <SequenceEditor
-                    i={i}
-                    name={name}
-                    start={start}
-                    stop={stop}
-                    sequence={protein.sequence}
-                    chains={protein.chains}
-                    matures={protein.matures}
-                />
-            )}
+            <SequenceEditorToggle i={i} protein={protein} />
         </React.Fragment>
+    )
+}
+
+type MatureSequenceImgProps = {
+    i: InteractorI
+    protein: Protein
+}
+
+const MatureSequenceImg: React.FC<MatureSequenceImgProps> = ({ i, protein }) => {
+    const type = useInteractorSelector(i, state => state.type)
+    const start = useInteractorSelector(i, state => state.start)
+    const stop = useInteractorSelector(i, state => state.stop)
+
+    return <SequenceImg type={type} start={start} stop={stop} length={protein.sequence.length} />
+}
+
+type SequenceEditorToggleProps = {
+    i: InteractorI
+    protein: Protein
+}
+
+const SequenceEditorToggle: React.FC<SequenceEditorToggleProps> = ({ i, protein }) => {
+    const editing = useInteractorSelector(i, state => state.editing)
+
+    if (!editing) return null
+
+    return (
+        <SequenceEditor
+            i={i}
+            sequence={protein.sequence}
+            chains={protein.chains}
+            matures={protein.matures}
+        />
+    )
+}
+
+type EditButtonProps = {
+    i: InteractorI
+}
+
+const EditButton: React.FC<EditButtonProps> = ({ i, children }) => {
+    const type = useInteractorSelector(i, state => state.type)
+    const editing = useInteractorSelector(i, state => state.editing)
+    const processing = useInteractorSelector(i, state => state.processing)
+    const edit = useAction(editMature)
+
+    return (
+        <button
+            className="btn btn-block btn-warning"
+            onClick={() => edit({ i })}
+            disabled={type == 'v' && !editing && !processing}
+        >
+            {children}
+        </button>
     )
 }

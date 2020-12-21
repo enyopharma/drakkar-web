@@ -1,10 +1,7 @@
 import React from 'react'
 
-type SequenceTextareaProps = {
-    sequence: string
-    start: number | null
-    stop: number | null
-}
+import { InteractorI } from '../../src/types'
+import { useInteractorSelector } from '../../src/hooks'
 
 const style = {
     overflowWrap: 'break-word',
@@ -19,7 +16,15 @@ const style = {
     backgroundColor: '#e9ecef',
 } as React.CSSProperties
 
-export const SequenceTextarea: React.FC<SequenceTextareaProps> = ({ sequence, start, stop }) => {
+type SequenceTextareaProps = {
+    i: InteractorI
+    sequence: string
+}
+
+export const SequenceTextarea: React.FC<SequenceTextareaProps> = ({ i, sequence }) => {
+    const start = useInteractorSelector(i, state => state.start)
+    const stop = useInteractorSelector(i, state => state.stop)
+
     const before = start == null ? '' : sequence.slice(0, start - 1)
     const after = stop == null ? '' : sequence.slice(stop, sequence.length)
     const slice = start == null || stop == null ? sequence : sequence.slice(start - 1, stop)

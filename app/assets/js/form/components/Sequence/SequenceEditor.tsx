@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from 'react'
-import { useAction } from '../../src/hooks'
+
 import { updateMature } from '../../src/reducer'
 import { InteractorI, Mature, Chain } from '../../src/types'
+import { useAction, useInteractorSelector } from '../../src/hooks'
 
 import { ChainsFormGroup } from './ChainsFormGroup'
 import { MatureProteinList } from './MatureProteinList'
@@ -12,22 +13,18 @@ import { SubsequenceFormGroup } from '../Shared/SubsequenceFormGroup'
 type SequenceEditorProps = {
     i: InteractorI
     sequence: string
-    name: string
-    start: number | null
-    stop: number | null
     matures: Mature[]
     chains: Chain[]
 }
 
-export const SequenceEditor: React.FC<SequenceEditorProps> = ({ i, sequence, name, start, stop, matures, chains }) => {
+export const SequenceEditor: React.FC<SequenceEditorProps> = ({ i, sequence, matures, chains }) => {
+    const name = useInteractorSelector(i, state => state.name)
+    const start = useInteractorSelector(i, state => state.start)
+    const stop = useInteractorSelector(i, state => state.stop)
+
     const [sname, setSName] = useState<string>(name)
     const [sstart, setSStart] = useState<number | null>(start)
     const [sstop, setSStop] = useState<number | null>(stop)
-
-    const setCoordinates = (start: number, stop: number) => {
-        setSStart(start)
-        setSStop(stop)
-    }
 
     const names = matures.map(m => m.name)
 
@@ -46,6 +43,11 @@ export const SequenceEditor: React.FC<SequenceEditorProps> = ({ i, sequence, nam
     const areCoordinatesValid = !areCoordinatesSet || doesMatureExist || areCoordinatesWellFormatted && !doesNameExist
 
     const isMatureValid = isNameValid && areCoordinatesValid
+
+    const setCoordinates = (start: number, stop: number) => {
+        setSStart(start)
+        setSStop(stop)
+    }
 
     return (
         <React.Fragment>
