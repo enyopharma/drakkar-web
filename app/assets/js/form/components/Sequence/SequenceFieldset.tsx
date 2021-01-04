@@ -116,7 +116,7 @@ const EditButton: React.FC<EditButtonProps> = ({ i, children }) => {
         <button
             className="btn btn-block btn-warning"
             onClick={() => edit({ i })}
-            disabled={type == 'v' && !editing && !processing}
+            disabled={type == 'h' || editing || processing}
         >
             {children}
         </button>
