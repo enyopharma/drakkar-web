@@ -88,6 +88,7 @@ export type Protein = {
     chains: Chain[]
     domains: Domain[]
     matures: Mature[]
+    sequences: Sequences
 }
 
 export type Isoform = {
@@ -125,8 +126,6 @@ export type Mature = {
 }
 
 export type Sequences = Record<string, string>
-
-export type Coordinates = Record<string, { start: number, stop: number, length: number }>
 
 export type Feedback = {
     success: boolean

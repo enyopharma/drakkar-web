@@ -3,17 +3,17 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons/faTrash'
 
 import { removeAlignment } from '../../src/reducer'
-import { InteractorI, Coordinates } from '../../src/types'
+import { InteractorI, Sequences } from '../../src/types'
 import { useAction, useInteractorSelector } from '../../src/hooks'
 
 import { SequenceImg } from '../Shared/SequenceImg'
 
 type Props = {
     i: InteractorI
-    coordinates: Coordinates
+    sequences: Sequences
 }
 
-export const MappingDisplay: React.FC<Props> = ({ i, coordinates }) => {
+export const MappingDisplay: React.FC<Props> = ({ i, sequences }) => {
     const mapping = useInteractorSelector(i, state => state.mapping)
 
     return (
@@ -45,7 +45,7 @@ export const MappingDisplay: React.FC<Props> = ({ i, coordinates }) => {
                                                         i={i}
                                                         start={occurrence.start}
                                                         stop={occurrence.stop}
-                                                        length={coordinates[isoform.accession].length}
+                                                        length={sequences[isoform.accession].length}
                                                     />
                                                 </li>
                                             ))}

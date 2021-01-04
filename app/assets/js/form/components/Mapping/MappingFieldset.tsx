@@ -1,8 +1,8 @@
-import React, { useState } from 'react'
+import React, { useMemo } from 'react'
 
 import { proteins as api } from '../../src/api'
 import { useInteractorSelector } from '../../src/hooks'
-import { InteractorI, Resource, Protein, Isoform, Alignment, Sequences, Coordinates } from '../../src/types'
+import { InteractorI, Resource, Protein, Isoform, Domain, Sequences } from '../../src/types'
 
 const MappingModal = React.lazy(() => import('./MappingModal').then(m => ({ default: m.MappingModal })))
 const MappingEditor = React.lazy(() => import('./MappingEditor').then(m => ({ default: m.MappingEditor })))
@@ -40,44 +40,50 @@ type MappingSectionProps = {
 const MappingSection: React.FC<MappingSectionProps> = ({ i, resource, start, stop }) => {
     const protein = resource.read()
 
-    const coordinates = start == 1 && stop == protein.sequence.length
-        ? protein.isoforms.reduce(reduceCoordinate, {})
-        : matureCoordinates(protein, start, stop)
+    const sequences = useMemo(() => sequencesMap(protein, start, stop), [protein, start, stop])
+    const domains = useMemo(() => scaledDomains(protein, start, stop), [protein, start, stop])
 
     return (
         <React.Fragment>
-            <MappingModalToggle i={i} coordinates={coordinates} />
-            <MappingEditor i={i} protein={protein} start={start} stop={stop} />
-            <MappingDisplay i={i} coordinates={coordinates} />
+            <MappingModalToggle i={i} sequences={sequences} />
+            <MappingEditor i={i} accession={protein.accession} sequences={sequences} domains={domains} />
+            <MappingDisplay i={i} sequences={sequences} />
         </React.Fragment>
     )
 }
 
 type MappingModalToggleProps = {
     i: InteractorI
-    coordinates: Coordinates
+    sequences: Sequences
 }
 
-const MappingModalToggle: React.FC<MappingModalToggleProps> = ({ i, coordinates }) => {
+const MappingModalToggle: React.FC<MappingModalToggleProps> = ({ i, sequences }) => {
     const alignment = useInteractorSelector(i, state => state.alignment)
 
     if (!alignment) return null
 
-    return <MappingModal i={i} coordinates={coordinates} alignment={alignment} />
+    return <MappingModal i={i} sequences={sequences} alignment={alignment} />
 }
 
-const reduceCoordinate = (reduced: Coordinates, isoform: Isoform) => {
-    reduced[isoform.accession] = {
-        start: 1,
-        stop: isoform.sequence.length,
-        length: isoform.sequence.length,
-    }
+const reduceSequences = (reduced: Sequences, isoform: Isoform) => {
+    reduced[isoform.accession] = isoform.sequence
     return reduced
 }
 
-const matureCoordinates = (protein: Protein, start: number, stop: number) => {
-    const length = stop - start + 1
-    return {
-        [protein.accession]: { start, stop, length }
-    }
+const sequencesMap = (protein: Protein, start: number, stop: number) => {
+    return start == 1 && stop == protein.sequence.length
+        ? protein.isoforms.reduce(reduceSequences, {})
+        : { [protein.accession]: protein.sequence.slice(start - 1, stop) }
+}
+
+const scaledDomains = (protein: Protein, start: number, stop: number) => {
+    return protein.domains.map(domain => {
+        return {
+            type: domain.type,
+            description: domain.description,
+            start: domain.start - start + 1,
+            stop: domain.stop - start + 1,
+            valid: domain.start >= start && domain.stop <= stop,
+        }
+    })
 }

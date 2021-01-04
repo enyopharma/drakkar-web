@@ -3,7 +3,7 @@ import Modal from 'react-bootstrap4-modal'
 
 import { useAction, useInteractorSelector } from '../../src/hooks'
 import { addAlignment, cancelAlignment } from '../../src/reducer';
-import { InteractorI, Coordinates, Alignment } from '../../src/types'
+import { InteractorI, Sequences, Alignment } from '../../src/types'
 
 import { SequenceImg } from '../Shared/SequenceImg';
 
@@ -11,11 +11,11 @@ type Index = [number, number]
 
 type MappingModalProps = {
     i: InteractorI
-    coordinates: Coordinates
+    sequences: Sequences
     alignment: Alignment
 }
 
-export const MappingModal: React.FC<MappingModalProps> = ({ i, coordinates, alignment }) => {
+export const MappingModal: React.FC<MappingModalProps> = ({ i, sequences, alignment }) => {
     const [selection, setSelection] = useState<Index[]>(indexes(alignment))
 
     return (
@@ -41,7 +41,7 @@ export const MappingModal: React.FC<MappingModalProps> = ({ i, coordinates, alig
                             x={x}
                             accession={isoform.accession}
                             occurrences={isoform.occurrences}
-                            length={coordinates[isoform.accession].length}
+                            length={sequences[isoform.accession].length}
                             selection={selection}
                             update={setSelection}
                         />

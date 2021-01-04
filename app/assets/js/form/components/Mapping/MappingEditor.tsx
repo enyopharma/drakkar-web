@@ -4,7 +4,7 @@ import { faCogs } from '@fortawesome/free-solid-svg-icons/faCogs'
 
 import { fireAlignment } from '../../src/reducer'
 import { useAction, useInteractorSelector } from '../../src/hooks'
-import { InteractorI, Protein, Isoform, Domain, Sequences, ScaledDomain } from '../../src/types'
+import { InteractorI, Domain, Sequences, ScaledDomain } from '../../src/types'
 
 import { DomainsFormGroup } from './DomainsFormGroup'
 import { ExtractFormGroup } from '../Shared/ExtractFormGroup'
@@ -12,37 +12,29 @@ import { CoordinatesFormGroup } from '../Shared/CoordinatesFormGroup'
 
 type MappingEditorProps = {
     i: InteractorI
-    start: number
-    stop: number
-    protein: Protein
+    accession: string
+    sequences: Sequences
+    domains: ScaledDomain[]
 }
 
-export const MappingEditor: React.FC<MappingEditorProps> = ({ i, start, stop, protein }) => {
+export const MappingEditor: React.FC<MappingEditorProps> = ({ i, accession, sequences, domains }) => {
     const [query, setQuery] = useState<string>('')
 
-    const sequences = start == 1 && stop == protein.sequence.length
-        ? protein.isoforms.reduce(reduceSequence, {})
-        : matureSequences(protein, start, stop)
-
-    const domains = scaledDomains(protein, start, stop)
-
-    const sequence = sequences[protein.accession]
-
-    const reset = () => setQuery('')
+    const reset = useCallback(() => setQuery(''), [])
 
     const selectCoordinates = useCallback((start: number, stop: number) => {
-        setQuery(sequence.slice(start - 1, stop))
-    }, [sequence])
+        setQuery(sequences[accession].slice(start - 1, stop))
+    }, [accession, sequences])
 
     return (
         <React.Fragment>
             <DomainsFormGroupToggle i={i} domains={domains} update={selectCoordinates}>
                 Extract feature sequence
             </DomainsFormGroupToggle>
-            <CoordinatesFormGroupToggle i={i} sequence={sequence} update={setQuery} >
+            <CoordinatesFormGroupToggle i={i} sequence={sequences[accession]} update={setQuery} >
                 Extract sequence to map
             </CoordinatesFormGroupToggle>
-            <ExtractFormGroupToggle i={i} sequence={sequence} update={selectCoordinates}>
+            <ExtractFormGroupToggle i={i} sequence={sequences[accession]} update={selectCoordinates}>
                 Extract sequence to map
             </ExtractFormGroupToggle>
             <div className="row">
@@ -176,28 +168,4 @@ const ProcessingIcon: React.FC<ProcessingIconProps> = ({ i }) => {
     return processing
         ? <span className="spinner-border spinner-border-sm"></span>
         : <FontAwesomeIcon icon={faCogs} />
-}
-
-const reduceSequence = (sequences: Sequences, isoform: Isoform) => {
-    sequences[isoform.accession] = isoform.sequence
-    return sequences
-}
-
-
-const matureSequences = (protein: Protein, start: number, stop: number) => {
-    const sequence = protein.sequence.slice(start - 1, stop)
-
-    return { [protein.accession]: sequence }
-}
-
-const scaledDomains = (protein: Protein, start: number, stop: number) => {
-    return protein.domains.map(domain => {
-        return {
-            type: domain.type,
-            description: domain.description,
-            start: domain.start - start + 1,
-            stop: domain.stop - start + 1,
-            valid: domain.start >= start && domain.stop <= stop,
-        }
-    })
 }
