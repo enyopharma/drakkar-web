@@ -13,7 +13,7 @@ export const SubsequenceFormGroup: React.FC<Props> = ({ sequence, enabled = true
     const [start, stop] = extract(sequence, subsequence.trim())
 
     const invalid = start >= 0 && stop >= 0 && start > stop
-    const disabled = !enabled || invalid || start === -1 || stop === -1 || subsequence.trim() === ''
+    const disabled = !enabled || invalid || start === -1 || stop === -1
 
     const classes = !invalid ? 'form-control' : 'form-control is-invalid'
 

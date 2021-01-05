@@ -11,14 +11,14 @@ export const ExtractFormGroup: React.FC<Props> = ({ sequence, enabled = true, up
     const [from, setFrom] = useState<string>('')
     const [to, setTo] = useState<string>('')
 
-    const e1 = extract(sequence, from.trim())
-    const e2 = extract(sequence, to.trim())
+    const c1 = extract(sequence, from.trim())
+    const c2 = extract(sequence, to.trim())
 
-    const start = e1[0]
-    const stop = e2[1]
+    const start = c1[0]
+    const stop = c2[1]
 
     const invalid = start >= 0 && stop >= 0 && start > stop
-    const disabled = !enabled || invalid || start === -1 || stop === -1 || from.trim() === '' || from.trim() === ''
+    const disabled = !enabled || invalid || start === -1 || stop === -1
 
     const classes = !invalid ? 'form-control' : 'form-control is-invalid'
 
