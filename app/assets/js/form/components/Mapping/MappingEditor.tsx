@@ -6,6 +6,7 @@ import { fireAlignment } from '../../src/reducer'
 import { useAction, useInteractorSelector } from '../../src/hooks'
 import { InteractorI, Domain, Sequences, ScaledDomain } from '../../src/types'
 
+import { MappingModal } from './MappingModal'
 import { DomainsFormGroup } from './DomainsFormGroup'
 import { ExtractFormGroup } from '../Shared/ExtractFormGroup'
 import { CoordinatesFormGroup } from '../Shared/CoordinatesFormGroup'
@@ -28,6 +29,7 @@ export const MappingEditor: React.FC<MappingEditorProps> = ({ i, accession, sequ
 
     return (
         <React.Fragment>
+            <MappingModalToggle i={i} sequences={sequences} reset={reset} />
             <DomainsFormGroupToggle i={i} domains={domains} update={selectCoordinates}>
                 Extract feature sequence
             </DomainsFormGroupToggle>
@@ -44,13 +46,27 @@ export const MappingEditor: React.FC<MappingEditorProps> = ({ i, accession, sequ
             </div>
             <div className="row">
                 <div className="col-3 offset-9">
-                    <StartAlignmentButton i={i} query={query} sequences={sequences} reset={reset}>
+                    <StartAlignmentButton i={i} query={query} sequences={sequences}>
                         <ProcessingIcon i={i} /> Start alignment
                     </StartAlignmentButton>
                 </div>
             </div>
         </React.Fragment>
     )
+}
+
+type MappingModalToggleProps = {
+    i: InteractorI
+    sequences: Sequences
+    reset: () => void
+}
+
+const MappingModalToggle: React.FC<MappingModalToggleProps> = ({ i, sequences, reset }) => {
+    const alignment = useInteractorSelector(i, state => state.alignment)
+
+    if (!alignment) return null
+
+    return <MappingModal i={i} sequences={sequences} alignment={alignment} reset={reset} />
 }
 
 type DomainsFormGroupToggle = {
@@ -129,10 +145,9 @@ type StartAlignmentButtonProps = {
     i: InteractorI
     query: string
     sequences: Sequences
-    reset: () => void
 }
 
-const StartAlignmentButton: React.FC<StartAlignmentButtonProps> = ({ i, query, sequences, reset, children }) => {
+const StartAlignmentButton: React.FC<StartAlignmentButtonProps> = ({ i, query, sequences, children }) => {
     const mapping = useInteractorSelector(i, state => state.mapping)
     const processing = useInteractorSelector(i, state => state.processing)
     const fire = useAction(fireAlignment)
@@ -141,16 +156,11 @@ const StartAlignmentButton: React.FC<StartAlignmentButtonProps> = ({ i, query, s
         return query.toUpperCase().trim() == alignment.sequence.toUpperCase().trim()
     }).length == 0
 
-    const fireAndReset = useCallback(() => {
-        fire({ i, query, sequences })
-        reset()
-    }, [i, query, sequences, fire, reset])
-
     return (
         <button
             type="button"
             className="btn btn-block btn-primary"
-            onClick={() => fireAndReset()}
+            onClick={() => fire({ i, query, sequences })}
             disabled={processing || !isQueryValid}
         >
             {children}

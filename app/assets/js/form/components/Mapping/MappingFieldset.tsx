@@ -4,7 +4,6 @@ import { proteins as api } from '../../src/api'
 import { useInteractorSelector } from '../../src/hooks'
 import { InteractorI, Resource, Protein, Isoform, Domain, Sequences } from '../../src/types'
 
-const MappingModal = React.lazy(() => import('./MappingModal').then(m => ({ default: m.MappingModal })))
 const MappingEditor = React.lazy(() => import('./MappingEditor').then(m => ({ default: m.MappingEditor })))
 const MappingDisplay = React.lazy(() => import('./MappingDisplay').then(m => ({ default: m.MappingDisplay })))
 
@@ -45,24 +44,10 @@ const MappingSection: React.FC<MappingSectionProps> = ({ i, resource, start, sto
 
     return (
         <React.Fragment>
-            <MappingModalToggle i={i} sequences={sequences} />
             <MappingEditor i={i} accession={protein.accession} sequences={sequences} domains={domains} />
             <MappingDisplay i={i} sequences={sequences} />
         </React.Fragment>
     )
-}
-
-type MappingModalToggleProps = {
-    i: InteractorI
-    sequences: Sequences
-}
-
-const MappingModalToggle: React.FC<MappingModalToggleProps> = ({ i, sequences }) => {
-    const alignment = useInteractorSelector(i, state => state.alignment)
-
-    if (!alignment) return null
-
-    return <MappingModal i={i} sequences={sequences} alignment={alignment} />
 }
 
 const reduceSequences = (reduced: Sequences, isoform: Isoform) => {

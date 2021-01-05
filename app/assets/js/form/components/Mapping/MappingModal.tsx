@@ -13,9 +13,10 @@ type MappingModalProps = {
     i: InteractorI
     sequences: Sequences
     alignment: Alignment
+    reset: () => void
 }
 
-export const MappingModal: React.FC<MappingModalProps> = ({ i, sequences, alignment }) => {
+export const MappingModal: React.FC<MappingModalProps> = ({ i, sequences, alignment, reset }) => {
     const [selection, setSelection] = useState<Index[]>(indexes(alignment))
 
     return (
@@ -49,7 +50,7 @@ export const MappingModal: React.FC<MappingModalProps> = ({ i, sequences, alignm
                 </ul>
             </div>
             <div className="modal-footer">
-                <SaveButton i={i} selection={selection} alignment={alignment}>
+                <SaveButton i={i} selection={selection} alignment={alignment} reset={reset}>
                     Save selection
                 </SaveButton>
             </div>
@@ -137,9 +138,10 @@ type SaveButtonProps = {
     i: InteractorI
     selection: Index[]
     alignment: Alignment
+    reset: () => void
 }
 
-const SaveButton: React.FC<SaveButtonProps> = ({ i, selection, alignment, children }) => {
+const SaveButton: React.FC<SaveButtonProps> = ({ i, selection, alignment, reset, children }) => {
     const add = useAction(addAlignment)
 
     const filtered = filter(alignment, selection)
@@ -149,7 +151,7 @@ const SaveButton: React.FC<SaveButtonProps> = ({ i, selection, alignment, childr
             type="button"
             className="btn btn-block btn-primary"
             disabled={filtered.isoforms.length === 0}
-            onClick={() => add({ i, alignment: filtered })}
+            onClick={() => { add({ i, alignment: filtered }); reset() }}
         >
             {children}
         </button>
