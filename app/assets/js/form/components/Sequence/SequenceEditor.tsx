@@ -59,7 +59,7 @@ export const SequenceEditor: React.FC<SequenceEditorProps> = ({ i, sequence, mat
                 <div className="col-3">
                     <CoordinateField
                         value={sstart}
-                        set={setSStart}
+                        update={setSStart}
                         max={sequence.length}
                         valid={areCoordinatesValid}
                         placeholder="Start"
@@ -68,7 +68,7 @@ export const SequenceEditor: React.FC<SequenceEditorProps> = ({ i, sequence, mat
                 <div className="col-3">
                     <CoordinateField
                         value={sstop}
-                        set={setSStop}
+                        update={setSStop}
                         max={sequence.length}
                         valid={areCoordinatesValid}
                         placeholder="Stop"
@@ -85,15 +85,15 @@ export const SequenceEditor: React.FC<SequenceEditorProps> = ({ i, sequence, mat
                     Extract coordinates
                 </ChainsFormGroup>
             )}
-            <SubsequenceFormGroup sequence={sequence} set={setCoordinates}>
+            <SubsequenceFormGroup sequence={sequence} update={setCoordinates}>
                 Extract coordinates
             </SubsequenceFormGroup>
-            <ExtractFormGroup sequence={sequence} set={setCoordinates}>
+            <ExtractFormGroup sequence={sequence} update={setCoordinates}>
                 Extract coordinates
             </ExtractFormGroup>
             <div className="row">
                 <div className="col offset-9">
-                    <FullLengthButton sequence={sequence} set={setCoordinates}>
+                    <FullLengthButton sequence={sequence} update={setCoordinates}>
                         Set to full length
                     </FullLengthButton>
                 </div>
@@ -154,11 +154,11 @@ const NameInput: React.FC<NameInputProps> = ({ value, existing, valid = true, pl
 
 type FullLengthButtonProps = {
     sequence: string
-    set: (start: number, stop: number) => void
+    update: (start: number, stop: number) => void
 }
 
-const FullLengthButton: React.FC<FullLengthButtonProps> = ({ sequence, set, children }) => (
-    <button type="button" className="btn btn-block btn-info" onClick={() => set(1, sequence.length)}>
+const FullLengthButton: React.FC<FullLengthButtonProps> = ({ sequence, update, children }) => (
+    <button type="button" className="btn btn-block btn-info" onClick={() => update(1, sequence.length)}>
         {children}
     </button>
 )

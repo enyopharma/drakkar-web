@@ -1,45 +1,43 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 
 import { CoordinateField } from './CoordinateField'
 
 type Props = {
     sequence: string
     enabled: boolean
-    set: (sequence: string) => void
+    update: (sequence: string) => void
 }
 
-export const CoordinatesFormGroup: React.FC<Props> = ({ sequence, enabled = true, set, children }) => {
+export const CoordinatesFormGroup: React.FC<Props> = ({ sequence, enabled = true, update, children }) => {
     const [start, setStart] = useState<number | null>(null)
     const [stop, setStop] = useState<number | null>(null)
-    const [valid, setValid] = useState<boolean>(true)
 
-    useEffect(() => setValid(true), [start, stop])
+    const invalid = start != null && stop != null && start > stop
+    const disabled = !enabled || invalid || start === null || stop === null
 
-    const disabled = !enabled || start == null || stop == null
-
-    const submit = () => {
-        start != null && stop != null && start <= stop
-            ? set(sequence.slice(start - 1, stop))
-            : setValid(false)
-    }
+    const submit = useCallback(() => {
+        if (start === null) return
+        if (stop === null) return
+        update(sequence.slice(start - 1, stop))
+    }, [start, stop, sequence, update])
 
     return (
         <div className="row">
             <div className="col">
                 <CoordinateField
                     value={start}
-                    set={setStart}
+                    update={setStart}
                     max={sequence.length}
-                    valid={valid}
+                    valid={!invalid}
                     placeholder="Start"
                 />
             </div>
             <div className="col">
                 <CoordinateField
                     value={stop}
-                    set={setStop}
+                    update={setStop}
                     max={sequence.length}
-                    valid={valid}
+                    valid={!invalid}
                     placeholder="Stop"
                 />
             </div>
@@ -47,7 +45,7 @@ export const CoordinatesFormGroup: React.FC<Props> = ({ sequence, enabled = true
                 <button
                     type="button"
                     className="btn btn-block btn-info"
-                    onClick={e => submit()}
+                    onClick={() => submit()}
                     disabled={disabled}
                 >
                     {children}

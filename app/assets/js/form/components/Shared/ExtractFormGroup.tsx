@@ -1,32 +1,28 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 import { extract } from '../../src/shared'
 
 type Props = {
     sequence: string
     enabled?: boolean
-    set: (start: number, stop: number) => void
+    update: (start: number, stop: number) => void
 }
 
-export const ExtractFormGroup: React.FC<Props> = ({ sequence, enabled = true, set, children }) => {
+export const ExtractFormGroup: React.FC<Props> = ({ sequence, enabled = true, update, children }) => {
     const [from, setFrom] = useState<string>('')
     const [to, setTo] = useState<string>('')
-    const [valid, setValid] = useState<boolean>(true)
 
-    useEffect(() => setValid(true), [from, to])
+    const e1 = extract(sequence, from.trim())
+    const e2 = extract(sequence, to.trim())
 
-    const classes = 'form-control' + (valid ? '' : ' is-invalid')
-    const disabled = !enabled || from.trim() == '' || to.trim() == ''
+    const start = e1[0]
+    const stop = e2[1]
 
-    const submit = () => {
-        if (from.trim() == '' || to.trim() == '') return
+    const invalid = start >= 0 && stop >= 0 && start > stop
+    const disabled = !enabled || invalid || start === -1 || stop === -1 || from.trim() === '' || from.trim() === ''
 
-        const [start1, stop1] = extract(sequence, from.trim())
-        const [start2, stop2] = extract(sequence, to.trim())
+    const classes = !invalid ? 'form-control' : 'form-control is-invalid'
 
-        start1 > 0 && start2 > 0 && stop1 < start2
-            ? set(start1, stop2)
-            : setValid(false)
-    }
+    const submit = useCallback(() => update(start, stop), [start, stop, update])
 
     return (
         <div className="row">
@@ -52,7 +48,7 @@ export const ExtractFormGroup: React.FC<Props> = ({ sequence, enabled = true, se
                 <button
                     type="button"
                     className="btn btn-block btn-info"
-                    onClick={e => submit()}
+                    onClick={() => submit()}
                     disabled={disabled}
                 >
                     {children}

@@ -9,20 +9,8 @@ type Props = {
     active?: boolean
 }
 
-const startp = (start: number, length: number): string => {
-    return ((start - 1) * 100 / length) + '%'
-}
-
-const stopp = (stop: number, length: number): string => {
-    return (stop * 100 / length) + '%'
-}
-
-const widthp = (start: number, stop: number, length: number): string => {
-    return ((stop - start + 1) * 100 / length) + '%'
-}
-
 export const SequenceImg: React.FC<Props> = ({ type, start, stop, length, active = true }) => {
-    if (start == null || stop == null) {
+    if (start === null || stop === null) {
         return (
             <svg className="alignment" width="100%" height="30">
                 <rect x="0" y="16" width="100%" height="2"></rect>
@@ -30,24 +18,20 @@ export const SequenceImg: React.FC<Props> = ({ type, start, stop, length, active
         )
     }
 
-    const classes = active ? type : ''
+    const startp = `${(start - 1) * 100 / length}%`
+    const stopp = `${stop * 100 / length}%`
+    const widthp = `${(stop - start + 1) * 100 / length}%`
 
     return (
         <svg className="alignment" width="100%" height="30">
-            <text x={startp(start, length)} y="10" fontSize="10">
+            <text x={startp} y="10" fontSize="10">
                 {start}
             </text>
-            <text x={stopp(stop, length)} y="30" fontSize="10" textAnchor="end">
+            <text x={stopp} y="30" fontSize="10" textAnchor="end">
                 {stop}
             </text>
             <rect x="0" y="16" width="100%" height="2"></rect>
-            <rect
-                className={classes}
-                x={startp(start, length)}
-                y="14"
-                width={widthp(start, stop, length)}
-                height="6"
-            ></rect>
+            <rect className={active ? type : ''} x={startp} y="14" width={widthp} height="6"></rect>
         </svg>
     )
 }

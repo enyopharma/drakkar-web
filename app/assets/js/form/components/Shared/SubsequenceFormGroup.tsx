@@ -1,28 +1,23 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 import { extract } from '../../src/shared'
 
 type Props = {
     sequence: string
     enabled?: boolean
-    set: (start: number, stop: number) => void
+    update: (start: number, stop: number) => void
 }
 
-export const SubsequenceFormGroup: React.FC<Props> = ({ sequence, enabled = true, set, children }) => {
+export const SubsequenceFormGroup: React.FC<Props> = ({ sequence, enabled = true, update, children }) => {
     const [subsequence, setSubsequence] = useState<string>('')
-    const [valid, setValid] = useState<boolean>(true)
 
-    useEffect(() => setValid(true), [subsequence])
+    const [start, stop] = extract(sequence, subsequence.trim())
 
-    const classes = 'form-control' + (valid ? '' : ' is-invalid')
-    const disabled = !enabled || subsequence.trim() == ''
+    const invalid = start >= 0 && stop >= 0 && start > stop
+    const disabled = !enabled || invalid || start === -1 || stop === -1 || subsequence.trim() === ''
 
-    const submit = () => {
-        if (subsequence.trim() == '') return
+    const classes = !invalid ? 'form-control' : 'form-control is-invalid'
 
-        const [start, stop] = extract(sequence, subsequence.trim())
-
-        start > 0 ? set(start, stop) : setValid(false)
-    }
+    const submit = useCallback(() => update(start, stop), [start, stop, update])
 
     return (
         <div className="row">
@@ -39,7 +34,7 @@ export const SubsequenceFormGroup: React.FC<Props> = ({ sequence, enabled = true
                 <button
                     type="button"
                     className="btn btn-block btn-info"
-                    onClick={e => submit()}
+                    onClick={() => submit()}
                     disabled={disabled}
                 >
                     {children}

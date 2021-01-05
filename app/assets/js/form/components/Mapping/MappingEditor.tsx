@@ -83,7 +83,7 @@ const CoordinatesFormGroupToggle: React.FC<CoordinatesFormGroupToggle> = ({ i, s
     const processing = useInteractorSelector(i, state => state.processing)
 
     return (
-        <CoordinatesFormGroup sequence={sequence} enabled={!processing} set={update}>
+        <CoordinatesFormGroup sequence={sequence} enabled={!processing} update={update}>
             {children}
         </CoordinatesFormGroup>
     )
@@ -99,7 +99,7 @@ const ExtractFormGroupToggle: React.FC<ExtractFormGroupToggle> = ({ i, sequence,
     const processing = useInteractorSelector(i, state => state.processing)
 
     return (
-        <ExtractFormGroup sequence={sequence} enabled={!processing} set={update}>
+        <ExtractFormGroup sequence={sequence} enabled={!processing} update={update}>
             {children}
         </ExtractFormGroup>
     )
