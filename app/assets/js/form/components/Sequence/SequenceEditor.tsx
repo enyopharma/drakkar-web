@@ -38,9 +38,9 @@ export const SequenceEditor: React.FC<SequenceEditorProps> = ({ i, sequence, mat
 
     const doesMatureExist = matures.filter(m => m.name == sname && m.start == sstart && m.stop == sstop).length > 0
 
-    const isNameValid = !isNameSet || doesMatureExist || isNameWellFormatted && !doCoordinatesExist
+    const isNameValid = doesMatureExist || isNameWellFormatted && !doCoordinatesExist
 
-    const areCoordinatesValid = !areCoordinatesSet || doesMatureExist || areCoordinatesWellFormatted && !doesNameExist
+    const areCoordinatesValid = doesMatureExist || areCoordinatesWellFormatted && !doesNameExist
 
     const isMatureValid = isNameValid && areCoordinatesValid
 
@@ -54,14 +54,14 @@ export const SequenceEditor: React.FC<SequenceEditorProps> = ({ i, sequence, mat
             <MatureProteinListSection i={i} matures={matures} />
             <div className="row">
                 <div className="col-3">
-                    <NameInput value={sname} update={setSName} valid={isNameValid} existing={names} />
+                    <NameInput value={sname} update={setSName} valid={!isNameSet || isNameValid} existing={names} />
                 </div>
                 <div className="col-3">
                     <CoordinateField
                         value={sstart}
                         update={setSStart}
                         max={sequence.length}
-                        valid={areCoordinatesValid}
+                        valid={!areCoordinatesSet || areCoordinatesValid}
                         placeholder="Start"
                     />
                 </div>
@@ -70,7 +70,7 @@ export const SequenceEditor: React.FC<SequenceEditorProps> = ({ i, sequence, mat
                         value={sstop}
                         update={setSStop}
                         max={sequence.length}
-                        valid={areCoordinatesValid}
+                        valid={!areCoordinatesSet || areCoordinatesValid}
                         placeholder="Stop"
                     />
                 </div>
