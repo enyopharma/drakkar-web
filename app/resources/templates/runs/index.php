@@ -70,11 +70,11 @@
 <table class="table">
     <thead>
         <tr>
-            <th class="text-center col-1">Type</th>
-            <th class="col-5">Name</th>
-            <th class="text-center col-2">Date</th>
-            <th class="text-center col-2">Publications</th>
-            <th class="text-center col-2">-</th>
+            <th class="text-center" style="width: 10%;">Type</th>
+            <th style="width: 30%;">Name</th>
+            <th class="text-center" style="width: 20%;">Date</th>
+            <th class="text-center" style="width: 20%;">Publications</th>
+            <th class="text-center" style="width: 20%;">-</th>
         </tr>
     </thead>
     <tbody>
