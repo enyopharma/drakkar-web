@@ -68,11 +68,18 @@
                 <div class="col">
                     <input type="hidden" name="_method" value="PUT" />
                     <input type="hidden" name="_source" value="<?= $source ?>" />
-                    <textarea
-                        class="form-control form-control-sm"
-                        name="annotation"
-                        rows="1"
-                    ><?= $publication['annotation'] ?></textarea>
+                    <div class="input-group mb-3">
+                        <textarea
+                            class="form-control form-control-sm"
+                            name="annotation"
+                            rows="1"
+                        ><?= $publication['annotation'] ?></textarea>
+                        <div class="input-group-append">
+                            <button type="submit" name="state" value="<?= $publication['state'] ?>" class="btn btn-info">
+                                Save comment
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="row">
