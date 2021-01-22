@@ -22,7 +22,7 @@ final class AssociationViewSql implements AssociationViewInterface
         WHERE p.pmid = a.pmid
         AND a.run_id = ?
         AND a.state = ?
-        ORDER BY a.updated_at ASC, a.id ASC
+        ORDER BY a.id ASC
         LIMIT ? OFFSET ?
     SQL;
 
