@@ -106,8 +106,8 @@ final class OccurrenceInput
 
     public function validateForSequence(string $sequence): ErrorList
     {
-        $errors = $this->stop - $this->start + 1 != strlen($sequence)
-            ? [new Error('must have the same length as sequence')]
+        $errors = $this->stop - $this->start + 1 < strlen($sequence)
+            ? [new Error('must be greater than or equal to sequence length')]
             : [];
 
         return new ErrorList(...$errors);
@@ -118,7 +118,7 @@ final class OccurrenceInput
         $errors = $this->stop > strlen($subject)
             ? [new Error('must be smaller than subject')]
             : [];
-        
+
         return new ErrorList(...$errors);
     }
 }
