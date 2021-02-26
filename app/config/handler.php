@@ -21,16 +21,16 @@ foreach ((array) glob(__DIR__ . '/boot/*.php') as $boot) {
 }
 
 /**
- * App Shutdown.
- */
-if (file_exists(__DIR__ . '/shutdown')) {
-    return Quanta\Http\Dispatcher::queue(new Middlewares\Shutdown);
-}
-
-/**
  * Get the response factory from the container.
  */
 $factory = $container->get(Psr\Http\Message\ResponseFactoryInterface::class);
+
+/**
+ * App Shutdown.
+ */
+if (file_exists(__DIR__ . '/shutdown')) {
+    return Quanta\Http\Dispatcher::queue(new Middlewares\Shutdown($factory));
+}
 
 /**
  * Get the fast route dispatcher and build a router.
@@ -43,7 +43,7 @@ return Quanta\Http\Dispatcher::queue(
     /**
      * Whoops error handler.
      */
-    new Middlewares\Whoops,
+    new Middlewares\Whoops(null, $factory),
 
     /**
      *  Not found html body.
@@ -60,7 +60,7 @@ return Quanta\Http\Dispatcher::queue(
     /**
      * Override the post method
      */
-    (new Middlewares\MethodOverride)->parsedBodyParameter('_method'),
+    (new Middlewares\MethodOverride($factory))->parsedBodyParameter('_method'),
 
     /**
      * Parse json payload.
