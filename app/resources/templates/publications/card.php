@@ -50,7 +50,7 @@
                 </a>
             </div>
             <div class="col-2">
-                <form method="POST" action="https://sci-hub.tw" target="_blank" class="m-0 p-0">
+                <form method="POST" action="https://sci-hub.se" target="_blank" class="m-0 p-0">
                     <input type="hidden" name="request" value="<?= $publication['pmid'] ?>">
                     <button type="submit" class="btn btn-sm btn-block btn-link" style="text-decoration: none">
                         SCIHUB
