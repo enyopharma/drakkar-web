@@ -61,11 +61,11 @@ final class DescriptionViewSql implements DescriptionViewInterface
     {
         $select_description_sth = $this->pdo->prepare(self::SELECT_DESCRIPTION_SQL);
 
-        if ($select_description_sth === false) throw new \Exception;
-
         $select_description_sth->execute([$stable_id]);
 
-        $descriptions = $select_description_sth->fetchAll();
+        $descriptions = ($rows = $select_description_sth->fetchAll())
+            ? $rows
+            : throw new Exception('fetchall ?');
 
         return Statement::from($descriptions);
     }
@@ -75,8 +75,6 @@ final class DescriptionViewSql implements DescriptionViewInterface
         if ($stable_id == '') $stable_id = '%';
 
         $count_descriptions_sth = $this->pdo->prepare(self::COUNT_DESCRIPTIONS_SQL);
-
-        if ($count_descriptions_sth === false) throw new \Exception;
 
         $count_descriptions_sth->execute([$run_id, $pmid, $stable_id]);
 
@@ -88,8 +86,6 @@ final class DescriptionViewSql implements DescriptionViewInterface
         if ($stable_id == '') $stable_id = '%';
 
         $select_descriptions_sth = $this->pdo->prepare(self::SELECT_DESCRIPTIONS_SQL);
-
-        if ($select_descriptions_sth === false) throw new \Exception;
 
         $select_descriptions_sth->execute([$run_id, $pmid, $stable_id, $limit, $offset]);
 

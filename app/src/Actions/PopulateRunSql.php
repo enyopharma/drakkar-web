@@ -32,10 +32,6 @@ final class PopulateRunSql implements PopulateRunInterface
         $select_publications_sth = $this->pdo->prepare(self::SELECT_PUBLICATIONS_SQL);
         $update_run_sth = $this->pdo->prepare(self::UPDATE_RUN_SQL);
 
-        if ($select_run_sth === false) throw new \Exception;
-        if ($select_publications_sth === false) throw new \Exception;
-        if ($update_run_sth === false) throw new \Exception;
-
         // select the curation run.
         $select_run_sth->execute([$id]);
 

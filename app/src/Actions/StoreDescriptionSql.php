@@ -89,8 +89,6 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
     {
         $select_descriptions_sth = $this->pdo->prepare(self::SELECT_DESCRIPTIONS_SQL);
 
-        if ($select_descriptions_sth === false) throw new \Exception;
-
         $select_descriptions_sth->execute([
             $association_id,
             $method_id,
@@ -121,8 +119,6 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
     private function insertFirstVersion(int $association_id, int $method_id, array $interactor1, array $interactor2): StoreDescriptionResult
     {
         $insert_description_sth = $this->pdo->prepare(self::INSERT_DESCRIPTION_SQL);
-
-        if ($insert_description_sth === false) throw new \Exception;
 
         $this->pdo->beginTransaction();
 
@@ -174,10 +170,6 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
         $update_descriptions_sth = $this->pdo->prepare(self::UPDATE_DESCRIPTIONS_SQL);
         $select_max_version_sth = $this->pdo->prepare(self::SELECT_MAX_VERSION_SQL);
         $insert_description_sth = $this->pdo->prepare(self::INSERT_DESCRIPTION_SQL);
-
-        if ($update_descriptions_sth === false) throw new \Exception;
-        if ($select_max_version_sth === false) throw new \Exception;
-        if ($insert_description_sth === false) throw new \Exception;
 
         $this->pdo->beginTransaction();
 

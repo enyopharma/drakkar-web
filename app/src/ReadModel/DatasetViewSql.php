@@ -51,8 +51,6 @@ final class DatasetViewSql implements DatasetViewInterface
 
         $select_descriptions_sth = $this->pdo->prepare(self::SELECT_DESCRIPTIONS_SQL);
 
-        if ($select_descriptions_sth === false) throw new \Exception;
-
         $select_descriptions_sth->execute([$type, PublicationState::CURATED]);
 
         return Statement::from($this->generator($select_descriptions_sth));

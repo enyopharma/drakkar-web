@@ -38,8 +38,6 @@ final class ValidateDescriptionMiddleware implements MiddlewareInterface
         // get the association.
         $select_association_sth = $this->pdo->prepare(self::SELECT_ASSOCIATION_SQL);
 
-        if ($select_association_sth === false) throw new \Exception;
-
         $select_association_sth->execute([$run_id, $pmid]);
 
         if (!$association = $select_association_sth->fetch()) {

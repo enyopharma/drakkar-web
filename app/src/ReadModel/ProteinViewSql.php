@@ -69,8 +69,6 @@ final class ProteinViewSql implements ProteinViewInterface
     {
         $select_protein_sth = $this->pdo->prepare(self::SELECT_PROTEIN_SQL);
 
-        if ($select_protein_sth === false) throw new \Exception;
-
         $select_protein_sth->execute([$id]);
 
         if (!$protein = $select_protein_sth->fetch()) {
@@ -119,8 +117,6 @@ final class ProteinViewSql implements ProteinViewInterface
 
         $select_proteins_sth = $this->pdo->prepare(sprintf(self::SELECT_PROTEINS_SQL, $where));
 
-        if ($select_proteins_sth === false) throw new \Exception;
-
         $select_proteins_sth->execute([$type, ...$qs, $limit]);
 
         return Statement::from($select_proteins_sth);
@@ -141,32 +137,32 @@ final class ProteinViewSql implements ProteinViewInterface
     {
         $select_domains_sth = $this->pdo->prepare(self::SELECT_DOMAINS_SQL);
 
-        if ($select_domains_sth === false) throw new \Exception;
-
         $select_domains_sth->execute([$accession, $version]);
 
-        return $select_domains_sth->fetchAll();
+        return ($domains = $select_domains_sth->fetchAll())
+            ? $domains
+            : throw new Exception('fetchall ?');
     }
 
     private function chains(string $accession, string $version): array
     {
         $select_chains_sth = $this->pdo->prepare(self::SELECT_CHAINS_SQL);
 
-        if ($select_chains_sth === false) throw new \Exception;
-
         $select_chains_sth->execute([$accession, $version]);
 
-        return $select_chains_sth->fetchAll();
+        return ($chains = $select_chains_sth->fetchAll())
+            ? $chains
+            : throw new Exception('fetchall ?');
     }
 
     private function matures(int $id): array
     {
         $select_matures_sth = $this->pdo->prepare(self::SELECT_MATURES_SQL);
 
-        if ($select_matures_sth === false) throw new \Exception;
-
         $select_matures_sth->execute([$id]);
 
-        return $select_matures_sth->fetchAll();
+        return ($matures = $select_matures_sth->fetchAll())
+            ? $matures
+            : throw new Exception('fetchall ?');
     }
 }

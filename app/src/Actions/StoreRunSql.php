@@ -61,13 +61,6 @@ final class StoreRunSql implements StoreRunInterface
             implode(', ', array_pad([], count($pmids), '?')),
         ]));
 
-        if ($insert_run_sth === false) throw new \Exception;
-        if ($insert_publication_sth === false) throw new \Exception;
-        if ($insert_association_sth === false) throw new \Exception;
-        if ($select_run_sth === false) throw new \Exception;
-        if ($select_publication_sth === false) throw new \Exception;
-        if ($select_publications_sth === false) throw new \Exception;
-
         // return an error when a run with the same name already exist.
         $select_run_sth->execute([$name]);
 

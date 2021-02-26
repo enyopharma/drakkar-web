@@ -22,8 +22,6 @@ final class PublicationViewSql implements PublicationViewInterface
     {
         $select_publications_sth = $this->pdo->prepare(self::SELECT_PUBLICATIONS_SQL);
 
-        if ($select_publications_sth === false) throw new \Exception;
-
         $select_publications_sth->execute([$pmid]);
 
         return Statement::from($this->generator($select_publications_sth));

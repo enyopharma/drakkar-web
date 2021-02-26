@@ -22,8 +22,6 @@ final class MethodViewSql implements MethodViewInterface
     {
         $select_method_sth = $this->pdo->prepare(self::SELECT_METHOD_SQL);
 
-        if ($select_method_sth === false) throw new \Exception;
-
         $select_method_sth->execute([$id]);
 
         return Statement::from($select_method_sth);
@@ -42,8 +40,6 @@ final class MethodViewSql implements MethodViewInterface
         $where = implode(' AND ', array_pad([], count($qs), 'search ILIKE ?'));
 
         $select_methods_sth = $this->pdo->prepare(sprintf(self::SELECT_METHODS_SQL, $where));
-
-        if ($select_methods_sth === false) throw new \Exception;
 
         $select_methods_sth->execute([...$qs, $limit]);
 

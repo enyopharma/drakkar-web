@@ -52,12 +52,6 @@ final class PopulatePublicationSql implements PopulatePublicationInterface
         $update_run_sth = $this->pdo->prepare(self::UPDATE_RUN_SQL);
         $update_publication_sth = $this->pdo->prepare(self::UPDATE_PUBLICATION_SQL);
 
-        if ($select_runs_sth === false) throw new \Exception;
-        if ($select_publication_sth === false) throw new \Exception;
-        if ($count_not_populated_sth === false) throw new \Exception;
-        if ($update_run_sth === false) throw new \Exception;
-        if ($update_publication_sth === false) throw new \Exception;
-
         // select the publication.
         $select_publication_sth->execute([$pmid]);
 

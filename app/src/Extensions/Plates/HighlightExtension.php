@@ -62,8 +62,6 @@ final class HighlightExtension implements ExtensionInterface
         if (!$this->keywords) {
             $select_keywords_sth = $this->pdo->prepare(self::SELECT_KEYWORDS_SQL);
 
-            if ($select_keywords_sth === false) throw new \Exception;
-
             $select_keywords_sth->execute();
 
             $this->keywords = (array) $select_keywords_sth->fetchAll();

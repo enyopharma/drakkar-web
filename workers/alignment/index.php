@@ -2,9 +2,6 @@
 
 declare(strict_types=1);
 
-use Symfony\Component\Dotenv\Dotenv;
-use Symfony\Component\Process\Process;
-
 /**
  * Set up the autoloader.
  */
@@ -14,7 +11,7 @@ require __DIR__ . '/vendor/autoload.php';
  * Complete the env with local values.
  */
 if (file_exists($envfile = __DIR__ . '/.env')) {
-    (new Dotenv(false))->load($envfile);
+    (new Symfony\Component\Dotenv\Dotenv)->load($envfile);
 }
 
 /**

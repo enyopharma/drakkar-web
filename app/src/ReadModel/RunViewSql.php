@@ -34,8 +34,6 @@ final class RunViewSql implements RunViewInterface
     {
         $select_run_sth = $this->pdo->prepare(self::SELECT_RUN_SQL);
 
-        if ($select_run_sth === false) throw new \Exception;
-
         $select_run_sth->execute([$id]);
 
         if (!$run = $select_run_sth->fetch()) {
@@ -56,8 +54,6 @@ final class RunViewSql implements RunViewInterface
     {
         $select_runs_sth = $this->pdo->prepare(self::SELECT_RUNS_SQL);
 
-        if ($select_runs_sth === false) throw new \Exception;
-
         $select_runs_sth->execute();
 
         $nbs = in_array('nbs', $with) ? $this->nbs() : [];
@@ -69,8 +65,6 @@ final class RunViewSql implements RunViewInterface
     {
         $count_publications_sth = $this->pdo->prepare(self::COUNT_PUBLICATIONS_SQL);
 
-        if ($count_publications_sth === false) throw new \Exception;
-
         $count_publications_sth->execute([$id, $state]);
 
         return $count_publications_sth->fetch(\PDO::FETCH_COLUMN) ?? 0;
@@ -79,8 +73,6 @@ final class RunViewSql implements RunViewInterface
     private function nbs(): array
     {
         $count_publications_sth = $this->pdo->prepare(self::EAGER_LOAD_COUNT_PUBLICATIONS_SQL);
-
-        if ($count_publications_sth === false) throw new \Exception;
 
         $count_publications_sth->execute();
 

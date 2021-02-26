@@ -27,8 +27,6 @@ final class FormViewSql implements FormViewInterface
     {
         $select_description_sth = $this->pdo->prepare(self::SELECT_DESCRIPTION_SQL);
 
-        if ($select_description_sth === false) throw new \Exception;
-
         $select_description_sth->execute([$run_id, $pmid, $id]);
 
         return Statement::from($this->generator($select_description_sth));

@@ -26,8 +26,6 @@ final class DeleteDescriptionSql implements DeleteDescriptionInterface
     {
         $select_description_sth = $this->pdo->prepare(self::SELECT_DESCRIPTION_SQL);
 
-        if ($select_description_sth === false) throw new \Exception;
-
         $select_description_sth->execute([$run_id, $pmid, $id]);
 
         if (!$select_description_sth->fetch()) {
@@ -35,8 +33,6 @@ final class DeleteDescriptionSql implements DeleteDescriptionInterface
         }
 
         $delete_description_sth = $this->pdo->prepare(self::DELETE_DESCRIPTION_SQL);
-
-        if ($delete_description_sth === false) throw new \Exception;
 
         $delete_description_sth->execute([$id]);
 

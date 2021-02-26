@@ -99,8 +99,6 @@ final class DescriptionInput
     {
         $select_association_sth = $pdo->prepare(self::SELECT_ASSOCIATION_SQL);
 
-        if ($select_association_sth === false) throw new \Exception;
-
         $select_association_sth->execute([$this->association_id]);
 
         $association = $select_association_sth->fetch();
@@ -128,8 +126,6 @@ final class DescriptionInput
 
         $select_descriptions_sth = $pdo->prepare(self::SELECT_DESCRIPTIONS_SQL);
 
-        if ($select_descriptions_sth === false) throw new \Exception;
-
         $select_descriptions_sth->execute([$this->stable_id]);
 
         $description = $select_descriptions_sth->fetch();
@@ -148,8 +144,6 @@ final class DescriptionInput
     private function validateMethodIdForDb(\PDO $pdo): array
     {
         $select_method_sth = $pdo->prepare(self::SELECT_METHOD_SQL);
-
-        if ($select_method_sth === false) throw new \Exception;
 
         $select_method_sth->execute([$this->method_id]);
 

@@ -137,8 +137,6 @@ final class InteractorInput
 
         $select_protein_sth = $pdo->prepare(self::SELECT_PROTEIN_SQL);
 
-        if ($select_protein_sth === false) throw new \Exception;
-
         $select_protein_sth->execute([$this->protein_id]);
 
         $protein = $select_protein_sth->fetch();
@@ -202,8 +200,6 @@ final class InteractorInput
         // validate name/coordinates consistency.
         $select_name_sth = $pdo->prepare(self::SELECT_MATURE_NAME_SQL);
 
-        if ($select_name_sth === false) throw new \Exception;
-
         $select_name_sth->execute([$this->protein_id, $this->start, $this->stop]);
 
         $data = $select_name_sth->fetch();
@@ -222,8 +218,6 @@ final class InteractorInput
 
         // validate coordinates/name consistency.
         $select_coordinates_sth = $pdo->prepare(self::SELECT_MATURE_COORDINATES_SQL);
-
-        if ($select_coordinates_sth === false) throw new \Exception;
 
         $select_coordinates_sth->execute([$this->protein_id, $this->name]);
 

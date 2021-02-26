@@ -24,8 +24,6 @@ final class UpdatePublicationStateSql implements UpdatePublicationStateInterface
 
         $update_publication_sth = $this->pdo->prepare(self::UPDATE_PUBLICATION_SQL);
 
-        if ($update_publication_sth === false) throw new \Exception;
-
         $update_publication_sth->execute([$state, $annotation, $run_id, $pmid]);
 
         return $update_publication_sth->rowCount() == 1
