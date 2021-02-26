@@ -9,10 +9,7 @@
         }
     ],
     "config": {
-        "sort-packages": true,
-        "platform": {
-            "php": "7.4"
-        }
+        "sort-packages": true
     },
     "require": {
         "predis/predis": "^1.1",
