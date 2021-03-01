@@ -37,7 +37,7 @@ final class ProteinViewSql implements ProteinViewInterface
     const SELECT_DOMAINS_SQL = <<<SQL
         SELECT f->>'type' AS type, f->>'start' AS start, f->>'stop' AS stop, f->>'description' AS description
         FROM proteins_versions AS v, jsonb_array_elements(v.features) AS f
-        WHERE v.accession = ? AND v.version = ? AND f->>'type' IN (
+        WHERE v.accession = ? AND v.current_version = ? AND f->>'type' IN (
             'topological domain',
             'transmembrane region',
             'intramembrane region',
@@ -50,7 +50,7 @@ final class ProteinViewSql implements ProteinViewInterface
     const SELECT_CHAINS_SQL = <<<SQL
         SELECT f->>'type' AS type, f->>'start' AS start, f->>'stop' AS stop, f->>'description' AS description
         FROM proteins_versions AS v, jsonb_array_elements(v.features) AS f
-        WHERE v.accession = ? AND v.version = ? AND f->>'type' = 'chain'
+        WHERE v.accession = ? AND v.current_version = ? AND f->>'type' = 'chain'
     SQL;
 
     # ASSUME THE VIRAL INTERACTOR IS ALWAYS THE SECOND INTERACTOR
