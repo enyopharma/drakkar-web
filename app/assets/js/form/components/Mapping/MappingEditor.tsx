@@ -79,7 +79,7 @@ const DomainsFormGroupToggle: React.FC<DomainsFormGroupToggle> = ({ i, domains, 
     const processing = useInteractorSelector(i, state => state.processing)
 
     const selectDomain = useCallback((domain: Domain) => {
-        update(domain.start - 1, domain.stop)
+        update(domain.start, domain.stop)
     }, [update])
 
     return (
