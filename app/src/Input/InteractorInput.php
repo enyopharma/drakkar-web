@@ -108,7 +108,7 @@ final class InteractorInput
     private function validateName(): array
     {
         return preg_match(self::NAME_PATTERN, $this->name) === 0
-            ? [Error::nested('name', 'must match %s', self::NAME_PATTERN)]
+            ? [Error::nested('name', sprintf('must match %s', self::NAME_PATTERN))]
             : [];
     }
 
