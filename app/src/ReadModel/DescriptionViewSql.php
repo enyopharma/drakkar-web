@@ -63,9 +63,11 @@ final class DescriptionViewSql implements DescriptionViewInterface
 
         $select_description_sth->execute([$stable_id]);
 
-        $descriptions = ($rows = $select_description_sth->fetchAll())
-            ? $rows
-            : throw new Exception('fetchall ?');
+        $descriptions = $select_description_sth->fetchAll();
+
+        if ($descriptions === false) {
+            throw new \Exception('fetchall ?');
+        }
 
         return Statement::from($descriptions);
     }

@@ -139,9 +139,11 @@ final class ProteinViewSql implements ProteinViewInterface
 
         $select_domains_sth->execute([$accession, $version]);
 
-        return ($domains = $select_domains_sth->fetchAll())
-            ? $domains
-            : throw new Exception('fetchall ?');
+        $domains = $select_domains_sth->fetchAll();
+
+        return $domains === false
+            ? throw new \Exception('fetchall ?')
+            : $domains;
     }
 
     private function chains(string $accession, string $version): array
@@ -150,9 +152,11 @@ final class ProteinViewSql implements ProteinViewInterface
 
         $select_chains_sth->execute([$accession, $version]);
 
-        return ($chains = $select_chains_sth->fetchAll())
-            ? $chains
-            : throw new Exception('fetchall ?');
+        $chains = $select_chains_sth->fetchAll();
+
+        return $chains === false
+            ? throw new \Exception('fetchall ?')
+            : $chains;
     }
 
     private function matures(int $id): array
@@ -161,8 +165,10 @@ final class ProteinViewSql implements ProteinViewInterface
 
         $select_matures_sth->execute([$id]);
 
-        return ($matures = $select_matures_sth->fetchAll())
-            ? $matures
-            : throw new Exception('fetchall ?');
+        $matures = $select_matures_sth->fetchAll();
+
+        return $matures === false
+            ? throw new \Exception('fetchall ?')
+            : $matures;
     }
 }
