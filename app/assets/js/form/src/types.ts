@@ -79,6 +79,7 @@ export type Protein = {
     type: ProteinType
     accession: string
     version: string
+    current_version: string | null
     taxon: string
     name: string
     description: string

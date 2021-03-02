@@ -17,7 +17,7 @@ use App\Assertions\ProteinType;
 final class InteractorInput
 {
     const SELECT_PROTEIN_SQL = <<<SQL
-        SELECT p.*, p.sequences->>p.accession AS sequence, v.current_version AS version
+        SELECT p.*, p.sequences->>p.accession AS sequence, v.current_version
         FROM proteins AS p LEFT JOIN proteins_versions AS v ON p.accession = v.accession AND p.version = v.version
         WHERE p.id = ?
     SQL;
@@ -151,7 +151,7 @@ final class InteractorInput
             $errors[] = new Error(sprintf('must be a %s protein', $type == ProteinType::H ? 'human' : 'viral'));
         }
 
-        if (is_null($protein['version'])) {
+        if (is_null($protein['current_version'])) {
             $errors[] = new Error(sprintf('this version of protein %s is obsolete', $protein['accession']));
         }
 

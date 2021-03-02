@@ -9,7 +9,7 @@ use App\Assertions\ProteinType;
 final class ProteinViewSql implements ProteinViewInterface
 {
     const SELECT_PROTEIN_SQL = <<<SQL
-        SELECT p.id, p.type, p.accession, COALESCE(v.current_version, p.version) AS version, p.name, p.description,
+        SELECT p.id, p.type, p.accession, p.version, v.current_version, p.name, p.description,
             p.sequences->>p.accession AS sequence, p.sequences,
             COALESCE(tn.name, 'obsolete taxon') AS taxon,
             (v.current_version IS NULL) AS obsolete
@@ -21,7 +21,7 @@ final class ProteinViewSql implements ProteinViewInterface
     SQL;
 
     const SELECT_PROTEINS_SQL = <<<SQL
-        SELECT p.id, p.type, p.accession, v.current_version AS version, p.name, p.description,
+        SELECT p.id, p.type, p.accession, v.current_version, p.name, p.description,
             COALESCE(tn.name, 'obsolete taxon') AS taxon,
             FALSE AS obsolete
         FROM
@@ -37,7 +37,7 @@ final class ProteinViewSql implements ProteinViewInterface
     const SELECT_DOMAINS_SQL = <<<SQL
         SELECT f->>'type' AS type, f->>'start' AS start, f->>'stop' AS stop, f->>'description' AS description
         FROM proteins_versions AS v, jsonb_array_elements(v.features) AS f
-        WHERE v.accession = ? AND v.current_version = ? AND f->>'type' IN (
+        WHERE v.accession = ? AND v.version = ? AND f->>'type' IN (
             'topological domain',
             'transmembrane region',
             'intramembrane region',

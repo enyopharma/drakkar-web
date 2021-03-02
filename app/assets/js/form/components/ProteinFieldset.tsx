@@ -102,7 +102,7 @@ const ProteinAlert: React.FC<ProteinAlertProps> = ({ i, resource, unselect }) =>
 
     const processing = useInteractorSelector(i, state => state.processing)
 
-    const label = [protein.version, protein.taxon, protein.name, protein.description].join(' - ')
+    const label = [protein.current_version ?? protein.version, protein.taxon, protein.name, protein.description].join(' - ')
 
     return (
         <React.Fragment>

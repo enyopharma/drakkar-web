@@ -47,7 +47,7 @@ const fetchProteins = async (type: ProteinType, query: string, limit: number) =>
         .then(response => response.json(), error => console.log(error))
         .then(json => json.data.map((p: Protein) => ({
             id: p.id,
-            label: [p.accession, p.version, p.taxon, p.name, p.description].join(' - '),
+            label: [p.accession, p.current_version, p.taxon, p.name, p.description].join(' - '),
         })))
 }
 
