@@ -151,7 +151,11 @@ const FeedbackRow: React.FC<FeedbackRowProps> = ({ feedback }) => {
             MySwal.fire({
                 icon: 'error',
                 title: <p>Something went wrong</p>,
-                html: <ul>{feedback.errors.map((e, i) => <li key={i}>{e}</li>)}</ul>,
+                html: (
+                    <ul className="list-unstyled">
+                        {feedback.errors.map((e, i) => <li key={i}>{e}</li>)}
+                    </ul>
+                ),
             })
         }
     }, [feedback])
