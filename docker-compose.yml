@@ -18,6 +18,7 @@ services:
             - REDIS_SCHEME=${REDIS_SCHEME}
             - REDIS_HOST=${REDIS_HOST}
             - REDIS_PORT=${REDIS_PORT}
+            - SCIHUB_HOST=${SCIHUB_HOST}
     socket:
         build: ./socket
         depends_on:
