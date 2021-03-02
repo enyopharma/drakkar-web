@@ -1377,16 +1377,16 @@
         },
         {
             "name": "quanta/http-routing",
-            "version": "0.2.3",
+            "version": "0.2.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quantaphp/http-routing.git",
-                "reference": "cbd1c88a093369e0c50acf2cbeabe124642d2c11"
+                "reference": "283f5908651d44839708ad3afb4be481d10bcc3f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/http-routing/zipball/cbd1c88a093369e0c50acf2cbeabe124642d2c11",
-                "reference": "cbd1c88a093369e0c50acf2cbeabe124642d2c11",
+                "url": "https://api.github.com/repos/quantaphp/http-routing/zipball/283f5908651d44839708ad3afb4be481d10bcc3f",
+                "reference": "283f5908651d44839708ad3afb4be481d10bcc3f",
                 "shasum": ""
             },
             "require": {
@@ -1399,6 +1399,7 @@
             "require-dev": {
                 "eloquent/phony-kahlan": "^4.0",
                 "kahlan/kahlan": "^5.0",
+                "nikic/fast-route": "^1.3",
                 "phpstan/phpstan": "^0.12.3"
             },
             "type": "library",
@@ -1429,7 +1430,7 @@
                 "issues": "https://github.com/quantaphp/http-routing/issues",
                 "source": "https://github.com/quantaphp/http-routing"
             },
-            "time": "2021-02-26T14:10:02+00:00"
+            "time": "2021-03-02T12:05:14+00:00"
         },
         {
             "name": "quanta/validation",

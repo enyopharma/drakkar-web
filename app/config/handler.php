@@ -35,7 +35,7 @@ if (file_exists(__DIR__ . '/shutdown')) {
 /**
  * Get the fast route dispatcher and build a router.
  */
-$router = new App\Routing\FastRouteRouter(
+$router = new Quanta\Http\FastRouteRouter(
     $container->get(FastRoute\Dispatcher::class),
 );
 
