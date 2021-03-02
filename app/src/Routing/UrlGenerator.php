@@ -26,7 +26,7 @@ final class UrlGenerator
         $url = $this->map[$name]($data);
 
         if (count($query) > 0) {
-            $url.= '?' . http_build_query($query, '', '&amp;');
+            $url.= '?' . http_build_query($query);
         }
 
         if (strlen($fragment) > 0) {
