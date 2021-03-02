@@ -138,12 +138,12 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
                     $interactor1['name'],
                     $interactor1['start'],
                     $interactor1['stop'],
-                    json_encode($interactor1['mapping']),
+                    json_encode($interactor1['mapping'], JSON_THROW_ON_ERROR),
                     $interactor2['protein_id'],
                     $interactor2['name'],
                     $interactor2['start'],
                     $interactor2['stop'],
-                    json_encode($interactor2['mapping']),
+                    json_encode($interactor2['mapping'], JSON_THROW_ON_ERROR),
                 ]);
             }
 
@@ -189,12 +189,12 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
                 $interactor1['name'],
                 $interactor1['start'],
                 $interactor1['stop'],
-                json_encode($interactor1['mapping']),
+                json_encode($interactor1['mapping'], JSON_THROW_ON_ERROR),
                 $interactor2['protein_id'],
                 $interactor2['name'],
                 $interactor2['start'],
                 $interactor2['stop'],
-                json_encode($interactor2['mapping']),
+                json_encode($interactor2['mapping'], JSON_THROW_ON_ERROR),
             ]);
         }
 

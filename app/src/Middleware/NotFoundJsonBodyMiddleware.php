@@ -26,11 +26,9 @@ final class NotFoundJsonBodyMiddleware implements MiddlewareInterface
 
     public function notFoundResponse(ResponseInterface $response): ResponseInterface
     {
-        $contents = json_encode(['code' => 404, 'success' => false, 'data' => []]);
+        $data = ['code' => 404, 'success' => false, 'data' => []];
 
-        if ($contents === false) {
-            throw new \Exception(json_last_error_msg());
-        }
+        $contents = json_encode($data, JSON_THROW_ON_ERROR);
 
         $response->getBody()->write($contents);
 

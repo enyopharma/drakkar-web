@@ -14,15 +14,13 @@ final class StartEndpoint
 
     public function __invoke(callable $input): array
     {
-        $id = $input('id');
-        $query = $input('query');
-        $sequences = array_filter((array) $input('sequences', []), 'is_string');
+        $data = [
+            'id' => $input('id'),
+            'query' => $input('query'),
+            'sequences' => array_filter((array) $input('sequences', []), 'is_string'),
+        ];
 
-        $payload = json_encode(['id' => $id, 'query' => $query, 'sequences' => $sequences]);
-
-        if ($payload === false) {
-            throw new \Exception;
-        }
+        $payload = json_encode($data, JSON_THROW_ON_ERROR);
 
         $this->client->rpush('default', [$payload]);
 

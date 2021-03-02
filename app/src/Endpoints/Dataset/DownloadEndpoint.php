@@ -40,7 +40,7 @@ final class DownloadEndpoint
     private function generator(iterable $descriptions): \Generator
     {
         foreach ($descriptions as $description) {
-            yield json_encode($description) . "\n";
+            yield json_encode($description, JSON_THROW_ON_ERROR) . "\n";
         }
     }
 }
