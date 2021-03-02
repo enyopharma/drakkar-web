@@ -12,10 +12,14 @@ final class ShowEndpoint
         private MethodViewInterface $methods,
     ) {}
 
-    public function __invoke(callable $input): array|false
+    public function __invoke(callable $input): array|null
     {
         $id = (int) $input('id');
 
-        return $this->methods->id($id)->fetch();
+        if ($method = $this->methods->id($id)->fetch()) {
+            return $method;
+        }
+
+        return null;
     }
 }

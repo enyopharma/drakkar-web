@@ -23,17 +23,17 @@ return function (ContainerInterface $container): array {
         return new Quanta\Http\LazyRequestHandler(function () use ($container, $factory) {
             $xs = $factory();
 
-            $responder = new Quanta\Http\Responder(
-                $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-            );
-
-            [$f, $middleware] = is_array($xs) ? [array_shift($xs), $xs] : [$xs, []];
+            [$f, $middleware] = is_array($xs) ? [array_pop($xs), $xs] : [$xs, []];
 
             if (!is_callable($f)) {
                 throw new \LogicException('invalid endpoint');
             }
 
-            $endpoint = new Quanta\Http\Endpoint($responder, $f);
+            $factory = $container->get(Psr\Http\Message\ResponseFactoryInterface::class);
+
+            $serializer = new Quanta\Http\MetadataSerializer('data', ['code' => 200, 'success' => true]);
+
+            $endpoint = new Quanta\Http\Endpoint($factory, $f, $serializer);
 
             return count($middleware) > 0
                 ? Quanta\Http\RequestHandler::queue($endpoint, ...$middleware)
@@ -91,12 +91,12 @@ return function (ContainerInterface $container): array {
         ),
 
         'POST /runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions' => fn () => [
-            new Descriptions\StoreEndpoint(
-                $container->get(App\Actions\StoreDescriptionInterface::class),
-            ),
             new App\Middleware\ValidateDescriptionMiddleware(
                 $container->get(PDO::class),
                 $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
+            ),
+            new Descriptions\StoreEndpoint(
+                $container->get(App\Actions\StoreDescriptionInterface::class),
             ),
         ],
 

@@ -13,7 +13,7 @@ final class DeleteEndpoint
         private DeleteDescriptionInterface $action,
     ) {}
 
-    public function __invoke(callable $input): array|false
+    public function __invoke(callable $input): array|null
     {
         $run_id = (int) $input('run_id');
         $pmid = (int) $input('pmid');
@@ -23,7 +23,7 @@ final class DeleteEndpoint
 
         return match ($result->status()) {
             0 => [],
-            1 => false,
+            1 => null,
         };
     }
 }

@@ -24,7 +24,7 @@ final class IndexEndpoint
         private DescriptionViewInterface $descriptions,
     ) {}
 
-    public function __invoke(callable $input, callable $responder): ResponseInterface|string|false
+    public function __invoke(callable $input, callable $responder): ResponseInterface|string|null
     {
         // get input.
         $run_id = (int) $input('run_id');
@@ -35,12 +35,12 @@ final class IndexEndpoint
 
         // get the run.
         if (!$run = $this->runs->id($run_id)->fetch()) {
-            return false;
+            return null;
         }
 
         // get the publication.
         if (!$publication = $this->associations->pmid($run_id, $pmid)->fetch()) {
-            return false;
+            return null;
         }
 
         // get the descriptions.
@@ -48,15 +48,15 @@ final class IndexEndpoint
         $offset = ($page - 1) * $limit;
 
         if ($limit < 0) {
-            return $responder(302, $this->outOfRangeUrl($publication, 1, 20));
+            return $this->redirect($responder(), $publication, 1, 20);
         }
 
         if ($page < 1) {
-            return $responder(302, $this->outOfRangeUrl($publication, 1, $limit));
+            return $this->redirect($responder(), $publication, 1, $limit);
         }
 
         if ($offset > 0 && $offset > $total) {
-            return $responder(302, $this->outOfRangeUrl($publication, (int) ceil($total/$limit), $limit));
+            return $this->redirect($responder(), $publication, (int) ceil($total/$limit), $limit);
         }
 
         $descriptions = $this->descriptions->all($run_id, $pmid, $stable_id, $limit, $offset)->fetchAll();
@@ -73,10 +73,14 @@ final class IndexEndpoint
         ]);
     }
 
-    private function outOfRangeUrl(array $publication, int $page, int $limit): string
+    private function redirect(ResponseInterface $response, array $publication, int $page, int $limit): ResponseInterface
     {
         $query = ['page' => $page, 'limit' => $limit];
 
-        return $this->generator->generate('runs.publications.descriptions.index', $publication, $query, 'descriptions');
+        $url = $this->generator->generate('runs.publications.descriptions.index', $publication, $query, 'descriptions');
+
+        return $response
+            ->withStatus(302)
+            ->withHeader('location', $url);
     }
 }

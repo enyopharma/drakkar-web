@@ -16,7 +16,7 @@ final class UpdateEndpoint
         private UpdatePublicationStateInterface $action,
     ) {}
 
-    public function __invoke(callable $input, callable $responder): ResponseInterface|false
+    public function __invoke(callable $input, callable $responder): ResponseInterface|null
     {
         $run_id = (int) $input('run_id');
         $pmid = (int) $input('pmid');
@@ -25,14 +25,14 @@ final class UpdateEndpoint
         $source = $input('_source', '');
 
         if (!PublicationState::isValid($state)) {
-            return false;
+            return null;
         }
 
         $result = $this->action->update($run_id, $pmid, $state, $annotation);
 
         return match ($result->status()) {
-            0 => $responder(302, $source),
-            1 => false,
+            0 => $responder(302)->withHeader('location', $source),
+            1 => null,
         };
     }
 }

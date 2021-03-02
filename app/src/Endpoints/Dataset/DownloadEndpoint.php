@@ -17,12 +17,12 @@ final class DownloadEndpoint
         private DatasetViewInterface $dataset,
     ) {}
 
-    public function __invoke(callable $input, callable $responder): ResponseInterface|false
+    public function __invoke(callable $input, callable $responder): ResponseInterface|null
     {
         $type = $input('type');
 
         if (!RunType::isValid($type)) {
-            return false;
+            return null;
         }
 
         $dataset = $this->dataset->all($type);

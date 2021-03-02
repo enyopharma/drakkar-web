@@ -17,7 +17,7 @@ final class CreateEndpoint
         private AssociationViewInterface $associations,
     ) {}
 
-    public function __invoke(callable $input): string|false
+    public function __invoke(callable $input): string|null
     {
         // get input.
         $run_id = (int) $input('run_id');
@@ -25,12 +25,12 @@ final class CreateEndpoint
 
         // get the run.
         if (!$run = $this->runs->id($run_id)->fetch()) {
-            return false;
+            return null;
         }
 
         // get the publication.
         if (!$publication = $this->associations->pmid($run_id, $pmid)->fetch()) {
-            return false;
+            return null;
         }
 
         return $this->engine->render('descriptions/form', [

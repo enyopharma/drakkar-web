@@ -19,7 +19,7 @@ final class EditEndpoint
         private FormViewInterface $descriptions,
     ) {}
 
-    public function __invoke(callable $input): string|false
+    public function __invoke(callable $input): string|null
     {
         // parse request.
         $run_id = (int) $input('run_id');
@@ -29,17 +29,17 @@ final class EditEndpoint
 
         // get the run.
         if (!$run = $this->runs->id($run_id)->fetch()) {
-            return false;
+            return null;
         }
 
         // get the publication.
         if (!$publication = $this->associations->pmid($run_id, $pmid)->fetch()) {
-            return false;
+            return null;
         }
 
         // get the description.
         if (!$description = $this->descriptions->id($run_id, $pmid, $id)->fetch()) {
-            return false;
+            return null;
         }
 
         // erase stable id when copying.

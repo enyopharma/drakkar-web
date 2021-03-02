@@ -31,6 +31,6 @@ final class SearchEndpoint
 
         $url = $this->url->generate('runs.publications.descriptions.index', $description, ['stable_id' => $stable_id], 'descriptions');
 
-        return $responder(302, $url);
+        return $responder(302)->withHeader('location', $url);
     }
 }

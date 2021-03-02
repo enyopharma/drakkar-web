@@ -30,20 +30,26 @@ final class StoreEndpoint
 
         return match ($result->status()) {
             0 => ['id' => $result->id()],
-            1 => $responder(409, $this->conflict(...$result->messages())),
-            2 => $responder(409, $this->conflict('Description already exists')),
-            3 => $responder(409, $this->conflict('Failed to insert the description')),
-            4 => $responder(409, $this->conflict('Failed to insert a new version of the description')),
+            1 => $this->conflict($responder(), ...$result->messages()),
+            2 => $this->conflict($responder(), 'Description already exists'),
+            3 => $this->conflict($responder(), 'Failed to insert the description'),
+            4 => $this->conflict($responder(), 'Failed to insert a new version of the description'),
         };
     }
 
-    private function conflict(string ...$messages): array
+    private function conflict(ResponseInterface $response, string ...$messages): ResponseInterface
     {
-        return [
+        $contents = json_encode([
             'code' => 409,
             'success' => false,
             'reason' => $messages,
             'data' => [],
-        ];
+        ], JSON_THROW_ON_ERROR);
+
+        $response->getBody()->write($contents);
+
+        return $response
+            ->withStatus(409)
+            ->withHeader('content-type', 'application/json');
     }
 }

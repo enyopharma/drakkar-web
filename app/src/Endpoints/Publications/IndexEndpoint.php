@@ -22,7 +22,7 @@ final class IndexEndpoint
         private AssociationViewInterface $associations,
     ) {}
 
-    public function __invoke(callable $input, callable $responder): ResponseInterface|string|false
+    public function __invoke(callable $input, callable $responder): ResponseInterface|string|null
     {
         // get input.
         $run_id = (int) $input('run_id');
@@ -32,12 +32,12 @@ final class IndexEndpoint
 
         // get the run.
         if (!$run = $this->runs->id($run_id, 'nbs')->fetch()) {
-            return false;
+            return null;
         }
 
         // validate the publication state.
         if (!PublicationState::isValid($state)) {
-            return false;
+            return null;
         }
 
         // get the publications.
@@ -45,15 +45,15 @@ final class IndexEndpoint
         $offset = ($page - 1) * $limit;
 
         if ($limit < 0) {
-            return $responder(302, $this->outOfRangeUrl($run, $state, 1, 20));
+            return $this->redirect($responder(), $run, $state, 1, 20);
         }
 
         if ($page < 1) {
-            return $responder(302, $this->outOfRangeUrl($run, $state, 1, $limit));
+            return $this->redirect($responder(), $run, $state, 1, $limit);
         }
 
         if ($offset > 0 && $offset > $total) {
-            return $responder(302, $this->outOfRangeUrl($run, $state, (int) ceil($total/$limit), $limit));
+            return $this->redirect($responder(), $run, $state, (int) ceil($total/$limit), $limit);
         }
 
         // success!
@@ -67,10 +67,14 @@ final class IndexEndpoint
         ]);
     }
 
-    private function outOfRangeUrl(array $run, string $state, int $page, int $limit): string
+    private function redirect(ResponseInterface $response, array $run, string $state, int $page, int $limit): ResponseInterface
     {
         $query = ['state' => $state, 'page' => $page, 'limit' => $limit];
 
-        return $this->generator->generate('runs.publications.index', $run, $query, 'publications');
+        $url = $this->generator->generate('runs.publications.index', $run, $query, 'publications');
+
+        return $response
+            ->withStatus(302)
+            ->withHeader('location', $url);
     }
 }

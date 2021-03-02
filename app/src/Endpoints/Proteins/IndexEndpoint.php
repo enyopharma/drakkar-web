@@ -16,14 +16,14 @@ final class IndexEndpoint
         $this->proteins = $proteins;
     }
 
-    public function __invoke(callable $input): array|false
+    public function __invoke(callable $input): array|null
     {
         $type = $input('type', '');
         $query = $input('query', '');
         $limit = (int) $input('limit', 5);
 
         if (!ProteinType::isValid($type)) {
-            return false;
+            return null;
         }
 
         return $this->proteins->search($type, $query, $limit)->fetchAll();
