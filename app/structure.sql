@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
--- Dumped by pg_dump version 12.5 (Ubuntu 12.5-0ubuntu0.20.04.1)
+-- Dumped from database version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
+-- Dumped by pg_dump version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -40,7 +40,7 @@ CREATE FUNCTION public.constrain_taxon() RETURNS integer
 CREATE RULE rule_taxon_i
        AS ON INSERT TO taxon
        WHERE (
-             SELECT taxon_id FROM taxon
+             SELECT taxon_id FROM taxon 
              WHERE ncbi_taxon_id = new.ncbi_taxon_id
              )
        	     IS NOT NULL
@@ -257,7 +257,7 @@ CREATE VIEW public.dataset AS
     p2.id AS protein2_id,
     p2.type AS type2,
     p2.accession AS accession2,
-    p2.name AS name2,
+    d.name2,
     d.start2,
     d.stop2,
     p2.description AS description2,
@@ -761,3 +761,4 @@ ALTER TABLE ONLY public.taxon_name
 --
 -- PostgreSQL database dump complete
 --
+
