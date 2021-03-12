@@ -13,18 +13,35 @@ use Psr\Container\ContainerInterface;
 return function (ContainerInterface $container) {
     $collector = $container->get(FastRoute\RouteCollector::class);
 
-    $routes = (require __DIR__ . '/../routes.php')($container);
+    $files = glob(__DIR__ . '/../routes/*.php');
 
-    foreach ($routes as $route => $handler) {
-        $parts = (array) preg_split('/\s+/', $route);
+    if ($files === false) {
+        throw new Exception;
+    }
 
-        if (count($parts) != 2) {
-            throw new LogicException(sprintf('invalid route \'%s\'', $route));
+    foreach ($files as $file) {
+        $provider = require $file;
+
+        if (!is_callable($provider)) {
+            throw new UnexpectedValueException('route definition file must return a callable');
         }
 
-        $method = (string) array_shift($parts);
-        $path = (string) array_shift($parts);
+        $routes = $provider($container);
 
-        $collector->addRoute($method, $path, $handler);
+        if (!is_iterable($routes)) {
+            throw new UnexpectedValueException('route definition callable must return an iterable');
+        }
+
+        foreach ($routes as $route) {
+            if (!$route instanceof App\Routing\Route) {
+                throw new UnexpectedValueException('iterable returned by the route definition callable must contain only Route instances');
+            }
+
+            $methods = $route->methods();
+            $pattern = $route->pattern();
+            $handler = $route->handler();
+
+            $collector->addRoute($methods, $pattern, $handler);
+        }
     }
 };
