@@ -26,13 +26,6 @@ foreach ((array) glob(__DIR__ . '/../boot/*.php') as $boot) {
 $factory = $container->get(Psr\Http\Message\ResponseFactoryInterface::class);
 
 /**
- * App Shutdown.
- */
-if (file_exists(__DIR__ . '/shutdown')) {
-    return Quanta\Http\Dispatcher::queue(new Middlewares\Shutdown($factory));
-}
-
-/**
  * Build a router from the Fast Route collector.
  */
 $router = new Quanta\Http\FastRouteRouter(
