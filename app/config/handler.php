@@ -16,7 +16,7 @@ $container = (require __DIR__ . '/container.php')($env, $debug);
 /**
  * Run the boot scripts.
  */
-foreach ((array) glob(__DIR__ . '/boot/*.php') as $boot) {
+foreach ((array) glob(__DIR__ . '/../boot/*.php') as $boot) {
     (require $boot)($container);
 }
 
@@ -33,10 +33,12 @@ if (file_exists(__DIR__ . '/shutdown')) {
 }
 
 /**
- * Get the fast route dispatcher and build a router.
+ * Build a router from the Fast Route collector.
  */
 $router = new Quanta\Http\FastRouteRouter(
-    $container->get(FastRoute\Dispatcher::class),
+    new FastRoute\Dispatcher\GroupCountBased(
+        $container->get(FastRoute\RouteCollector::class)->getData(),
+    )
 );
 
 return Quanta\Http\Dispatcher::queue(

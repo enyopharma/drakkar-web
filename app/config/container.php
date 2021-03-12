@@ -12,5 +12,5 @@ use Psr\Container\ContainerInterface;
  * @return Psr\Container\ContainerInterface
  */
 return function (string $env, bool $debug): ContainerInterface {
-    return Quanta\Container::files(__DIR__ . '/factories/*.php');
+    return Quanta\Container::files(__DIR__ . '/../factories/*.php');
 };
