@@ -25,15 +25,6 @@ foreach ((array) glob(__DIR__ . '/../boot/*.php') as $boot) {
  */
 $factory = $container->get(Psr\Http\Message\ResponseFactoryInterface::class);
 
-/**
- * Build a router from the Fast Route collector.
- */
-$router = new Quanta\Http\FastRouteRouter(
-    new FastRoute\Dispatcher\GroupCountBased(
-        $container->get(FastRoute\RouteCollector::class)->getData(),
-    )
-);
-
 return Quanta\Http\Dispatcher::queue(
     /**
      * Whoops error handler.
@@ -60,7 +51,11 @@ return Quanta\Http\Dispatcher::queue(
     /**
      * Router.
      */
-    new Quanta\Http\RoutingMiddleware($router),
+    new Quanta\Http\RoutingMiddleware(
+        new Quanta\Http\FastRouteRouter(
+            $container->get(FastRoute\Dispatcher::class),
+        ),
+    ),
 
     /**
      * Return a not allowed response.
