@@ -55,7 +55,7 @@ final class IndexEndpoint
             return $this->redirect($responder(), $publication, 1, $limit);
         }
 
-        if ($offset > 0 && $offset > $total) {
+        if ($offset > 0 && $offset >= $total) {
             return $this->redirect($responder(), $publication, (int) ceil($total/$limit), $limit);
         }
 

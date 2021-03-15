@@ -70,7 +70,7 @@ final class Route
         $this->middleware = $middleware;
     }
 
-    public function hasName(): bool
+    public function isNamed(): bool
     {
         return !is_null($this->name);
     }

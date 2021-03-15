@@ -25,13 +25,13 @@ final class IndexEndpoint
     public function __invoke(callable $input, callable $responder): ResponseInterface|string|null
     {
         // get input.
-        $run_id = (int) $input('run_id');
+        $id = (int) $input('id');
         $state = $input('state', PublicationState::PENDING);
         $page = (int) $input('page', 1);
         $limit = (int) $input('limit', 20);
 
         // get the run.
-        if (!$run = $this->runs->id($run_id, 'nbs')->fetch()) {
+        if (!$run = $this->runs->id($id, 'nbs')->fetch()) {
             return null;
         }
 
@@ -52,14 +52,14 @@ final class IndexEndpoint
             return $this->redirect($responder(), $run, $state, 1, $limit);
         }
 
-        if ($offset > 0 && $offset > $total) {
+        if ($offset > 0 && $offset >= $total) {
             return $this->redirect($responder(), $run, $state, (int) ceil($total/$limit), $limit);
         }
 
         // success!
         return $this->engine->render('publications/index', [
             'run' => $run,
-            'publications' => $this->associations->all($run_id, $state, $limit, $offset)->fetchAll(),
+            'publications' => $this->associations->all($id, $state, $limit, $offset)->fetchAll(),
             'state' => $state,
             'page' => $page,
             'limit' => $limit,

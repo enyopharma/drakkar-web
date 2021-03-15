@@ -12,6 +12,7 @@ use Psr\Container\ContainerInterface;
  */
 return function (ContainerInterface $container) {
     $collector = $container->get(FastRoute\RouteCollector::class);
+    $generator = $container->get(App\Routing\UrlGenerator::class);
 
     $files = glob(__DIR__ . '/../routes/*.php');
 
@@ -42,6 +43,10 @@ return function (ContainerInterface $container) {
             $handler = $route->handler();
 
             $collector->addRoute($methods, $pattern, $handler);
+
+            if ($route->isNamed()) {
+                $generator->register($route->name(), $pattern);
+            }
         }
     }
 };

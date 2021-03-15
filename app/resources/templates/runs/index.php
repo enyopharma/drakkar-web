@@ -1,3 +1,8 @@
+<?php
+    use App\Assertions\RunType;
+    use App\Assertions\PublicationState;
+?>
+
 <?php $this->layout('layout'); ?>
 <div class="page-header">
     <h1>
@@ -9,7 +14,7 @@
 <div class="row">
     <div class="col">
         <a
-            href="<?= $this->url('dataset', ['type' => App\Assertions\RunType::HH]) ?>"
+            href="<?= $this->url('dataset', ['type' => RunType::HH]) ?>"
             class="btn btn-primary btn-lg btn-block"
         >
             Download current HH dataset
@@ -17,7 +22,7 @@
     </div>
     <div class="col">
         <a
-            href="<?= $this->url('dataset', ['type' => App\Assertions\RunType::VH]) ?>"
+            href="<?= $this->url('dataset', ['type' => RunType::VH]) ?>"
             class="btn btn-primary btn-lg btn-block"
         >
             Download current VH dataset
@@ -91,19 +96,19 @@
             </td>
             <td class="text-center">
                 <span class="text-warning">
-                    <?= $this->e($run['nbs'][App\Assertions\PublicationState::PENDING]) ?>
+                    <?= $this->e($run['nbs'][PublicationState::PENDING]) ?>
                 </span>
                 -
                 <span class="text-primary">
-                    <?= $this->e($run['nbs'][App\Assertions\PublicationState::SELECTED]) ?>
+                    <?= $this->e($run['nbs'][PublicationState::SELECTED]) ?>
                 </span>
                 -
                 <span class="text-danger">
-                    <?= $this->e($run['nbs'][App\Assertions\PublicationState::DISCARDED]) ?>
+                    <?= $this->e($run['nbs'][PublicationState::DISCARDED]) ?>
                 </span>
                 -
                 <span class="text-success">
-                    <?= $this->e($run['nbs'][App\Assertions\PublicationState::CURATED]) ?>
+                    <?= $this->e($run['nbs'][PublicationState::CURATED]) ?>
                 </span>
             </td>
             <td class="text-center">

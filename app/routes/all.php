@@ -28,7 +28,7 @@ return function (ContainerInterface $container): array {
     $endpoint = fn (callable $f) => new Quanta\Http\Endpoint($factory, $f, $serializer);
 
     return [
-        Route::named('index')->get('/')->handler(fn () => $endpoint(new Runs\IndexEndpoint(
+        Route::named('runs.index')->get('/')->handler(fn () => $endpoint(new Runs\IndexEndpoint(
             $container->get(League\Plates\Engine::class),
             $container->get(App\ReadModel\RunViewInterface::class),
         ))),
@@ -47,7 +47,7 @@ return function (ContainerInterface $container): array {
             ))),
 
         Route::named('runs.publications.index')
-            ->get('/runs/{run_id:\d+}/publications')
+            ->get('/runs/{id:\d+}/publications')
             ->handler(fn () => $endpoint(new Publications\IndexEndpoint(
                 $container->get(League\Plates\Engine::class),
                 $container->get(App\Routing\UrlGenerator::class),

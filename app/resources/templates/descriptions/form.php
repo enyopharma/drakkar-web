@@ -1,6 +1,14 @@
 <?php $this->layout('layout'); ?>
 
 <?php
+    $source = match ($type) {
+        'create' => $this->url('runs.publications.descriptions.create', $publication + ['type' => 'create']),
+        'copy' => $this->url('runs.publications.descriptions.edit', $description + ['type' => 'copy']),
+        'edit' => $this->url('runs.publications.descriptions.edit', $description + ['type' => 'edit']),
+    };
+?>
+
+<?php
     $display = $type == 'edit' || $publication['state'] == App\Assertions\PublicationState::SELECTED;
 ?>
 
@@ -34,18 +42,10 @@
     </h1>
 </div>
 
-<?php
-    $source = [
-        'create' => ['runs.publications.descriptions.create', $publication],
-        'copy' => ['runs.publications.descriptions.copy', $description],
-        'edit' => ['runs.publications.descriptions.edit', $description],
-    ];
-?>
-
 <?= $this->insert('publications/card', [
     'run' => $run,
     'publication' => $publication,
-    'source' => $this->url(...($source[$type] ?? [])),
+    'source' => $source,
 ]) ?>
 
 <?php if ($display): ?>
