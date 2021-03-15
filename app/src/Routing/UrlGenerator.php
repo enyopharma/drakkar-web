@@ -8,10 +8,15 @@ use FastRoute\RouteParser;
 
 final class UrlGenerator
 {
-    public function __construct(
-        private RouteParser $parser,
-        private array $map = [],
-    ) {}
+    private UrlPatternParserInterface $parser;
+
+    private array $map;
+
+    public function __construct(UrlPatternParserInterface $parser, array $map = [])
+    {
+        $this->parser = $parser;
+        $this->map = $map;
+    }
 
     public function register(string $name, string $pattern): void
     {
@@ -31,42 +36,21 @@ final class UrlGenerator
             throw new \LogicException(sprintf('route name \'%s\' not found', $name));
         }
 
-        $signatures = $this->parser->parse($pattern);
+        $result = $this->parser->parsed($pattern)->path($placeholders);
 
-        foreach ($signatures as $signature) {
-            $names = array_map(fn ($x) => $x[0], array_filter($signature, 'is_array'));
-
-            $isect = array_intersect(array_keys($placeholders), $names);
-
-            if (count($names) == count($isect)) {
-                return $this->path($signature, $placeholders)
-                    . $this->query($query)
-                    . $this->fragment($fragment);
-            }
+        if ($result->isSuccess()) {
+            return $result->path() . $this->query($query) . $this->fragment($fragment);
         }
 
-        throw new \LogicException(sprintf('invalid placeholders for route \'%s\'', $name));
-    }
-
-    private function path(array $signature, array $placeholders): string
-    {
-        if (count($signature) == 0) {
-            return '';
+        if ($result->isNoVariantMatching()) {
+            throw new \LogicException($result->error($name));
         }
 
-        $head = array_shift($signature);
-
-        if (!is_array($head)) {
-            return $head . $this->path($signature, $placeholders);
+        if ($result->isPlaceholderFormatError()) {
+            throw new \LogicException($result->error($name));
         }
 
-        $placeholder = $placeholders[$head[0]];
-
-        if (preg_match('~^' . $head[1] . '$~', (string) $placeholder) !== 0) {
-            return $placeholder . $this->path($signature, $placeholders);
-        }
-
-        throw new \LogicException('given placeholder does not match pattern');
+        throw new \LogicException(sprintf('Unable to generate url for route named \'%s\'', $name));
     }
 
     private function query(array $query): string
