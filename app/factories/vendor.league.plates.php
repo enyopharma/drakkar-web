@@ -14,7 +14,7 @@ return [
             )
         );
 
-        $generator = $container->get(App\Routing\UrlGenerator::class);
+        $generator = $container->get(Quanta\Http\UrlGenerator::class);
 
         $pagination = new App\Extensions\Plates\PaginationExtension;
 

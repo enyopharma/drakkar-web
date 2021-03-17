@@ -30,6 +30,7 @@
         "quanta/http-dispatcher": "^0.4",
         "quanta/http-endpoint": "^0.5",
         "quanta/http-routing": "^0.3",
+        "quanta/http-url-generator": "^0.1.1",
         "quanta/validation": "^0.7",
         "symfony/asset": "^5.1",
         "symfony/console": "^5.1",

@@ -8,7 +8,8 @@ use Psr\Http\Message\ResponseInterface;
 
 use League\Plates\Engine;
 
-use App\Routing\UrlGenerator;
+use Quanta\Http\UrlGenerator;
+
 use App\ReadModel\RunInterface;
 use App\ReadModel\RunViewInterface;
 use App\ReadModel\AssociationViewInterface;

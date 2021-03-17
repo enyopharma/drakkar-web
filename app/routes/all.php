@@ -41,7 +41,7 @@ return function (ContainerInterface $container): array {
 
         Route::named('descriptions.index')->get('/descriptions')
             ->handler(fn () => $endpoint(new Descriptions\SearchEndpoint(
-                $container->get(App\Routing\UrlGenerator::class),
+                $container->get(Quanta\Http\UrlGenerator::class),
                 $container->get(League\Plates\Engine::class),
                 $container->get(App\ReadModel\DescriptionViewInterface::class),
             ))),
@@ -50,7 +50,7 @@ return function (ContainerInterface $container): array {
             ->get('/runs/{id:\d+}/publications')
             ->handler(fn () => $endpoint(new Publications\IndexEndpoint(
                 $container->get(League\Plates\Engine::class),
-                $container->get(App\Routing\UrlGenerator::class),
+                $container->get(Quanta\Http\UrlGenerator::class),
                 $container->get(App\ReadModel\RunViewInterface::class),
                 $container->get(App\ReadModel\AssociationViewInterface::class),
             ))),
@@ -65,7 +65,7 @@ return function (ContainerInterface $container): array {
             ->get('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions')
             ->handler(fn () => $endpoint(new Descriptions\IndexEndpoint(
                 $container->get(League\Plates\Engine::class),
-                $container->get(App\Routing\UrlGenerator::class),
+                $container->get(Quanta\Http\UrlGenerator::class),
                 $container->get(App\ReadModel\RunViewInterface::class),
                 $container->get(App\ReadModel\AssociationViewInterface::class),
                 $container->get(App\ReadModel\DescriptionViewInterface::class),

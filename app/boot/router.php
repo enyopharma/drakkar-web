@@ -12,7 +12,7 @@ use Psr\Container\ContainerInterface;
  */
 return function (ContainerInterface $container) {
     $collector = $container->get(FastRoute\RouteCollector::class);
-    $generator = $container->get(App\Routing\UrlGenerator::class);
+    $generator = $container->get(Quanta\Http\UrlGenerator::class);
 
     $files = glob(__DIR__ . '/../routes/*.php');
 

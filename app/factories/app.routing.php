@@ -2,10 +2,12 @@
 
 declare(strict_types=1);
 
-use App\Routing\UrlGenerator;
+use Quanta\Http\UrlGenerator;
 
 return [
     UrlGenerator::class => fn () => new UrlGenerator(
-        App\Routing\FastRouteUrlPatternParser::default(),
+        new Quanta\Http\FastRouteUrlPatternParser(
+            new FastRoute\RouteParser\Std,
+        ),
     ),
 ];
