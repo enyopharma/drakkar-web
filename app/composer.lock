@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "67869152ed745875927fdb1d7d7833e1",
+    "content-hash": "5c2b2061bdb4b1569696623400c35ef1",
     "packages": [
         {
             "name": "filp/whoops",
-            "version": "2.9.2",
+            "version": "2.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filp/whoops.git",
-                "reference": "df7933820090489623ce0be5e85c7e693638e536"
+                "reference": "6ecda5217bf048088b891f7403b262906be5a957"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filp/whoops/zipball/df7933820090489623ce0be5e85c7e693638e536",
-                "reference": "df7933820090489623ce0be5e85c7e693638e536",
+                "url": "https://api.github.com/repos/filp/whoops/zipball/6ecda5217bf048088b891f7403b262906be5a957",
+                "reference": "6ecda5217bf048088b891f7403b262906be5a957",
                 "shasum": ""
             },
             "require": {
@@ -67,7 +67,7 @@
             ],
             "support": {
                 "issues": "https://github.com/filp/whoops/issues",
-                "source": "https://github.com/filp/whoops/tree/2.9.2"
+                "source": "https://github.com/filp/whoops/tree/2.10.0"
             },
             "funding": [
                 {
@@ -75,7 +75,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-01-24T12:00:00+00:00"
+            "time": "2021-03-16T12:00:00+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
@@ -1157,25 +1157,25 @@
         },
         {
             "name": "quanta/container",
-            "version": "0.5.1",
+            "version": "0.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quantaphp/container.git",
-                "reference": "81a63981de61c38e2d268b7dde033646d502a079"
+                "reference": "ddb995d0d61351e48d7343e7684e8632b5a1ceb8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/container/zipball/81a63981de61c38e2d268b7dde033646d502a079",
-                "reference": "81a63981de61c38e2d268b7dde033646d502a079",
+                "url": "https://api.github.com/repos/quantaphp/container/zipball/ddb995d0d61351e48d7343e7684e8632b5a1ceb8",
+                "reference": "ddb995d0d61351e48d7343e7684e8632b5a1ceb8",
                 "shasum": ""
             },
             "require": {
-                "php": ">=7.0",
+                "php": ">=7.4",
                 "psr/container": "^1.0"
             },
             "require-dev": {
-                "eloquent/phony-kahlan": "^3.0",
-                "kahlan/kahlan": "^4.7",
+                "eloquent/phony-kahlan": "^4.0",
+                "kahlan/kahlan": "^5.0",
                 "phpstan/phpstan": "^0.12.27"
             },
             "type": "library",
@@ -1205,7 +1205,7 @@
                 "issues": "https://github.com/quantaphp/container/issues",
                 "source": "https://github.com/quantaphp/container"
             },
-            "time": "2021-02-26T13:41:55+00:00"
+            "time": "2021-03-17T16:01:56+00:00"
         },
         {
             "name": "quanta/http-dispatcher",
@@ -1319,16 +1319,16 @@
         },
         {
             "name": "quanta/http-routing",
-            "version": "0.3.0",
+            "version": "0.3.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quantaphp/http-routing.git",
-                "reference": "5726739eacc5bf068ec9d1ea0e310d9b534f4c93"
+                "reference": "a138155eae985d8b0816529a75b5beccedd05caf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/http-routing/zipball/5726739eacc5bf068ec9d1ea0e310d9b534f4c93",
-                "reference": "5726739eacc5bf068ec9d1ea0e310d9b534f4c93",
+                "url": "https://api.github.com/repos/quantaphp/http-routing/zipball/a138155eae985d8b0816529a75b5beccedd05caf",
+                "reference": "a138155eae985d8b0816529a75b5beccedd05caf",
                 "shasum": ""
             },
             "require": {
@@ -1373,7 +1373,7 @@
                 "issues": "https://github.com/quantaphp/http-routing/issues",
                 "source": "https://github.com/quantaphp/http-routing"
             },
-            "time": "2021-03-02T17:22:00+00:00"
+            "time": "2021-03-16T16:29:49+00:00"
         },
         {
             "name": "quanta/http-url-generator",

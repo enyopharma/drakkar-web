@@ -12,5 +12,9 @@ use Psr\Container\ContainerInterface;
  * @return Psr\Container\ContainerInterface
  */
 return function (string $env, bool $debug): ContainerInterface {
-    return Quanta\Container::files(__DIR__ . '/../factories/*.php');
+    return Quanta\Container::factories(
+        new App\Sources\ArraySource(
+            new App\Sources\PHPFileSource(__DIR__ . '/../factories/*.php'),
+        ),
+    );
 };

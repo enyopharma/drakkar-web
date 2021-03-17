@@ -14,39 +14,31 @@ return function (ContainerInterface $container) {
     $collector = $container->get(FastRoute\RouteCollector::class);
     $generator = $container->get(Quanta\Http\UrlGenerator::class);
 
-    $files = glob(__DIR__ . '/../routes/*.php');
+    $factory = $container->get(Psr\Http\Message\ResponseFactoryInterface::class);
 
-    if ($files === false) {
-        throw new Exception;
-    }
+    $serializer = new Quanta\Http\MetadataSerializer('data', ['success' => true, 'code' => 200]);
 
-    foreach ($files as $file) {
-        $provider = require $file;
+    $endpoint = fn (callable $f) => new Quanta\Http\Endpoint($factory, $f, $serializer);
 
-        if (!is_callable($provider)) {
-            throw new UnexpectedValueException('route definition file must return a callable');
+    $routes = new App\Sources\CallableSource(
+        new App\Sources\PHPFileSource(__DIR__ . '/../routes/*.php'),
+        $container,
+        $endpoint,
+    );
+
+    foreach ($routes as $route) {
+        if (!$route instanceof App\Routing\Route) {
+            throw new UnexpectedValueException('iterable returned by the route definition callable must contain only Route instances');
         }
 
-        $routes = $provider($container);
+        $methods = $route->methods();
+        $pattern = $route->pattern();
+        $handler = $route->handler();
 
-        if (!is_iterable($routes)) {
-            throw new UnexpectedValueException('route definition callable must return an iterable');
-        }
+        $collector->addRoute($methods, $pattern, $handler);
 
-        foreach ($routes as $route) {
-            if (!$route instanceof App\Routing\Route) {
-                throw new UnexpectedValueException('iterable returned by the route definition callable must contain only Route instances');
-            }
-
-            $methods = $route->methods();
-            $pattern = $route->pattern();
-            $handler = $route->handler();
-
-            $collector->addRoute($methods, $pattern, $handler);
-
-            if ($route->isNamed()) {
-                $generator->register($route->name(), $pattern);
-            }
+        if ($route->isNamed()) {
+            $generator->register($route->name(), $pattern);
         }
     }
 };

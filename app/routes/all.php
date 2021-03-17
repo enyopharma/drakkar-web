@@ -17,16 +17,11 @@ use App\Endpoints\Descriptions;
 /**
  * Return the route definitions.
  *
- * @param Psr\Container\ContainerInterface $container
+ * @param Psr\Container\ContainerInterface  $container
+ * @param callable                          $endpoint
  * @return array[]
  */
-return function (ContainerInterface $container): array {
-    $factory = $container->get(Psr\Http\Message\ResponseFactoryInterface::class);
-
-    $serializer = new Quanta\Http\MetadataSerializer('data', ['success' => true, 'code' => 200]);
-
-    $endpoint = fn (callable $f) => new Quanta\Http\Endpoint($factory, $f, $serializer);
-
+return function (ContainerInterface $container, callable $endpoint): array {
     return [
         Route::named('runs.index')->get('/')->handler(fn () => $endpoint(new Runs\IndexEndpoint(
             $container->get(League\Plates\Engine::class),
