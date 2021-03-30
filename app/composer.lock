@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "5c2b2061bdb4b1569696623400c35ef1",
+    "content-hash": "dcd6a8de23fcd36b719359d46ebfeddf",
     "packages": [
         {
             "name": "filp/whoops",
-            "version": "2.10.0",
+            "version": "2.12.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filp/whoops.git",
-                "reference": "6ecda5217bf048088b891f7403b262906be5a957"
+                "reference": "d501fd2658d55491a2295ff600ae5978eaad7403"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filp/whoops/zipball/6ecda5217bf048088b891f7403b262906be5a957",
-                "reference": "6ecda5217bf048088b891f7403b262906be5a957",
+                "url": "https://api.github.com/repos/filp/whoops/zipball/d501fd2658d55491a2295ff600ae5978eaad7403",
+                "reference": "d501fd2658d55491a2295ff600ae5978eaad7403",
                 "shasum": ""
             },
             "require": {
@@ -67,7 +67,7 @@
             ],
             "support": {
                 "issues": "https://github.com/filp/whoops/issues",
-                "source": "https://github.com/filp/whoops/tree/2.10.0"
+                "source": "https://github.com/filp/whoops/tree/2.12.0"
             },
             "funding": [
                 {
@@ -75,20 +75,20 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-03-16T12:00:00+00:00"
+            "time": "2021-03-30T12:00:00+00:00"
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "1.7.0",
+            "version": "1.8.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "53330f47520498c0ae1f61f7e2c90f55690c06a3"
+                "reference": "35ea11d335fd638b5882ff1725228b3d35496ab1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/53330f47520498c0ae1f61f7e2c90f55690c06a3",
-                "reference": "53330f47520498c0ae1f61f7e2c90f55690c06a3",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/35ea11d335fd638b5882ff1725228b3d35496ab1",
+                "reference": "35ea11d335fd638b5882ff1725228b3d35496ab1",
                 "shasum": ""
             },
             "require": {
@@ -148,9 +148,9 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/1.7.0"
+                "source": "https://github.com/guzzle/psr7/tree/1.8.1"
             },
-            "time": "2020-09-30T07:37:11+00:00"
+            "time": "2021-03-21T16:25:00+00:00"
         },
         {
             "name": "http-interop/http-factory-guzzle",
@@ -1209,23 +1209,24 @@
         },
         {
             "name": "quanta/http-dispatcher",
-            "version": "0.4.4",
+            "version": "0.5.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quantaphp/http-dispatcher.git",
-                "reference": "8f5e2aa871be71c354ee65a753c0a5f774039183"
+                "reference": "de12235c5118d3aa76f212b6cfe3d6c7c951acb2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/http-dispatcher/zipball/8f5e2aa871be71c354ee65a753c0a5f774039183",
-                "reference": "8f5e2aa871be71c354ee65a753c0a5f774039183",
+                "url": "https://api.github.com/repos/quantaphp/http-dispatcher/zipball/de12235c5118d3aa76f212b6cfe3d6c7c951acb2",
+                "reference": "de12235c5118d3aa76f212b6cfe3d6c7c951acb2",
                 "shasum": ""
             },
             "require": {
                 "php": ">=7.4",
                 "psr/http-message": "^1.0",
                 "psr/http-server-handler": "^1.0",
-                "psr/http-server-middleware": "^1.0"
+                "psr/http-server-middleware": "^1.0",
+                "quanta/http-utils": "^0.1.0"
             },
             "require-dev": {
                 "eloquent/phony-kahlan": "^4.0",
@@ -1260,7 +1261,7 @@
                 "issues": "https://github.com/quantaphp/http-dispatcher/issues",
                 "source": "https://github.com/quantaphp/http-dispatcher"
             },
-            "time": "2021-02-26T13:45:19+00:00"
+            "time": "2021-03-19T16:15:47+00:00"
         },
         {
             "name": "quanta/http-endpoint",
@@ -1316,6 +1317,64 @@
                 "source": "https://github.com/quantaphp/http-endpoint"
             },
             "time": "2021-03-01T18:12:55+00:00"
+        },
+        {
+            "name": "quanta/http-route",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/quantaphp/http-route.git",
+                "reference": "20a6a7dd0e2d1c40722f4747d9bc854d71d7d6e9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/quantaphp/http-route/zipball/20a6a7dd0e2d1c40722f4747d9bc854d71d7d6e9",
+                "reference": "20a6a7dd0e2d1c40722f4747d9bc854d71d7d6e9",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0",
+                "psr/http-message": "^1.0",
+                "psr/http-server-handler": "^1.0",
+                "psr/http-server-middleware": "^1.0",
+                "quanta/http-utils": "^0.1.0"
+            },
+            "require-dev": {
+                "eloquent/phony-kahlan": "^4.0",
+                "kahlan/kahlan": "^5.0",
+                "phpstan/phpstan": "^0.12.28"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Quanta\\Http\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "pmall",
+                    "email": "pierre.mallinjoud@gmail.com"
+                }
+            ],
+            "description": "Quanta Psr-15 route",
+            "homepage": "https://github.com/quantaphp/http-route",
+            "keywords": [
+                "middleware",
+                "psr-15",
+                "request-handler",
+                "route",
+                "router",
+                "routing"
+            ],
+            "support": {
+                "issues": "https://github.com/quantaphp/http-route/issues",
+                "source": "https://github.com/quantaphp/http-route"
+            },
+            "time": "2021-03-30T16:14:13+00:00"
         },
         {
             "name": "quanta/http-routing",
@@ -1427,6 +1486,65 @@
                 "source": "https://github.com/quantaphp/http-url-generator"
             },
             "time": "2021-03-16T16:20:43+00:00"
+        },
+        {
+            "name": "quanta/http-utils",
+            "version": "0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/quantaphp/http-utils.git",
+                "reference": "8970bc43fd413e7da98a02cae5c10eedcde57867"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/quantaphp/http-utils/zipball/8970bc43fd413e7da98a02cae5c10eedcde57867",
+                "reference": "8970bc43fd413e7da98a02cae5c10eedcde57867",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4",
+                "psr/http-message": "^1.0",
+                "psr/http-server-handler": "^1.0",
+                "psr/http-server-middleware": "^1.0"
+            },
+            "require-dev": {
+                "eloquent/phony-kahlan": "^4.0",
+                "kahlan/kahlan": "^5.0",
+                "phpstan/phpstan": "^0.12.28"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Quanta\\Http\\": "src"
+                },
+                "files": [
+                    "src/reducers.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "pmall",
+                    "email": "pierre.mallinjoud@gmail.com"
+                }
+            ],
+            "description": "Quanta Psr-15 utilities",
+            "homepage": "https://github.com/quantaphp/http-utils",
+            "keywords": [
+                "middleware",
+                "psr-15",
+                "queue",
+                "request-handler",
+                "stack"
+            ],
+            "support": {
+                "issues": "https://github.com/quantaphp/http-utils/issues",
+                "source": "https://github.com/quantaphp/http-utils"
+            },
+            "time": "2021-03-19T15:22:27+00:00"
         },
         {
             "name": "quanta/validation",
@@ -1593,16 +1711,16 @@
         },
         {
             "name": "symfony/console",
-            "version": "v5.2.5",
+            "version": "v5.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "938ebbadae1b0a9c9d1ec313f87f9708609f1b79"
+                "reference": "35f039df40a3b335ebf310f244cb242b3a83ac8d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/938ebbadae1b0a9c9d1ec313f87f9708609f1b79",
-                "reference": "938ebbadae1b0a9c9d1ec313f87f9708609f1b79",
+                "url": "https://api.github.com/repos/symfony/console/zipball/35f039df40a3b335ebf310f244cb242b3a83ac8d",
+                "reference": "35f039df40a3b335ebf310f244cb242b3a83ac8d",
                 "shasum": ""
             },
             "require": {
@@ -1670,7 +1788,7 @@
                 "terminal"
             ],
             "support": {
-                "source": "https://github.com/symfony/console/tree/v5.2.5"
+                "source": "https://github.com/symfony/console/tree/v5.2.6"
             },
             "funding": [
                 {
@@ -1686,7 +1804,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-03-06T13:42:15+00:00"
+            "time": "2021-03-28T09:42:18+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -2392,16 +2510,16 @@
         },
         {
             "name": "symfony/string",
-            "version": "v5.2.4",
+            "version": "v5.2.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/string.git",
-                "reference": "4e78d7d47061fa183639927ec40d607973699609"
+                "reference": "ad0bd91bce2054103f5eaa18ebeba8d3bc2a0572"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/string/zipball/4e78d7d47061fa183639927ec40d607973699609",
-                "reference": "4e78d7d47061fa183639927ec40d607973699609",
+                "url": "https://api.github.com/repos/symfony/string/zipball/ad0bd91bce2054103f5eaa18ebeba8d3bc2a0572",
+                "reference": "ad0bd91bce2054103f5eaa18ebeba8d3bc2a0572",
                 "shasum": ""
             },
             "require": {
@@ -2455,7 +2573,7 @@
                 "utf8"
             ],
             "support": {
-                "source": "https://github.com/symfony/string/tree/v5.2.4"
+                "source": "https://github.com/symfony/string/tree/v5.2.6"
             },
             "funding": [
                 {
@@ -2471,22 +2589,22 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-02-16T10:20:28+00:00"
+            "time": "2021-03-17T17:12:15+00:00"
         }
     ],
     "packages-dev": [
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.81",
+            "version": "0.12.82",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "0dd5b0ebeff568f7000022ea5f04aa86ad3124b8"
+                "reference": "3920f0fb0aff39263d3a4cb0bca120a67a1a6a11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/0dd5b0ebeff568f7000022ea5f04aa86ad3124b8",
-                "reference": "0dd5b0ebeff568f7000022ea5f04aa86ad3124b8",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/3920f0fb0aff39263d3a4cb0bca120a67a1a6a11",
+                "reference": "3920f0fb0aff39263d3a4cb0bca120a67a1a6a11",
                 "shasum": ""
             },
             "require": {
@@ -2517,7 +2635,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/0.12.81"
+                "source": "https://github.com/phpstan/phpstan/tree/0.12.82"
             },
             "funding": [
                 {
@@ -2533,7 +2651,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-03-08T22:03:02+00:00"
+            "time": "2021-03-19T06:08:17+00:00"
         }
     ],
     "aliases": [],

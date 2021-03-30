@@ -25,7 +25,7 @@ foreach ((array) glob(__DIR__ . '/../boot/*.php') as $boot) {
  */
 $factory = $container->get(Psr\Http\Message\ResponseFactoryInterface::class);
 
-return Quanta\Http\Dispatcher::queue(
+return new Quanta\Http\Dispatcher(
     /**
      * Whoops error handler.
      */
