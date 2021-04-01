@@ -29,7 +29,7 @@
         "quanta/container": "^0.6",
         "quanta/http-dispatcher": "^0.5",
         "quanta/http-endpoint": "^0.5",
-        "quanta/http-route": "^0.1.0",
+        "quanta/http-route": "^0.2.0",
         "quanta/http-routing": "^0.3",
         "quanta/http-url-generator": "^0.1.1",
         "quanta/validation": "^0.7",

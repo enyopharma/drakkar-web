@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "dcd6a8de23fcd36b719359d46ebfeddf",
+    "content-hash": "96ab47a062bbe49e2ba78ce7eb9e2ad7",
     "packages": [
         {
             "name": "filp/whoops",
@@ -1320,16 +1320,16 @@
         },
         {
             "name": "quanta/http-route",
-            "version": "0.1.0",
+            "version": "0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quantaphp/http-route.git",
-                "reference": "20a6a7dd0e2d1c40722f4747d9bc854d71d7d6e9"
+                "reference": "1eb01e02fc7a5495f3a4379ed783dc040930d1a2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/http-route/zipball/20a6a7dd0e2d1c40722f4747d9bc854d71d7d6e9",
-                "reference": "20a6a7dd0e2d1c40722f4747d9bc854d71d7d6e9",
+                "url": "https://api.github.com/repos/quantaphp/http-route/zipball/1eb01e02fc7a5495f3a4379ed783dc040930d1a2",
+                "reference": "1eb01e02fc7a5495f3a4379ed783dc040930d1a2",
                 "shasum": ""
             },
             "require": {
@@ -1374,7 +1374,7 @@
                 "issues": "https://github.com/quantaphp/http-route/issues",
                 "source": "https://github.com/quantaphp/http-route"
             },
-            "time": "2021-03-30T16:14:13+00:00"
+            "time": "2021-04-01T08:26:19+00:00"
         },
         {
             "name": "quanta/http-routing",
