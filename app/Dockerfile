@@ -7,7 +7,7 @@ COPY . ./
 RUN composer dump-autoload --no-dev --optimize --classmap-authoritative
 
 # Stage 2 - build assets
-FROM node:12 as build-assets
+FROM node:14.16 as build-assets
 WORKDIR /var/www/html
 COPY package.json package-lock.json ./
 RUN npm ci && npm audit fix

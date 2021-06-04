@@ -115,6 +115,11 @@ return function (ContainerInterface $container): array {
             $container->get(App\ReadModel\ProteinViewInterface::class),
         ))),
 
+        Route::matching('/proteins/{id:[0-9]+}/names')->get(fn () => $endpoint(new Proteins\Names\IndexEndpoint(
+            $container->get(App\ReadModel\ProteinViewInterface::class),
+            $container->get(App\ReadModel\ProteinNameViewInterface::class),
+        ))),
+
         Route::matching('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions')
             ->middleware(fn () => new App\Middleware\ValidateDescriptionMiddleware(
                 $container->get(PDO::class),

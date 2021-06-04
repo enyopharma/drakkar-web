@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { Suspense } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEdit } from '@fortawesome/free-solid-svg-icons/faEdit'
 
@@ -64,7 +64,9 @@ export const SequenceSection: React.FC<SequenceSectionProps> = ({ i, resource })
                     </EditButton>
                 </div>
             </div>
-            <SequenceEditorToggle i={i} protein={protein} />
+            <Suspense fallback={null}>
+                <SequenceEditorToggle i={i} protein={protein} />
+            </Suspense>
         </React.Fragment>
     )
 }
@@ -92,12 +94,31 @@ const SequenceEditorToggle: React.FC<SequenceEditorToggleProps> = ({ i, protein 
 
     if (!editing) return null
 
+    const resource = api.hints(protein.id)
+
+    return (
+        <Suspense fallback={null}>
+            <SequenceEditorWrapper i={i} protein={protein} resource={resource} />
+        </Suspense>
+    )
+}
+
+type SequenceEditorWrapperProps = {
+    i: InteractorI
+    protein: Protein
+    resource: Resource<string[]>
+}
+
+const SequenceEditorWrapper: React.FC<SequenceEditorWrapperProps> = ({ i, protein, resource }) => {
+    const hints = resource.read()
+
     return (
         <SequenceEditor
             i={i}
             sequence={protein.sequence}
             chains={protein.chains}
             matures={protein.matures}
+            hints={hints}
         />
     )
 }

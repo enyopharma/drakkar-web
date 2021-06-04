@@ -35,6 +35,7 @@ export const methods = {
 
 const cprotein = cache<Protein>()
 const cproteins = cache<SearchResult[]>()
+const cnamehints = cache<string[]>()
 
 const fetchProtein = async (id: number) => {
     return fetch(`/proteins/${id}`)
@@ -51,6 +52,12 @@ const fetchProteins = async (type: ProteinType, query: string, limit: number) =>
         })))
 }
 
+const fetchNameHints = async (protein_id: number) => {
+    return fetch(`/proteins/${protein_id}/names`)
+        .then(response => response.json(), error => console.log(error))
+        .then(json => json.data)
+}
+
 export const proteins = {
     select: (id: number): Resource<Protein> => {
         return cprotein.resource(id, () => fetchProtein(id), 10)
@@ -59,6 +66,10 @@ export const proteins = {
     search: (type: ProteinType, query: string): Resource<SearchResult[]> => {
         return cproteins.resource(`${type}:${query}`, () => fetchProteins(type, query, 5), 300)
     },
+
+    hints: (protein_id: number): Resource<string[]> => {
+        return cnamehints.resource(protein_id, () => fetchNameHints(protein_id), 10)
+    }
 }
 
 export const alignment = async (query: string, sequences: Sequences): Promise<Alignment> => {

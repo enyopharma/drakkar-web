@@ -10,14 +10,20 @@ import { CoordinateField } from '../Shared/CoordinateField'
 import { ExtractFormGroup } from '../Shared/ExtractFormGroup'
 import { SubsequenceFormGroup } from '../Shared/SubsequenceFormGroup'
 
+const natsort = (a: string, b: string) => a.localeCompare(b, undefined, {
+    numeric: true,
+    sensitivity: 'base'
+})
+
 type SequenceEditorProps = {
     i: InteractorI
     sequence: string
     matures: Mature[]
     chains: Chain[]
+    hints: string[]
 }
 
-export const SequenceEditor: React.FC<SequenceEditorProps> = ({ i, sequence, matures, chains }) => {
+export const SequenceEditor: React.FC<SequenceEditorProps> = ({ i, sequence, matures, chains, hints }) => {
     const name = useInteractorSelector(i, state => state.name)
     const start = useInteractorSelector(i, state => state.start)
     const stop = useInteractorSelector(i, state => state.stop)
@@ -27,6 +33,8 @@ export const SequenceEditor: React.FC<SequenceEditorProps> = ({ i, sequence, mat
     const [sstop, setSStop] = useState<number | null>(stop)
 
     const names = matures.map(m => m.name)
+
+    const availableHints = hints.filter(hint => matures.filter(m => m.name === hint).length === 0)
 
     const isNameSet = sname.trim().length > 0
     const isNameWellFormatted = sname.match(/^[^\s]+$/) != null
@@ -44,6 +52,12 @@ export const SequenceEditor: React.FC<SequenceEditorProps> = ({ i, sequence, mat
 
     const isMatureValid = isNameValid && areCoordinatesValid
 
+    const selectHint = (hint: string) => {
+        setSName(hint)
+        setSStart(null)
+        setSStop(null)
+    }
+
     const setCoordinates = (start: number, stop: number) => {
         setSStart(start)
         setSStop(stop)
@@ -52,6 +66,7 @@ export const SequenceEditor: React.FC<SequenceEditorProps> = ({ i, sequence, mat
     return (
         <React.Fragment>
             <MatureProteinListSection i={i} matures={matures} />
+            <HintList hints={availableHints} select={selectHint} />
             <div className="row">
                 <div className="col-3">
                     <NameInput value={sname} update={setSName} valid={!isNameSet || isNameValid} existing={names} />
@@ -118,6 +133,30 @@ const MatureProteinListSection: React.FC<MatureProteinListSectionProps> = ({ i, 
                 Existing sequences on this uniprot entry:
             </p>
             <MatureProteinList i={i} matures={matures} />
+        </React.Fragment>
+    )
+}
+
+type HintListProps = {
+    hints: string[],
+    select: (hint: string) => void
+}
+
+const HintList: React.FC<HintListProps> = ({ hints, select }) => {
+    if (hints.length === 0) {
+        return <p>No existing name for this taxon yet.</p>
+    }
+
+    return (
+        <React.Fragment>
+            <p>Existing names for this taxon:</p>
+            <ul className="list-inline">
+                {hints.sort(natsort).map((hint, i) => (
+                    <li key={i} className="list-inline-item mb-1">
+                        <button className="btn btn-sm btn-outline-danger" onClick={() => select(hint)}>{hint}</button>
+                    </li>
+                ))}
+            </ul>
         </React.Fragment>
     )
 }
