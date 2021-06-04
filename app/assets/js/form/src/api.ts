@@ -52,10 +52,10 @@ const fetchProteins = async (type: ProteinType, query: string, limit: number) =>
         })))
 }
 
-const fetchNameHints = async (protein_id: number) => {
-    return fetch(`/proteins/${protein_id}/names`)
+const fetchNameHints = async (ncbi_taxon_id: number) => {
+    return fetch(`/taxa/${ncbi_taxon_id}/names`)
         .then(response => response.json(), error => console.log(error))
-        .then(json => json.data)
+        .then(json => json.data.names)
 }
 
 export const proteins = {
@@ -67,8 +67,8 @@ export const proteins = {
         return cproteins.resource(`${type}:${query}`, () => fetchProteins(type, query, 5), 300)
     },
 
-    hints: (protein_id: number): Resource<string[]> => {
-        return cnamehints.resource(protein_id, () => fetchNameHints(protein_id), 10)
+    hints: (ncbi_taxon_id: number): Resource<string[]> => {
+        return cnamehints.resource(ncbi_taxon_id, () => fetchNameHints(ncbi_taxon_id), 10)
     }
 }
 

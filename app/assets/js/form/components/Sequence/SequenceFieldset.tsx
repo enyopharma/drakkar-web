@@ -94,7 +94,7 @@ const SequenceEditorToggle: React.FC<SequenceEditorToggleProps> = ({ i, protein 
 
     if (!editing) return null
 
-    const resource = api.hints(protein.id)
+    const resource = api.hints(protein.ncbi_taxon_id)
 
     return (
         <Suspense fallback={null}>

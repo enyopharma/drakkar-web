@@ -80,6 +80,7 @@ export type Protein = {
     accession: string
     version: string
     current_version: string | null
+    ncbi_taxon_id: number,
     taxon: string
     name: string
     description: string

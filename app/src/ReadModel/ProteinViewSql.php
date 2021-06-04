@@ -11,7 +11,7 @@ final class ProteinViewSql implements ProteinViewInterface
     const SELECT_PROTEIN_SQL = <<<SQL
         SELECT p.id, p.type, p.accession, p.version, v.current_version, p.name, p.description,
             p.sequences->>p.accession AS sequence, p.sequences,
-            COALESCE(tn.name, 'obsolete taxon') AS taxon,
+            p.ncbi_taxon_id, COALESCE(tn.name, 'obsolete taxon') AS taxon,
             (v.current_version IS NULL) AS obsolete
         FROM
             proteins AS p LEFT JOIN proteins_versions AS v ON p.accession = v.accession AND p.version = v.version,
@@ -63,7 +63,8 @@ final class ProteinViewSql implements ProteinViewInterface
 
     public function __construct(
         private \PDO $pdo,
-    ) {}
+    ) {
+    }
 
     public function id(int $id, string ...$with): Statement
     {

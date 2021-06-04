@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 use App\ReadModel\RunViewInterface;
 use App\ReadModel\FormViewInterface;
+use App\ReadModel\TaxonViewInterface;
 use App\ReadModel\MethodViewInterface;
 use App\ReadModel\ProteinViewInterface;
-use App\ReadModel\ProteinNameViewInterface;
 use App\ReadModel\DatasetViewInterface;
 use App\ReadModel\AssociationViewInterface;
 use App\ReadModel\PublicationViewInterface;
@@ -41,7 +41,7 @@ return [
         $container->get(PDO::class),
     ),
 
-    ProteinNameViewInterface::class => fn ($container) => new App\ReadModel\ProteinNameViewSql(
+    TaxonViewInterface::class => fn ($container) => new App\ReadModel\TaxonViewSql(
         $container->get(PDO::class),
     ),
 
