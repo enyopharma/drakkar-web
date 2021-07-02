@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
--- Dumped by pg_dump version 12.6 (Ubuntu 12.6-0ubuntu0.20.04.1)
+-- Dumped from database version 12.7 (Ubuntu 12.7-0ubuntu0.20.04.1)
+-- Dumped by pg_dump version 12.7 (Ubuntu 12.7-0ubuntu0.20.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -247,6 +247,7 @@ CREATE VIEW public.dataset AS
     d.start1,
     d.stop1,
     p1.description AS description1,
+    p1.ncbi_taxon_id AS ncbi_taxon_id1,
     'Homo sapiens'::text AS taxon1,
     4480672 AS left_value1,
     4480677 AS right_value1,
@@ -261,6 +262,7 @@ CREATE VIEW public.dataset AS
     d.start2,
     d.stop2,
     p2.description AS description2,
+    p2.ncbi_taxon_id AS ncbi_taxon_id2,
     COALESCE(tn2.name, 'Obsolete'::character varying) AS taxon2,
     t2.left_value AS left_value2,
     t2.right_value AS right_value2,
@@ -281,57 +283,6 @@ CREATE VIEW public.dataset AS
     (public.taxon t2
      LEFT JOIN public.taxon_name tn2 ON (((t2.taxon_id = tn2.taxon_id) AND ((tn2.name_class)::text = 'scientific name'::text))))
   WHERE ((r.id = a.run_id) AND (a.id = d.association_id) AND (m.id = d.method_id) AND (p1.id = d.protein1_id) AND (p2.id = d.protein2_id) AND (p2.ncbi_taxon_id = t2.ncbi_taxon_id));
-
-
---
--- Name: dataset_coronaviridae; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW public.dataset_coronaviridae AS
- SELECT dataset.stable_id,
-    dataset.type,
-    dataset.run_id,
-    dataset.run,
-    dataset.association_id,
-    dataset.state,
-    dataset.annotation,
-    dataset.description_id,
-    dataset.pmid,
-    dataset.method_id,
-    dataset.psimi_id,
-    dataset.method,
-    dataset.protein1_id,
-    dataset.type1,
-    dataset.accession1,
-    dataset.name1,
-    dataset.start1,
-    dataset.stop1,
-    dataset.description1,
-    dataset.taxon1,
-    dataset.left_value1,
-    dataset.right_value1,
-    dataset.mapping1,
-    dataset.original_version1,
-    dataset.current_version1,
-    dataset.is_obsolete1,
-    dataset.protein2_id,
-    dataset.type2,
-    dataset.accession2,
-    dataset.name2,
-    dataset.start2,
-    dataset.stop2,
-    dataset.description2,
-    dataset.taxon2,
-    dataset.left_value2,
-    dataset.right_value2,
-    dataset.mapping2,
-    dataset.original_version2,
-    dataset.current_version2,
-    dataset.is_obsolete2,
-    dataset.created_at,
-    dataset.deleted_at
-   FROM public.dataset
-  WHERE ((dataset.type = 'vh'::bpchar) AND (dataset.left_value2 >= 309095) AND (dataset.right_value2 <= 312416));
 
 
 --
