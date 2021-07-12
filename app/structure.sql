@@ -40,7 +40,7 @@ CREATE FUNCTION public.constrain_taxon() RETURNS integer
 CREATE RULE rule_taxon_i
        AS ON INSERT TO taxon
        WHERE (
-             SELECT taxon_id FROM taxon 
+             SELECT taxon_id FROM taxon
              WHERE ncbi_taxon_id = new.ncbi_taxon_id
              )
        	     IS NOT NULL
@@ -224,10 +224,10 @@ CREATE TABLE public.taxon_name (
 
 
 --
--- Name: dataset; Type: VIEW; Schema: public; Owner: -
+-- Name: dataset; Type: MATERIALIZED VIEW; Schema: public; Owner: -
 --
 
-CREATE VIEW public.dataset AS
+CREATE MATERIALIZED VIEW public.dataset AS
  SELECT d.stable_id,
     r.type,
     r.id AS run_id,
@@ -282,7 +282,8 @@ CREATE VIEW public.dataset AS
      LEFT JOIN public.proteins_versions v2 ON ((((p2.accession)::text = (v2.accession)::text) AND (p2.version = v2.version)))),
     (public.taxon t2
      LEFT JOIN public.taxon_name tn2 ON (((t2.taxon_id = tn2.taxon_id) AND ((tn2.name_class)::text = 'scientific name'::text))))
-  WHERE ((r.id = a.run_id) AND (a.id = d.association_id) AND (m.id = d.method_id) AND (p1.id = d.protein1_id) AND (p2.id = d.protein2_id) AND (p2.ncbi_taxon_id = t2.ncbi_taxon_id));
+  WHERE ((r.id = a.run_id) AND (a.id = d.association_id) AND (m.id = d.method_id) AND (p1.id = d.protein1_id) AND (p2.id = d.protein2_id) AND (p2.ncbi_taxon_id = t2.ncbi_taxon_id))
+  WITH NO DATA;
 
 
 --
@@ -712,4 +713,3 @@ ALTER TABLE ONLY public.taxon_name
 --
 -- PostgreSQL database dump complete
 --
-
