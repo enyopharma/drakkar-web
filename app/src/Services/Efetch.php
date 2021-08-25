@@ -22,6 +22,7 @@ final class Efetch
         }
 
         // PUT CDATA AROUND TITLE AND ABSTRACT TO PARSE HTML
+        $xml = (string) preg_replace('/></', ">\n<", $xml);
         $xml = (string) preg_replace('/<ArticleTitle(.*?)>(.+?)<\/ArticleTitle>/s', '<ArticleTitle$1><![CDATA[$2]]></ArticleTitle>', $xml);
         $xml = (string) preg_replace('/<AbstractText.*?\/>/', '', $xml);
         $xml = (string) preg_replace('/<AbstractText(.*?)>(.+?)<\/AbstractText>/s', '<AbstractText$1><![CDATA[$2]]></AbstractText>', $xml);
@@ -32,7 +33,8 @@ final class Efetch
         $metadata = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA);
 
         if ($metadata === false) {
-            throw new ParsingException(implode("\n", libxml_get_errors()));
+            var_dump(libxml_get_errors());
+            throw new ParsingException(implode("\n", array_map(fn ($e) => $e->message, libxml_get_errors())));
         }
 
         // convert xml to json.
