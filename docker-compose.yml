@@ -19,6 +19,8 @@ services:
             - REDIS_HOST=${REDIS_HOST}
             - REDIS_PORT=${REDIS_PORT}
             - SCIHUB_HOST=${SCIHUB_HOST}
+        extra_hosts:
+            - host.docker.internal:host-gateway
     socket:
         build: ./socket
         depends_on:
