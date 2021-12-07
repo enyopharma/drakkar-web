@@ -10,7 +10,7 @@ services:
         environment:
             - APP_ENV=development
             - APP_DEBUG=true
-            - DB_HOSTNAME=${DB_HOSTNAME}
+            - DB_HOSTNAME=host.docker.internal
             - DB_DATABASE=${DB_DATABASE}
             - DB_USERNAME=${DB_USERNAME}
             - DB_PASSWORD=${DB_PASSWORD}
