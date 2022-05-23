@@ -19,10 +19,10 @@ final class ArraySource implements \IteratorAggregate
         $this->files = $files;
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         foreach ($this->files as $file => $value) {
-            if(!is_array($value)) {
+            if (!is_array($value)) {
                 throw new \UnexpectedValueException(
                     sprintf('Value returned by file \'%s\' must be an array, %s returned', $file, gettype($value)),
                 );

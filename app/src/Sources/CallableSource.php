@@ -23,7 +23,7 @@ final class CallableSource implements \IteratorAggregate
         $this->xs = $xs;
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         foreach ($this->files as $key => $f) {
             if (!is_callable($f)) {

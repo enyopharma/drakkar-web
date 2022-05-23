@@ -14,6 +14,7 @@ use App\Endpoints\Taxa;
 use App\Endpoints\Dataset;
 use App\Endpoints\Methods;
 use App\Endpoints\Proteins;
+use App\Endpoints\Peptides;
 use App\Endpoints\Alignments;
 use App\Endpoints\Publications;
 use App\Endpoints\Descriptions;
@@ -92,6 +93,15 @@ return function (ContainerInterface $container): array {
                 $container->get(App\ReadModel\RunViewInterface::class),
                 $container->get(App\ReadModel\AssociationViewInterface::class),
                 $container->get(App\ReadModel\FormViewInterface::class),
+            ))),
+
+        Route::named('runs.publications.descriptions.peptides.index')
+            ->matching('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/peptides')
+            ->get(fn () => $endpoint(new Peptides\IndexEndpoint(
+                $container->get(App\ReadModel\RunViewInterface::class),
+                $container->get(App\ReadModel\AssociationViewInterface::class),
+                $container->get(App\ReadModel\FormViewInterface::class),
+                $container->get(App\ReadModel\PeptideViewInterface::class),
             ))),
 
         Route::named('dataset')

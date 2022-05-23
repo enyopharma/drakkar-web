@@ -7,16 +7,16 @@ COPY . ./
 RUN composer dump-autoload --no-dev --optimize --classmap-authoritative
 
 # Stage 2 - build assets
-FROM node:14.16 as build-assets
+FROM node:16.15 as build-assets
 WORKDIR /var/www/html
 COPY package.json package-lock.json ./
-RUN npm ci && npm audit fix
+RUN npm ci
 COPY webpack.config.js tsconfig.json ./
 COPY assets ./assets
 RUN npm run prod
 
 # Stage 3 - copy the artifacts and start php-fpm
-FROM php:8.0-fpm
+FROM php:8.1-fpm
 RUN apt-get update && \
     apt-get install -y libpq-dev && \
     rm -rf /var/lib/apt/lists/* && \

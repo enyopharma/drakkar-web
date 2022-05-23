@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 12.7 (Ubuntu 12.7-0ubuntu0.20.04.1)
--- Dumped by pg_dump version 12.7 (Ubuntu 12.7-0ubuntu0.20.04.1)
+-- Dumped from database version 12.10 (Ubuntu 12.10-0ubuntu0.20.04.1)
+-- Dumped by pg_dump version 12.10 (Ubuntu 12.10-0ubuntu0.20.04.1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -40,7 +40,7 @@ CREATE FUNCTION public.constrain_taxon() RETURNS integer
 CREATE RULE rule_taxon_i
        AS ON INSERT TO taxon
        WHERE (
-             SELECT taxon_id FROM taxon
+             SELECT taxon_id FROM taxon 
              WHERE ncbi_taxon_id = new.ncbi_taxon_id
              )
        	     IS NOT NULL
@@ -62,25 +62,6 @@ SELECT 1;
 $$;
 
 
-SET default_tablespace = '';
-
-SET default_table_access_method = heap;
-
---
--- Name: associations; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.associations (
-    id integer NOT NULL,
-    run_id integer NOT NULL,
-    pmid bigint NOT NULL,
-    state character varying(10) DEFAULT 'pending'::character varying NOT NULL,
-    annotation text DEFAULT ''::text NOT NULL,
-    updated_at timestamp(0) without time zone DEFAULT now() NOT NULL,
-    CONSTRAINT associations_state_check CHECK (((state)::text = ANY (ARRAY[('pending'::character varying)::text, ('selected'::character varying)::text, ('discarded'::character varying)::text, ('curated'::character varying)::text])))
-);
-
-
 --
 -- Name: associations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
@@ -94,11 +75,23 @@ CREATE SEQUENCE public.associations_id_seq
     CACHE 1;
 
 
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
 --
--- Name: associations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+-- Name: associations; Type: TABLE; Schema: public; Owner: -
 --
 
-ALTER SEQUENCE public.associations_id_seq OWNED BY public.associations.id;
+CREATE TABLE public.associations (
+    id integer DEFAULT nextval('public.associations_id_seq'::regclass) NOT NULL,
+    run_id integer NOT NULL,
+    pmid bigint NOT NULL,
+    state character varying(10) DEFAULT 'pending'::character varying NOT NULL,
+    annotation text DEFAULT ''::text NOT NULL,
+    updated_at timestamp(0) without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT associations_state_check CHECK (((state)::text = ANY (ARRAY[('pending'::character varying)::text, ('selected'::character varying)::text, ('discarded'::character varying)::text, ('curated'::character varying)::text])))
+);
 
 
 --
@@ -170,11 +163,24 @@ CREATE TABLE public.proteins_versions (
 
 
 --
+-- Name: runs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.runs_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
 -- Name: runs; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE public.runs (
-    id integer NOT NULL,
+    id integer DEFAULT nextval('public.runs_id_seq'::regclass) NOT NULL,
     type character(2) NOT NULL,
     name text NOT NULL,
     populated boolean DEFAULT false NOT NULL,
@@ -358,6 +364,20 @@ ALTER SEQUENCE public.methods_id_seq OWNED BY public.methods.id;
 
 
 --
+-- Name: peptides; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.peptides (
+    description_id integer NOT NULL,
+    stable_id character varying NOT NULL,
+    type character(1) NOT NULL,
+    sequence text NOT NULL,
+    data jsonb NOT NULL,
+    CONSTRAINT peptides_type_check CHECK (((type)::text = ANY (ARRAY[('h'::character varying)::text, ('v'::character varying)::text])))
+);
+
+
+--
 -- Name: proteins_id_seq; Type: SEQUENCE; Schema: public; Owner: -
 --
 
@@ -389,30 +409,14 @@ CREATE TABLE public.publications (
 
 
 --
--- Name: runs_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+-- Name: species; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE SEQUENCE public.runs_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: runs_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.runs_id_seq OWNED BY public.runs.id;
-
-
---
--- Name: associations id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.associations ALTER COLUMN id SET DEFAULT nextval('public.associations_id_seq'::regclass);
+CREATE TABLE public.species (
+    ncbi_taxon_id integer NOT NULL,
+    species_ncbi_taxon_id integer NOT NULL,
+    species_name character varying NOT NULL
+);
 
 
 --
@@ -441,13 +445,6 @@ ALTER TABLE ONLY public.methods ALTER COLUMN id SET DEFAULT nextval('public.meth
 --
 
 ALTER TABLE ONLY public.proteins ALTER COLUMN id SET DEFAULT nextval('public.proteins_id_seq'::regclass);
-
-
---
--- Name: runs id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.runs ALTER COLUMN id SET DEFAULT nextval('public.runs_id_seq'::regclass);
 
 
 --
@@ -507,6 +504,14 @@ ALTER TABLE ONLY public.methods
 
 
 --
+-- Name: peptides peptides_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.peptides
+    ADD CONSTRAINT peptides_pkey PRIMARY KEY (stable_id, type, sequence);
+
+
+--
 -- Name: proteins proteins_accession_version_key; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -552,6 +557,14 @@ ALTER TABLE ONLY public.publications
 
 ALTER TABLE ONLY public.runs
     ADD CONSTRAINT runs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: species species_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.species
+    ADD CONSTRAINT species_pkey PRIMARY KEY (ncbi_taxon_id, species_ncbi_taxon_id);
 
 
 --
@@ -713,3 +726,4 @@ ALTER TABLE ONLY public.taxon_name
 --
 -- PostgreSQL database dump complete
 --
+

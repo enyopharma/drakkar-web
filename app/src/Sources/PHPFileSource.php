@@ -16,7 +16,7 @@ final class PHPFileSource implements \IteratorAggregate
         $this->patterns = $patterns;
     }
 
-    public function getIterator()
+    public function getIterator(): \Traversable
     {
         foreach ($this->patterns as $pattern) {
             $files = glob($pattern);

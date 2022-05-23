@@ -7,6 +7,7 @@ use App\ReadModel\FormViewInterface;
 use App\ReadModel\TaxonViewInterface;
 use App\ReadModel\MethodViewInterface;
 use App\ReadModel\ProteinViewInterface;
+use App\ReadModel\PeptideViewInterface;
 use App\ReadModel\DatasetViewInterface;
 use App\ReadModel\AssociationViewInterface;
 use App\ReadModel\PublicationViewInterface;
@@ -38,6 +39,10 @@ return [
     ),
 
     ProteinViewInterface::class => fn ($container) => new App\ReadModel\ProteinViewSql(
+        $container->get(PDO::class),
+    ),
+
+    PeptideViewInterface::class => fn ($container) => new App\ReadModel\PeptideViewSql(
         $container->get(PDO::class),
     ),
 
