@@ -59,7 +59,7 @@ final class PeptideViewSql implements PeptideViewInterface
             $map[$type][$sequence] = $data;
         }
 
-        while ([$id, $type, $stable_id, $sequence] = $rows1->fetch(\PDO::FETCH_NUM)) {
+        while ([$id, $stable_id, $type, $sequence] = $rows1->fetch(\PDO::FETCH_NUM)) {
             yield [
                 'description_id' => $id,
                 'stable_id' => $stable_id,
@@ -69,7 +69,7 @@ final class PeptideViewSql implements PeptideViewInterface
             ];
         }
 
-        while ([$id, $type, $stable_id, $sequence] = $rows2->fetch(\PDO::FETCH_NUM)) {
+        while ([$id, $stable_id, $type, $sequence] = $rows2->fetch(\PDO::FETCH_NUM)) {
             $ptype = $type == 'hh' ? 'h' : 'v';
 
             yield [
