@@ -17,7 +17,8 @@ final class EditEndpoint
         private RunViewInterface $runs,
         private AssociationViewInterface $associations,
         private FormViewInterface $descriptions,
-    ) {}
+    ) {
+    }
 
     public function __invoke(callable $input): string|null
     {

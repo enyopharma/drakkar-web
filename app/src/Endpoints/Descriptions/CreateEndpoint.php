@@ -15,7 +15,8 @@ final class CreateEndpoint
         private Engine $engine,
         private RunViewInterface $runs,
         private AssociationViewInterface $associations,
-    ) {}
+    ) {
+    }
 
     public function __invoke(callable $input): string|null
     {

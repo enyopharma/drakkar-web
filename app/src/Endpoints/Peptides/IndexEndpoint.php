@@ -7,6 +7,7 @@ namespace App\Endpoints\Peptides;
 final class IndexEndpoint
 {
     public function __construct(
+        private \League\Plates\Engine $engine,
         private \App\ReadModel\RunViewInterface $runs,
         private \App\ReadModel\AssociationViewInterface $associations,
         private \App\ReadModel\FormViewInterface $descriptions,
@@ -14,7 +15,7 @@ final class IndexEndpoint
     ) {
     }
 
-    public function __invoke(callable $input): iterable|null
+    public function __invoke(callable $input): string|null
     {
         // parse request.
         $run_id = (int) $input('run_id');
@@ -22,21 +23,29 @@ final class IndexEndpoint
         $id = (int) $input('id');
 
         // get the run.
-        if (!$this->runs->id($run_id)->fetch()) {
+        if (!$run = $this->runs->id($run_id)->fetch()) {
             return null;
         }
 
         // get the publication.
-        if (!$this->associations->pmid($run_id, $pmid)->fetch()) {
+        if (!$publication = $this->associations->pmid($run_id, $pmid)->fetch()) {
             return null;
         }
 
         // get the description.
-        if (!$this->descriptions->id($run_id, $pmid, $id)->fetch()) {
+        if (!$description = $this->descriptions->id($run_id, $pmid, $id)->fetch()) {
             return null;
         }
 
-        // return the peptides.
-        return $this->peptides->all($run_id, $pmid, $id);
+        // get the peptides.
+        $peptides = $this->peptides->all($run_id, $pmid, $id)->fetchAll();
+
+        return $this->engine->render('peptides/index', [
+            'type' => 'create',
+            'run' => $run,
+            'publication' => $publication,
+            'description' => $description,
+            'peptides' => $peptides,
+        ]);
     }
 }

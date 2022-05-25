@@ -10,13 +10,13 @@ module.exports = (env, argv) => {
             app: './assets/js/app.js',
             form: './assets/js/form/index.tsx',
             table: './assets/js/table/index.tsx',
+            peptides: './assets/js/peptides/index.tsx',
         },
         devtool: argv.mode == 'development' ? 'inline-source-map' : '',
         output: {
             filename: '[name].[contenthash].js',
             path: path.resolve(__dirname, './public/build'),
             publicPath: '/build/',
-            library: 'Drakkar',
         },
         resolve: {
             extensions: ['.js', '.ts', '.tsx', '.scss'],

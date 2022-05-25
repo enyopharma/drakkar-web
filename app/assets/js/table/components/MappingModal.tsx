@@ -11,6 +11,12 @@ type Props = {
     close: () => void
 }
 
+const peptides = {
+    url: ({ run_id, pmid, id }: Description) => {
+        return `/runs/${run_id}/publications/${pmid}/descriptions/${id}/peptides`
+    }
+}
+
 export const MappingModal: React.FC<Props> = ({ description, close }) => {
     const [protein1, setProtein1] = useState<Protein | null>(null)
     const [protein2, setProtein2] = useState<Protein | null>(null)
@@ -37,20 +43,25 @@ export const MappingModal: React.FC<Props> = ({ description, close }) => {
                 </button>
             </div>
             <div className="modal-body">
+                <a className="btn btn-block btn-primary" href={peptides.url(description)}>
+                    Edit peptides info
+                </a>
+            </div>
+            <div className="modal-body">
                 <div className="row">
                     <div className="col">
                         {protein1 == null ? null : (
                             description.interactor1.mapping.length == 0 ? (
                                 <p>No mapping on interactor 1</p>
                             ) : (
-                                    <Mapping
-                                        name={description.interactor1.name}
-                                        start={description.interactor1.start}
-                                        stop={description.interactor1.stop}
-                                        protein={protein1}
-                                        mapping={description.interactor1.mapping}
-                                    />
-                                )
+                                <Mapping
+                                    name={description.interactor1.name}
+                                    start={description.interactor1.start}
+                                    stop={description.interactor1.stop}
+                                    protein={protein1}
+                                    mapping={description.interactor1.mapping}
+                                />
+                            )
                         )}
                     </div>
                     <div className="col">
@@ -58,14 +69,14 @@ export const MappingModal: React.FC<Props> = ({ description, close }) => {
                             description.interactor2.mapping.length == 0 ? (
                                 <p>No mapping on interactor 2</p>
                             ) : (
-                                    <Mapping
-                                        name={description.interactor2.name}
-                                        start={description.interactor2.start}
-                                        stop={description.interactor2.stop}
-                                        protein={protein2}
-                                        mapping={description.interactor2.mapping}
-                                    />
-                                )
+                                <Mapping
+                                    name={description.interactor2.name}
+                                    start={description.interactor2.start}
+                                    stop={description.interactor2.stop}
+                                    protein={protein2}
+                                    mapping={description.interactor2.mapping}
+                                />
+                            )
                         )}
                     </div>
                 </div>
