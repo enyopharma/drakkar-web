@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faSave } from '@fortawesome/free-solid-svg-icons/faSave'
 import { faEraser } from '@fortawesome/free-solid-svg-icons/faEraser'
 
-import { InteractorI, Feedback } from '../src/types'
+import { InteractorI } from '../src/types'
 import { resetForm, fireSave } from '../src/reducer'
 import { useAppSelector, useAction } from '../src/hooks'
 
@@ -18,12 +18,9 @@ import { MappingFieldset } from './Mapping/MappingFieldset'
 const MySwal = withReactContent(Swal)
 
 export const Form: React.FC = () => {
-    const save = useAction(fireSave)
-    const reset = useAction(resetForm)
-    const props = useAppSelector(state => state)
-    const [tab, setTab] = useState<InteractorI>(1)
+    const { stable_id, type } = useAppSelector(state => state)
 
-    const { run_id, pmid, id, stable_id, type, saving, savable, resetable, feedback } = props
+    const [tab, setTab] = useState<InteractorI>(1)
 
     return (
         <form id="form-top" onSubmit={e => e.preventDefault()}>
@@ -43,53 +40,34 @@ export const Form: React.FC = () => {
                 <div className="card-footer">
                     {stable_id.trim().length > 0 && (
                         <div className="alert alert-danger">
-                            Validating this form will create a new version of description {props.stable_id}!
+                            Validating this form will create a new version of description {stable_id}!
                         </div>
                     )}
                     <div className="row">
                         <div className="col">
-                            <SaveButton stable_id={stable_id} enabled={savable} saving={saving} save={save} />
+                            <SaveButton />
                         </div>
                         <div className="col">
-                            <ResetButton enabled={resetable} reset={() => { reset(); setTab(1) }} />
+                            <ResetButton setTab={setTab} />
                         </div>
                     </div>
                     <div className="row">
                         <div className="col">
-                            <PeptidesButton run_id={run_id} pmid={pmid} id={id} />
+                            <PeptidesButton />
                         </div>
                     </div>
-                    {feedback && <FeedbackRow feedback={feedback} />}
+                    <FeedbackRow />
                 </div>
             </div>
         </form>
     )
 }
 
-type ButtonProps = {
-    enabled: boolean
-    onClick: () => void
-}
+const SaveButton: React.FC = () => {
+    const save = useAction(fireSave)
 
-const Button: React.FC<ButtonProps> = ({ enabled, onClick, children }) => (
-    <button
-        type="button"
-        className="btn btn-block btn-primary"
-        onClick={onClick}
-        disabled={!enabled}
-    >
-        {children}
-    </button>
-)
+    const { stable_id, savable, saving } = useAppSelector(state => state)
 
-type SaveButtonProps = {
-    stable_id: string
-    enabled: boolean
-    saving: boolean
-    save: () => void
-}
-
-const SaveButton: React.FC<SaveButtonProps> = ({ stable_id, enabled, saving, save }) => {
     const onClick = () => {
         if (stable_id.trim().length > 0) {
             MySwal.fire({
@@ -112,38 +90,44 @@ const SaveButton: React.FC<SaveButtonProps> = ({ stable_id, enabled, saving, sav
         : <FontAwesomeIcon icon={faSave} />
 
     return (
-        <Button enabled={enabled} onClick={onClick}>
+        <button
+            type="button"
+            className="btn btn-block btn-primary"
+            onClick={onClick}
+            disabled={!savable}
+        >
             {icon} Save description
-        </Button>
+        </button>
     )
 }
 
-type ResetButtonProps = {
-    enabled: boolean
-    reset: () => void
-}
+const ResetButton: React.FC<{ setTab: (i: InteractorI) => void }> = ({ setTab }) => {
+    const reset = useAction(resetForm)
 
-const ResetButton: React.FC<ResetButtonProps> = ({ enabled, reset }) => {
+    const { resetable } = useAppSelector(state => state)
+
     const onClick = () => {
         reset()
+        setTab(1)
         document.getElementById('form-top')?.scrollIntoView()
         MySwal.fire({ icon: 'success', text: 'form reseted!' })
     }
 
     return (
-        <Button enabled={enabled} onClick={onClick}>
+        <button
+            type="button"
+            className="btn btn-block btn-primary"
+            onClick={onClick}
+            disabled={!resetable}
+        >
             <FontAwesomeIcon icon={faEraser} /> Reset form data
-        </Button>
+        </button>
     )
 }
 
-type PeptidesButtonProps = {
-    run_id: number
-    pmid: number
-    id: number | null
-}
+const PeptidesButton: React.FC = () => {
+    const { run_id, pmid, id } = useAppSelector(state => state)
 
-const PeptidesButton: React.FC<PeptidesButtonProps> = ({ run_id, pmid, id }) => {
     const url = `/runs/${run_id}/publications/${pmid}/descriptions/${id}/peptides`
 
     const classes = id === null
@@ -157,12 +141,12 @@ const PeptidesButton: React.FC<PeptidesButtonProps> = ({ run_id, pmid, id }) => 
     )
 }
 
-type FeedbackRowProps = {
-    feedback: Feedback
-}
+const FeedbackRow: React.FC = () => {
+    const { feedback } = useAppSelector(state => state)
 
-const FeedbackRow: React.FC<FeedbackRowProps> = ({ feedback }) => {
     useEffect(() => {
+        if (!feedback) return
+
         if (feedback.success) {
             MySwal.fire({
                 icon: 'success',
@@ -181,6 +165,7 @@ const FeedbackRow: React.FC<FeedbackRowProps> = ({ feedback }) => {
         }
     }, [feedback])
 
+    if (!feedback) return null
     if (!feedback.success) return null
 
     return (
