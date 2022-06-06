@@ -21,6 +21,9 @@ export const useAppSelector = <T>(selector: (props: AppProps) => T): T => {
         const resetable = !state.interactorUI1.processing && !state.interactorUI2.processing
 
         return selector({
+            run_id: state.run_id,
+            pmid: state.pmid,
+            id: state.description.id,
             type: state.type,
             stable_id: state.description.stable_id,
             method_id: state.description.method_id,

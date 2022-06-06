@@ -49,13 +49,6 @@ $display = $type == 'edit' || $publication['state'] == App\Assertions\Publicatio
 ]) ?>
 
 <?php if ($display) : ?>
-    <?php if ($type == 'edit') : ?>
-        <p>
-            <a href="<?= $this->url('runs.publications.descriptions.peptides.index', $description) ?>" class="btn btn-block btn-primary">
-                Edit peptides info
-            </a>
-        </p>
-    <?php endif; ?>
     <div id="description-form"></div>
 <?php else : ?>
     <p class="card-text text-warning">

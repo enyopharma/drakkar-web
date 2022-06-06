@@ -23,7 +23,7 @@ export const Form: React.FC = () => {
     const props = useAppSelector(state => state)
     const [tab, setTab] = useState<InteractorI>(1)
 
-    const { stable_id, type, saving, savable, resetable, feedback } = props
+    const { run_id, pmid, id, stable_id, type, saving, savable, resetable, feedback } = props
 
     return (
         <form id="form-top" onSubmit={e => e.preventDefault()}>
@@ -48,14 +48,15 @@ export const Form: React.FC = () => {
                     )}
                     <div className="row">
                         <div className="col">
-                            <SaveButton stable_id={stable_id} enabled={savable} saving={saving} save={save}>
-                                Save description
-                            </SaveButton>
+                            <SaveButton stable_id={stable_id} enabled={savable} saving={saving} save={save} />
                         </div>
                         <div className="col">
-                            <ResetButton enabled={resetable} reset={() => { reset(); setTab(1) }}>
-                                Reset form data
-                            </ResetButton>
+                            <ResetButton enabled={resetable} reset={() => { reset(); setTab(1) }} />
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col">
+                            <PeptidesButton run_id={run_id} pmid={pmid} id={id} />
                         </div>
                     </div>
                     {feedback && <FeedbackRow feedback={feedback} />}
@@ -80,25 +81,6 @@ const Button: React.FC<ButtonProps> = ({ enabled, onClick, children }) => (
         {children}
     </button>
 )
-
-type ResetButtonProps = {
-    enabled: boolean
-    reset: () => void
-}
-
-const ResetButton: React.FC<ResetButtonProps> = ({ enabled, reset, children }) => {
-    const onClick = () => {
-        reset()
-        document.getElementById('form-top')?.scrollIntoView()
-        MySwal.fire({ icon: 'success', text: 'form reseted!' })
-    }
-
-    return (
-        <Button enabled={enabled} onClick={onClick}>
-            <FontAwesomeIcon icon={faEraser} /> {children}
-        </Button>
-    )
-}
 
 type SaveButtonProps = {
     stable_id: string
@@ -133,6 +115,45 @@ const SaveButton: React.FC<SaveButtonProps> = ({ stable_id, enabled, saving, sav
         <Button enabled={enabled} onClick={onClick}>
             {icon} Save description
         </Button>
+    )
+}
+
+type ResetButtonProps = {
+    enabled: boolean
+    reset: () => void
+}
+
+const ResetButton: React.FC<ResetButtonProps> = ({ enabled, reset }) => {
+    const onClick = () => {
+        reset()
+        document.getElementById('form-top')?.scrollIntoView()
+        MySwal.fire({ icon: 'success', text: 'form reseted!' })
+    }
+
+    return (
+        <Button enabled={enabled} onClick={onClick}>
+            <FontAwesomeIcon icon={faEraser} /> Reset form data
+        </Button>
+    )
+}
+
+type PeptidesButtonProps = {
+    run_id: number
+    pmid: number
+    id: number | null
+}
+
+const PeptidesButton: React.FC<PeptidesButtonProps> = ({ run_id, pmid, id }) => {
+    const url = `/runs/${run_id}/publications/${pmid}/descriptions/${id}/peptides`
+
+    const classes = id === null
+        ? 'btn btn-block btn-primary disabled'
+        : 'btn btn-block btn-primary'
+
+    return (
+        <a href={url} target="_blank" className={classes}>
+            Edit peptides info
+        </a>
     )
 }
 

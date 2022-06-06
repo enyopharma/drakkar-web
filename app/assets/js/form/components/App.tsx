@@ -19,6 +19,7 @@ export const App: React.FC<AppProps> = ({ type, run_id, pmid, description }) => 
         pmid: pmid,
         type: type,
         description: description == null ? undefined : {
+            id: description.id,
             stable_id: description.stable_id,
             method_id: description.method_id,
             interactor1: description.interactor1,

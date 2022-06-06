@@ -143,6 +143,12 @@ const run_id = createReducer(0, builder => builder.addDefaultCase((state) => sta
 
 const pmid = createReducer(0, builder => builder.addDefaultCase((state) => state))
 
+const id = createReducer<number | null>(null, builder => {
+    builder
+        .addCase(showFeedback, (state, action) => action.payload.data.id ? action.payload.data.id : state)
+        .addDefaultCase((state) => state)
+})
+
 const type = createReducer('hh', builder => builder.addDefaultCase((state) => state))
 
 const stable_id = createReducer('', builder => builder.addDefaultCase((state) => state))
@@ -168,7 +174,7 @@ const feedback = createReducer<Feedback | null>(null, builder => {
 
 const interactor1 = buildInteractorReducer(1);
 const interactor2 = buildInteractorReducer(2);
-const description = combineReducers({ stable_id, method_id, interactor1, interactor2 })
+const description = combineReducers({ id, stable_id, method_id, interactor1, interactor2 })
 const interactorUI1 = buildInteractorUIReducer(1);
 const interactorUI2 = buildInteractorUIReducer(2);
 

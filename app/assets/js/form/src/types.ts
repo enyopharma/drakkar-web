@@ -16,6 +16,9 @@ export type InteractorUI = {
 }
 
 export type AppProps = {
+    run_id: number
+    pmid: number
+    id: number | null
     type: DescriptionType
     stable_id: string
     method_id: number | null
@@ -38,6 +41,7 @@ export type InteractorProps = {
 export type DescriptionType = 'hh' | 'vh'
 
 export type Description = {
+    id: number | null
     stable_id: string
     method_id: number | null
     interactor1: Interactor
@@ -131,6 +135,7 @@ export type Sequences = Record<string, string>
 
 export type Feedback = {
     success: boolean
+    data: { id: number | undefined }
     errors: string[]
 }
 

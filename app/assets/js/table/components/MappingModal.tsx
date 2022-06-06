@@ -43,7 +43,7 @@ export const MappingModal: React.FC<Props> = ({ description, close }) => {
                 </button>
             </div>
             <div className="modal-body">
-                <a className="btn btn-block btn-primary" href={peptides.url(description)}>
+                <a className="btn btn-block btn-primary" href={peptides.url(description)} target="_blank">
                     Edit peptides info
                 </a>
             </div>
