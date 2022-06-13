@@ -5,5 +5,9 @@ export type Peptide = {
     stable_id: number
     type: PeptideType
     sequence: string
-    data: any
+    data: {
+        hotspots: Hotspots
+    }
 }
+
+export type Hotspots = Record<number, string>

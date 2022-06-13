@@ -55,6 +55,8 @@ final class PeptideViewSql implements PeptideViewInterface
     {
         $map = [];
 
+        $default = ['hotspots' => []];
+
         while ([$type, $sequence, $data] = $select_data_sth->fetch(\PDO::FETCH_NUM)) {
             $map[$type][$sequence] = $data;
         }
@@ -65,7 +67,9 @@ final class PeptideViewSql implements PeptideViewInterface
                 'stable_id' => $stable_id,
                 'type' => 'h',
                 'sequence' => $sequence,
-                'data' => json_decode($map['h'][$sequence] ?? '{}', true),
+                'data' => $map['h'][$sequence]
+                    ? json_decode($map['h'][$sequence], true)
+                    : $default,
             ];
         }
 
@@ -77,7 +81,9 @@ final class PeptideViewSql implements PeptideViewInterface
                 'stable_id' => $stable_id,
                 'type' => $ptype,
                 'sequence' => $sequence,
-                'data' => json_decode($map[$ptype][$sequence] ?? '{}', true),
+                'data' => array_key_exists($ptype, $map) && array_key_exists($sequence, $map[$ptype])
+                    ? json_decode($map[$ptype][$sequence], true)
+                    : $default,
             ];
         }
     }
