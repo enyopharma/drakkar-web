@@ -195,25 +195,15 @@ export const reducer = combineReducers({
 export type AppThunk = ThunkAction<void, AppState, unknown, Action<string>>
 
 export const selectMethod = ({ id }: { id: number }): AppThunk => async dispatch => {
-    // populate the cache.
-    const f = () => {
-        const method = api.methods.select(id).read()
+    const method = await api.methods.select(id).promise
 
-        dispatch(__selectMethod({ method }))
-    }
-
-    try { f() } catch (promise) { promise.then(f) }
+    dispatch(__selectMethod({ method }))
 }
 
 export const selectProtein = ({ i, id }: { i: InteractorI, id: number }): AppThunk => async dispatch => {
-    // populate the cache.
-    const f = () => {
-        const protein = api.proteins.select(id).read()
+    const protein = await api.proteins.select(id).promise
 
-        dispatch(__selectProtein({ i, protein }))
-    }
-
-    try { f() } catch (promise) { promise.then(f) }
+    dispatch(__selectProtein({ i, protein }))
 }
 
 export const fireAlignment = ({ i, query, sequences }: { i: InteractorI, query: string, sequences: Sequences }): AppThunk => async dispatch => {

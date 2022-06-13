@@ -148,4 +148,5 @@ export type SearchResult = {
 
 export type Resource<T> = {
     read: () => T
+    promise: Promise<T>
 }

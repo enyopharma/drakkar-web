@@ -49,6 +49,7 @@ const resource = <T>(promise: Promise<T>) => {
                     throw new Error()
             }
         },
+        promise,
     }
 }
 
