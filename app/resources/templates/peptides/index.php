@@ -4,7 +4,7 @@
 <script type="text/javascript" src="<?= $this->asset('react-dom.js') ?>"></script>
 <script type="text/javascript" src="<?= $this->asset('peptides.js') ?>"></script>
 <script type="text/javascript">
-    peptides('peptides', <?= json_encode($peptides) ?>);
+    peptides('peptides', <?= json_encode($run) ?>, <?= json_encode($publication) ?>, <?= json_encode($peptides) ?>);
 </script>
 <?php $this->end(); ?>
 

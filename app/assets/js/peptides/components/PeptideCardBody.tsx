@@ -1,13 +1,15 @@
 import React, { useState } from 'react'
 
-import { Peptide } from '../src/types'
+import { Run, Publication, Peptide } from '../src/types'
 import { PeptideForm } from './PeptideForm'
 
 type PeptideCardBodyProps = {
+    run: Run
+    publication: Publication
     peptides: Peptide[]
 }
 
-export const PeptideCardBody: React.FC<PeptideCardBodyProps> = ({ peptides, children }) => {
+export const PeptideCardBody: React.FC<PeptideCardBodyProps> = ({ run, publication, peptides, children }) => {
     const [peptide, setPeptide] = useState<Peptide | null>(peptides.length === 0 ? null : peptides[0])
 
     const update = (sequence: string) => {
@@ -38,7 +40,7 @@ export const PeptideCardBody: React.FC<PeptideCardBodyProps> = ({ peptides, chil
                     ))}
                 </select>
             </p>
-            <PeptideForm peptide={peptide} />
+            <PeptideForm run={run} publication={publication} peptide={peptide} />
         </div>
     )
 }

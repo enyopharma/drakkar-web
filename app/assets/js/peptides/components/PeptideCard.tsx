@@ -1,13 +1,15 @@
 import React, { useState } from "react"
 
-import { Peptide } from "../src/types"
+import { Run, Publication, Peptide } from '../src/types'
 import { PeptideCardBody } from "./PeptideCardBody"
 
 type PeptideCardProps = {
+    run: Run
+    publication: Publication
     peptides: Peptide[]
 }
 
-export const PeptideCard: React.FC<PeptideCardProps> = ({ peptides }) => {
+export const PeptideCard: React.FC<PeptideCardProps> = ({ run, publication, peptides }) => {
     const [tab, setTab] = useState<0 | 1>(0)
 
     const classes1 = ['nav-link', 'text-primary']
@@ -46,8 +48,8 @@ export const PeptideCard: React.FC<PeptideCardProps> = ({ peptides }) => {
                 </ul>
             </div>
             {tab === 0
-                ? <PeptideCardBody key={0} peptides={peptidesH}>No human peptide</PeptideCardBody>
-                : <PeptideCardBody key={1} peptides={peptidesV}>No viral peptide</PeptideCardBody>
+                ? <PeptideCardBody key={0} run={run} publication={publication} peptides={peptidesH}>No human peptide</PeptideCardBody>
+                : <PeptideCardBody key={1} run={run} publication={publication} peptides={peptidesV}>No viral peptide</PeptideCardBody>
             }
         </div>
     )

@@ -1,3 +1,11 @@
+export type Run = {
+    id: number
+}
+
+export type Publication = {
+    pmid: number
+}
+
 export type Peptide = {
     description_id: number
     stable_id: number

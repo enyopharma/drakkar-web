@@ -1,12 +1,14 @@
 import React, { useState } from "react"
 
-import { Peptide, PeptideData, Hotspots } from "../src/types"
+import { Run, Publication, Peptide, PeptideData, Hotspots } from "../src/types"
 
 type PeptideFormProps = {
+    run: Run
+    publication: Publication
     peptide: Peptide
 }
 
-export const PeptideForm: React.FC<PeptideFormProps> = ({ peptide }) => {
+export const PeptideForm: React.FC<PeptideFormProps> = ({ run, publication, peptide }) => {
     const [current, setCurrent] = useState<PeptideData>(peptide.data)
     const [cter, setCter] = useState<string>(current.cter)
     const [nter, setNter] = useState<string>(current.nter)
@@ -20,6 +22,8 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ peptide }) => {
     const [saving, setSaving] = useState<boolean>(false)
 
     const data = {
+        type: peptide.type,
+        sequence: peptide.sequence,
         cter: cter.trim(),
         nter: nter.trim(),
         affinity: {
@@ -47,10 +51,30 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ peptide }) => {
         current.info === data.info
     )
 
+    const url = `/runs/${run.id}/publications/${publication.pmid}/descriptions/${peptide.description_id}/peptides`
+
+    const params = {
+        method: 'POST',
+        headers: {
+            'accept': 'application/json',
+            'content-type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    }
+
     const save = async () => {
         setSaving(true)
-        await new Promise(r => setTimeout(r, 1000))
-        setCurrent(data)
+
+        try {
+            const response = await fetch(url, params)
+            if (response.status === 200) {
+                const json = await response.json()
+                if (json.success) setCurrent(data)
+            }
+        }
+
+        catch (e) { console.log(e) }
+
         setSaving(false)
     }
 
