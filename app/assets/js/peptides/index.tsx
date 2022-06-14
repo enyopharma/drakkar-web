@@ -1,14 +1,14 @@
 import React from 'react'
 import { render } from 'react-dom'
 
-import { PeptideType, Peptide } from './src/types'
+import { Peptide } from './src/types'
 
-import { PeptideList } from './components/PeptideList'
+import { PeptideCard } from './components/PeptideCard'
 
-type InitPeptide = (container: string, type: PeptideType, descriptions: Peptide[]) => ReturnType<typeof render>
+type InitPeptide = (container: string, peptides: Peptide[]) => ReturnType<typeof render>
 
-const peptides: InitPeptide = (container, type, peptides) => {
-    render(<PeptideList type={type} peptides={peptides} />, document.getElementById(container))
+const peptides: InitPeptide = (container, peptides) => {
+    render(<PeptideCard peptides={peptides} />, document.getElementById(container))
 }
 
 declare global {

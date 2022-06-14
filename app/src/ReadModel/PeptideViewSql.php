@@ -55,7 +55,21 @@ final class PeptideViewSql implements PeptideViewInterface
     {
         $map = [];
 
-        $default = ['hotspots' => []];
+        $default = [
+            'cter' => '',
+            'nter' => '',
+            'affinity' => [
+                'type' => '',
+                'value' => null,
+                'unit' => '',
+            ],
+            'hotspots' => [],
+            'methods' => [
+                'expression' => '',
+                'interaction' => '',
+            ],
+            'info' => '',
+        ];
 
         while ([$type, $sequence, $data] = $select_data_sth->fetch(\PDO::FETCH_NUM)) {
             $map[$type][$sequence] = $data;

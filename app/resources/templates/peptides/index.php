@@ -4,8 +4,7 @@
 <script type="text/javascript" src="<?= $this->asset('react-dom.js') ?>"></script>
 <script type="text/javascript" src="<?= $this->asset('peptides.js') ?>"></script>
 <script type="text/javascript">
-    peptides('peptides-h', 'h', <?= json_encode($peptides) ?>);
-    peptides('peptides-v', 'v', <?= json_encode($peptides) ?>);
+    peptides('peptides', <?= json_encode($peptides) ?>);
 </script>
 <?php $this->end(); ?>
 
@@ -32,5 +31,4 @@
     'source' => $this->url('runs.publications.descriptions.peptides.index', $description),
 ]) ?>
 
-<div id="peptides-h" class="mb-3"></div>
-<div id="peptides-v"></div>
+<div id="peptides"></div>
