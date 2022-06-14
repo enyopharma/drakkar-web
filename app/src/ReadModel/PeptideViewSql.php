@@ -81,7 +81,7 @@ final class PeptideViewSql implements PeptideViewInterface
                 'stable_id' => $stable_id,
                 'type' => 'h',
                 'sequence' => $sequence,
-                'data' => $map['h'][$sequence]
+                'data' => array_key_exists('h', $map) && array_key_exists($sequence, $map['h'])
                     ? json_decode($map['h'][$sequence], true)
                     : $default,
             ];
