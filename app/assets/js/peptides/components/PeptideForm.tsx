@@ -41,13 +41,11 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ peptide }) => {
         current.affinity.type === data.affinity.type &&
         current.affinity.value === data.affinity.value &&
         current.affinity.unit === data.affinity.unit &&
-        sameHotspots(current.hotspots, hotspots) &&
+        sameHotspots(current.hotspots, data.hotspots) &&
         current.methods.expression === data.methods.expression &&
         current.methods.interaction === data.methods.interaction &&
         current.info === data.info
     )
-
-    console.log(data)
 
     const save = async () => {
         setSaving(true)
@@ -202,6 +200,7 @@ const HotspotFieldset: React.FC<HotspotFieldsetProps> = ({ peptide, hotspots, up
                         type="button"
                         className={`btn ${i === index ? 'btn-primary' : 'btn-outline-primary'}`}
                         onClick={() => setIndex(i)}
+                        disabled={disabled}
                     >
                         {aa}
                     </button>
@@ -252,5 +251,21 @@ const HotspotFieldset: React.FC<HotspotFieldsetProps> = ({ peptide, hotspots, up
 }
 
 const sameHotspots = (hotspots1: Hotspots, hotspots2: Hotspots) => {
+    if (Object.keys(hotspots1).length !== Object.keys(hotspots2).length) {
+        return false
+    }
+
+    for (const istr of Object.keys(hotspots1)) {
+        const i = parseInt(istr)
+
+        if (hotspots2[i] === undefined) {
+            return false
+        }
+
+        if (hotspots1[i].trim() !== hotspots2[i].trim()) {
+            return false
+        }
+    }
+
     return true
 }
