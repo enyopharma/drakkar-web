@@ -3,21 +3,23 @@ export type Peptide = {
     stable_id: number
     type: 'h' | 'v'
     sequence: string
-    data: {
-        cter: string
-        nter: string
-        affinity: {
-            type: string
-            value: number | null
-            unit: string
-        }
-        hotspots: Hotspots
-        methods: {
-            expression: string
-            interaction: string
-        }
-        info: string
+    data: PeptideData
+}
+
+export type PeptideData = {
+    cter: string
+    nter: string
+    affinity: {
+        type: string
+        value: number | null
+        unit: string
     }
+    hotspots: Hotspots
+    methods: {
+        expression: string
+        interaction: string
+    }
+    info: string
 }
 
 export type Hotspots = Record<number, string>

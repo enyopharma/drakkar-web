@@ -1,46 +1,60 @@
 import React, { useState } from "react"
 
-import { Peptide, Hotspots } from "../src/types"
+import { Peptide, PeptideData, Hotspots } from "../src/types"
 
 type PeptideFormProps = {
     peptide: Peptide
 }
 
 export const PeptideForm: React.FC<PeptideFormProps> = ({ peptide }) => {
-    const [cter, setCter] = useState<string>(peptide.data.cter)
-    const [nter, setNter] = useState<string>(peptide.data.nter)
-    const [affType, setAffType] = useState<string>(peptide.data.affinity.type)
-    const [affValue, setAffValue] = useState<number | null>(peptide.data.affinity.value)
-    const [affUnit, setAffUnit] = useState<string>(peptide.data.affinity.unit)
-    const [hotspots, setHotspots] = useState<Hotspots>(peptide.data.hotspots)
-    const [xprMethod, setXprMethod] = useState<string>(peptide.data.methods.expression)
-    const [itxMethod, setItxMethod] = useState<string>(peptide.data.methods.interaction)
-    const [info, setInfo] = useState<string>(peptide.data.info)
+    const [current, setCurrent] = useState<PeptideData>(peptide.data)
+    const [cter, setCter] = useState<string>(current.cter)
+    const [nter, setNter] = useState<string>(current.nter)
+    const [affType, setAffType] = useState<string>(current.affinity.type)
+    const [affValue, setAffValue] = useState<number | null>(current.affinity.value)
+    const [affUnit, setAffUnit] = useState<string>(current.affinity.unit)
+    const [hotspots, setHotspots] = useState<Hotspots>(current.hotspots)
+    const [xprMethod, setXprMethod] = useState<string>(current.methods.expression)
+    const [itxMethod, setItxMethod] = useState<string>(current.methods.interaction)
+    const [info, setInfo] = useState<string>(current.info)
+    const [saving, setSaving] = useState<boolean>(false)
 
     const data = {
         cter: cter.trim(),
         nter: nter.trim(),
-        affType: affType.trim(),
-        affValue: affValue,
-        affUnit: affUnit.trim(),
+        affinity: {
+            type: affType.trim(),
+            value: affValue,
+            unit: affUnit.trim(),
+        },
         hotspots,
-        xprMethod: xprMethod.trim(),
-        itxMethod: itxMethod.trim(),
+        methods: {
+            expression: xprMethod.trim(),
+            interaction: itxMethod.trim(),
+        },
         info: info.trim(),
     }
 
-    const same =
-        peptide.data.cter === cter &&
-        peptide.data.nter === nter &&
-        peptide.data.affinity.type === affType &&
-        peptide.data.affinity.value === affValue &&
-        peptide.data.affinity.unit === affUnit &&
-        sameHotspots(peptide.data.hotspots, hotspots) &&
-        peptide.data.methods.expression === xprMethod &&
-        peptide.data.methods.interaction === itxMethod &&
-        peptide.data.info === info
+    const disabled = saving || (
+        current.cter === data.cter &&
+        current.nter === data.nter &&
+        current.affinity.type === data.affinity.type &&
+        current.affinity.value === data.affinity.value &&
+        current.affinity.unit === data.affinity.unit &&
+        sameHotspots(current.hotspots, hotspots) &&
+        current.methods.expression === data.methods.expression &&
+        current.methods.interaction === data.methods.interaction &&
+        current.info === data.info
+    )
 
     console.log(data)
+
+    const save = async () => {
+        setSaving(true)
+        await new Promise(r => setTimeout(r, 1000))
+        setCurrent(data)
+        setSaving(false)
+    }
 
     return (
         <form>
@@ -53,6 +67,7 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ peptide }) => {
                         type="text"
                         className="form-control"
                         onChange={e => setCter(e.target.value)}
+                        disabled={saving}
                     />
                 </div>
                 <div className="form-group">
@@ -62,6 +77,7 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ peptide }) => {
                         type="text"
                         className="form-control"
                         onChange={e => setNter(e.target.value)}
+                        disabled={saving}
                     />
                 </div>
             </fieldset>
@@ -75,6 +91,7 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ peptide }) => {
                         className="form-control"
                         onChange={e => setAffType(e.target.value)}
                         placeholder="IC50, IC95, EC50, Ki, Kd, Km, Potency, Inhibition ..."
+                        disabled={saving}
                     />
                 </div>
                 <div className="form-group">
@@ -84,6 +101,7 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ peptide }) => {
                         type="number"
                         className="form-control"
                         onChange={e => setAffValue(parseInt(e.target.value))}
+                        disabled={saving}
                     />
                 </div>
                 <div className="form-group">
@@ -94,10 +112,11 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ peptide }) => {
                         className="form-control"
                         onChange={e => setAffUnit(e.target.value)}
                         placeholder="µM, nM, % ..."
+                        disabled={saving}
                     />
                 </div>
             </fieldset>
-            <HotspotFieldset peptide={peptide} hotspots={hotspots} update={setHotspots} />
+            <HotspotFieldset peptide={peptide} hotspots={hotspots} update={setHotspots} disabled={saving} />
             <fieldset>
                 <legend>Additional info</legend>
                 <div className="form-group">
@@ -107,6 +126,7 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ peptide }) => {
                         type="text"
                         className="form-control"
                         onChange={e => setXprMethod(e.target.value)}
+                        disabled={saving}
                     />
                 </div>
                 <div className="form-group">
@@ -116,6 +136,7 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ peptide }) => {
                         type="text"
                         className="form-control"
                         onChange={e => setItxMethod(e.target.value)}
+                        disabled={saving}
                     />
                 </div>
                 <div className="form-group">
@@ -125,11 +146,12 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ peptide }) => {
                         className="form-control"
                         onChange={e => setInfo(e.target.value)}
                         placeholder="Disruption of interaction, inhibition of enzymatic activity, ..."
+                        disabled={saving}
                         rows={3}
                     ></textarea>
                 </div>
             </fieldset>
-            <button type="button" className="btn btn-block btn-primary" disabled={same}>
+            <button type="button" className="btn btn-block btn-primary" disabled={disabled} onClick={save}>
                 Save peptide infos
             </button>
         </form>
@@ -140,9 +162,10 @@ type HotspotFieldsetProps = {
     peptide: Peptide
     hotspots: Hotspots
     update: (hotspots: Hotspots) => void
+    disabled: boolean
 }
 
-const HotspotFieldset: React.FC<HotspotFieldsetProps> = ({ peptide, hotspots, update }) => {
+const HotspotFieldset: React.FC<HotspotFieldsetProps> = ({ peptide, hotspots, update, disabled }) => {
     const [index, setIndex] = useState<number | null>(null)
     const [description, setDescription] = useState<string>('')
 
@@ -191,12 +214,14 @@ const HotspotFieldset: React.FC<HotspotFieldsetProps> = ({ peptide, hotspots, up
                     value={description}
                     onChange={e => setDescription(e.target.value)}
                     placeholder="Hotspot description"
+                    disabled={disabled}
                 />
                 <div className="input-group-append">
                     <button
                         type="button"
                         className="btn btn-primary"
-                        onClick={() => saveHotspot()} disabled={index === null}
+                        onClick={() => saveHotspot()}
+                        disabled={disabled || index === null}
                     >
                         Add
                     </button>
@@ -215,6 +240,7 @@ const HotspotFieldset: React.FC<HotspotFieldsetProps> = ({ peptide, hotspots, up
                                     type="button"
                                     className="btn btn-sm btn-danger float-right"
                                     onClick={() => removeHotspot(i)}
+                                    disabled={disabled}
                                 >Delete</button>
                             </li>
                         )
