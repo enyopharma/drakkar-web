@@ -40,7 +40,7 @@ export const PeptideCardBody: React.FC<PeptideCardBodyProps> = ({ run, publicati
                     ))}
                 </select>
             </p>
-            <PeptideForm run={run} publication={publication} peptide={peptide} />
+            <PeptideForm key={peptide.sequence} run={run} publication={publication} peptide={peptide} />
         </div>
     )
 }

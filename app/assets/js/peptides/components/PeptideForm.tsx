@@ -1,6 +1,10 @@
 import React, { useState } from "react"
+import Swal from "sweetalert2"
+import withReactContent from "sweetalert2-react-content"
 
 import { Run, Publication, Peptide, PeptideData, Hotspots } from "../src/types"
+
+const MySwal = withReactContent(Swal)
 
 type PeptideFormProps = {
     run: Run
@@ -53,8 +57,27 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ run, publication, pept
 
     const save = async () => {
         setSaving(true)
-        const success = await savePeptide(run, publication, peptide, data)
-        if (success) setCurrent(data)
+
+        const result = await savePeptide(run, publication, peptide, data)
+
+        if (result.success) {
+            setCurrent(data)
+            MySwal.fire({
+                icon: 'success',
+                text: 'Peptide data successfully saved!',
+            })
+        } else {
+            MySwal.fire({
+                icon: 'error',
+                title: <p>Something went wrong</p>,
+                html: (
+                    <ul className="list-unstyled">
+                        {result.errors.map((e, i) => <li key={i}>{e}</li>)}
+                    </ul>
+                ),
+            })
+        }
+
         setSaving(false)
     }
 
@@ -282,7 +305,9 @@ const sameHotspots = (hotspots1: Hotspots, hotspots2: Hotspots) => {
     return true
 }
 
-const savePeptide = async (run: Run, publication: Publication, peptide: Peptide, data: PeptideData): Promise<boolean> => {
+type Result = { success: true } | { success: false, errors: string[] }
+
+const savePeptide = async (run: Run, publication: Publication, peptide: Peptide, data: PeptideData): Promise<Result> => {
     const url = `/runs/${run.id}/publications/${publication.pmid}/descriptions/${peptide.description_id}/peptides`
 
     const params = {
@@ -296,14 +321,11 @@ const savePeptide = async (run: Run, publication: Publication, peptide: Peptide,
 
     try {
         const response = await fetch(url, params)
-
-        if (response.status === 200) {
-            const json = await response.json()
-            return json.success
-        }
+        const json = await response.json()
+        return json
     }
 
     catch (e) { console.log(e) }
 
-    return false
+    return { success: false, errors: [] }
 }
