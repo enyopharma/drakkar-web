@@ -1,0 +1,214 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Input;
+
+use Quanta\Validation\Error;
+use Quanta\Validation\Field;
+use Quanta\Validation\OfType;
+use Quanta\Validation\ArrayFactory;
+use Quanta\Validation\InvalidDataException;
+
+use App\Assertions\ProteinType;
+
+final class PeptideInput
+{
+    const MIN_LENGTH = 5;
+    const MAX_LENGTH = 20;
+    const SEQUENCE_PATTERN = '/^[A-Z]*$/';
+
+    public static function factory(): callable
+    {
+        $is_str = OfType::guard('string');
+        $is_arr = OfType::guard('array');
+
+        return new ArrayFactory(
+            [self::class, 'from'],
+            Field::required('type', $is_str)->focus(),
+            Field::required('sequence', $is_str)->focus(),
+            Field::required('cter', $is_str)->focus(),
+            Field::required('nter', $is_str)->focus(),
+            Field::required('affinity', $is_arr)->focus(),
+            Field::required('hotspots', $is_arr)->focus(),
+            Field::required('methods', $is_arr)->focus(),
+            Field::required('info', $is_str)->focus(),
+        );
+    }
+
+    public static function from(
+        string $type,
+        string $sequence,
+        string $cter,
+        string $nter,
+        array $affinity,
+        array $hotspots,
+        array $methods,
+        string $info,
+    ): self {
+        $input = new self($type, $sequence, $cter, $nter, $affinity, $hotspots, $methods, $info);
+
+        $errors = [
+            ...$input->validateType(),
+            ...$input->validateSequence(),
+            ...$input->validateAffinity(),
+            ...$input->validateHotspots(),
+            ...$input->validateMethods(),
+        ];;
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        return $input;
+    }
+
+    private function __construct(
+        private string $type,
+        private string $sequence,
+        private string $cter,
+        private string $nter,
+        private array $affinity,
+        private array $hotspots,
+        private array $methods,
+        private string $info,
+    ) {
+    }
+
+    public function type(): string
+    {
+        return $this->type;
+    }
+
+    public function sequence(): string
+    {
+        return $this->sequence;
+    }
+
+    public function data(): array
+    {
+        return [
+            'cter' => $this->cter,
+            'nter' => $this->nter,
+            'affinity' => $this->affinity,
+            'hotspots' => $this->hotspots,
+            'methods' => $this->methods,
+            'info' => $this->info,
+        ];
+    }
+
+    private function validateType(): array
+    {
+        $errors = [];
+
+        if (!ProteinType::isValid($this->type)) {
+            $errors[] = Error::nested('type', vsprintf('must be either \'%s\' or \'%s\'', [
+                ProteinType::H,
+                ProteinType::V,
+            ]));
+        }
+
+        return $errors;
+    }
+
+    private function validateSequence(): array
+    {
+        $errors = [];
+
+        if (strlen($this->sequence) < self::MIN_LENGTH) {
+            $errors[] = Error::nested('sequence', sprintf('Must be longer than or equal to %s', self::MIN_LENGTH));
+        }
+
+        if (strlen($this->sequence) > self::MAX_LENGTH) {
+            $errors[] = Error::nested('sequence', sprintf('Must be shorter than or equal to %s', self::MAX_LENGTH));
+        }
+
+        if (preg_match(self::SEQUENCE_PATTERN, $this->sequence) === 0) {
+            $errors[] = Error::nested('sequence', sprintf('must match %s', self::SEQUENCE_PATTERN));
+        }
+
+        return $errors;
+    }
+
+    private function validateAffinity(): array
+    {
+        $errors = [];
+
+        $type = array_key_exists('type', $this->affinity);
+        $value = array_key_exists('value', $this->affinity);
+        $unit = array_key_exists('unit', $this->affinity);
+
+        if (!$type) {
+            $errors[] = Error::nested('type', 'is required')->nest('affinity');
+        }
+
+        if (!$value) {
+            $errors[] = Error::nested('value', 'is required')->nest('affinity');
+        }
+
+        if (!$unit) {
+            $errors[] = Error::nested('unit', 'is required')->nest('affinity');
+        }
+
+        if ($type && !is_string($this->affinity['type'])) {
+            $errors[] = Error::nested('type', 'must be a string')->nest('affinity');
+        }
+
+        if ($value && !(is_null($this->affinity['value']) || is_int($this->affinity['value']) || is_float($this->affinity['value']))) {
+            $errors[] = Error::nested('type', 'must be a number or null')->nest('affinity');
+        }
+
+        if ($unit && !is_string($this->affinity['unit'])) {
+            $errors[] = Error::nested('unit', 'must be a string')->nest('affinity');
+        }
+
+        return $errors;
+    }
+
+    private function validateHotspots(): array
+    {
+        $errors = [];
+
+        $no_num = false;
+        $no_str = false;
+        $too_big = false;
+
+        foreach ($this->hotspots as $key => $value) {
+            if (!is_int($key)) $no_str = true;
+            if (!is_string($value)) $no_str = true;
+            if (is_int($key) && $key >= strlen($this->sequence)) $too_big = true;
+        }
+
+        if ($no_num) Error::nested('hotspots', 'positions must be numeric');
+        if ($no_str) Error::nested('hotspots', 'descriptions must be string');
+        if ($too_big) Error::nested('hotspots', 'position cant be outsite sequence');
+
+        return $errors;
+    }
+
+    private function validateMethods(): array
+    {
+        $errors = [];
+
+        $expression = array_key_exists('expression', $this->methods);
+        $interaction = array_key_exists('interaction', $this->methods);
+
+        if (!$expression) {
+            $errors[] = Error::nested('expression', 'is required')->nest('methods');
+        }
+
+        if (!$interaction) {
+            $errors[] = Error::nested('interaction', 'is required')->nest('methods');
+        }
+
+        if ($expression && !is_string($this->methods['expression'])) {
+            $errors[] = Error::nested('expression', 'must be a string')->nest('methods');
+        }
+
+        if ($interaction && !is_string($this->methods['interaction'])) {
+            $errors[] = Error::nested('interaction', 'must be a string')->nest('methods');
+        }
+
+        return $errors;
+    }
+}

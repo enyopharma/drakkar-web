@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Actions\StoreRunInterface;
 use App\Actions\PopulateRunInterface;
+use App\Actions\StorePeptideInterface;
 use App\Actions\StoreDescriptionInterface;
 use App\Actions\DeleteDescriptionInterface;
 use App\Actions\PopulatePublicationInterface;
@@ -32,6 +33,10 @@ return [
     ),
 
     DeleteDescriptionInterface::class => fn ($container) => new App\Actions\DeleteDescriptionSql(
+        $container->get(PDO::class),
+    ),
+
+    StorePeptideInterface::class => fn ($container) => new App\Actions\StorePeptideSql(
         $container->get(PDO::class),
     ),
 ];

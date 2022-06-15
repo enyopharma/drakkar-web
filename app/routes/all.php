@@ -140,6 +140,14 @@ return function (ContainerInterface $container): array {
                 $container->get(App\Actions\StoreDescriptionInterface::class),
             ))),
 
+        Route::matching('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/peptides')
+            ->middleware(fn () => new App\Middleware\ValidatePeptideMiddleware(
+                $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
+            ))
+            ->post(fn () => $endpoint(new Peptides\StoreEndpoint(
+                $container->get(App\Actions\StorePeptideInterface::class),
+            ))),
+
         Route::matching('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}')
             ->delete(fn () => $endpoint(new Descriptions\DeleteEndpoint(
                 $container->get(App\Actions\DeleteDescriptionInterface::class),

@@ -51,30 +51,10 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ run, publication, pept
         current.info === data.info
     )
 
-    const url = `/runs/${run.id}/publications/${publication.pmid}/descriptions/${peptide.description_id}/peptides`
-
-    const params = {
-        method: 'POST',
-        headers: {
-            'accept': 'application/json',
-            'content-type': 'application/json',
-        },
-        body: JSON.stringify(data),
-    }
-
     const save = async () => {
         setSaving(true)
-
-        try {
-            const response = await fetch(url, params)
-            if (response.status === 200) {
-                const json = await response.json()
-                if (json.success) setCurrent(data)
-            }
-        }
-
-        catch (e) { console.log(e) }
-
+        const success = await savePeptide(run, publication, peptide, data)
+        if (success) setCurrent(data)
         setSaving(false)
     }
 
@@ -88,6 +68,7 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ run, publication, pept
                         id={`${peptide.type}-cter`}
                         type="text"
                         className="form-control"
+                        value={cter}
                         onChange={e => setCter(e.target.value)}
                         disabled={saving}
                     />
@@ -98,6 +79,7 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ run, publication, pept
                         id={`${peptide.type}-nter`}
                         type="text"
                         className="form-control"
+                        value={nter}
                         onChange={e => setNter(e.target.value)}
                         disabled={saving}
                     />
@@ -111,6 +93,7 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ run, publication, pept
                         id={`${peptide.type}-aff-type`}
                         type="text"
                         className="form-control"
+                        value={affType}
                         onChange={e => setAffType(e.target.value)}
                         placeholder="IC50, IC95, EC50, Ki, Kd, Km, Potency, Inhibition ..."
                         disabled={saving}
@@ -122,6 +105,7 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ run, publication, pept
                         id={`${peptide.type}-aff-value`}
                         type="number"
                         className="form-control"
+                        value={affValue === null ? undefined : affValue}
                         onChange={e => setAffValue(parseInt(e.target.value))}
                         disabled={saving}
                     />
@@ -133,6 +117,7 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ run, publication, pept
                         type="text"
                         className="form-control"
                         onChange={e => setAffUnit(e.target.value)}
+                        value={affUnit}
                         placeholder="µM, nM, % ..."
                         disabled={saving}
                     />
@@ -147,6 +132,7 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ run, publication, pept
                         id={`${peptide.type}-xpr`}
                         type="text"
                         className="form-control"
+                        value={xprMethod}
                         onChange={e => setXprMethod(e.target.value)}
                         disabled={saving}
                     />
@@ -157,6 +143,7 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ run, publication, pept
                         id={`${peptide.type}-itx`}
                         type="text"
                         className="form-control"
+                        value={itxMethod}
                         onChange={e => setItxMethod(e.target.value)}
                         disabled={saving}
                     />
@@ -166,6 +153,7 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ run, publication, pept
                     <textarea
                         id={`${peptide.type}-free`}
                         className="form-control"
+                        value={info}
                         onChange={e => setInfo(e.target.value)}
                         placeholder="Disruption of interaction, inhibition of enzymatic activity, ..."
                         disabled={saving}
@@ -292,4 +280,30 @@ const sameHotspots = (hotspots1: Hotspots, hotspots2: Hotspots) => {
     }
 
     return true
+}
+
+const savePeptide = async (run: Run, publication: Publication, peptide: Peptide, data: PeptideData): Promise<boolean> => {
+    const url = `/runs/${run.id}/publications/${publication.pmid}/descriptions/${peptide.description_id}/peptides`
+
+    const params = {
+        method: 'POST',
+        headers: {
+            'accept': 'application/json',
+            'content-type': 'application/json',
+        },
+        body: JSON.stringify(data),
+    }
+
+    try {
+        const response = await fetch(url, params)
+
+        if (response.status === 200) {
+            const json = await response.json()
+            return json.success
+        }
+    }
+
+    catch (e) { console.log(e) }
+
+    return false
 }
