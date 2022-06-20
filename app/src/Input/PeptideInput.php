@@ -54,7 +54,7 @@ final class PeptideInput
             ...$input->validateAffinity(),
             ...$input->validateHotspots(),
             ...$input->validateMethods(),
-        ];;
+        ];
 
         if (count($errors) > 0) {
             throw new InvalidDataException(...$errors);
@@ -174,14 +174,14 @@ final class PeptideInput
         $too_big = false;
 
         foreach ($this->hotspots as $key => $value) {
-            if (!is_int($key)) $no_str = true;
+            if (!is_int($key)) $no_num = true;
             if (!is_string($value)) $no_str = true;
             if (is_int($key) && $key >= strlen($this->sequence)) $too_big = true;
         }
 
-        if ($no_num) Error::nested('hotspots', 'positions must be numeric');
-        if ($no_str) Error::nested('hotspots', 'descriptions must be string');
-        if ($too_big) Error::nested('hotspots', 'position cant be outsite sequence');
+        if ($no_num) $errors[] = Error::nested('hotspots', 'positions must be numeric');
+        if ($no_str) $errors[] = Error::nested('hotspots', 'descriptions must be string');
+        if ($too_big) $errors[] = Error::nested('hotspots', 'position cant be outsite sequence');
 
         return $errors;
     }

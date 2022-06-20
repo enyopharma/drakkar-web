@@ -14,26 +14,31 @@ final class StoreEndpoint
 {
     public function __construct(
         private StoreDescriptionInterface $action,
-    ) {}
+    ) {
+    }
 
-    public function __invoke(callable $input, callable $responder): ResponseInterface|array
+    public function __invoke(callable $input, callable $responder): ResponseInterface|array|null
     {
         // get the description input.
-        $input = $input(DescriptionInput::class);
+        $run_id = (int) $input('run_id');
+        $pmid = (int) $input('pmid');
+        $description = $input(DescriptionInput::class);
 
-        if (!$input instanceof DescriptionInput) {
+        if (!$description instanceof DescriptionInput) {
             throw new \LogicException;
         }
 
         // store the description.
-        $result = $this->action->store($input);
+        $result = $this->action->store($run_id, $pmid, $description);
 
         return match ($result->status()) {
             0 => ['id' => $result->id()],
-            1 => $this->conflict($responder(), ...$result->messages()),
-            2 => $this->conflict($responder(), 'Description already exists'),
-            3 => $this->conflict($responder(), 'Failed to insert the description'),
-            4 => $this->conflict($responder(), 'Failed to insert a new version of the description'),
+            1 => null,
+            2 => null,
+            3 => $this->conflict($responder(), ...$result->messages()),
+            4 => $this->conflict($responder(), 'Description already exists'),
+            5 => $this->conflict($responder(), 'Failed to insert the description'),
+            6 => $this->conflict($responder(), 'Failed to insert a new version of the description'),
         };
     }
 

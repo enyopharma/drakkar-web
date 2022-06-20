@@ -55,7 +55,8 @@ final class DescriptionViewSql implements DescriptionViewInterface
 
     public function __construct(
         private \PDO $pdo,
-    ) {}
+    ) {
+    }
 
     public function search(string $stable_id): Statement
     {
@@ -64,10 +65,6 @@ final class DescriptionViewSql implements DescriptionViewInterface
         $select_description_sth->execute([$stable_id]);
 
         $descriptions = $select_description_sth->fetchAll();
-
-        if ($descriptions === false) {
-            throw new \Exception('fetchall ?');
-        }
 
         return Statement::from($descriptions);
     }

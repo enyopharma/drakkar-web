@@ -30,7 +30,8 @@ final class OccurrenceInput
         $is_int = OfType::guard('int');
         $is_flt = OfType::guard('float');
 
-        return new ArrayFactory([self::class, 'from'],
+        return new ArrayFactory(
+            [self::class, 'from'],
             Field::required('start', $is_int)->focus(),
             Field::required('stop', $is_int)->focus(),
             Field::required('identity', $is_flt)->focus(),
@@ -108,15 +109,6 @@ final class OccurrenceInput
     {
         $errors = $this->stop - $this->start + 1 < strlen($sequence)
             ? [new Error('must be greater than or equal to sequence length')]
-            : [];
-
-        return new ErrorList(...$errors);
-    }
-
-    public function validateForSubject(string $subject): ErrorList
-    {
-        $errors = $this->stop > strlen($subject)
-            ? [new Error('must be smaller than subject')]
             : [];
 
         return new ErrorList(...$errors);

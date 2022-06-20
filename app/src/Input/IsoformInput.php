@@ -28,7 +28,8 @@ final class IsoformInput
         $is_str = OfType::guard('string');
         $occurrence = OccurrenceInput::factory();
 
-        return new ArrayFactory($factory,
+        return new ArrayFactory(
+            $factory,
             Field::required('accession', $is_str)->focus(),
             Field::required('occurrences', $is_arr, Map::merged($is_arr, $occurrence))->focus(),
         );
@@ -107,21 +108,6 @@ final class IsoformInput
 
         foreach ($this->occurrences as $i => $occurrence) {
             $errors = [...$errors, ...$occurrence->validateForSequence($sequence)->errors('occurrences', (string) $i)];
-        }
-
-        return new ErrorList(...$errors);
-    }
-
-    public function validateForSubjects(array $subjects): ErrorList
-    {
-        if (!array_key_exists($this->accession, $subjects)) {
-            return new ErrorList(Error::nested('accession', 'must be associated with the interactor'));
-        }
-
-        $errors = [];
-
-        foreach ($this->occurrences as $i => $occurrence) {
-            $errors = [...$errors, ...$occurrence->validateForSubject($subjects[$this->accession])->errors('occurrences', (string) $i)];
         }
 
         return new ErrorList(...$errors);

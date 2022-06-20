@@ -15,7 +15,7 @@ final class StoreEndpoint
     {
     }
 
-    public function __invoke(callable $input, callable $responder): ResponseInterface|array|null
+    public function __invoke(callable $input): array|null
     {
         // get the description input.
         $run_id = (int) $input('run_id');
@@ -32,24 +32,8 @@ final class StoreEndpoint
 
         return match ($result->status()) {
             0 => [],
-            1 => $this->conflict($responder(), ...$result->messages()),
-            2 => $this->conflict($responder(), ...$result->messages()),
+            1 => null,
+            2 => null,
         };
-    }
-
-    private function conflict(ResponseInterface $response, string ...$messages): ResponseInterface
-    {
-        $contents = json_encode([
-            'code' => 409,
-            'success' => false,
-            'reason' => $messages,
-            'data' => [],
-        ], JSON_THROW_ON_ERROR);
-
-        $response->getBody()->write($contents);
-
-        return $response
-            ->withStatus(409)
-            ->withHeader('content-type', 'application/json');
     }
 }

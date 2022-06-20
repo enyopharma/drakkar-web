@@ -8,7 +8,6 @@ use Quanta\Validation\Map;
 use Quanta\Validation\Error;
 use Quanta\Validation\Field;
 use Quanta\Validation\OfType;
-use Quanta\Validation\ErrorList;
 use Quanta\Validation\ArrayFactory;
 use Quanta\Validation\InvalidDataException;
 
@@ -30,7 +29,8 @@ final class AlignmentInput
         $is_str = OfType::guard('string');
         $isoform = IsoformInput::factory();
 
-        return new ArrayFactory($factory,
+        return new ArrayFactory(
+            $factory,
             Field::required('sequence', $is_str)->focus(),
             Field::required('isoforms', $is_arr, Map::merged($is_arr, $isoform))->focus()
         );
@@ -57,7 +57,7 @@ final class AlignmentInput
         $this->sequence = $sequence;
         $this->isoforms = $isoforms;
     }
-    
+
     public function sequence(): string
     {
         return $this->sequence;
@@ -105,16 +105,5 @@ final class AlignmentInput
         }
 
         return $errors;
-    }
-
-    public function validateForSubjects(array $subjects): ErrorList
-    {
-        $errors = [];
-
-        foreach ($this->isoforms as $i => $isoform) {
-            $errors = [...$errors, ...$isoform->validateForSubjects($subjects)->errors('isoforms', (string) $i)];
-        }
-
-        return new ErrorList(...$errors);
     }
 }

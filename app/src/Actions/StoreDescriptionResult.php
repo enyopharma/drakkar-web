@@ -7,14 +7,26 @@ namespace App\Actions;
 final class StoreDescriptionResult
 {
     const SUCCESS = 0;
-    const INCONSISTENT_DATA = 1;
-    const DESCRIPTION_ALREADY_EXISTS = 2;
-    const FIRST_VERSION_FAILURE = 3;
-    const NEW_VERSION_FAILURE = 4;
+    const RUN_NOT_FOUND = 1;
+    const ASSOCIATION_NOT_FOUND = 2;
+    const INCONSISTENT_DATA = 3;
+    const DESCRIPTION_ALREADY_EXISTS = 4;
+    const FIRST_VERSION_FAILURE = 5;
+    const NEW_VERSION_FAILURE = 6;
 
     public static function success(int $id): self
     {
         return new self(self::SUCCESS, $id);
+    }
+
+    public static function runNotFound(int $run_id): self
+    {
+        return new self(self::RUN_NOT_FOUND, null, sprintf('run not found (id => %s)', $run_id));
+    }
+
+    public static function associationNotFound(int $run_id, int $pmid): self
+    {
+        return new self(self::RUN_NOT_FOUND, null, sprintf('association not found (run_id => %s, pmid => %s)', $run_id, $pmid));
     }
 
     public static function inconsistentData(string $message, string ...$messages): self
@@ -40,7 +52,7 @@ final class StoreDescriptionResult
     private array $messages;
 
     /**
-     * @param 0|1|2|3|4 $status
+     * @param 0|1|2|3|4|5|6 $status
      */
     private function __construct(
         private int $status,
@@ -51,7 +63,7 @@ final class StoreDescriptionResult
     }
 
     /**
-     * @return 0|1|2|3|4
+     * @return 0|1|2|3|4|5|6
      */
     public function status()
     {
