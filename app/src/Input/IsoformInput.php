@@ -4,45 +4,55 @@ declare(strict_types=1);
 
 namespace App\Input;
 
-use Quanta\Validation\Map;
 use Quanta\Validation\Error;
-use Quanta\Validation\Field;
-use Quanta\Validation\OfType;
-use Quanta\Validation\ErrorList;
-use Quanta\Validation\ArrayFactory;
 use Quanta\Validation\InvalidDataException;
 
 final class IsoformInput
 {
     const ACCESSION_PATTERN = '/^[A-Z0-9]{6,10}(-[0-9]+)?$/';
 
-    private string $accession;
-
-    private array $occurrences;
-
-    public static function factory(): callable
+    public static function fromArray(array $data): self
     {
-        $factory = fn ($accession, $occurrences) => self::from($accession, ...array_values($occurrences));
+        $errors = [];
 
-        $is_arr = OfType::guard('array');
-        $is_str = OfType::guard('string');
-        $occurrence = OccurrenceInput::factory();
+        if (!array_key_exists('accession', $data)) $errors[] = Error::nested('accession', 'is required');
+        if (!array_key_exists('occurrences', $data)) $errors[] = Error::nested('occurrences', 'is required');
 
-        return new ArrayFactory(
-            $factory,
-            Field::required('accession', $is_str)->focus(),
-            Field::required('occurrences', $is_arr, Map::merged($is_arr, $occurrence))->focus(),
-        );
+        if (!is_string($data['accession'] ?? '')) $errors[] = Error::nested('accession', 'must be a string');
+        if (!is_array($data['occurrences'] ?? [])) $errors[] = Error::nested('occurrences', 'must be an array');
+
+        $accession = $data['accession'];
+        $occurrences = [];
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        foreach ($data['occurrences'] as $o => $occurrence) {
+            try {
+                $occurrences[] = OccurrenceInput::fromArray($occurrence);
+            } catch (InvalidDataException $e) {
+                $es = array_map(fn () => $e->nest('occurrences', (string) $o), $e->errors());
+
+                array_push($errors, ...$es);
+            }
+        }
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        return self::from($accession, ...$occurrences);
     }
 
     public static function from(string $accession, OccurrenceInput ...$occurrences): self
     {
         $input = new self($accession, ...$occurrences);
 
-        $errors = [
-            ...$input->validateAccession(),
-            ...$input->validateOccurrences(),
-        ];
+        $errors = [];
+
+        array_push($errors, ...$input->validateAccession());
+        array_push($errors, ...$input->validateOccurrences());
 
         if (count($errors) > 0) {
             throw new InvalidDataException(...$errors);
@@ -51,15 +61,11 @@ final class IsoformInput
         return $input;
     }
 
-    private function __construct(string $accession, OccurrenceInput ...$occurrences)
-    {
-        $this->accession = $accession;
-        $this->occurrences = $occurrences;
-    }
+    public readonly array $occurrences;
 
-    public function accession(): string
+    private function __construct(public readonly string $accession, OccurrenceInput ...$occurrences)
     {
-        return $this->accession;
+        $this->occurrences = $occurrences;
     }
 
     public function data(): array
@@ -87,29 +93,16 @@ final class IsoformInput
 
         $seen = [];
 
-        foreach ($this->occurrences as $occurrence) {
-            [$start, $stop] = $occurrence->coordinates();
-
-            $nb = $seen[$start][$stop] ?? 0;
+        foreach ($this->occurrences as $occ) {
+            $nb = $seen[$occ->start][$occ->stop] ?? 0;
 
             if ($nb == 1) {
-                $errors[] = Error::nested('occurrences', sprintf('[%s, %s] must be present only once', $start, $stop));
+                $errors[] = Error::nested('occurrences', sprintf('[%s, %s] must be present only once', $occ->start, $occ->stop));
             }
 
-            $seen[$start][$stop] = $nb + 1;
+            $seen[$occ->start][$occ->stop] = $nb + 1;
         }
 
         return $errors;
-    }
-
-    public function validateForSequence(string $sequence): ErrorList
-    {
-        $errors = [];
-
-        foreach ($this->occurrences as $i => $occurrence) {
-            $errors = [...$errors, ...$occurrence->validateForSequence($sequence)->errors('occurrences', (string) $i)];
-        }
-
-        return new ErrorList(...$errors);
     }
 }

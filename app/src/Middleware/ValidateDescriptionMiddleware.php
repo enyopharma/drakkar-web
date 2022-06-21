@@ -23,15 +23,8 @@ final class ValidateDescriptionMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        // get the description data.
-        $data = (array) $request->getParsedBody();
-
-        // get the factory.
-        $factory = DescriptionInput::factory();
-
-        // try to produce a description input.
         try {
-            $input = $factory($data);
+            $input = DescriptionInput::fromRequest($request);
 
             $request = $request->withAttribute(DescriptionInput::class, $input);
 

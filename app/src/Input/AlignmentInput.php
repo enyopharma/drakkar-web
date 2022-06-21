@@ -4,11 +4,7 @@ declare(strict_types=1);
 
 namespace App\Input;
 
-use Quanta\Validation\Map;
 use Quanta\Validation\Error;
-use Quanta\Validation\Field;
-use Quanta\Validation\OfType;
-use Quanta\Validation\ArrayFactory;
 use Quanta\Validation\InvalidDataException;
 
 final class AlignmentInput
@@ -17,33 +13,44 @@ final class AlignmentInput
 
     const SEQUENCE_PATTERN = '/^[A-Z]*$/';
 
-    private string $sequence;
-
-    private array $isoforms;
-
-    public static function factory(): callable
+    public static function fromArray(array $data): self
     {
-        $factory = fn ($sequence, $isoforms) => self::from($sequence, ...array_values($isoforms));
+        $errors = [];
 
-        $is_arr = OfType::guard('array');
-        $is_str = OfType::guard('string');
-        $isoform = IsoformInput::factory();
+        if (!array_key_exists('sequence', $data)) $errors[] = Error::nested('sequence', 'is required');
+        if (!array_key_exists('isoforms', $data)) $errors[] = Error::nested('isoforms', 'is required');
 
-        return new ArrayFactory(
-            $factory,
-            Field::required('sequence', $is_str)->focus(),
-            Field::required('isoforms', $is_arr, Map::merged($is_arr, $isoform))->focus()
-        );
+        if (!is_string($data['sequence'] ?? '')) $errors[] = Error::nested('sequence', 'must be a string');
+        if (!is_array($data['isoforms'] ?? [])) $errors[] = Error::nested('isoforms', 'must be an array');
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        $sequence = $data['sequence'];
+        $isoforms = [];
+
+        foreach ($data['isoforms'] as $i => $isoform) {
+            try {
+                $isoforms[] = IsoformInput::fromArray($isoform);
+            } catch (InvalidDataException $e) {
+                $es = array_map(fn () => $e->nest('isoforms', (string) $i), $e->errors());
+
+                array_push($errors, ...$es);
+            }
+        }
+
+        return self::from($sequence, ...$isoforms);
     }
 
     public static function from(string $sequence, IsoformInput ...$isoforms): self
     {
         $input = new self($sequence, ...$isoforms);
 
-        $errors = [
-            ...$input->validateSequence(),
-            ...$input->validateIsoforms(),
-        ];
+        $errors = [];
+
+        array_push($errors, ...$input->validateSequence());
+        array_push($errors, ...$input->validateIsoforms());
 
         if (count($errors) > 0) {
             throw new InvalidDataException(...$errors);
@@ -52,15 +59,11 @@ final class AlignmentInput
         return $input;
     }
 
-    private function __construct(string $sequence, IsoformInput ...$isoforms)
-    {
-        $this->sequence = $sequence;
-        $this->isoforms = $isoforms;
-    }
+    public readonly array $isoforms;
 
-    public function sequence(): string
+    private function __construct(public readonly string $sequence, IsoformInput ...$isoforms)
     {
-        return $this->sequence;
+        $this->isoforms = $isoforms;
     }
 
     public function data(): array
@@ -94,14 +97,19 @@ final class AlignmentInput
             $errors[] = Error::nested('isoforms', 'must not be empty');
         }
 
-        $accessions = array_map(fn ($i) => $i->accession(), $this->isoforms);
+        $accessions = array_map(fn ($i) => $i->accession, $this->isoforms);
 
         if (count($accessions) > count(array_unique($accessions))) {
             $errors[] = Error::nested('accession', 'must be unique')->nest('isoforms');
         }
 
-        foreach ($this->isoforms as $i => $isoform) {
-            $errors = [...$errors, ...$isoform->validateForSequence($this->sequence)->errors('isoforms', (string) $i)];
+        foreach ($this->isoforms as $i => $iso) {
+            foreach ($iso->occurrences as $o => $occ) {
+                if ($occ->length() > $this->sequence) {
+                    $errors[] = (new Error('must be greater than or equal to sequence length'))
+                        ->nest('isoforms', (string) $i, 'occurrences', (string) $o);
+                }
+            }
         }
 
         return $errors;

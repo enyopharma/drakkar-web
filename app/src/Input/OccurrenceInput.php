@@ -5,10 +5,6 @@ declare(strict_types=1);
 namespace App\Input;
 
 use Quanta\Validation\Error;
-use Quanta\Validation\Field;
-use Quanta\Validation\OfType;
-use Quanta\Validation\ErrorList;
-use Quanta\Validation\ArrayFactory;
 use Quanta\Validation\InvalidDataException;
 
 final class OccurrenceInput
@@ -19,33 +15,39 @@ final class OccurrenceInput
 
     const MAX_IDENTITY = 100;
 
-    private int $start;
-
-    private int $stop;
-
-    private float $identity;
-
-    public static function factory(): callable
+    public static function fromArray(array $data): self
     {
-        $is_int = OfType::guard('int');
-        $is_flt = OfType::guard('float');
+        $errors = [];
 
-        return new ArrayFactory(
-            [self::class, 'from'],
-            Field::required('start', $is_int)->focus(),
-            Field::required('stop', $is_int)->focus(),
-            Field::required('identity', $is_flt)->focus(),
-        );
+        if (!array_key_exists('start', $data)) $errors[] = Error::nested('start', 'is required');
+        if (!array_key_exists('stop', $data)) $errors[] = Error::nested('stop', 'is required');
+        if (!array_key_exists('identity', $data)) $errors[] = Error::nested('identity', 'is required');
+
+        if (!is_int($data['start'] ?? 0)) $errors[] = Error::nested('start', 'must be an int');
+        if (!is_int($data['stop'] ?? 0)) $errors[] = Error::nested('stop', 'must be an int');
+        if (!is_int($data['identity'] ?? 0) && !is_float($data['identity'] ?? 0.0)) {
+            $errors[] = Error::nested('start', 'must be an int');
+        }
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        $start = $data['start'];
+        $stop = $data['stop'];
+        $identity = $data['identity'];
+
+        return self::from($start, $stop, $identity);
     }
 
     public static function from(int $start, int $stop, float $identity): self
     {
         $input = new self($start, $stop, $identity);
 
-        $errors = [
-            ...$input->validateCoordinates(),
-            ...$input->validateIdentity(),
-        ];
+        $errors = [];
+
+        array_push($errors, ...$input->validateCoordinates());
+        array_push($errors, ...$input->validateIdentity());
 
         if (count($errors) > 0) {
             throw new InvalidDataException(...$errors);
@@ -54,16 +56,16 @@ final class OccurrenceInput
         return $input;
     }
 
-    private function __construct(int $start, int $stop, float $identity)
-    {
-        $this->start = $start;
-        $this->stop = $stop;
-        $this->identity = $identity;
+    private function __construct(
+        public readonly int $start,
+        public readonly int $stop,
+        public readonly float $identity,
+    ) {
     }
 
-    public function coordinates(): array
+    public function length(): int
     {
-        return [$this->start, $this->stop];
+        return $this->stop - $this->start + 1;
     }
 
     public function data(): array
@@ -103,14 +105,5 @@ final class OccurrenceInput
         return $this->identity < self::MIN_IDENTITY || $this->identity > self::MAX_IDENTITY
             ? [Error::nested('identity', sprintf('must be between %s and %s', self::MIN_IDENTITY, self::MAX_IDENTITY))]
             : [];
-    }
-
-    public function validateForSequence(string $sequence): ErrorList
-    {
-        $errors = $this->stop - $this->start + 1 < strlen($sequence)
-            ? [new Error('must be greater than or equal to sequence length')]
-            : [];
-
-        return new ErrorList(...$errors);
     }
 }
