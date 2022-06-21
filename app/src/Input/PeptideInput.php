@@ -4,10 +4,9 @@ declare(strict_types=1);
 
 namespace App\Input;
 
+use Psr\Http\Message\ServerRequestInterface;
+
 use Quanta\Validation\Error;
-use Quanta\Validation\Field;
-use Quanta\Validation\OfType;
-use Quanta\Validation\ArrayFactory;
 use Quanta\Validation\InvalidDataException;
 
 use App\Assertions\ProteinType;
@@ -18,22 +17,49 @@ final class PeptideInput
     const MAX_LENGTH = 20;
     const SEQUENCE_PATTERN = '/^[A-Z]*$/';
 
-    public static function factory(): callable
+    public static function fromRequest(ServerRequestInterface $request): self
     {
-        $is_str = OfType::guard('string');
-        $is_arr = OfType::guard('array');
+        $data = (array) $request->getParsedBody();
 
-        return new ArrayFactory(
-            [self::class, 'from'],
-            Field::required('type', $is_str)->focus(),
-            Field::required('sequence', $is_str)->focus(),
-            Field::required('cter', $is_str)->focus(),
-            Field::required('nter', $is_str)->focus(),
-            Field::required('affinity', $is_arr)->focus(),
-            Field::required('hotspots', $is_arr)->focus(),
-            Field::required('methods', $is_arr)->focus(),
-            Field::required('info', $is_str)->focus(),
-        );
+        return self::fromArray($data);
+    }
+
+    public static function fromArray(array $data): self
+    {
+        $errors = [];
+
+        if (!array_key_exists('type', $data)) $errors[] = Error::nested('type', 'is required');
+        if (!array_key_exists('sequence', $data)) $errors[] = Error::nested('sequence', 'is required');
+        if (!array_key_exists('cter', $data)) $errors[] = Error::nested('cter', 'is required');
+        if (!array_key_exists('nter', $data)) $errors[] = Error::nested('nter', 'is required');
+        if (!array_key_exists('affinity', $data)) $errors[] = Error::nested('affinity', 'is required');
+        if (!array_key_exists('hotspots', $data)) $errors[] = Error::nested('hotspots', 'is required');
+        if (!array_key_exists('methods', $data)) $errors[] = Error::nested('methods', 'is required');
+        if (!array_key_exists('info', $data)) $errors[] = Error::nested('info', 'is required');
+
+        if (!is_string($data['type'] ?? '')) $errors[] = Error::nested('type', 'must be a string');
+        if (!is_string($data['sequence'] ?? '')) $errors[] = Error::nested('sequence', 'must be a string');
+        if (!is_string($data['cter'] ?? '')) $errors[] = Error::nested('cter', 'must be a string');
+        if (!is_string($data['nter'] ?? '')) $errors[] = Error::nested('nter', 'must be a string');
+        if (!is_array($data['affinity'] ?? [])) $errors[] = Error::nested('affinity', 'must be an array');
+        if (!is_array($data['hotspots'] ?? [])) $errors[] = Error::nested('hotspots', 'must be an array');
+        if (!is_array($data['methods'] ?? [])) $errors[] = Error::nested('methods', 'must be an array');
+        if (!is_string($data['info'] ?? '')) $errors[] = Error::nested('info', 'must be a string');
+
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
+        $type = $data['type'];
+        $sequence = $data['sequence'];
+        $cter = $data['cter'];
+        $nter = $data['nter'];
+        $affinity = $data['affinity'];
+        $hotspots = $data['hotspots'];
+        $methods = $data['methods'];
+        $info = $data['info'];
+
+        return self::from($type, $sequence, $cter, $nter, $affinity, $hotspots, $methods, $info);
     }
 
     public static function from(
@@ -134,31 +160,27 @@ final class PeptideInput
     {
         $errors = [];
 
-        $type = array_key_exists('type', $this->affinity);
-        $value = array_key_exists('value', $this->affinity);
-        $unit = array_key_exists('unit', $this->affinity);
-
-        if (!$type) {
+        if (!array_key_exists('type', $this->affinity)) {
             $errors[] = Error::nested('type', 'is required')->nest('affinity');
         }
 
-        if (!$value) {
+        if (!array_key_exists('value', $this->affinity)) {
             $errors[] = Error::nested('value', 'is required')->nest('affinity');
         }
 
-        if (!$unit) {
+        if (!array_key_exists('unit', $this->affinity)) {
             $errors[] = Error::nested('unit', 'is required')->nest('affinity');
         }
 
-        if ($type && !is_string($this->affinity['type'])) {
+        if (!is_string($this->affinity['type'] ?? '')) {
             $errors[] = Error::nested('type', 'must be a string')->nest('affinity');
         }
 
-        if ($value && !(is_null($this->affinity['value']) || is_int($this->affinity['value']) || is_float($this->affinity['value']))) {
+        if (!is_null($this->affinity['value'] ?? null) && !is_int($this->affinity['value'] ?? 0) && !is_float($this->affinity['value'] ?? 0.0)) {
             $errors[] = Error::nested('type', 'must be a number or null')->nest('affinity');
         }
 
-        if ($unit && !is_string($this->affinity['unit'])) {
+        if (!is_string($this->affinity['unit'] ?? '')) {
             $errors[] = Error::nested('unit', 'must be a string')->nest('affinity');
         }
 
@@ -190,22 +212,19 @@ final class PeptideInput
     {
         $errors = [];
 
-        $expression = array_key_exists('expression', $this->methods);
-        $interaction = array_key_exists('interaction', $this->methods);
-
-        if (!$expression) {
+        if (!array_key_exists('expression', $this->methods)) {
             $errors[] = Error::nested('expression', 'is required')->nest('methods');
         }
 
-        if (!$interaction) {
+        if (!array_key_exists('interaction', $this->methods)) {
             $errors[] = Error::nested('interaction', 'is required')->nest('methods');
         }
 
-        if ($expression && !is_string($this->methods['expression'])) {
+        if (!is_string($this->methods['expression'] ?? '')) {
             $errors[] = Error::nested('expression', 'must be a string')->nest('methods');
         }
 
-        if ($interaction && !is_string($this->methods['interaction'])) {
+        if (!is_string($this->methods['interaction'] ?? '')) {
             $errors[] = Error::nested('interaction', 'must be a string')->nest('methods');
         }
 

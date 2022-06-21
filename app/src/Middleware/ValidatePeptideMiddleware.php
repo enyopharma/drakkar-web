@@ -23,15 +23,8 @@ final class ValidatePeptideMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        // get the peptide data.
-        $data = (array) $request->getParsedBody();
-
-        // get the factory.
-        $factory = PeptideInput::factory();
-
-        // try to produce a description input.
         try {
-            $input = $factory($data);
+            $input = PeptideInput::fromRequest($request);
 
             $request = $request->withAttribute(PeptideInput::class, $input);
 
