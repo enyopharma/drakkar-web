@@ -13,7 +13,7 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Quanta\Validation\Error;
 use Quanta\Validation\InvalidDataException;
 
-final class ValidationMiddleware implements MiddlewareInterface
+abstract class AbstractValidationMiddleware implements MiddlewareInterface
 {
     private $f;
 
