@@ -132,7 +132,9 @@ return function (ContainerInterface $container): array {
         ))),
 
         Route::matching('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions')
-            ->middleware(fn () => new App\Middleware\ValidateDescriptionMiddleware(
+            ->middleware(fn () => new App\Middleware\ValidationMiddleware(
+                App\Input\DescriptionInput::class,
+                [App\Input\DescriptionInput::class, 'fromRequest'],
                 $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
             ))
             ->post(fn () => $endpoint(new Descriptions\StoreEndpoint(
@@ -140,7 +142,9 @@ return function (ContainerInterface $container): array {
             ))),
 
         Route::matching('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/peptides')
-            ->middleware(fn () => new App\Middleware\ValidatePeptideMiddleware(
+            ->middleware(fn () => new App\Middleware\ValidationMiddleware(
+                App\Input\PeptideInput::class,
+                [App\Input\PeptideInput::class, 'fromRequest'],
                 $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
             ))
             ->post(fn () => $endpoint(new Peptides\StoreEndpoint(

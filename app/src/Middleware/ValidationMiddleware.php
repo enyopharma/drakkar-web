@@ -13,20 +13,21 @@ use Psr\Http\Message\ResponseFactoryInterface;
 use Quanta\Validation\Error;
 use Quanta\Validation\InvalidDataException;
 
-use App\Input\DescriptionInput;
-
-final class ValidateDescriptionMiddleware implements MiddlewareInterface
+final class ValidationMiddleware implements MiddlewareInterface
 {
-    public function __construct(private ResponseFactoryInterface $factory)
+    private $f;
+
+    public function __construct(private string $attribute, callable $f, private ResponseFactoryInterface $factory)
     {
+        $this->f = $f;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         try {
-            $input = DescriptionInput::fromRequest($request);
+            $input = ($this->f)($request);
 
-            $request = $request->withAttribute(DescriptionInput::class, $input);
+            $request = $request->withAttribute($this->attribute, $input);
 
             return $handler->handle($request);
         } catch (InvalidDataException $e) {
