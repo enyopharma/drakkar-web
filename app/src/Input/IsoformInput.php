@@ -21,31 +21,17 @@ final class IsoformInput
         if (!is_string($data['accession'] ?? '')) $errors[] = Error::nested('accession', 'must be a string');
         if (!is_array($data['occurrences'] ?? [])) $errors[] = Error::nested('occurrences', 'must be an array');
 
+        if (count($errors) > 0) {
+            throw new InvalidDataException(...$errors);
+        }
+
         $accession = $data['accession'];
-        $occurrences = [];
-
-        if (count($errors) > 0) {
-            throw new InvalidDataException(...$errors);
-        }
-
-        foreach ($data['occurrences'] as $o => $occurrence) {
-            try {
-                $occurrences[] = OccurrenceInput::fromArray($occurrence);
-            } catch (InvalidDataException $e) {
-                $es = array_map(fn () => $e->nest('occurrences', (string) $o), $e->errors());
-
-                array_push($errors, ...$es);
-            }
-        }
-
-        if (count($errors) > 0) {
-            throw new InvalidDataException(...$errors);
-        }
+        $occurrences = $data['occurrences'];
 
         return self::from($accession, ...$occurrences);
     }
 
-    public static function from(string $accession, OccurrenceInput ...$occurrences): self
+    public static function from(string $accession, array ...$occurrences): self
     {
         $input = new self($accession, ...$occurrences);
 
@@ -63,17 +49,9 @@ final class IsoformInput
 
     public readonly array $occurrences;
 
-    private function __construct(public readonly string $accession, OccurrenceInput ...$occurrences)
+    private function __construct(public readonly string $accession, array ...$occurrences)
     {
         $this->occurrences = $occurrences;
-    }
-
-    public function data(): array
-    {
-        return [
-            'accession' => $this->accession,
-            'occurrences' => array_map(fn ($o) => $o->data(), $this->occurrences),
-        ];
     }
 
     private function validateAccession(): array
@@ -85,24 +63,30 @@ final class IsoformInput
 
     private function validateOccurrences(): array
     {
+        $nested = [];
+
+        $coordinates = [];
+
+        foreach ($this->occurrences as $o => $occurrence) {
+            try {
+                $input = OccurrenceInput::fromArray($occurrence);
+
+                $coordinates[] = implode(':', [$input->start, $input->stop]);
+            } catch (InvalidDataException $e) {
+                array_push($nested, ...$e->nest('occurrences', (string) $o)->errors());
+            }
+        }
+
         $errors = [];
 
         if (count($this->occurrences) == 0) {
             $errors[] = Error::nested('occurrences', 'must not be empty');
         }
 
-        $seen = [];
-
-        foreach ($this->occurrences as $occ) {
-            $nb = $seen[$occ->start][$occ->stop] ?? 0;
-
-            if ($nb == 1) {
-                $errors[] = Error::nested('occurrences', sprintf('[%s, %s] must be present only once', $occ->start, $occ->stop));
-            }
-
-            $seen[$occ->start][$occ->stop] = $nb + 1;
+        if (count($coordinates) > count(array_unique($coordinates))) {
+            $errors[] = Error::nested('occurrences', 'coordinates must be unique');
         }
 
-        return $errors;
+        return [...$errors, ...$nested];
     }
 }

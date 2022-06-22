@@ -83,12 +83,10 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
     public function store(int $run_id, int $pmid, DescriptionInput $input): StoreDescriptionResult
     {
         // exctract data from the input.
-        $data = $input->data();
-
-        $stable_id = $data['stable_id'];
-        $method_id = $data['method_id'];
-        $interactor1 = $data['interactor1'];
-        $interactor2 = $data['interactor2'];
+        $stable_id = $input->stable_id;
+        $method_id = $input->method_id;
+        $interactor1 = $input->interactor1;
+        $interactor2 = $input->interactor2;
 
         // ensure run exists.
         $select_run_sth = $this->pdo->prepare(self::SELECT_RUN_SQL);

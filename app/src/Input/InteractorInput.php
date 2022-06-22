@@ -35,22 +35,12 @@ final class InteractorInput
         $name = $data['name'];
         $start = $data['start'];
         $stop = $data['stop'];
-        $alignments = [];
-
-        foreach ($data['mapping'] as $a => $alignment) {
-            try {
-                $alignments[] = AlignmentInput::fromArray($alignment);
-            } catch (InvalidDataException $e) {
-                $es = array_map(fn () => $e->nest('alignments', (string) $a), $e->errors());
-
-                array_push($errors, ...$es);
-            }
-        }
+        $alignments = $data['mapping'];
 
         return self::from($protein_id, $name, $start, $stop, ...$alignments);
     }
 
-    public static function from(int $protein_id, string $name, int $start, int $stop, AlignmentInput ...$alignments): self
+    public static function from(int $protein_id, string $name, int $start, int $stop, array ...$alignments): self
     {
         $input = new self($protein_id, $name, $start, $stop, ...$alignments);
 
@@ -75,20 +65,9 @@ final class InteractorInput
         public readonly string $name,
         public readonly int $start,
         public readonly int $stop,
-        AlignmentInput ...$alignments,
+        array ...$alignments,
     ) {
         $this->alignments = $alignments;
-    }
-
-    public function data(): array
-    {
-        return [
-            'protein_id' => $this->protein_id,
-            'name' => $this->name,
-            'start' => $this->start,
-            'stop' => $this->stop,
-            'mapping' => array_map(fn ($a) => $a->data(), $this->alignments),
-        ];
     }
 
     private function validateProteinId(): array
@@ -126,12 +105,26 @@ final class InteractorInput
 
     private function validateMapping(): array
     {
-        $sequences = array_map(fn ($a) => $a->sequence, $this->alignments);
+        $nested = [];
 
-        if (count($sequences) > count(array_unique($sequences))) {
-            return [Error::nested('sequence', 'must be unique')->nest('mapping')];
+        $sequences = [];
+
+        foreach ($this->alignments as $a => $alignment) {
+            try {
+                $input = AlignmentInput::fromArray($alignment);
+
+                $sequences[] = $input->sequence;
+            } catch (InvalidDataException $e) {
+                array_push($nested, ...$$e->nest('alignments', (string) $a)->errors());
+            }
         }
 
-        return [];
+        $errors = [];
+
+        if (count($sequences) > count(array_unique($sequences))) {
+            $errors[] = Error::nested('mapping', 'sequences must be unique');
+        }
+
+        return [...$errors, ...$nested];
     }
 }

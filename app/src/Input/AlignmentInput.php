@@ -28,22 +28,12 @@ final class AlignmentInput
         }
 
         $sequence = $data['sequence'];
-        $isoforms = [];
-
-        foreach ($data['isoforms'] as $i => $isoform) {
-            try {
-                $isoforms[] = IsoformInput::fromArray($isoform);
-            } catch (InvalidDataException $e) {
-                $es = array_map(fn () => $e->nest('isoforms', (string) $i), $e->errors());
-
-                array_push($errors, ...$es);
-            }
-        }
+        $isoforms = $data['isoforms'];
 
         return self::from($sequence, ...$isoforms);
     }
 
-    public static function from(string $sequence, IsoformInput ...$isoforms): self
+    public static function from(string $sequence, array ...$isoforms): self
     {
         $input = new self($sequence, ...$isoforms);
 
@@ -61,17 +51,9 @@ final class AlignmentInput
 
     public readonly array $isoforms;
 
-    private function __construct(public readonly string $sequence, IsoformInput ...$isoforms)
+    private function __construct(public readonly string $sequence, array ...$isoforms)
     {
         $this->isoforms = $isoforms;
-    }
-
-    public function data(): array
-    {
-        return [
-            'sequence' => $this->sequence,
-            'isoforms' => array_map(fn ($i) => $i->data(), $this->isoforms),
-        ];
     }
 
     private function validateSequence(): array
@@ -91,27 +73,39 @@ final class AlignmentInput
 
     private function validateIsoforms(): array
     {
+        $nested = [];
+
+        $accessions = [];
+
+        foreach ($this->isoforms as $i => $isoform) {
+            try {
+                $input = IsoformInput::fromArray($isoform);
+
+                $accessions[] = $input->accession;
+
+                foreach ($input->occurrences as $o => $occurrence) {
+                    ['start' => $start, 'stop' => $stop] = $occurrence;
+
+                    if ($stop - $start + 1 > $this->sequence) {
+                        $nested[] = (new Error('must be greater than or equal to sequence length'))
+                            ->nest('isoforms', (string) $i, 'occurrences', (string) $o);
+                    }
+                }
+            } catch (InvalidDataException $e) {
+                array_push($nested, ...$e->nest('isoforms', (string) $i)->errors());
+            }
+        }
+
         $errors = [];
 
         if (count($this->isoforms) == 0) {
             $errors[] = Error::nested('isoforms', 'must not be empty');
         }
 
-        $accessions = array_map(fn ($i) => $i->accession, $this->isoforms);
-
         if (count($accessions) > count(array_unique($accessions))) {
-            $errors[] = Error::nested('accession', 'must be unique')->nest('isoforms');
+            $errors[] = Error::nested('isoforms', 'accessions must be unique');
         }
 
-        foreach ($this->isoforms as $i => $iso) {
-            foreach ($iso->occurrences as $o => $occ) {
-                if ($occ->length() > $this->sequence) {
-                    $errors[] = (new Error('must be greater than or equal to sequence length'))
-                        ->nest('isoforms', (string) $i, 'occurrences', (string) $o);
-                }
-            }
-        }
-
-        return $errors;
+        return [...$errors, ...$nested];
     }
 }

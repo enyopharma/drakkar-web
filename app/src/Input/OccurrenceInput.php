@@ -63,20 +63,6 @@ final class OccurrenceInput
     ) {
     }
 
-    public function length(): int
-    {
-        return $this->stop - $this->start + 1;
-    }
-
-    public function data(): array
-    {
-        return [
-            'start' => $this->start,
-            'stop' => $this->stop,
-            'identity' => $this->identity,
-        ];
-    }
-
     private function validateCoordinates(): array
     {
         $errors = [];

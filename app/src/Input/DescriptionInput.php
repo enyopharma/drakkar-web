@@ -34,33 +34,19 @@ final class DescriptionInput
         if (!is_array($data['interactor1'] ?? [])) $errors[] = Error::nested('interactor1', 'must be an array');
         if (!is_array($data['interactor2'] ?? [])) $errors[] = Error::nested('interactor2', 'must be an array');
 
-        $stable_id = $data['stable_id'];
-        $method_id = $data['method_id'];
-
-        try {
-            $interactor1 = InteractorInput::fromArray($data['interactor1']);
-        } catch (InvalidDataException $e) {
-            $es = array_map(fn () => $e->nest('interactor1'), $e->errors());
-
-            array_push($errors, ...$es);
-        }
-
-        try {
-            $interactor2 = InteractorInput::fromArray($data['interactor2']);
-        } catch (InvalidDataException $e) {
-            $es = array_map(fn () => $e->nest('interactor2'), $e->errors());
-
-            array_push($errors, ...$es);
-        }
-
         if (count($errors) > 0) {
             throw new InvalidDataException(...$errors);
         }
 
+        $stable_id = $data['stable_id'];
+        $method_id = $data['method_id'];
+        $interactor1 = $data['interactor1'];
+        $interactor2 = $data['interactor2'];
+
         return self::from($stable_id, $method_id, $interactor1, $interactor2);
     }
 
-    public static function from(string $stable_id, int $method_id, InteractorInput $interactor1, InteractorInput $interactor2): self
+    public static function from(string $stable_id, int $method_id, array $interactor1, array $interactor2): self
     {
         $input = new self($stable_id, $method_id, $interactor1, $interactor2);
 
@@ -68,6 +54,8 @@ final class DescriptionInput
 
         array_push($errors, ...$input->validateStableId());
         array_push($errors, ...$input->validateMethodId());
+        array_push($errors, ...$input->validateInteractor1());
+        array_push($errors, ...$input->validateInteractor2());
 
         if (count($errors) > 0) {
             throw new InvalidDataException(...$errors);
@@ -79,19 +67,9 @@ final class DescriptionInput
     private function __construct(
         public readonly string $stable_id,
         public readonly int $method_id,
-        public readonly InteractorInput $interactor1,
-        public readonly InteractorInput $interactor2,
+        public readonly array $interactor1,
+        public readonly array $interactor2,
     ) {
-    }
-
-    public function data(): array
-    {
-        return [
-            'stable_id' => $this->stable_id,
-            'method_id' => $this->method_id,
-            'interactor1' => $this->interactor1->data(),
-            'interactor2' => $this->interactor2->data(),
-        ];
     }
 
     private function validateStableId(): array
@@ -107,6 +85,27 @@ final class DescriptionInput
     {
         if ($this->method_id < 1) {
             return [Error::nested('method_id', 'must be positive')];
+        }
+
+        return [];
+    }
+
+    private function validateInteractor1(): array
+    {
+        return $this->validateInteractor('interactor1', $this->interactor1);
+    }
+
+    private function validateInteractor2(): array
+    {
+        return $this->validateInteractor('interactor2', $this->interactor2);
+    }
+
+    private function validateInteractor(string $key, array $interactor): array
+    {
+        try {
+            InteractorInput::fromArray($interactor);
+        } catch (InvalidDataException $e) {
+            return $e->nest($key)->errors();
         }
 
         return [];
