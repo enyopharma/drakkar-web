@@ -39,8 +39,8 @@ final class StorePeptideSql implements StorePeptideInterface
     public function store(int $run_id, int $pmid, int $description_id, PeptideInput $input): StorePeptideResult
     {
         // exctract data from the input.
-        $type = $input->type();
-        $sequence = $input->sequence();
+        $type = $input->type;
+        $sequence = $input->sequence;
         $data = $input->data();
 
         // select description.

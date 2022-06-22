@@ -90,14 +90,14 @@ final class PeptideInput
     }
 
     private function __construct(
-        private string $type,
-        private string $sequence,
-        private string $cter,
-        private string $nter,
-        private array $affinity,
-        private array $hotspots,
-        private array $methods,
-        private string $info,
+        public readonly string $type,
+        public readonly string $sequence,
+        public readonly string $cter,
+        public readonly string $nter,
+        public readonly array $affinity,
+        public readonly array $hotspots,
+        public readonly array $methods,
+        public readonly string $info,
     ) {
     }
 
