@@ -6,11 +6,13 @@ namespace App\Endpoints\Proteins;
 
 use App\ReadModel\ProteinViewInterface;
 
+#[\App\Attributes\Pattern('/proteins/{id:[0-9]+}')]
 final class ShowEndpoint
 {
     public function __construct(
         private ProteinViewInterface $proteins,
-    ) {}
+    ) {
+    }
 
     public function __invoke(callable $input): array|null
     {

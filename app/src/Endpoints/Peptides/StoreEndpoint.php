@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Peptides;
 
-use Psr\Http\Message\ResponseInterface;
-
 use App\Input\PeptideInput;
 use App\Actions\StorePeptideInterface;
+use App\Middleware\ValidatePeptideMiddleware;
 
+#[\App\Attributes\Method('POST')]
+#[\App\Attributes\Pattern('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/peptides')]
+#[\App\Attributes\Middleware(ValidatePeptideMiddleware::class)]
 final class StoreEndpoint
 {
     public function __construct(private StorePeptideInterface $action)

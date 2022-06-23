@@ -8,12 +8,15 @@ use League\Plates\Engine;
 
 use App\ReadModel\PublicationViewInterface;
 
+#[\App\Attributes\Pattern('/publications')]
+#[\App\Attributes\Name('publications.index')]
 final class SearchEndpoint
 {
     public function __construct(
         private Engine $engine,
         private PublicationViewInterface $publications,
-    ) {}
+    ) {
+    }
 
     public function __invoke(callable $input): string
     {

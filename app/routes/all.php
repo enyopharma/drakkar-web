@@ -7,153 +7,156 @@ use Psr\Http\Message\ResponseFactoryInterface;
 
 use Quanta\Http\Route;
 use Quanta\Http\Endpoint;
+use Quanta\Http\MethodList;
 use Quanta\Http\MetadataSerializer;
 
-use App\Endpoints\Runs;
-use App\Endpoints\Taxa;
-use App\Endpoints\Dataset;
-use App\Endpoints\Methods;
-use App\Endpoints\Proteins;
-use App\Endpoints\Peptides;
-use App\Endpoints\Alignments;
-use App\Endpoints\Publications;
-use App\Endpoints\Descriptions;
+$classes = [
+    App\Endpoints\Runs\IndexEndpoint::class,
+    App\Endpoints\Publications\SearchEndpoint::class,
+    App\Endpoints\Publications\IndexEndpoint::class,
+    App\Endpoints\Publications\UpdateEndpoint::class,
+    App\Endpoints\Descriptions\SearchEndpoint::class,
+    App\Endpoints\Descriptions\IndexEndpoint::class,
+    App\Endpoints\Descriptions\CreateEndpoint::class,
+    App\Endpoints\Descriptions\EditEndpoint::class,
+    App\Endpoints\Descriptions\StoreEndpoint::class,
+    App\Endpoints\Descriptions\DeleteEndpoint::class,
+    App\Endpoints\Peptides\IndexEndpoint::class,
+    App\Endpoints\Peptides\StoreEndpoint::class,
+    App\Endpoints\Methods\IndexEndpoint::class,
+    App\Endpoints\Methods\ShowEndpoint::class,
+    App\Endpoints\Proteins\IndexEndpoint::class,
+    App\Endpoints\Proteins\ShowEndpoint::class,
+    App\Endpoints\Taxa\ShowEndpoint::class,
+    App\Endpoints\Alignments\StartEndpoint::class,
+    App\Endpoints\Dataset\DownloadEndpoint::class,
+];
 
 /**
- * Return the route definitions.
+ * Return route definitions from attributes.
  *
  * @param Psr\Container\ContainerInterface $container
  * @return array<int, Quanta\Http\Route>
  */
-return function (ContainerInterface $container): array {
+return function (ContainerInterface $container) use ($classes): array {
     $factory = $container->get(ResponseFactoryInterface::class);
 
     $serializer = new MetadataSerializer('data', ['success' => true, 'code' => 200]);
 
     $endpoint = fn (callable $f) => new Endpoint($factory, $f, $serializer);
 
-    return [
-        Route::named('runs.index')->matching('/')->get(fn () => $endpoint(new Runs\IndexEndpoint(
-            $container->get(League\Plates\Engine::class),
-            $container->get(App\ReadModel\RunViewInterface::class),
-        ))),
+    $routes = [];
 
-        Route::named('publications.index')
-            ->matching('/publications')
-            ->get(fn () => $endpoint(new Publications\SearchEndpoint(
-                $container->get(League\Plates\Engine::class),
-                $container->get(App\ReadModel\PublicationViewInterface::class),
-            ))),
+    foreach ($classes as $class) {
+        $parsed = ParsedEndpoint::from($class);
 
-        Route::named('descriptions.index')
-            ->matching('/descriptions')
-            ->get(fn () => $endpoint(new Descriptions\SearchEndpoint(
-                $container->get(Quanta\Http\UrlGenerator::class),
-                $container->get(League\Plates\Engine::class),
-                $container->get(App\ReadModel\DescriptionViewInterface::class),
-            ))),
+        if (count($parsed->patterns) == 0) {
+            throw new LogicException('pattern is required');
+        }
 
-        Route::named('runs.publications.index')
-            ->matching('/runs/{id:\d+}/publications')
-            ->get(fn () => $endpoint(new Publications\IndexEndpoint(
-                $container->get(League\Plates\Engine::class),
-                $container->get(Quanta\Http\UrlGenerator::class),
-                $container->get(App\ReadModel\RunViewInterface::class),
-                $container->get(App\ReadModel\AssociationViewInterface::class),
-            ))),
+        if (count($parsed->patterns) > 1) {
+            throw new LogicException('only one pattern allowed');
+        }
 
-        Route::named('runs.publications.update')
-            ->matching('/runs/{run_id:\d+}/publications/{pmid:\d+}')
-            ->put(fn () => $endpoint(new Publications\UpdateEndpoint(
-                $container->get(App\Actions\UpdatePublicationStateInterface::class),
-            ))),
+        if (count($parsed->names) > 1) {
+            throw new LogicException('only one name allowed');
+        }
 
-        Route::named('runs.publications.descriptions.index')
-            ->matching('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions')
-            ->get(fn () => $endpoint(new Descriptions\IndexEndpoint(
-                $container->get(League\Plates\Engine::class),
-                $container->get(Quanta\Http\UrlGenerator::class),
-                $container->get(App\ReadModel\RunViewInterface::class),
-                $container->get(App\ReadModel\AssociationViewInterface::class),
-                $container->get(App\ReadModel\DescriptionViewInterface::class),
-            ))),
+        $methods = count($parsed->methods) > 0
+            ? new MethodList(...$parsed->methods[0]->values)
+            : MethodList::get();
 
-        Route::named('runs.publications.descriptions.create')
-            ->matching('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/create')
-            ->get(fn () => $endpoint(new Descriptions\CreateEndpoint(
-                $container->get(League\Plates\Engine::class),
-                $container->get(App\ReadModel\RunViewInterface::class),
-                $container->get(App\ReadModel\AssociationViewInterface::class),
-            ))),
+        $route = Route::matching($parsed->patterns[0]->value);
 
-        Route::named('runs.publications.descriptions.edit')
-            ->matching('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/{type:copy|edit}')
-            ->get(fn () => $endpoint(new Descriptions\EditEndpoint(
-                $container->get(League\Plates\Engine::class),
-                $container->get(App\ReadModel\RunViewInterface::class),
-                $container->get(App\ReadModel\AssociationViewInterface::class),
-                $container->get(App\ReadModel\FormViewInterface::class),
-            ))),
+        if (count($parsed->names) == 1) {
+            $route = $route->named($parsed->names[0]->value);
+        }
 
-        Route::named('runs.publications.descriptions.peptides.index')
-            ->matching('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/peptides')
-            ->get(fn () => $endpoint(new Peptides\IndexEndpoint(
-                $container->get(League\Plates\Engine::class),
-                $container->get(App\ReadModel\RunViewInterface::class),
-                $container->get(App\ReadModel\AssociationViewInterface::class),
-                $container->get(App\ReadModel\FormViewInterface::class),
-                $container->get(App\ReadModel\PeptideViewInterface::class),
-            ))),
+        foreach ($parsed->middlewares as $middleware) {
+            $route = $route->middleware(new ContainerFactory($container, $middleware->value));
+        }
 
-        Route::named('dataset')
-            ->matching('/dataset/{type:hh|vh}')
-            ->get(fn () => $endpoint(new Dataset\DownloadEndpoint(
-                $container->get(App\ReadModel\DatasetViewInterface::class),
-            ))),
+        $routes[] = $route->route($methods, fn () => $endpoint(ContainerFactory::build($container, $class)));
+    }
 
-        Route::matching('/methods')->get(fn () => $endpoint(new Methods\IndexEndpoint(
-            $container->get(App\ReadModel\MethodViewInterface::class),
-        ))),
-
-        Route::matching('/methods/{id:[0-9]+}')->get(fn () => $endpoint(new Methods\ShowEndpoint(
-            $container->get(App\ReadModel\MethodViewInterface::class),
-        ))),
-
-        Route::matching('/proteins')->get(fn () => $endpoint(new Proteins\IndexEndpoint(
-            $container->get(App\ReadModel\ProteinViewInterface::class),
-        ))),
-
-        Route::matching('/proteins/{id:[0-9]+}')->get(fn () => $endpoint(new Proteins\ShowEndpoint(
-            $container->get(App\ReadModel\ProteinViewInterface::class),
-        ))),
-
-        Route::matching('/taxa/{ncbi_taxon_id:[0-9]+}/names')->get(fn () => $endpoint(new Taxa\ShowEndpoint(
-            $container->get(App\ReadModel\TaxonViewInterface::class),
-        ))),
-
-        Route::matching('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions')
-            ->middleware(fn () => new App\Middleware\ValidateDescriptionMiddleware(
-                $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-            ))
-            ->post(fn () => $endpoint(new Descriptions\StoreEndpoint(
-                $container->get(App\Actions\StoreDescriptionInterface::class),
-            ))),
-
-        Route::matching('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/peptides')
-            ->middleware(fn () => new App\Middleware\ValidatePeptideMiddleware(
-                $container->get(Psr\Http\Message\ResponseFactoryInterface::class),
-            ))
-            ->post(fn () => $endpoint(new Peptides\StoreEndpoint(
-                $container->get(App\Actions\StorePeptideInterface::class),
-            ))),
-
-        Route::matching('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}')
-            ->delete(fn () => $endpoint(new Descriptions\DeleteEndpoint(
-                $container->get(App\Actions\DeleteDescriptionInterface::class),
-            ))),
-
-        Route::matching('/jobs/alignments')->post(fn () => $endpoint(new Alignments\StartEndpoint(
-            $container->get(Predis\Client::class),
-        ))),
-    ];
+    return $routes;
 };
+
+final class ParsedEndpoint
+{
+    public static function from(string $class): self
+    {
+        $methods = [];
+        $patterns = [];
+        $names = [];
+        $middlewares = [];
+
+        $reflection = new ReflectionClass($class);
+
+        $attr['methods'] = $reflection->getAttributes(App\Attributes\Method::class);
+        $attr['patterns'] = $reflection->getAttributes(App\Attributes\Pattern::class);
+        $attr['names'] = $reflection->getAttributes(App\Attributes\Name::class);
+        $attr['middlewares'] = $reflection->getAttributes(App\Attributes\Middleware::class);
+
+        foreach ($attr['methods'] as $method) $methods[] = $method->newInstance();
+        foreach ($attr['patterns'] as $pattern) $patterns[] = $pattern->newInstance();
+        foreach ($attr['names'] as $name) $names[] = $name->newInstance();
+        foreach ($attr['middlewares'] as $middleware) $middlewares[] = $middleware->newInstance();
+
+        return new self($methods, $patterns, $names, $middlewares);
+    }
+
+    private function __construct(
+        public readonly array $methods,
+        public readonly array $patterns,
+        public readonly array $names,
+        public readonly array $middlewares,
+    ) {
+    }
+}
+
+final class ContainerFactory
+{
+    public static function build(ContainerInterface $container, string $class): object
+    {
+        $args = [];
+
+        $reflection = new ReflectionClass($class);
+
+        $constructor = $reflection->getConstructor();
+
+        foreach ($constructor->getParameters() as $parameter) {
+            if (!$parameter->hasType()) {
+                throw new LogicException('parameter has no type');
+            }
+
+            $type = $parameter->getType();
+
+            if (!$type instanceof ReflectionNamedType) {
+                throw new LogicException('parameter type is not named');
+            }
+
+            if ($type->isBuiltin()) {
+                throw new LogicException('parameter type is not a class name');
+            }
+
+            $id = (string) $type;
+
+            if (!$container->has($id)) {
+                throw new LogicException('parameter type is not defined in container');
+            }
+
+            $args[] = $container->get($id);
+        }
+        return new ($class)(...$args);
+    }
+
+    public function __construct(private ContainerInterface $container, private string $class)
+    {
+    }
+
+    public function __invoke(): object
+    {
+        return self::build($this->container, $this->class);
+    }
+}

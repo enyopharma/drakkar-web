@@ -6,11 +6,14 @@ namespace App\Endpoints\Alignments;
 
 use Predis\Client;
 
+#[\App\Attributes\Method('POST')]
+#[\App\Attributes\Pattern('/jobs/alignments')]
 final class StartEndpoint
 {
     public function __construct(
         private Client $client,
-    ) {}
+    ) {
+    }
 
     public function __invoke(callable $input): array
     {

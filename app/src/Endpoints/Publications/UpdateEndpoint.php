@@ -6,15 +6,18 @@ namespace App\Endpoints\Publications;
 
 use Psr\Http\Message\ResponseInterface;
 
-use App\Actions\UpdatePublicationStateResult;
 use App\Actions\UpdatePublicationStateInterface;
 use App\Assertions\PublicationState;
 
+#[\App\Attributes\Method('PUT')]
+#[\App\Attributes\Pattern('/runs/{run_id:\d+}/publications/{pmid:\d+}')]
+#[\App\Attributes\Name('runs.publications.update')]
 final class UpdateEndpoint
 {
     public function __construct(
         private UpdatePublicationStateInterface $action,
-    ) {}
+    ) {
+    }
 
     public function __invoke(callable $input, callable $responder): ResponseInterface|null
     {

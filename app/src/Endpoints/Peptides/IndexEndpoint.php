@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Peptides;
 
+#[\App\Attributes\Pattern('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/peptides')]
+#[\App\Attributes\Name('runs.publications.descriptions.peptides.index')]
 final class IndexEndpoint
 {
     public function __construct(

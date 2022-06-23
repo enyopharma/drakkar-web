@@ -9,6 +9,8 @@ use League\Plates\Engine;
 use App\ReadModel\RunViewInterface;
 use App\ReadModel\AssociationViewInterface;
 
+#[\App\Attributes\Pattern('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/create')]
+#[\App\Attributes\Name('runs.publications.descriptions.create')]
 final class CreateEndpoint
 {
     public function __construct(

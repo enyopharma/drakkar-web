@@ -12,13 +12,16 @@ use Quanta\Http\UrlGenerator;
 
 use App\ReadModel\DescriptionViewInterface;
 
+#[\App\Attributes\Pattern('/descriptions')]
+#[\App\Attributes\Name('descriptions.index')]
 final class SearchEndpoint
 {
     public function __construct(
         private UrlGenerator $url,
         private Engine $engine,
         private DescriptionViewInterface $descriptions,
-    ) {}
+    ) {
+    }
 
     public function __invoke(callable $input, callable $responder): ResponseInterface|string
     {

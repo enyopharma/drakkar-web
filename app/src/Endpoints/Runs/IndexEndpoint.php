@@ -8,12 +8,15 @@ use League\Plates\Engine;
 
 use App\ReadModel\RunViewInterface;
 
+#[\App\Attributes\Pattern('/')]
+#[\App\Attributes\Name('runs.index')]
 final class IndexEndpoint
 {
     public function __construct(
         private Engine $engine,
         private RunViewInterface $runs,
-    ) {}
+    ) {
+    }
 
     public function __invoke(): string
     {

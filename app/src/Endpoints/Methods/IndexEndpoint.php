@@ -6,11 +6,13 @@ namespace App\Endpoints\Methods;
 
 use App\ReadModel\MethodViewInterface;
 
+#[\App\Attributes\Pattern('/methods')]
 final class IndexEndpoint
 {
     public function __construct(
         private MethodViewInterface $methods,
-    ) {}
+    ) {
+    }
 
     public function __invoke(callable $input): array
     {

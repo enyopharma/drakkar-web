@@ -6,6 +6,7 @@ namespace App\Endpoints\Taxa;
 
 use App\ReadModel\TaxonViewInterface;
 
+#[\App\Attributes\Pattern('/taxa/{ncbi_taxon_id:[0-9]+}/names')]
 final class ShowEndpoint
 {
     public function __construct(

@@ -7,9 +7,12 @@ namespace App\Endpoints\Descriptions;
 use Psr\Http\Message\ResponseInterface;
 
 use App\Input\DescriptionInput;
-use App\Actions\StoreDescriptionResult;
 use App\Actions\StoreDescriptionInterface;
+use App\Middleware\ValidateDescriptionMiddleware;
 
+#[\App\Attributes\Method('POST')]
+#[\App\Attributes\Pattern('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions')]
+#[\App\Attributes\Middleware(ValidateDescriptionMiddleware::class)]
 final class StoreEndpoint
 {
     public function __construct(

@@ -11,11 +11,14 @@ use GuzzleHttp\Psr7;
 use App\ReadModel\DatasetViewInterface;
 use App\Assertions\RunType;
 
+#[\App\Attributes\Pattern('/dataset/{type:hh|vh}')]
+#[\App\Attributes\Name('dataset')]
 final class DownloadEndpoint
 {
     public function __construct(
         private DatasetViewInterface $dataset,
-    ) {}
+    ) {
+    }
 
     public function __invoke(callable $input, callable $responder): ResponseInterface|null
     {

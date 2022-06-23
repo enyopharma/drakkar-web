@@ -10,11 +10,12 @@ use League\Plates\Engine;
 
 use Quanta\Http\UrlGenerator;
 
-use App\ReadModel\RunInterface;
 use App\ReadModel\RunViewInterface;
 use App\ReadModel\AssociationViewInterface;
 use App\ReadModel\DescriptionViewInterface;
 
+#[\App\Attributes\Pattern('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions')]
+#[\App\Attributes\Name('runs.publications.descriptions.index')]
 final class IndexEndpoint
 {
     public function __construct(
@@ -23,7 +24,8 @@ final class IndexEndpoint
         private RunViewInterface $runs,
         private AssociationViewInterface $associations,
         private DescriptionViewInterface $descriptions,
-    ) {}
+    ) {
+    }
 
     public function __invoke(callable $input, callable $responder): ResponseInterface|string|null
     {
@@ -57,7 +59,7 @@ final class IndexEndpoint
         }
 
         if ($offset > 0 && $offset >= $total) {
-            return $this->redirect($responder(), $publication, (int) ceil($total/$limit), $limit);
+            return $this->redirect($responder(), $publication, (int) ceil($total / $limit), $limit);
         }
 
         $descriptions = $this->descriptions->all($run_id, $pmid, $stable_id, $limit, $offset)->fetchAll();

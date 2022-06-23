@@ -14,6 +14,8 @@ use App\ReadModel\RunViewInterface;
 use App\ReadModel\AssociationViewInterface;
 use App\Assertions\PublicationState;
 
+#[\App\Attributes\Name('runs.publications.index')]
+#[\App\Attributes\Pattern('/runs/{id:\d+}/publications')]
 final class IndexEndpoint
 {
     public function __construct(
@@ -21,7 +23,8 @@ final class IndexEndpoint
         private UrlGenerator $generator,
         private RunViewInterface $runs,
         private AssociationViewInterface $associations,
-    ) {}
+    ) {
+    }
 
     public function __invoke(callable $input, callable $responder): ResponseInterface|string|null
     {
@@ -54,7 +57,7 @@ final class IndexEndpoint
         }
 
         if ($offset > 0 && $offset >= $total) {
-            return $this->redirect($responder(), $run, $state, (int) ceil($total/$limit), $limit);
+            return $this->redirect($responder(), $run, $state, (int) ceil($total / $limit), $limit);
         }
 
         // success!

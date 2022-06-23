@@ -7,6 +7,7 @@ namespace App\Endpoints\Proteins;
 use App\ReadModel\ProteinViewInterface;
 use App\Assertions\ProteinType;
 
+#[\App\Attributes\Pattern('/proteins')]
 final class IndexEndpoint
 {
     private ProteinViewInterface $proteins;

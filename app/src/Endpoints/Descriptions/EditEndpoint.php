@@ -10,6 +10,8 @@ use App\ReadModel\RunViewInterface;
 use App\ReadModel\FormViewInterface;
 use App\ReadModel\AssociationViewInterface;
 
+#[\App\Attributes\Pattern('/runs/{run_id:\d+}/publications/{pmid:\d+}/descriptions/{id:\d+}/{type:copy|edit}')]
+#[\App\Attributes\Name('runs.publications.descriptions.edit')]
 final class EditEndpoint
 {
     public function __construct(
