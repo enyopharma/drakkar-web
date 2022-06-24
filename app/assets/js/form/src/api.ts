@@ -9,13 +9,17 @@ const cmethod = cache<Method>()
 const cmethods = cache<SearchResult[]>()
 
 const fetchMethod = async (id: number) => {
-    return fetch(`/methods/${id}`)
+    const params = { headers: { 'accept': 'application/json' } }
+
+    return fetch(`/methods/${id}`, params)
         .then(response => response.json(), error => console.log(error))
         .then(json => json.data)
 }
 
 const fetchMethods = async (query: string, limit: number) => {
-    return fetch('/methods?' + qs.stringify({ query: query, limit: limit }))
+    const params = { headers: { 'accept': 'application/json' } }
+
+    return fetch('/methods?' + qs.stringify({ query: query, limit: limit }), params)
         .then(response => response.json(), error => console.log(error))
         .then(json => json.data.map((m: Method) => ({
             id: m.id,
@@ -38,13 +42,17 @@ const cproteins = cache<SearchResult[]>()
 const cnamehints = cache<string[]>()
 
 const fetchProtein = async (id: number) => {
-    return fetch(`/proteins/${id}`)
+    const params = { headers: { 'accept': 'application/json' } }
+
+    return fetch(`/proteins/${id}`, params)
         .then(response => response.json(), error => console.log(error))
         .then(json => json.data)
 }
 
 const fetchProteins = async (type: ProteinType, query: string, limit: number) => {
-    return fetch('/proteins?' + qs.stringify({ type: type, query: query, limit: limit }))
+    const params = { headers: { 'accept': 'application/json' } }
+
+    return fetch('/proteins?' + qs.stringify({ type: type, query: query, limit: limit }), params)
         .then(response => response.json(), error => console.log(error))
         .then(json => json.data.map((p: Protein) => ({
             id: p.id,
@@ -53,7 +61,9 @@ const fetchProteins = async (type: ProteinType, query: string, limit: number) =>
 }
 
 const fetchNameHints = async (ncbi_taxon_id: number) => {
-    return fetch(`/taxa/${ncbi_taxon_id}/names`)
+    const params = { headers: { 'accept': 'application/json' } }
+
+    return fetch(`/taxa/${ncbi_taxon_id}/names`, params)
         .then(response => response.json(), error => console.log(error))
         .then(json => json.data.names)
 }
