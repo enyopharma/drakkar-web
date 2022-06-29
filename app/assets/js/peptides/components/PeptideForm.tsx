@@ -128,9 +128,10 @@ export const PeptideForm: React.FC<PeptideFormProps> = ({ run, publication, pept
                         id={`${peptide.type}-aff-value`}
                         type="number"
                         className="form-control"
-                        value={affValue === null ? undefined : affValue}
-                        onChange={e => setAffValue(parseInt(e.target.value))}
+                        value={affValue === null ? '' : affValue}
+                        onChange={e => setAffValue(e.target.value === '' ? null : parseFloat(e.target.value))}
                         disabled={saving}
+                        step="any"
                     />
                 </div>
                 <div className="form-group">
