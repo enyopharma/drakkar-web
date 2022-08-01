@@ -6,22 +6,18 @@ namespace App\Input;
 
 use App\Input\Validation\Error;
 use App\Input\Validation\ArrayKey;
+use App\Input\Validation\ArrayInput;
 use App\Input\Validation\ArrayFactory;
 use App\Input\Validation\InvalidDataException;
 
-final class Alignment implements \JsonSerializable
+final class Alignment extends ArrayInput implements \JsonSerializable
 {
-    /**
-     * @param mixed[] $data
-     */
-    public static function from(array $data): self
+    protected static function validation(ArrayFactory $factory): ArrayFactory
     {
-        $factory = ArrayFactory::class(self::class)->validators(
+        return $factory->validators(
             ArrayKey::required('sequence')->string([Mapping::class, 'from']),
             ArrayKey::required('isoforms')->array([IsoformList::class, 'from']),
         );
-
-        return $factory($data);
     }
 
     public function __construct(

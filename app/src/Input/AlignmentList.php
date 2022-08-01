@@ -4,23 +4,18 @@ declare(strict_types=1);
 
 namespace App\Input;
 
-use App\Input\Validation\Collection;
-use App\Input\Validation\InvalidDataException;
+use App\Input\Validation\VariadicInput;
 use App\Input\Validation\VariadicFactory;
+use App\Input\Validation\InvalidDataException;
 
 /**
  * @implements \IteratorAggregate<\App\Input\Alignment>
  */
-final class AlignmentList implements \IteratorAggregate, \JsonSerializable
+final class AlignmentList extends VariadicInput implements \IteratorAggregate, \JsonSerializable
 {
-    /**
-     * @param mixed[] $data
-     */
-    public static function from(array $data): self
+    protected static function validation(VariadicFactory $factory): VariadicFactory
     {
-        $factory = VariadicFactory::class(self::class)->array([Alignment::class, 'from']);
-
-        return $factory($data);
+        return $factory->array([Alignment::class, 'from']);
     }
 
     /**

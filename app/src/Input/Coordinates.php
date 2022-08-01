@@ -5,24 +5,20 @@ declare(strict_types=1);
 namespace App\Input;
 
 use App\Input\Validation\ArrayKey;
+use App\Input\Validation\ArrayInput;
 use App\Input\Validation\ArrayFactory;
 use App\Input\Validation\InvalidDataException;
 
-final class Coordinates
+final class Coordinates extends ArrayInput
 {
     const MIN_LENGTH = 4;
 
-    /**
-     * @param mixed[] $data
-     */
-    public static function from(array $data): self
+    protected static function validation(ArrayFactory $factory): ArrayFactory
     {
-        $factory = ArrayFactory::class(self::class)->validators(
+        return $factory->validators(
             ArrayKey::required('start')->int([Position::class, 'from']),
             ArrayKey::required('stop')->int([Position::class, 'from']),
         );
-
-        return $factory($data);
     }
 
     public function __construct(public readonly Position $start, public readonly Position $stop)

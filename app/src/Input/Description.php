@@ -7,9 +7,10 @@ namespace App\Input;
 use Psr\Http\Message\ServerRequestInterface;
 
 use App\Input\Validation\ArrayKey;
+use App\Input\Validation\ArrayInput;
 use App\Input\Validation\ArrayFactory;
 
-final class Description
+final class Description extends ArrayInput
 {
     public static function fromRequest(ServerRequestInterface $request): self
     {
@@ -18,19 +19,14 @@ final class Description
         return self::from($data);
     }
 
-    /**
-     * @param mixed[] $data
-     */
-    public static function from(array $data): self
+    protected static function validation(ArrayFactory $factory): ArrayFactory
     {
-        $factory = ArrayFactory::class(self::class)->validators(
+        return $factory->validators(
             ArrayKey::required('stable_id')->string([StableId::class, 'from']),
             ArrayKey::required('method_id')->int([DatabaseId::class, 'from']),
             ArrayKey::required('interactor1')->array([Interactor::class, 'from']),
             ArrayKey::required('interactor2')->array([Interactor::class, 'from']),
         );
-
-        return $factory($data);
     }
 
     public function __construct(

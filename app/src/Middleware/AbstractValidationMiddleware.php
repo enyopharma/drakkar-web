@@ -27,6 +27,9 @@ abstract class AbstractValidationMiddleware implements MiddlewareInterface
         try {
             $input = ($this->f)($request);
 
+            var_dump($input);
+            die();
+
             $request = $request->withAttribute($this->attribute, $input);
 
             return $handler->handle($request);

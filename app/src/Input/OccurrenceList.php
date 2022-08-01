@@ -4,22 +4,18 @@ declare(strict_types=1);
 
 namespace App\Input;
 
+use App\Input\Validation\VariadicInput;
 use App\Input\Validation\VariadicFactory;
 use App\Input\Validation\InvalidDataException;
 
 /**
  * @implements \IteratorAggregate<\App\Input\Occurrence>
  */
-final class OccurrenceList implements \IteratorAggregate, \JsonSerializable
+final class OccurrenceList extends VariadicInput implements \IteratorAggregate, \JsonSerializable
 {
-    /**
-     * @param mixed[] $data
-     */
-    public static function from(array $data): self
+    protected static function validation(VariadicFactory $factory): VariadicFactory
     {
-        $factory = VariadicFactory::class(self::class)->array([Occurrence::class, 'from']);
-
-        return $factory($data);
+        return $factory->array([Occurrence::class, 'from']);
     }
 
     /**

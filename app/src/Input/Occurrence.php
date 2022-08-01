@@ -6,20 +6,16 @@ namespace App\Input;
 
 use App\Input\Validation\ArrayKey;
 use App\Input\Validation\ArrayFactory;
+use App\Input\Validation\ArrayInput;
 
-final class Occurrence implements \JsonSerializable
+final class Occurrence extends ArrayInput implements \JsonSerializable
 {
-    /**
-     * @param mixed[] $data
-     */
-    public static function from(array $data): self
+    protected static function validation(ArrayFactory $factory): ArrayFactory
     {
-        $factory = ArrayFactory::class(self::class)->validators(
+        return $factory->validators(
             [Coordinates::class, 'from'],
             ArrayKey::required('identity')->float([Identity::class, 'from']),
         );
-
-        return $factory($data);
     }
 
     public function __construct(

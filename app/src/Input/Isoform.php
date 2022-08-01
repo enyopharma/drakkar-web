@@ -5,21 +5,17 @@ declare(strict_types=1);
 namespace App\Input;
 
 use App\Input\Validation\ArrayKey;
+use App\Input\Validation\ArrayInput;
 use App\Input\Validation\ArrayFactory;
 
-final class Isoform implements \JsonSerializable
+final class Isoform extends ArrayInput implements \JsonSerializable
 {
-    /**
-     * @param mixed[] $data
-     */
-    public static function from(array $data): self
+    protected static function validation(ArrayFactory $factory): ArrayFactory
     {
-        $factory = ArrayFactory::class(self::class)->validators(
+        return $factory->validators(
             ArrayKey::required('accession')->string([Accession::class, 'from']),
             ArrayKey::required('occurrences')->array([OccurrenceList::class, 'from']),
         );
-
-        return $factory($data);
     }
 
     public function __construct(
