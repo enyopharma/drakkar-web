@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
-use App\Input\DescriptionInput;
+use App\Input\Occurrence;
+use App\Input\Interactor;
+use App\Input\Description;
+use App\Input\AlignmentList;
+
 use App\Assertions\RunType;
 use App\Assertions\ProteinType;
+use App\Input\IsoformList;
 
 final class StoreDescriptionSql implements StoreDescriptionInterface
 {
@@ -80,11 +85,11 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
     ) {
     }
 
-    public function store(int $run_id, int $pmid, DescriptionInput $input): StoreDescriptionResult
+    public function store(int $run_id, int $pmid, Description $input): StoreDescriptionResult
     {
         // exctract data from the input.
-        $stable_id = $input->stable_id;
-        $method_id = $input->method_id;
+        $stable_id = $input->stable_id->value;
+        $method_id = $input->method_id->value;
         $interactor1 = $input->interactor1;
         $interactor2 = $input->interactor2;
 
@@ -165,7 +170,7 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
         return [];
     }
 
-    private function validateInteractors(string $run_type, array $interactor1, array $interactor2): array
+    private function validateInteractors(string $run_type, Interactor $interactor1, Interactor $interactor2): array
     {
         $errors = [];
 
@@ -174,18 +179,18 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
 
         $select_protein_sth = $this->pdo->prepare(self::SELECT_PROTEIN_SQL);
 
-        $select_protein_sth->execute([$interactor1['protein_id']]);
+        $select_protein_sth->execute([$interactor1->protein_id->value]);
 
         if (!$protein1 = $select_protein_sth->fetch()) {
-            $errors[] = sprintf('protein with id %s must exist', $interactor1['protein_id']);
+            $errors[] = sprintf('protein with id %s must exist', $interactor1->protein_id->value);
         } else {
             $errors = [...$errors, ...$this->validateProtein(1, $type1, $protein1, $interactor1)];
         }
 
-        $select_protein_sth->execute([$interactor2['protein_id']]);
+        $select_protein_sth->execute([$interactor2->protein_id->value]);
 
         if (!$protein2 = $select_protein_sth->fetch()) {
-            $errors[] = sprintf('protein with id %s must exist', $interactor2['protein_id']);
+            $errors[] = sprintf('protein with id %s must exist', $interactor2->protein_id->value);
         } else {
             $errors = [...$errors, ...$this->validateProtein(2, $type2, $protein2, $interactor2)];
         }
@@ -193,7 +198,7 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
         return $errors;
     }
 
-    private function validateProtein(int $n, string $type, array $protein, array $interactor): array
+    private function validateProtein(int $n, string $type, array $protein, Interactor $interactor): array
     {
         $errors = [];
 
@@ -214,11 +219,13 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
             : $this->validateVProtein($n, $protein, $interactor);
     }
 
-    private function validateHProtein(int $n, array $protein, array $interactor): array
+    private function validateHProtein(int $n, array $protein, Interactor $interactor): array
     {
         $errors = [];
 
-        ['name' => $name, 'start' => $start, 'stop' => $stop] = $interactor;
+        $name = $interactor->name->value;
+        $start = $interactor->coordinates->start->value;
+        $stop = $interactor->coordinates->stop->value;
 
         if ($protein['name'] != $name) {
             $errors[] = vsprintf('invalid name \'%s\' for interactor %s (human, %s) - \'%s\' expected', [
@@ -245,12 +252,14 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
 
         $sequences = json_decode($protein['sequences'], true);
 
-        return $this->validateMapping($n, $sequences, $interactor['mapping']);
+        return $this->validateMapping($n, $sequences, $interactor->mapping);
     }
 
-    private function validateVProtein(int $n, array $protein, array $interactor): array
+    private function validateVProtein(int $n, array $protein, Interactor $interactor): array
     {
-        ['name' => $name, 'start' => $start, 'stop' => $stop] = $interactor;
+        $name = $interactor->name->value;
+        $start = $interactor->coordinates->start->value;
+        $stop = $interactor->coordinates->stop->value;
 
         if ($stop > strlen($protein['sequence'])) {
             return [sprintf('coordinates of interactor %s must be inside the protein sequence', $n)];
@@ -300,24 +309,24 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
 
         $sequences[$accession] = substr($sequences[$accession], $start - 1, $stop - $start + 1);
 
-        return $this->validateMapping($n, $sequences, $interactor['mapping']);
+        return $this->validateMapping($n, $sequences, $interactor->mapping);
     }
 
-    private function validateMapping(int $n, array $sequences, array $mapping): array
+    private function validateMapping(int $n, array $sequences, AlignmentList $mapping): array
     {
         $errors = [];
 
         foreach ($mapping as $alignment) {
-            foreach ($alignment['isoforms'] as $isoform) {
-                $accession = $isoform['accession'];
+            foreach ($alignment->isoforms as $isoform) {
+                $accession = $isoform->accession->value;
 
                 if (!array_key_exists($accession, $sequences)) {
                     $errors[] = sprintf('interactor %s - no isoform with accession %s', $n, $accession);
                 } else {
                     $sequence = $sequences[$accession];
 
-                    foreach ($isoform['occurrences'] as $occurrence) {
-                        $stop = $occurrence['stop'];
+                    foreach ($isoform->occurrences as $occurrence) {
+                        $stop = $occurrence->coordinates->stop->value;
 
                         if ($stop > strlen($sequence)) {
                             $errors[] = sprintf('interactor %s - mapping occurrence longer than sequence %s', $n, $accession);
@@ -330,19 +339,19 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
         return $errors;
     }
 
-    private function isExisting(int $association_id, string $stable_id, int $method_id, array $interactor1, array $interactor2): bool
+    private function isExisting(int $association_id, string $stable_id, int $method_id, Interactor $interactor1, Interactor $interactor2): bool
     {
         $select_descriptions_sth = $this->pdo->prepare(self::SELECT_DESCRIPTIONS_SQL);
 
         $select_descriptions_sth->execute([
             $association_id,
             $method_id,
-            $interactor1['protein_id'],
-            $interactor1['start'],
-            $interactor1['stop'],
-            $interactor2['protein_id'],
-            $interactor2['start'],
-            $interactor2['stop'],
+            $interactor1->protein_id->value,
+            $interactor1->coordinates->start->value,
+            $interactor1->coordinates->stop->value,
+            $interactor2->protein_id->value,
+            $interactor2->coordinates->start->value,
+            $interactor2->coordinates->stop->value,
         ]);
 
         while ($description = $select_descriptions_sth->fetch()) {
@@ -350,8 +359,8 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
                 return true;
             }
 
-            $same1 = $this->sameMapping(json_decode($description['mapping1'], true), $interactor1['mapping']);
-            $same2 = $this->sameMapping(json_decode($description['mapping2'], true), $interactor2['mapping']);
+            $same1 = $this->sameMapping(json_decode($description['mapping1'], true), $interactor1->mapping);
+            $same2 = $this->sameMapping(json_decode($description['mapping2'], true), $interactor2->mapping);
 
             if ($same1 && $same2) {
                 return true;
@@ -361,7 +370,7 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
         return false;
     }
 
-    private function insertFirstVersion(int $association_id, int $method_id, array $interactor1, array $interactor2): StoreDescriptionResult
+    private function insertFirstVersion(int $association_id, int $method_id, Interactor $interactor1, Interactor $interactor2): StoreDescriptionResult
     {
         $insert_description_sth = $this->pdo->prepare(self::INSERT_DESCRIPTION_SQL);
 
@@ -379,16 +388,16 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
                     1,
                     $association_id,
                     $method_id,
-                    $interactor1['protein_id'],
-                    $interactor1['name'],
-                    $interactor1['start'],
-                    $interactor1['stop'],
-                    json_encode($interactor1['mapping'], JSON_THROW_ON_ERROR),
-                    $interactor2['protein_id'],
-                    $interactor2['name'],
-                    $interactor2['start'],
-                    $interactor2['stop'],
-                    json_encode($interactor2['mapping'], JSON_THROW_ON_ERROR),
+                    $interactor1->protein_id->value,
+                    $interactor1->name->value,
+                    $interactor1->coordinates->start->value,
+                    $interactor1->coordinates->stop->value,
+                    json_encode($interactor1->mapping, JSON_THROW_ON_ERROR),
+                    $interactor2->protein_id->value,
+                    $interactor2->name->value,
+                    $interactor2->coordinates->start->value,
+                    $interactor2->coordinates->stop->value,
+                    json_encode($interactor2->mapping, JSON_THROW_ON_ERROR),
                 ]);
             } catch (\PDOException $e) {
                 $inserted = false;
@@ -408,7 +417,7 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
         return StoreDescriptionResult::success($id);
     }
 
-    private function insertNewVersion(int $association_id, string $stable_id, int $method_id, array $interactor1, array $interactor2): StoreDescriptionResult
+    private function insertNewVersion(int $association_id, string $stable_id, int $method_id, Interactor $interactor1, Interactor $interactor2): StoreDescriptionResult
     {
         $update_descriptions_sth = $this->pdo->prepare(self::UPDATE_DESCRIPTIONS_SQL);
         $select_max_version_sth = $this->pdo->prepare(self::SELECT_MAX_VERSION_SQL);
@@ -428,16 +437,16 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
                 $max_version + 1,
                 $association_id,
                 $method_id,
-                $interactor1['protein_id'],
-                $interactor1['name'],
-                $interactor1['start'],
-                $interactor1['stop'],
-                json_encode($interactor1['mapping'], JSON_THROW_ON_ERROR),
-                $interactor2['protein_id'],
-                $interactor2['name'],
-                $interactor2['start'],
-                $interactor2['stop'],
-                json_encode($interactor2['mapping'], JSON_THROW_ON_ERROR),
+                $interactor1->protein_id->value,
+                $interactor1->name->value,
+                $interactor1->coordinates->start->value,
+                $interactor1->coordinates->stop->value,
+                json_encode($interactor1->mapping, JSON_THROW_ON_ERROR),
+                $interactor2->protein_id->value,
+                $interactor2->name->value,
+                $interactor2->coordinates->start->value,
+                $interactor2->coordinates->stop->value,
+                json_encode($interactor2->mapping, JSON_THROW_ON_ERROR),
             ]);
         } catch (\PDOException $e) {
             $this->pdo->rollback();
@@ -452,7 +461,7 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
         return StoreDescriptionResult::success($id);
     }
 
-    private function sameMapping(array $mapping1, array $mapping2): bool
+    private function sameMapping(AlignmentList $mapping1, AlignmentList $mapping2): bool
     {
         $flat1 = iterator_to_array($this->flatAlignments($mapping1));
         $flat2 = iterator_to_array($this->flatAlignments($mapping2));
@@ -478,17 +487,23 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
         return true;
     }
 
-    private function flatAlignments(array $alignments): \Generator
+    private function flatAlignments(AlignmentList $alignments): \Generator
     {
-        foreach ($alignments as ['sequence' => $sequence, 'isoforms' => $isoforms]) {
+        foreach ($alignments as $alignment) {
+            $sequence = $alignment->sequence->value;
+            $isoforms = $alignment->isoforms;
+
             yield md5($sequence) => iterator_to_array($this->flatIsoforms($isoforms));
         }
     }
 
-    private function flatIsoforms(array $isoforms): \Generator
+    private function flatIsoforms(IsoformList $isoforms): \Generator
     {
-        foreach ($isoforms as ['accession' => $accession, 'occurrences' => $occurrences]) {
-            yield $accession => array_map(fn (array $o) => $o['start'], $occurrences);
+        foreach ($isoforms as $isoform) {
+            $accession = $isoform->accession->value;
+            $occurrences = iterator_to_array($isoform->occurrences);
+
+            yield $accession => array_map(fn ($o) => $o->coordinates->start->value, $occurrences);
         }
     }
 }

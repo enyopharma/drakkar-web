@@ -10,8 +10,8 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
-use Quanta\Validation\Error;
-use Quanta\Validation\InvalidDataException;
+use App\Input\Validation\Error;
+use App\Input\Validation\InvalidData;
 
 abstract class AbstractValidationMiddleware implements MiddlewareInterface
 {
@@ -30,8 +30,8 @@ abstract class AbstractValidationMiddleware implements MiddlewareInterface
             $request = $request->withAttribute($this->attribute, $input);
 
             return $handler->handle($request);
-        } catch (InvalidDataException $e) {
-            return $this->failure(...$e->errors());
+        } catch (InvalidData $e) {
+            return $this->failure(...$e->errors);
         }
     }
 
@@ -55,11 +55,11 @@ abstract class AbstractValidationMiddleware implements MiddlewareInterface
 
     private function message(Error $error): string
     {
-        $name = array_map(fn ($key) => '[' . $key . ']', $error->keys());
+        $name = array_map(fn ($key) => '[' . $key . ']', $error->keys);
         $name = implode('', $name);
 
         return $name == ''
-            ? $error->message()
-            : $name . ' => ' . $error->message();
+            ? $error->message
+            : $name . ' => ' . $error->message;
     }
 }

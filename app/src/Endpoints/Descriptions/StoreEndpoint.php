@@ -6,7 +6,7 @@ namespace App\Endpoints\Descriptions;
 
 use Psr\Http\Message\ResponseInterface;
 
-use App\Input\DescriptionInput;
+use App\Input\Description;
 use App\Actions\StoreDescriptionInterface;
 use App\Middleware\ValidateDescriptionMiddleware;
 
@@ -25,9 +25,9 @@ final class StoreEndpoint
         // get the description input.
         $run_id = (int) $input('run_id');
         $pmid = (int) $input('pmid');
-        $description = $input(DescriptionInput::class);
+        $description = $input(Description::class);
 
-        if (!$description instanceof DescriptionInput) {
+        if (!$description instanceof Description) {
             throw new \LogicException;
         }
 

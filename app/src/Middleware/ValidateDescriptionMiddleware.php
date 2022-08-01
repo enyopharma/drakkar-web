@@ -6,15 +6,15 @@ namespace App\Middleware;
 
 use Psr\Http\Message\ResponseFactoryInterface;
 
-use App\Input\DescriptionInput;
+use App\Input\Description;
 
 final class ValidateDescriptionMiddleware extends AbstractValidationMiddleware
 {
     public function __construct(ResponseFactoryInterface $factory)
     {
         parent::__construct(
-            DescriptionInput::class,
-            [DescriptionInput::class, 'fromRequest'],
+            Description::class,
+            [Description::class, 'fromRequest'],
             $factory,
         );
     }
