@@ -22,4 +22,9 @@ final class InvalidDataException extends \DomainException
 
         parent::__construct('invalid data');
     }
+
+    public function messages(ErrorFormatterInterface $formatter = null): array
+    {
+        return array_map($formatter ?? new ErrorFormatter, $this->errors);
+    }
 }

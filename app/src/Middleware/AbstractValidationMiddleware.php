@@ -10,40 +10,39 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
-use App\Input\Validation\Error;
-use App\Input\Validation\InvalidData;
+use App\Input\Validation\InvalidDataException;
 
 abstract class AbstractValidationMiddleware implements MiddlewareInterface
 {
-    private $f;
-
-    public function __construct(private string $attribute, callable $f, private ResponseFactoryInterface $factory)
+    public function __construct(private string $class, private ResponseFactoryInterface $factory)
     {
-        $this->f = $f;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        try {
-            $input = ($this->f)($request);
+        $factory = [$this->class, 'fromRequest'];
 
-            var_dump($input);
-            die();
-
-            $request = $request->withAttribute($this->attribute, $input);
-
-            return $handler->handle($request);
-        } catch (InvalidData $e) {
-            return $this->failure(...$e->errors);
+        if (!is_callable($factory)) {
+            throw new \LogicException('The given class name must have a static function fromRequest');
         }
+
+        try {
+            $input = $factory($request);
+        } catch (InvalidDataException $e) {
+            return $this->failure($e);
+        }
+
+        $request = $request->withAttribute($this->class, $input);
+
+        return $handler->handle($request);
     }
 
-    private function failure(Error ...$errors): ResponseInterface
+    private function failure(InvalidDataException $e): ResponseInterface
     {
         $contents = json_encode([
             'code' => 422,
             'success' => false,
-            'errors' => array_map([$this, 'message'], $errors),
+            'errors' => $e->messages(),
             'data' => [],
         ], JSON_THROW_ON_ERROR);
 
@@ -54,15 +53,5 @@ abstract class AbstractValidationMiddleware implements MiddlewareInterface
         $response->getBody()->write($contents);
 
         return $response;
-    }
-
-    private function message(Error $error): string
-    {
-        $name = array_map(fn ($key) => '[' . $key . ']', $error->keys);
-        $name = implode('', $name);
-
-        return $name == ''
-            ? $error->message
-            : $name . ' => ' . $error->message;
     }
 }

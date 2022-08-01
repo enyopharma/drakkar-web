@@ -12,10 +12,6 @@ final class ValidateDescriptionMiddleware extends AbstractValidationMiddleware
 {
     public function __construct(ResponseFactoryInterface $factory)
     {
-        parent::__construct(
-            Description::class,
-            [Description::class, 'fromRequest'],
-            $factory,
-        );
+        parent::__construct(Description::class, $factory);
     }
 }
