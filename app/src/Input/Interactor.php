@@ -24,14 +24,11 @@ final class Interactor
         return $factory($data);
     }
 
-    private array $alignments;
-
     public function __construct(
         public readonly DatabaseId $protein_id,
         public readonly NonEmptyString $name,
         public readonly Coordinates $coordinates,
-        Alignment ...$alignments,
+        public readonly AlignmentList $mapping,
     ) {
-        $this->alignments = $alignments;
     }
 }
