@@ -89,9 +89,14 @@ final class VariadicFactory
         $results = [];
 
         foreach ($data as $key => $item) {
-            $results[] = Result::success($item)->reduce(...$this->validations)->nest((string) $key);
+            $results[] = $this->reduce(Result::success($item))->nest((string) $key);
         }
 
         return ($this->factory)(...$results)->value();
+    }
+
+    private function reduce(Result $result): Result
+    {
+        return array_reduce($this->validations, fn ($x, $f) => $f($x), $result);
     }
 }

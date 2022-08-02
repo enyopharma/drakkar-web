@@ -84,7 +84,7 @@ final class ArrayKey
      */
     public function __invoke(array $data): Result
     {
-        return $this->result($data)->reduce(...$this->validations)->nest($this->key);
+        return $this->reduce($this->result($data))->nest($this->key);
     }
 
     /**
@@ -101,5 +101,10 @@ final class ArrayKey
         }
 
         return Result::error('%%s is required');
+    }
+
+    private function reduce(Result $result): Result
+    {
+        return array_reduce($this->validations, fn ($x, $f) => $f($x), $result);
     }
 }
