@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Actions;
 
-use App\Input\PeptideInput;
+use App\Input\Peptide;
 
 final class StorePeptideSql implements StorePeptideInterface
 {
@@ -36,12 +36,12 @@ final class StorePeptideSql implements StorePeptideInterface
     ) {
     }
 
-    public function store(int $run_id, int $pmid, int $description_id, PeptideInput $input): StorePeptideResult
+    public function store(int $run_id, int $pmid, int $description_id, Peptide $peptide): StorePeptideResult
     {
-        // exctract data from the input.
-        $type = $input->type;
-        $sequence = $input->sequence;
-        $data = $input->data();
+        // exctract data from the peptide.
+        $type = $peptide->type->value;
+        $sequence = $peptide->sequence->value;
+        $data = $peptide->data();
 
         // select description.
         if (!$description = $this->description($run_id, $pmid, $description_id)) {

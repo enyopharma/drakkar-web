@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Endpoints\Peptides;
 
-use App\Input\PeptideInput;
+use App\Input\Peptide;
 use App\Actions\StorePeptideInterface;
 use App\Middleware\ValidatePeptideMiddleware;
 
@@ -23,9 +23,9 @@ final class StoreEndpoint
         $run_id = (int) $input('run_id');
         $pmid = (int) $input('pmid');
         $id = (int) $input('id');
-        $peptide = $input(PeptideInput::class);
+        $peptide = $input(Peptide::class);
 
-        if (!$peptide instanceof PeptideInput) {
+        if (!$peptide instanceof Peptide) {
             throw new \LogicException;
         }
 

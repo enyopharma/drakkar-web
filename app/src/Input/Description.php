@@ -9,7 +9,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use App\Input\Validation\ArrayKey;
 use App\Input\Validation\ArrayInput;
 use App\Input\Validation\ArrayFactory;
-use App\Input\Validation\Common\DatabaseId;
+use App\Input\Validation\Common\PositiveInteger;
 
 use App\Input\Description\StableId;
 use App\Input\Description\Interactor;
@@ -27,7 +27,7 @@ final class Description extends ArrayInput
     {
         return $factory->validators(
             ArrayKey::required('stable_id')->string([StableId::class, 'from']),
-            ArrayKey::required('method_id')->int([DatabaseId::class, 'from']),
+            ArrayKey::required('method_id')->int([PositiveInteger::class, 'from']),
             ArrayKey::required('interactor1')->array([Interactor::class, 'from']),
             ArrayKey::required('interactor2')->array([Interactor::class, 'from']),
         );
@@ -35,7 +35,7 @@ final class Description extends ArrayInput
 
     public function __construct(
         public readonly StableId $stable_id,
-        public readonly DatabaseId $method_id,
+        public readonly PositiveInteger $method_id,
         public readonly Interactor $interactor1,
         public readonly Interactor $interactor2,
     ) {

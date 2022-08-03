@@ -6,7 +6,7 @@ namespace App\Input\Validation\Common;
 
 use App\Input\Validation\InvalidDataException;
 
-final class DatabaseId
+final class PositiveInteger
 {
     public static function from(int $value): self
     {

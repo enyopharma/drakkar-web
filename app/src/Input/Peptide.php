@@ -62,9 +62,9 @@ final class Peptide extends ArrayInput
         return [
             'cter' => $this->cter,
             'nter' => $this->nter,
-            'affinity' => $this->affinity,
-            'hotspots' => $this->hotspots,
-            'methods' => $this->methods,
+            'affinity' => $this->affinity->data(),
+            'hotspots' => $this->hotspots->value,
+            'methods' => $this->methods->data(),
             'info' => $this->info,
         ];
     }

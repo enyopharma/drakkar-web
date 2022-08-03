@@ -25,4 +25,13 @@ final class Affinity extends ArrayInput
         public readonly string $unit,
     ) {
     }
+
+    public function data(): array
+    {
+        return [
+            'type' => $this->type,
+            'value' => $this->value,
+            'unit' => $this->unit,
+        ];
+    }
 }

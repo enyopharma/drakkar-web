@@ -23,4 +23,12 @@ final class Methods extends ArrayInput
         public readonly string $interaction,
     ) {
     }
+
+    public function data(): array
+    {
+        return [
+            'expression' => $this->expression,
+            'interaction' => $this->interaction,
+        ];
+    }
 }

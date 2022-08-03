@@ -18,16 +18,18 @@ final class Hotspots
     {
         $errors = [];
 
-        $num = false;
-        $str = false;
+        $allpos = array_keys($value);
+        $intpos = array_map('is_int', $allpos);
 
-        foreach ($value as $pos => $text) {
-            if (!is_int($pos)) $num = true;
-            if (!is_string($text)) $str = true;
+        if (count($intpos) < count($allpos)) {
+            $errors[] = Error::from('%%s positions must be numeric');
         }
 
-        if ($num) $errors[] = Error::from('%%s positions must be numeric');
-        if ($str) $errors[] = Error::from('%%s descriptions must be string');
+        foreach ($value as $pos => $text) {
+            if (is_int($pos) && !is_string($text)) {
+                $errors[] = Error::from('%%s pos %s description must be a string', $pos);
+            }
+        }
 
         if (count($errors) > 0) {
             throw new InvalidDataException(...$errors);
