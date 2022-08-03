@@ -9,8 +9,8 @@ use Psr\Http\Message\ServerRequestInterface;
 use App\Input\Validation\ArrayKey;
 use App\Input\Validation\ArrayInput;
 use App\Input\Validation\ArrayFactory;
-use App\Input\Validation\Common\PositiveInteger;
 
+use App\Input\Common\PositiveInteger;
 use App\Input\Description\StableId;
 use App\Input\Description\Interactor;
 

@@ -7,8 +7,9 @@ namespace App\Input\Description;
 use App\Input\Validation\ArrayKey;
 use App\Input\Validation\ArrayInput;
 use App\Input\Validation\ArrayFactory;
-use App\Input\Validation\Common\NonEmptyString;
-use App\Input\Validation\Common\PositiveInteger;
+
+use App\Input\Common\NonEmptyString;
+use App\Input\Common\PositiveInteger;
 
 final class Interactor extends ArrayInput
 {
