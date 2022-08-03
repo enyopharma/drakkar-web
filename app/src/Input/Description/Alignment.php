@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Input;
+namespace App\Input\Description;
 
 use App\Input\Validation\Error;
 use App\Input\Validation\ArrayKey;

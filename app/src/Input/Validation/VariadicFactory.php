@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Input\Validation;
 
-use App\Input\Validation\Common;
+use App\Input\Validation\Types;
 
 final class VariadicFactory
 {
@@ -42,22 +42,22 @@ final class VariadicFactory
 
     public function int(callable ...$validations): self
     {
-        return $this->then(new Common\IsInt, ...$validations);
+        return $this->then(new Types\IsInt, ...$validations);
     }
 
     public function float(callable ...$validations): self
     {
-        return $this->then(new Common\IsFloat, ...$validations);
+        return $this->then(new Types\IsFloat, ...$validations);
     }
 
     public function string(callable ...$validations): self
     {
-        return $this->then(new Common\IsString, ...$validations);
+        return $this->then(new Types\IsString, ...$validations);
     }
 
     public function array(callable ...$validations): self
     {
-        return $this->then(new Common\IsArray, ...$validations);
+        return $this->then(new Types\IsArray, ...$validations);
     }
 
     /**

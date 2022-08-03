@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Input;
+namespace App\Input\Description;
 
 use App\Input\Validation\VariadicInput;
 use App\Input\Validation\VariadicFactory;
 use App\Input\Validation\InvalidDataException;
 
 /**
- * @implements \IteratorAggregate<\App\Input\Isoform>
+ * @implements \IteratorAggregate<\App\Input\Description\Isoform>
  */
 final class IsoformList extends VariadicInput implements \IteratorAggregate, \JsonSerializable
 {
@@ -19,7 +19,7 @@ final class IsoformList extends VariadicInput implements \IteratorAggregate, \Js
     }
 
     /**
-     * @var \App\Input\Isoform[]
+     * @var \App\Input\Description\Isoform[]
      */
     public readonly array $isoforms;
 

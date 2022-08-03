@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Input;
+namespace App\Input\Validation\Common;
 
 use App\Input\Validation\InvalidDataException;
 

@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Input;
+namespace App\Input\Description;
 
 use App\Input\Validation\VariadicInput;
 use App\Input\Validation\VariadicFactory;
 use App\Input\Validation\InvalidDataException;
 
 /**
- * @implements \IteratorAggregate<\App\Input\Alignment>
+ * @implements \IteratorAggregate<\App\Input\Description\Alignment>
  */
 final class AlignmentList extends VariadicInput implements \IteratorAggregate, \JsonSerializable
 {
@@ -19,7 +19,7 @@ final class AlignmentList extends VariadicInput implements \IteratorAggregate, \
     }
 
     /**
-     * @var \App\Input\Alignment[]
+     * @var \App\Input\Description\Alignment[]
      */
     public readonly array $alignments;
 

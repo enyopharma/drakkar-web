@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-namespace App\Input;
+namespace App\Input\Description;
 
 use App\Input\Validation\ArrayKey;
 use App\Input\Validation\ArrayInput;
 use App\Input\Validation\ArrayFactory;
+use App\Input\Validation\Common\DatabaseId;
+use App\Input\Validation\Common\NonEmptyString;
 
 final class Interactor extends ArrayInput
 {

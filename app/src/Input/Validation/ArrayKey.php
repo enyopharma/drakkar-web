@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Input\Validation;
 
-use App\Input\Validation\Common;
+use App\Input\Validation\Types;
 
 final class ArrayKey
 {
@@ -40,22 +40,22 @@ final class ArrayKey
 
     public function int(callable ...$validations): self
     {
-        return $this->then(new Common\IsInt, ...$validations);
+        return $this->then(new Types\IsInt, ...$validations);
     }
 
     public function float(callable ...$validations): self
     {
-        return $this->then(new Common\IsFloat, ...$validations);
+        return $this->then(new Types\IsFloat, ...$validations);
     }
 
     public function string(callable ...$validations): self
     {
-        return $this->then(new Common\IsString, ...$validations);
+        return $this->then(new Types\IsString, ...$validations);
     }
 
     public function array(callable ...$validations): self
     {
-        return $this->then(new Common\IsArray, ...$validations);
+        return $this->then(new Types\IsArray, ...$validations);
     }
 
     /**
@@ -95,7 +95,13 @@ final class ArrayKey
     private function result(array $data): Result
     {
         if (array_key_exists($this->key, $data)) {
-            return Result::success($data[$this->key]);
+            $value = $data[$this->key];
+
+            if (!$this->required && is_null($value)) {
+                return Result::final($this->default);
+            }
+
+            return Result::success($value);
         }
 
         if (!$this->required) {

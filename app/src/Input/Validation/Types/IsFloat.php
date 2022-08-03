@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Input\Validation\Common;
+namespace App\Input\Validation\Types;
 
 use App\Input\Validation\Result;
 

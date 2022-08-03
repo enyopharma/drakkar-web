@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Input;
+namespace App\Input\Description;
 
 use App\Input\Validation\VariadicInput;
 use App\Input\Validation\VariadicFactory;
 use App\Input\Validation\InvalidDataException;
 
 /**
- * @implements \IteratorAggregate<\App\Input\Occurrence>
+ * @implements \IteratorAggregate<\App\Input\Description\Occurrence>
  */
 final class OccurrenceList extends VariadicInput implements \IteratorAggregate, \JsonSerializable
 {
@@ -19,7 +19,7 @@ final class OccurrenceList extends VariadicInput implements \IteratorAggregate, 
     }
 
     /**
-     * @var \App\Input\Occurrence[]
+     * @var \App\Input\Description\Occurrence[]
      */
     public readonly array $occurrences;
 
