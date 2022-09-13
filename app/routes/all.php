@@ -73,10 +73,10 @@ return function (ContainerInterface $container) use ($classes): array {
         }
 
         foreach ($parsed->middlewares as $middleware) {
-            $route = $route->middleware(new ContainerFactory($container, $middleware->value));
+            $route = $route->middleware(fn () => $container->get($middleware->value));
         }
 
-        $routes[] = $route->route($methods, fn () => $endpoint(ContainerFactory::build($container, $class)));
+        $routes[] = $route->route($methods, fn () => $endpoint($container->get($class)));
     }
 
     return $routes;
@@ -112,51 +112,5 @@ final class ParsedEndpoint
         public readonly array $names,
         public readonly array $middlewares,
     ) {
-    }
-}
-
-final class ContainerFactory
-{
-    public static function build(ContainerInterface $container, string $class): object
-    {
-        $args = [];
-
-        $reflection = new ReflectionClass($class);
-
-        $constructor = $reflection->getConstructor();
-
-        foreach ($constructor->getParameters() as $parameter) {
-            if (!$parameter->hasType()) {
-                throw new LogicException('parameter has no type');
-            }
-
-            $type = $parameter->getType();
-
-            if (!$type instanceof ReflectionNamedType) {
-                throw new LogicException('parameter type is not named');
-            }
-
-            if ($type->isBuiltin()) {
-                throw new LogicException('parameter type is not a class name');
-            }
-
-            $id = (string) $type;
-
-            if (!$container->has($id)) {
-                throw new LogicException('parameter type is not defined in container');
-            }
-
-            $args[] = $container->get($id);
-        }
-        return new ($class)(...$args);
-    }
-
-    public function __construct(private ContainerInterface $container, private string $class)
-    {
-    }
-
-    public function __invoke(): object
-    {
-        return self::build($this->container, $this->class);
     }
 }

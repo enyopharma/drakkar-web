@@ -8,19 +8,8 @@ use App\Actions\DeleteDescriptionInterface;
 use App\Actions\UpdatePublicationStateInterface;
 
 return [
-    StorePeptideInterface::class => fn ($container) => new App\Actions\StorePeptideSql(
-        $container->get(PDO::class),
-    ),
-
-    StoreDescriptionInterface::class => fn ($container) => new App\Actions\StoreDescriptionSql(
-        $container->get(PDO::class),
-    ),
-
-    DeleteDescriptionInterface::class => fn ($container) => new App\Actions\DeleteDescriptionSql(
-        $container->get(PDO::class),
-    ),
-
-    UpdatePublicationStateInterface::class => fn ($container) => new App\Actions\UpdatePublicationStateSql(
-        $container->get(PDO::class),
-    ),
+    StorePeptideInterface::class => App\Actions\StorePeptideSql::class,
+    StoreDescriptionInterface::class => App\Actions\StoreDescriptionSql::class,
+    DeleteDescriptionInterface::class => App\Actions\DeleteDescriptionSql::class,
+    UpdatePublicationStateInterface::class => App\Actions\UpdatePublicationStateSql::class,
 ];

@@ -12,7 +12,7 @@ use Psr\Container\ContainerInterface;
  * @return Psr\Container\ContainerInterface
  */
 return function (string $env, bool $debug): ContainerInterface {
-    return Quanta\Container::factories(
+    return new Quanta\Container(
         new App\Sources\ArraySource(
             new App\Sources\PHPFileSource(__DIR__ . '/../factories/*.php'),
         ),

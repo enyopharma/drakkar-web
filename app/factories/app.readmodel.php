@@ -14,43 +14,14 @@ use App\ReadModel\PublicationViewInterface;
 use App\ReadModel\DescriptionViewInterface;
 
 return [
-    RunViewInterface::class => fn ($container) => new App\ReadModel\RunViewSql(
-        $container->get(PDO::class),
-    ),
-
-    FormViewInterface::class => fn ($container) => new App\ReadModel\FormViewSql(
-        $container->get(PDO::class),
-    ),
-
-    AssociationViewInterface::class => fn ($container) => new App\ReadModel\AssociationViewSql(
-        $container->get(PDO::class),
-    ),
-
-    PublicationViewInterface::class => fn ($container) => new App\ReadModel\PublicationViewSql(
-        $container->get(PDO::class),
-    ),
-
-    DescriptionViewInterface::class => fn ($container) => new App\ReadModel\DescriptionViewSql(
-        $container->get(PDO::class),
-    ),
-
-    MethodViewInterface::class => fn ($container) => new App\ReadModel\MethodViewSql(
-        $container->get(PDO::class),
-    ),
-
-    ProteinViewInterface::class => fn ($container) => new App\ReadModel\ProteinViewSql(
-        $container->get(PDO::class),
-    ),
-
-    PeptideViewInterface::class => fn ($container) => new App\ReadModel\PeptideViewSql(
-        $container->get(PDO::class),
-    ),
-
-    TaxonViewInterface::class => fn ($container) => new App\ReadModel\TaxonViewSql(
-        $container->get(PDO::class),
-    ),
-
-    DatasetViewInterface::class => fn ($container) => new App\ReadModel\DatasetViewSql(
-        $container->get(PDO::class),
-    ),
+    RunViewInterface::class => App\ReadModel\RunViewSql::class,
+    FormViewInterface::class => App\ReadModel\FormViewSql::class,
+    AssociationViewInterface::class => App\ReadModel\AssociationViewSql::class,
+    PublicationViewInterface::class => App\ReadModel\PublicationViewSql::class,
+    DescriptionViewInterface::class => App\ReadModel\DescriptionViewSql::class,
+    MethodViewInterface::class => App\ReadModel\MethodViewSql::class,
+    ProteinViewInterface::class => App\ReadModel\ProteinViewSql::class,
+    PeptideViewInterface::class => App\ReadModel\PeptideViewSql::class,
+    TaxonViewInterface::class => App\ReadModel\TaxonViewSql::class,
+    DatasetViewInterface::class => App\ReadModel\DatasetViewSql::class,
 ];

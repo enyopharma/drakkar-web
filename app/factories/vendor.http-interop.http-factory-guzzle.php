@@ -7,7 +7,7 @@ use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
 return [
-    UriFactoryInterface::class => fn () => new Http\Factory\Guzzle\UriFactory,
-    StreamFactoryInterface::class => fn () => new Http\Factory\Guzzle\StreamFactory,
-    ResponseFactoryInterface::class => fn () => new Http\Factory\Guzzle\ResponseFactory,
+    UriFactoryInterface::class => Http\Factory\Guzzle\UriFactory::class,
+    StreamFactoryInterface::class => Http\Factory\Guzzle\StreamFactory::class,
+    ResponseFactoryInterface::class => Http\Factory\Guzzle\ResponseFactory::class,
 ];

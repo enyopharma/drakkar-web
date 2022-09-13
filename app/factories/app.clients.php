@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Predis\Client;
 
 return [
-    PDO::class => fn ($container) => new PDO(
+    PDO::class => fn () => new PDO(
         vsprintf('pgsql:host=%s;port=%s;dbname=%s', [
             $_ENV['DB_HOSTNAME'] ?? 'localhost',
             $_ENV['DB_PORT'] ?? '5432',
@@ -19,7 +19,7 @@ return [
         ],
     ),
 
-    Client::class => fn ($container) => new Client([
+    Client::class => fn () => new Client([
         'scheme' => $_ENV['REDIS_SCHEME'] ?? 'tcp',
         'host' => $_ENV['REDIS_HOST'] ?? 'localhost',
         'port' => $_ENV['REDIS_PORT'] ?? '6379',
