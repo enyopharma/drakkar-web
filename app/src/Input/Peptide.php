@@ -20,13 +20,6 @@ use App\Input\Peptide\Hotspots;
 
 final class Peptide extends AbstractInput
 {
-    public static function fromRequest(ServerRequestInterface $request): self
-    {
-        $data = (array) $request->getParsedBody();
-
-        return self::from($data);
-    }
-
     protected static function validation(Factory $factory, Validation $v): Factory
     {
         return $factory->validation(

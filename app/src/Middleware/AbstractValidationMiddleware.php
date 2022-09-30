@@ -20,14 +20,16 @@ abstract class AbstractValidationMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $factory = [$this->class, 'fromRequest'];
+        $factory = [$this->class, 'from'];
 
         if (!is_callable($factory)) {
-            throw new \LogicException('The given class name must have a static function fromRequest');
+            throw new \LogicException('The given class name must have a static function from');
         }
 
+        $data = (array) $request->getParsedBody();
+
         try {
-            $input = $factory($request);
+            $input = $factory($data);
         } catch (InvalidDataException $e) {
             return $this->failure($e);
         }
