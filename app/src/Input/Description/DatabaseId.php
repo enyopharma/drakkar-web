@@ -6,6 +6,6 @@ namespace App\Input\Description;
 
 use Quanta\Validation\Types\StrictlyPositiveInteger;
 
-final class Position extends StrictlyPositiveInteger
+final class DatabaseId extends StrictlyPositiveInteger
 {
 }

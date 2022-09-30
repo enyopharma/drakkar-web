@@ -4,31 +4,36 @@ declare(strict_types=1);
 
 namespace App\Input\Description;
 
-use App\Input\Validation\ArrayKey;
-use App\Input\Validation\ArrayInput;
-use App\Input\Validation\ArrayFactory;
-use App\Input\Validation\InvalidDataException;
+use Quanta\Validation;
+use Quanta\Validation\Error;
+use Quanta\Validation\Factory;
+use Quanta\Validation\AbstractInput;
+use Quanta\Validation\InvalidDataException;
 
-final class Coordinates extends ArrayInput
+final class Coordinates extends AbstractInput
 {
     const MIN_LENGTH = 4;
 
-    protected static function validation(ArrayFactory $factory): ArrayFactory
+    protected static function validation(Factory $factory, Validation $v): Factory
     {
-        return $factory->validators(
-            ArrayKey::required('start')->int([Position::class, 'from']),
-            ArrayKey::required('stop')->int([Position::class, 'from']),
+        return $factory->validation(
+            $v->key('start')->int(Position::class),
+            $v->key('stop')->int(Position::class),
         );
     }
 
     public function __construct(public readonly Position $start, public readonly Position $stop)
     {
-        if ($start->value > $stop->value) {
-            throw InvalidDataException::error('start must be smaller than stop');
+        if ($start->value() > $stop->value()) {
+            throw new InvalidDataException(
+                Error::from('start must be smaller than stop'),
+            );
         }
 
-        if ($this->stop->value - $this->start->value + 1 < self::MIN_LENGTH) {
-            throw InvalidDataException::error('length must be at least %s', self::MIN_LENGTH);
+        if ($this->stop->value() - $this->start->value() + 1 < self::MIN_LENGTH) {
+            throw new InvalidDataException(
+                Error::from('length must be at least %s', ['min' => self::MIN_LENGTH]),
+            );
         }
     }
 }

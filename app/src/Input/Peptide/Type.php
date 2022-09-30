@@ -4,25 +4,22 @@ declare(strict_types=1);
 
 namespace App\Input\Peptide;
 
+use Quanta\Validation\Error;
+use Quanta\Validation\InvalidDataException;
+use Quanta\Validation\Types\AbstractString;
+
 use App\Assertions\ProteinType;
 
-use App\Input\Validation\InvalidDataException;
-
-final class Type
+final class Type extends AbstractString
 {
-    public static function from(string $value): self
-    {
-        return new self($value);
-    }
-
-    public function __construct(public readonly string $value)
+    public function __construct(string $value)
     {
         if (!ProteinType::isValid($value)) {
-            throw InvalidDataException::error(
-                '%%s must be either \'%s\' or \'%s\'',
-                ProteinType::H,
-                ProteinType::V,
+            throw new InvalidDataException(
+                Error::from('{key} must be either \'%s\' or \'%s\'', [ProteinType::H, ProteinType::V]),
             );
         }
+
+        parent::__construct($value);
     }
 }

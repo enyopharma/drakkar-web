@@ -4,35 +4,35 @@ declare(strict_types=1);
 
 namespace App\Input\Peptide;
 
-use App\Input\Validation\Error;
-use App\Input\Validation\InvalidDataException;
+use Quanta\Validation\Error;
+use Quanta\Validation\InvalidDataException;
 
 final class Hotspots
 {
-    public static function from(array $value): self
-    {
-        return new self($value);
-    }
-
-    public function __construct(public readonly array $value)
+    public function __construct(private array $data)
     {
         $errors = [];
 
-        $allpos = array_keys($value);
+        $allpos = array_keys($data);
         $intpos = array_map('is_int', $allpos);
 
         if (count($intpos) < count($allpos)) {
-            $errors[] = Error::from('%%s positions must be numeric');
+            $errors[] = Error::from('{key} positions must be numeric');
         }
 
-        foreach ($value as $pos => $text) {
+        foreach ($data as $pos => $text) {
             if (is_int($pos) && !is_string($text)) {
-                $errors[] = Error::from('%%s pos %s description must be a string', $pos);
+                $errors[] = Error::from('{key} pos %s description must be a string', ['pos' => $pos]);
             }
         }
 
         if (count($errors) > 0) {
             throw new InvalidDataException(...$errors);
         }
+    }
+
+    public function data(): array
+    {
+        return $this->data;
     }
 }

@@ -6,18 +6,19 @@ namespace App\Input;
 
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\Input\Validation\ArrayKey;
-use App\Input\Validation\ArrayInput;
-use App\Input\Validation\ArrayFactory;
+use Quanta\Validation;
+use Quanta\Validation\Error;
+use Quanta\Validation\Factory;
+use Quanta\Validation\AbstractInput;
+use Quanta\Validation\InvalidDataException;
 
 use App\Input\Peptide\Type;
 use App\Input\Peptide\Sequence;
 use App\Input\Peptide\Affinity;
 use App\Input\Peptide\Methods;
 use App\Input\Peptide\Hotspots;
-use App\Input\Validation\InvalidDataException;
 
-final class Peptide extends ArrayInput
+final class Peptide extends AbstractInput
 {
     public static function fromRequest(ServerRequestInterface $request): self
     {
@@ -26,17 +27,17 @@ final class Peptide extends ArrayInput
         return self::from($data);
     }
 
-    protected static function validation(ArrayFactory $factory): ArrayFactory
+    protected static function validation(Factory $factory, Validation $v): Factory
     {
-        return $factory->validators(
-            ArrayKey::required('type')->string([Type::class, 'from']),
-            ArrayKey::required('sequence')->string([Sequence::class, 'from']),
-            ArrayKey::required('cter')->string(),
-            ArrayKey::required('nter')->string(),
-            ArrayKey::required('affinity')->array([Affinity::class, 'from']),
-            ArrayKey::required('hotspots')->array([Hotspots::class, 'from']),
-            ArrayKey::required('methods')->array([Methods::class, 'from']),
-            ArrayKey::required('info')->string(),
+        return $factory->validation(
+            $v->key('type')->string(Type::class),
+            $v->key('sequence')->string(Sequence::class),
+            $v->key('cter')->string(),
+            $v->key('nter')->string(),
+            $v->key('affinity')->array(Affinity::class),
+            $v->key('hotspots')->array(Hotspots::class),
+            $v->key('methods')->array(Methods::class),
+            $v->key('info')->string(),
         );
     }
 
@@ -50,9 +51,11 @@ final class Peptide extends ArrayInput
         public readonly Methods $methods,
         public readonly string $info,
     ) {
-        foreach (array_keys($hotspots->value) as $pos) {
-            if ($pos >= strlen($this->sequence->value)) {
-                throw InvalidDataException::error('Hotspot position cant be outsite sequence');
+        foreach (array_keys($hotspots->data()) as $pos) {
+            if ($pos >= strlen($this->sequence->value())) {
+                throw new InvalidDataException(
+                    Error::from('Hotspot position cannot be outsite sequence'),
+                );
             }
         }
     }
@@ -63,7 +66,7 @@ final class Peptide extends ArrayInput
             'cter' => $this->cter,
             'nter' => $this->nter,
             'affinity' => $this->affinity->data(),
-            'hotspots' => $this->hotspots->value,
+            'hotspots' => $this->hotspots->data(),
             'methods' => $this->methods->data(),
             'info' => $this->info,
         ];

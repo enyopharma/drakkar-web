@@ -6,15 +6,15 @@ namespace App\Input;
 
 use Psr\Http\Message\ServerRequestInterface;
 
-use App\Input\Validation\ArrayKey;
-use App\Input\Validation\ArrayInput;
-use App\Input\Validation\ArrayFactory;
+use Quanta\Validation;
+use Quanta\Validation\Factory;
+use Quanta\Validation\AbstractInput;
 
-use App\Input\Common\PositiveInteger;
 use App\Input\Description\StableId;
+use App\Input\Description\DatabaseId;
 use App\Input\Description\Interactor;
 
-final class Description extends ArrayInput
+final class Description extends AbstractInput
 {
     public static function fromRequest(ServerRequestInterface $request): self
     {
@@ -23,19 +23,19 @@ final class Description extends ArrayInput
         return self::from($data);
     }
 
-    protected static function validation(ArrayFactory $factory): ArrayFactory
+    protected static function validation(Factory $factory, Validation $v): Factory
     {
-        return $factory->validators(
-            ArrayKey::required('stable_id')->string([StableId::class, 'from']),
-            ArrayKey::required('method_id')->int([PositiveInteger::class, 'from']),
-            ArrayKey::required('interactor1')->array([Interactor::class, 'from']),
-            ArrayKey::required('interactor2')->array([Interactor::class, 'from']),
+        return $factory->validation(
+            $v->key('stable_id')->string(StableId::class),
+            $v->key('method_id')->int(DatabaseId::class),
+            $v->key('interactor1')->array(Interactor::class),
+            $v->key('interactor2')->array(Interactor::class),
         );
     }
 
     public function __construct(
         public readonly StableId $stable_id,
-        public readonly PositiveInteger $method_id,
+        public readonly DatabaseId $method_id,
         public readonly Interactor $interactor1,
         public readonly Interactor $interactor2,
     ) {

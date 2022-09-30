@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Input\Description;
 
-use App\Input\Validation\ArrayKey;
-use App\Input\Validation\ArrayFactory;
-use App\Input\Validation\ArrayInput;
+use Quanta\Validation;
+use Quanta\Validation\Factory;
+use Quanta\Validation\AbstractInput;
 
-final class Occurrence extends ArrayInput implements \JsonSerializable
+final class Occurrence extends AbstractInput implements \JsonSerializable
 {
-    protected static function validation(ArrayFactory $factory): ArrayFactory
+    protected static function validation(Factory $factory, Validation $v): Factory
     {
-        return $factory->validators(
-            [Coordinates::class, 'from'],
-            ArrayKey::required('identity')->float([Identity::class, 'from']),
+        return $factory->validation(
+            $v->rule(Coordinates::class),
+            $v->key('identity')->float(Identity::class),
         );
     }
 
@@ -29,20 +29,20 @@ final class Occurrence extends ArrayInput implements \JsonSerializable
      */
     public function xy(): array
     {
-        return [$this->coordinates->start->value, $this->coordinates->stop->value];
+        return [$this->coordinates->start->value(), $this->coordinates->stop->value()];
     }
 
     public function length(): int
     {
-        return $this->coordinates->stop->value - $this->coordinates->start->value + 1;
+        return $this->coordinates->stop->value() - $this->coordinates->start->value() + 1;
     }
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): array
     {
         return [
-            'start' => $this->coordinates->start->value,
-            'stop' => $this->coordinates->stop->value,
-            'identity' => $this->identity->value,
+            'start' => $this->coordinates->start,
+            'stop' => $this->coordinates->stop,
+            'identity' => $this->identity,
         ];
     }
 }

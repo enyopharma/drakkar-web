@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace App\Actions;
 
 use App\Input\Description;
+use App\Input\Description\Alignment;
 use App\Input\Description\Interactor;
-use App\Input\Description\AlignmentList;
 
 use App\Assertions\RunType;
 use App\Assertions\ProteinType;
@@ -86,8 +86,8 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
     public function store(int $run_id, int $pmid, Description $description): StoreDescriptionResult
     {
         // exctract data from the input.
-        $stable_id = $description->stable_id->value;
-        $method_id = $description->method_id->value;
+        $stable_id = $description->stable_id->value();
+        $method_id = $description->method_id->value();
         $interactor1 = $description->interactor1;
         $interactor2 = $description->interactor2;
 
@@ -141,12 +141,12 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
         $select_descriptions_sth->execute([
             $association_id,
             $method_id,
-            $interactor1->protein_id->value,
-            $interactor1->coordinates->start->value,
-            $interactor1->coordinates->stop->value,
-            $interactor2->protein_id->value,
-            $interactor2->coordinates->start->value,
-            $interactor2->coordinates->stop->value,
+            $interactor1->protein_id->value(),
+            $interactor1->coordinates->start->value(),
+            $interactor1->coordinates->stop->value(),
+            $interactor2->protein_id->value(),
+            $interactor2->coordinates->start->value(),
+            $interactor2->coordinates->stop->value(),
         ]);
 
         while ($description = $select_descriptions_sth->fetch()) {
@@ -154,8 +154,8 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
                 return true;
             }
 
-            $same1 = $interactor1->mapping->isSame(json_decode($description['mapping1'], true));
-            $same2 = $interactor2->mapping->isSame(json_decode($description['mapping2'], true));
+            $same1 = $interactor1->hasSameMapping(json_decode($description['mapping1'], true));
+            $same2 = $interactor2->hasSameMapping(json_decode($description['mapping2'], true));
 
             if ($same1 && $same2) {
                 return true;
@@ -182,17 +182,17 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
                     'EY' . strtoupper(bin2hex(random_bytes(4))),
                     1,
                     $association_id,
-                    $description->method_id->value,
-                    $description->interactor1->protein_id->value,
-                    $description->interactor1->name->value,
-                    $description->interactor1->coordinates->start->value,
-                    $description->interactor1->coordinates->stop->value,
-                    json_encode($description->interactor1->mapping, JSON_THROW_ON_ERROR),
-                    $description->interactor2->protein_id->value,
-                    $description->interactor2->name->value,
-                    $description->interactor2->coordinates->start->value,
-                    $description->interactor2->coordinates->stop->value,
-                    json_encode($description->interactor2->mapping, JSON_THROW_ON_ERROR),
+                    $description->method_id->value(),
+                    $description->interactor1->protein_id->value(),
+                    $description->interactor1->name->value(),
+                    $description->interactor1->coordinates->start->value(),
+                    $description->interactor1->coordinates->stop->value(),
+                    json_encode($description->interactor1->alignments, JSON_THROW_ON_ERROR),
+                    $description->interactor2->protein_id->value(),
+                    $description->interactor2->name->value(),
+                    $description->interactor2->coordinates->start->value(),
+                    $description->interactor2->coordinates->stop->value(),
+                    json_encode($description->interactor2->alignments, JSON_THROW_ON_ERROR),
                 ]);
             } catch (\PDOException $e) {
                 $inserted = false;
@@ -214,7 +214,7 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
 
     private function insertNewVersion(int $association_id, Description $description): StoreDescriptionResult
     {
-        $stable_id = $description->stable_id->value;
+        $stable_id = $description->stable_id->value();
 
         $update_descriptions_sth = $this->pdo->prepare(self::UPDATE_DESCRIPTIONS_SQL);
         $select_max_version_sth = $this->pdo->prepare(self::SELECT_MAX_VERSION_SQL);
@@ -233,17 +233,17 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
                 $stable_id,
                 $max_version + 1,
                 $association_id,
-                $description->method_id->value,
-                $description->interactor1->protein_id->value,
-                $description->interactor1->name->value,
-                $description->interactor1->coordinates->start->value,
-                $description->interactor1->coordinates->stop->value,
-                json_encode($description->interactor1->mapping, JSON_THROW_ON_ERROR),
-                $description->interactor2->protein_id->value,
-                $description->interactor2->name->value,
-                $description->interactor2->coordinates->start->value,
-                $description->interactor2->coordinates->stop->value,
-                json_encode($description->interactor2->mapping, JSON_THROW_ON_ERROR),
+                $description->method_id->value(),
+                $description->interactor1->protein_id->value(),
+                $description->interactor1->name->value(),
+                $description->interactor1->coordinates->start->value(),
+                $description->interactor1->coordinates->stop->value(),
+                json_encode($description->interactor1->alignments, JSON_THROW_ON_ERROR),
+                $description->interactor2->protein_id->value(),
+                $description->interactor2->name->value(),
+                $description->interactor2->coordinates->start->value(),
+                $description->interactor2->coordinates->stop->value(),
+                json_encode($description->interactor2->alignments, JSON_THROW_ON_ERROR),
             ]);
         } catch (\PDOException) {
             $this->pdo->rollback();
@@ -300,8 +300,8 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
         $type1 = ProteinType::H;
         $type2 = $run_type == RunType::HH ? ProteinType::H : ProteinType::V;
 
-        $protein1_id = $interactor1->protein_id->value;
-        $protein2_id = $interactor2->protein_id->value;
+        $protein1_id = $interactor1->protein_id->value();
+        $protein2_id = $interactor2->protein_id->value();
 
         $select_protein_sth = $this->pdo->prepare(self::SELECT_PROTEIN_SQL);
 
@@ -350,9 +350,9 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
     {
         $errors = [];
 
-        $name = $interactor->name->value;
-        $start = $interactor->coordinates->start->value;
-        $stop = $interactor->coordinates->stop->value;
+        $name = $interactor->name->value();
+        $start = $interactor->coordinates->start->value();
+        $stop = $interactor->coordinates->stop->value();
 
         if ($protein['name'] != $name) {
             $errors[] = vsprintf('invalid name \'%s\' for interactor %s (human, %s) - \'%s\' expected', [
@@ -379,14 +379,14 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
 
         $sequences = json_decode($protein['sequences'], true);
 
-        return $this->validateMapping($n, $sequences, $interactor->mapping);
+        return $this->validateMapping($n, $sequences, ...$interactor->alignments);
     }
 
     private function validateVProtein(int $n, array $protein, Interactor $interactor): array
     {
-        $name = $interactor->name->value;
-        $start = $interactor->coordinates->start->value;
-        $stop = $interactor->coordinates->stop->value;
+        $name = $interactor->name->value();
+        $start = $interactor->coordinates->start->value();
+        $stop = $interactor->coordinates->stop->value();
 
         if ($stop > strlen($protein['sequence'])) {
             return [sprintf('coordinates of interactor %s must be inside the protein sequence', $n)];
@@ -436,16 +436,16 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
 
         $sequences[$accession] = substr($sequences[$accession], $start - 1, $stop - $start + 1);
 
-        return $this->validateMapping($n, $sequences, $interactor->mapping);
+        return $this->validateMapping($n, $sequences, ...$interactor->alignments);
     }
 
-    private function validateMapping(int $n, array $sequences, AlignmentList $mapping): array
+    private function validateMapping(int $n, array $sequences, Alignment ...$alignments): array
     {
         $errors = [];
 
-        foreach ($mapping as $alignment) {
+        foreach ($alignments as $alignment) {
             foreach ($alignment->isoforms as $isoform) {
-                $accession = $isoform->accession->value;
+                $accession = $isoform->accession->value();
 
                 if (!array_key_exists($accession, $sequences)) {
                     $errors[] = sprintf('interactor %s - no isoform with accession %s', $n, $accession);
@@ -453,7 +453,7 @@ final class StoreDescriptionSql implements StoreDescriptionInterface
                     $sequence = $sequences[$accession];
 
                     foreach ($isoform->occurrences as $occurrence) {
-                        $stop = $occurrence->coordinates->stop->value;
+                        $stop = $occurrence->coordinates->stop->value();
 
                         if ($stop > strlen($sequence)) {
                             $errors[] = sprintf('interactor %s - mapping occurrence longer than sequence %s', $n, $accession);

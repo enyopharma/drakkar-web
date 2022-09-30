@@ -4,35 +4,50 @@ declare(strict_types=1);
 
 namespace App\Input\Description;
 
-use App\Input\Validation\Error;
-use App\Input\Validation\ArrayKey;
-use App\Input\Validation\ArrayInput;
-use App\Input\Validation\ArrayFactory;
-use App\Input\Validation\InvalidDataException;
+use Quanta\Validation;
+use Quanta\Validation\Error;
+use Quanta\Validation\Factory;
+use Quanta\Validation\AbstractInput;
+use Quanta\Validation\InvalidDataException;
 
-final class Alignment extends ArrayInput implements \JsonSerializable
+final class Alignment extends AbstractInput implements \JsonSerializable
 {
-    protected static function validation(ArrayFactory $factory): ArrayFactory
+    protected static function validation(Factory $factory, Validation $v): Factory
     {
-        return $factory->validators(
-            ArrayKey::required('sequence')->string([Mapping::class, 'from']),
-            ArrayKey::required('isoforms')->array([IsoformList::class, 'from']),
+        return $factory->validation(
+            $v->key('sequence')->string(Mapping::class),
+            $v->key('isoforms')->variadic(Isoform::class),
         );
     }
 
+    /**
+     * @var \App\Input\Description\Isoform[]
+     */
+    public readonly array $isoforms;
+
     public function __construct(
         public readonly Mapping $sequence,
-        public readonly IsoformList $isoforms,
+        Isoform ...$isoforms,
     ) {
         $errors = [];
+
+        if (count($isoforms) == 0) {
+            $errors[] = Error::from('{key} must not be empty');
+        }
+
+        $accessions = array_map(fn ($i) => $i->accession->value(), $isoforms);
+
+        if (count($accessions) > count(array_unique($accessions))) {
+            $errors[] = Error::from('{key} accessions must be unique');
+        }
 
         foreach ($isoforms as $i => $isoform) {
             foreach ($isoform->occurrences as $o => $occurrence) {
                 $length = $occurrence->length();
 
-                if ($length < strlen($sequence->value)) {
-                    $errors[] = Error::from('%%s must be greater than or equal to sequence length')
-                        ->nest('isoforms', (string) $i, 'occurrences', (string) $o);
+                if ($length < strlen($sequence->value())) {
+                    $errors[] = Error::from('{key} must be greater than or equal to sequence length')
+                        ->nested('isoforms', (string) $i, 'occurrences', (string) $o);
                 }
             }
         }
@@ -40,12 +55,14 @@ final class Alignment extends ArrayInput implements \JsonSerializable
         if (count($errors) > 0) {
             throw new InvalidDataException(...$errors);
         }
+
+        $this->isoforms = $isoforms;
     }
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): array
     {
         return [
-            'sequence' => $this->sequence->value,
+            'sequence' => $this->sequence,
             'isoforms' => $this->isoforms,
         ];
     }

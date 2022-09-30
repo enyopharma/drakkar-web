@@ -10,7 +10,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 
-use App\Input\Validation\InvalidDataException;
+use Quanta\Validation\InvalidDataException;
 
 abstract class AbstractValidationMiddleware implements MiddlewareInterface
 {

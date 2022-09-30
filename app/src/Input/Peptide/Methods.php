@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace App\Input\Peptide;
 
-use App\Input\Validation\ArrayKey;
-use App\Input\Validation\ArrayInput;
-use App\Input\Validation\ArrayFactory;
+use Quanta\Validation;
+use Quanta\Validation\Factory;
+use Quanta\Validation\AbstractInput;
 
-final class Methods extends ArrayInput
+final class Methods extends AbstractInput
 {
-    protected static function validation(ArrayFactory $factory): ArrayFactory
+    protected static function validation(Factory $factory, Validation $v): Factory
     {
-        return $factory->validators(
-            ArrayKey::required('expression')->string(),
-            ArrayKey::required('interaction')->string(),
+        return $factory->validation(
+            $v->key('expression')->string(),
+            $v->key('interaction')->string(),
         );
     }
 
