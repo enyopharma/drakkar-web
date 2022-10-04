@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "27da51952a9897579ba5cac11019aebf",
+    "content-hash": "489a1afc3afc7851d0108b7b794114de",
     "packages": [
         {
             "name": "filp/whoops",
@@ -1512,16 +1512,16 @@
         },
         {
             "name": "quanta/validation",
-            "version": "0.9.1",
+            "version": "0.10",
             "source": {
                 "type": "git",
                 "url": "https://github.com/quantaphp/validation.git",
-                "reference": "88cdb0a6f5e4efdb1e5d976e7747f714d648d6c1"
+                "reference": "62ce96ec9271f4fb33f8ec5c52b2d5ced408c51a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/quantaphp/validation/zipball/88cdb0a6f5e4efdb1e5d976e7747f714d648d6c1",
-                "reference": "88cdb0a6f5e4efdb1e5d976e7747f714d648d6c1",
+                "url": "https://api.github.com/repos/quantaphp/validation/zipball/62ce96ec9271f4fb33f8ec5c52b2d5ced408c51a",
+                "reference": "62ce96ec9271f4fb33f8ec5c52b2d5ced408c51a",
                 "shasum": ""
             },
             "require-dev": {
@@ -1554,7 +1554,7 @@
                 "issues": "https://github.com/quantaphp/validation/issues",
                 "source": "https://github.com/quantaphp/validation"
             },
-            "time": "2022-09-30T12:55:07+00:00"
+            "time": "2022-10-04T13:12:21+00:00"
         },
         {
             "name": "ralouphie/getallheaders",

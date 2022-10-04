@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\Input;
 
-use Psr\Http\Message\ServerRequestInterface;
-
 use Quanta\Validation;
 use Quanta\Validation\Factory;
 use Quanta\Validation\AbstractInput;

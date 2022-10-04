@@ -4,22 +4,12 @@ declare(strict_types=1);
 
 namespace App\Input\Description;
 
-use Quanta\Validation\Error;
-use Quanta\Validation\InvalidDataException;
-use Quanta\Validation\Types\AbstractString;
+use Quanta\Validation\Types\AbstractStringMatching;
 
-final class Accession extends AbstractString
+final class Accession extends AbstractStringMatching
 {
-    const PATTERN = '/^[A-Z0-9]{6,10}(-[0-9]+)?$/';
-
-    public function __construct(string $value)
+    protected static function pattern(): string
     {
-        if (preg_match(self::PATTERN, $value) === 0) {
-            throw new InvalidDataException(
-                Error::from('{key} must match %s', ['pattern' => self::PATTERN]),
-            );
-        }
-
-        parent::__construct($value);
+        return '/^[A-Z0-9]{6,10}(-[0-9]+)?$/';
     }
 }

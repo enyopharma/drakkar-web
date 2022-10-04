@@ -32,7 +32,7 @@
         "quanta/http-route": "^0.2.0",
         "quanta/http-routing": "^0.3",
         "quanta/http-url-generator": "^0.1.1",
-        "quanta/validation": "^0.9",
+        "quanta/validation": "^0.10",
         "symfony/asset": "^5.1",
         "symfony/console": "^5.1",
         "symfony/dotenv": "^5.1"
