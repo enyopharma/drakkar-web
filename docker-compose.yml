@@ -1,41 +1,49 @@
-version: '3'
+version: "3"
 services:
-    frontend:
-        build: ./frontend
-        depends_on:
-            - app
-            - socket
-    app:
-        build: ./app
-        environment:
-            - APP_ENV=development
-            - APP_DEBUG=true
-            - DB_HOSTNAME=host.docker.internal
-            - DB_DATABASE=${DB_DATABASE}
-            - DB_USERNAME=${DB_USERNAME}
-            - DB_PASSWORD=${DB_PASSWORD}
-            - DB_PORT=${DB_PORT}
-            - REDIS_SCHEME=${REDIS_SCHEME}
-            - REDIS_HOST=${REDIS_HOST}
-            - REDIS_PORT=${REDIS_PORT}
-            - SCIHUB_HOST=${SCIHUB_HOST}
-        extra_hosts:
-            - host.docker.internal:host-gateway
-    socket:
-        build: ./socket
-        depends_on:
-            - redis
-        environment:
-            - REDIS_SCHEME=${REDIS_SCHEME}
-            - REDIS_HOST=${REDIS_HOST}
-            - REDIS_PORT=${REDIS_PORT}
-    alignment:
-        build: ./workers/alignment
-        depends_on:
-            - redis
-        environment:
-            - REDIS_SCHEME=${REDIS_SCHEME}
-            - REDIS_HOST=${REDIS_HOST}
-            - REDIS_PORT=${REDIS_PORT}
-    redis:
-        image: redis
+  frontend:
+    build: ./frontend
+    volumes:
+      - app:/var/www/html:ro
+    ports:
+      - 80:80
+    depends_on:
+      - app
+      - socket
+  app:
+    build: ./app
+    volumes:
+      - app:/var/www/html:rw
+    environment:
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - DB_HOSTNAME=${DB_HOSTNAME}
+      - DB_DATABASE=${DB_DATABASE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_PORT=${DB_PORT}
+      - REDIS_SCHEME=${REDIS_SCHEME}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - SCIHUB_HOST=${SCIHUB_HOST}
+    extra_hosts:
+      - host.docker.internal:host-gateway
+  socket:
+    build: ./socket
+    depends_on:
+      - redis
+    environment:
+      - REDIS_SCHEME=${REDIS_SCHEME}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+  alignment:
+    build: ./workers/alignment
+    depends_on:
+      - redis
+    environment:
+      - REDIS_SCHEME=${REDIS_SCHEME}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+  redis:
+    image: redis
+volumes:
+  app:
